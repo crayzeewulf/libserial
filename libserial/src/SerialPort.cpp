@@ -21,6 +21,14 @@
 #    include "SerialPort.h"
 #endif
 
+#ifndef _PosixSignalDispatcher_h_
+#    include "PosixSignalDispatcher.h"
+#endif
+
+#ifndef _PosixSignalHandler_h_
+#    include "PosixSignalHandler.h"
+#endif
+
 #ifndef _std_queue_INCLUDED_
 #    include <queue>
 #    define _std_queue_INCLUDED_
@@ -78,25 +86,9 @@ namespace {
     const std::string ERR_MSG_INVALID_PARITY    = "Invalid parity setting." ;
     const std::string ERR_MSG_INVALID_STOP_BITS = "Invalid number of stop bits." ;
     const std::string ERR_MSG_INVALID_FLOW_CONTROL = "Invalid flow control." ;
-
-    //
-    // :DEBUGGING: The asynchronous I/O implementation if for testing
-    // purpose only. The final design will have a signal dispatcher
-    // class. 
-    //     
-    void 
-    SignalHandler( int signalNumber ) ;
-                   
-    //
-    // :DEBUGGING: List of input buffers associated with a
-    // file descriptor. The signal handler dumps the incoming
-    // data into the corresponding buffer.
-    //
-    std::queue<unsigned char> sInputBuffer ;
-    int sFileDescriptor = -1 ;
 } ;
 
-class SerialPortImpl {
+class SerialPortImpl : public PosixSignalHandler {
 public:
     /**
      * Constructor.
@@ -225,6 +217,12 @@ public:
            const unsigned int   bufferSize )
         throw( SerialPort::NotOpen, 
                std::runtime_error ) ; 
+               
+    /*
+     * This method must be defined by all subclasses of PosixSignalHandler.
+     */
+    void
+    HandlePosixSignal(int signalNumber) ;
 private:
     /**
      * Name of the serial port. On POSIX systems this is the name of
@@ -253,7 +251,7 @@ private:
      * Circular buffer used to store the received data. This is done
      * asynchronously so we do not let tty buffer get filled. 
      */
-    // CircularBuffer<unsigned char> mInputBuffer ;
+    std::queue<unsigned char> mInputBuffer ;
     
     /**
      * Set the timeout for the next read to msTimeout milliseconds. If
@@ -544,26 +542,11 @@ SerialPortImpl::Open()
     if ( mFileDescriptor < 0 ) {
         throw SerialPort::OpenFailed( strerror(errno) )  ;
     }
-    //
-    // :DEBUGGING:
-    //
-    sFileDescriptor = mFileDescriptor ;
 
-    /*
-     * Attach a signal handler to be called whenever data is available
-     * at the serial port.
-     */
-    struct sigaction signal_handler_spec ;
-    signal_handler_spec.sa_handler = SignalHandler ;
-    sigemptyset( &signal_handler_spec.sa_mask ) ;
-    signal_handler_spec.sa_flags = 0 ;
-    signal_handler_spec.sa_restorer = NULL ;
-    if ( sigaction( SIGIO,
-                    &signal_handler_spec,
-                    NULL ) < 0 )
-    {
-        throw SerialPort::OpenFailed( strerror(errno) ) ;
-    }
+    
+    PosixSignalDispatcher& signal_dispatcher = PosixSignalDispatcher::Instance() ;
+    signal_dispatcher.AttachHandler( SIGIO,
+                                     *this ) ;
                            
     /*
      * Direct all SIGIO and SIGURG signals for the port to the current
@@ -659,6 +642,10 @@ SerialPortImpl::Close()
     if ( ! this->IsOpen() ) {
         throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
     }
+    //
+    PosixSignalDispatcher& signal_dispatcher = PosixSignalDispatcher::Instance() ;
+    signal_dispatcher.DetachHandler( SIGIO,
+                                     *this ) ;    
     //
     // Restore the old settings of the port. 
     //
@@ -1065,7 +1052,7 @@ SerialPortImpl::IsDataAvailable() const
     //
     // Check if any data is available in the input buffer.
     //
-    return ( sInputBuffer.size() > 0 ? true : false ) ;
+    return ( mInputBuffer.size() > 0 ? true : false ) ;
 }
 
 inline
@@ -1087,15 +1074,15 @@ SerialPortImpl::ReadByte(const unsigned int msTimeout)
     // :TODO: The msTimeout parameter is not used here yet. 
     // We need to implemented timeouts during reads.
     //
-    while( 0 == sInputBuffer.size() ) 
+    while( 0 == mInputBuffer.size() ) 
     {
         usleep( 1000 ) ;
     }
     //
     // Return the first byte and remove it from the queue.
     //
-    unsigned char next_char = sInputBuffer.front() ;
-    sInputBuffer.pop() ;
+    unsigned char next_char = mInputBuffer.front() ;
+    mInputBuffer.pop() ;
     return next_char ;
 }
 
@@ -1360,46 +1347,47 @@ SerialPortImpl::SetReadTimeout( const unsigned int msTimeout,
     return ;
 }
 
-namespace
+inline
+void 
+SerialPortImpl::HandlePosixSignal( int signalNumber )
 {
-    void 
-    SignalHandler( int signalNumber )
+    //
+    // We only want to deal with SIGIO signals here.
+    //
+    if ( SIGIO != signalNumber )
     {
-        //
-        // The file descriptor for the serial port.
-        //
-        int file_descriptor = sFileDescriptor ;
-        //
-        // Check if any data is available at the specified file 
-        // descriptor. 
-        //
-        int num_of_bytes_available = 0 ;
-        if ( ioctl( file_descriptor,
-                    FIONREAD, 
-                    &num_of_bytes_available ) < 0 ) {
-            /* 
-             * Ignore any errors and return immediately.
-             */
-            return ;
-        }
-        //
-        // If data is available, read all available data and shove 
-        // it into the corresponding input buffer. 
-        //
-        for(int i=0; i<num_of_bytes_available; ++i)
-        {
-            unsigned char next_byte ; 
-            if ( read( file_descriptor, 
-                       &next_byte,
-                       1 ) > 0 )
-            {
-                sInputBuffer.push( next_byte ) ;
-            }
-            else
-            {
-                break ;
-            }
-        }
         return ;
     }
-} ;
+    //
+    // Check if any data is available at the specified file 
+    // descriptor. 
+    //
+    int num_of_bytes_available = 0 ;
+    if ( ioctl( mFileDescriptor,
+                FIONREAD, 
+                &num_of_bytes_available ) < 0 ) {
+        /* 
+            * Ignore any errors and return immediately.
+            */
+        return ;
+    }
+    //
+    // If data is available, read all available data and shove 
+    // it into the corresponding input buffer. 
+    //
+    for(int i=0; i<num_of_bytes_available; ++i)
+    {
+        unsigned char next_byte ; 
+        if ( read( mFileDescriptor,
+                   &next_byte,
+                   1 ) > 0 )
+        {
+            mInputBuffer.push( next_byte ) ;
+        }
+        else
+        {
+            break ;
+        }
+    }
+    return ;
+}
