@@ -6,6 +6,11 @@
 #    define _std_string_INCLUDED_
 #endif
 
+#ifndef _std_vector_INCLUDED_
+#    include <vector>
+#    define _std_vector_INCLUDED_
+#endif
+
 #ifndef _std_stdexcept_INCLUDED_
 #    include <stdexcept>
 #    define _std_stdexcept_INCLUDED_
@@ -306,6 +311,36 @@ public:
                std::runtime_error ) ;
 
     /**
+     * Read the specified number of bytes from the serial port. The
+     * method will timeout if no data is received in the specified
+     * number of milliseconds (msTimeout). If msTimeout is 0, then
+     * this method will block till all requested bytes are
+     * received. If numOfBytes is zero, then this method will keep
+     * reading data till no more data is available at the serial
+     * port. In all cases, all read data is available in dataBuffer on
+     * return from this method.
+     */
+    typedef std::vector<unsigned char> DataBuffer ;
+    void
+    Read( DataBuffer&        dataBuffer,
+          const unsigned int numOfBytes = 0, 
+          const unsigned int msTimeout  = 0 ) 
+        throw( NotOpen, 
+               ReadTimeout,
+               std::runtime_error ) ;
+
+
+    /**
+     * Read a line of characters from the serial port.
+     */
+    const std::string 
+    ReadLine( const unsigned int msTimeout = 0,
+              const char         lineTerminator = '\n' ) 
+        throw( NotOpen, 
+               ReadTimeout,
+               std::runtime_error ) ;
+
+    /**
      * Send a single byte to the serial port. 
      *
      * @throw NotOpen Thrown if this method is called while the serial
@@ -313,6 +348,22 @@ public:
      */
     void 
     WriteByte(const unsigned char dataByte) 
+        throw( NotOpen, 
+               std::runtime_error ) ;
+
+    /**
+     * Write the data from the specified vector to the serial port. 
+     */
+    void 
+    Write(const DataBuffer& dataBuffer)
+        throw( NotOpen, 
+               std::runtime_error ) ;
+
+    /**
+     * Write a string to the serial port.
+     */
+    void
+    Write(const std::string& dataString) 
         throw( NotOpen, 
                std::runtime_error ) ;
 private:

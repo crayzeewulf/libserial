@@ -24,7 +24,7 @@ main( int    argc,
     //
     // Set the baud rate of the serial port.
     //
-    serial_port.SetBaudRate( SerialStreamBuf::BAUD_115200 ) ;
+    serial_port.SetBaudRate( SerialStreamBuf::BAUD_57600 ) ;
     if ( ! serial_port.good() ) {
         std::cerr << "Error: Could not set the baud rate." << std::endl ;
         exit(1) ;
@@ -75,9 +75,10 @@ main( int    argc,
     //
     // Keep reading data from serial port and print it to the screen.
     //
-    char ch ;
-    while( serial_port.get(ch) ) {
-        std::cerr.put(ch) ;
+    char next_byte ;
+    while( serial_port.get(next_byte) ) {
+        std::cerr << std::hex << (int)next_byte << " " ;
     }
+    std::cerr << std::endl ;
     return EXIT_SUCCESS ;
 }

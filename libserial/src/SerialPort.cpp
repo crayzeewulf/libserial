@@ -27,6 +27,10 @@
 #    define _std_cerrno_INCLUDED_
 #endif
 
+#ifndef _std_cassert_INCLUDED_
+#    include <cassert>
+#    define _std_cassert_INCLUDED_
+#endif
 
 namespace {
     //
@@ -149,9 +153,28 @@ public:
                std::runtime_error ) ;
 
     void
+    Read( SerialPort::DataBuffer& dataBuffer,
+          const unsigned int      numOfBytes, 
+          const unsigned int      msTimeout ) 
+        throw( SerialPort::NotOpen, 
+               SerialPort::ReadTimeout, 
+               std::runtime_error  ) ;
+        
+    void
     WriteByte( const unsigned char dataByte )
         throw( SerialPort::NotOpen,
                std::runtime_error ) ;
+
+    void 
+    SerialPortImpl::Write(const SerialPort::DataBuffer& dataBuffer)
+        throw( SerialPort::NotOpen, 
+               std::runtime_error ) ;
+
+    void 
+    SerialPortImpl::Write( const unsigned char* dataBuffer, 
+                           const unsigned int   bufferSize )
+        throw( SerialPort::NotOpen, 
+               std::runtime_error ) ; 
 private:
     /**
      * Name of the serial port. On POSIX systems this is the name of
@@ -175,6 +198,21 @@ private:
      * serial port is closed.
      */
     termios mOldPortSettings ;
+
+    /**
+     * Set the timeout for the next read to msTimeout milliseconds. If
+     * msTimeout is zero, then the reads will block until atleast
+     * numOfBytes bytes are received. 
+     *
+     * :TRICKY: This method does not check if the serial port is
+     * currently open. Hence, it should not be called without making
+     * sure that the serial port is open.
+     */
+    void SetReadTimeout( const unsigned int msTimeout,
+                         const unsigned int numOfBytes = 0 ) 
+        throw( std::invalid_argument, 
+               std::runtime_error ) ;
+    
 } ;
 
 SerialPort::SerialPort( const std::string& serialPortName ) :
@@ -341,6 +379,35 @@ SerialPort::ReadByte( const unsigned int msTimeout )
 }
 
 void
+SerialPort::Read( SerialPort::DataBuffer& dataBuffer, 
+                  const unsigned int      numOfBytes, 
+                  const unsigned int      msTimeout ) 
+    throw( NotOpen, 
+           ReadTimeout,
+           std::runtime_error ) 
+{
+    return mSerialPortImpl->Read( dataBuffer, 
+                                  numOfBytes, 
+                                  msTimeout ) ;
+}
+
+const std::string 
+SerialPort::ReadLine( const unsigned int msTimeout,
+                      const char         lineTerminator ) 
+    throw( NotOpen, 
+           ReadTimeout,
+           std::runtime_error ) 
+{
+    std::string result ;
+    char next_char = 0 ; 
+    do {
+        next_char = this->ReadByte( msTimeout ) ;
+        result += next_char ;
+    } while( next_char != lineTerminator ) ;
+    return result ;
+}
+
+void
 SerialPort::WriteByte( const unsigned char dataByte )
     throw( SerialPort::NotOpen,
            std::runtime_error )
@@ -348,6 +415,27 @@ SerialPort::WriteByte( const unsigned char dataByte )
     mSerialPortImpl->WriteByte( dataByte ) ;
     return ;
 } 
+
+
+void 
+SerialPort::Write(const DataBuffer& dataBuffer)
+    throw( NotOpen, 
+           std::runtime_error ) 
+{
+    mSerialPortImpl->Write( dataBuffer ) ;
+    return ;
+}
+
+void
+SerialPort::Write(const std::string& dataString) 
+    throw( NotOpen, 
+           std::runtime_error ) 
+{
+    mSerialPortImpl->Write( reinterpret_cast<const unsigned char*>(dataString.c_str()),
+                            dataString.length() ) ;
+    return ;
+}
+
 /* ------------------------------------------------------------ */
 inline
 SerialPortImpl::SerialPortImpl( const std::string& serialPortName ) :
@@ -391,7 +479,7 @@ SerialPortImpl::Open()
                             O_RDWR | O_NOCTTY ) ; 
     if ( mFileDescriptor < 0 ) {
         throw SerialPort::OpenFailed( strerror(errno) )  ;
-    }
+    } 
     /*
      * Save the current settings of the serial port so they can be
      * restored when the serial port is closed.
@@ -882,6 +970,30 @@ SerialPortImpl::ReadByte(const unsigned int msTimeout)
            SerialPort::ReadTimeout,
            std::runtime_error )
 {
+    SerialPort::DataBuffer data_buffer ; 
+    //
+    // Read a single byte. 
+    //
+    this->Read( data_buffer, 
+                1, 
+                msTimeout ) ;
+    //
+    // If the above Read() does not throw an exception, then we should
+    // have exactly one byte in data_buffer.
+    //
+    assert( 1 == data_buffer.size() ) ;
+    //
+    return data_buffer[0] ;
+}
+
+void
+SerialPortImpl::Read( SerialPort::DataBuffer& dataBuffer,
+                      const unsigned int      numOfBytes, 
+                      const unsigned int      msTimeout ) 
+    throw( SerialPort::NotOpen, 
+           SerialPort::ReadTimeout, 
+           std::runtime_error ) 
+{
     //
     // Make sure that the serial port is open. 
     //
@@ -889,66 +1001,149 @@ SerialPortImpl::ReadByte(const unsigned int msTimeout)
         throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
     }
     //
-    // Read the current serial port settings. 
-    //
-    termios port_settings ;
-    if ( tcgetattr( mFileDescriptor, 
-                    &port_settings ) < 0 ) {
-        throw std::runtime_error( strerror(errno) ) ;
-    }
-    //
-    // Wait till data is available if msTimeout is zero.
-    //
-    if ( 0 == msTimeout ) {
-        port_settings.c_cc[ VMIN ]  = 1 ;
-        port_settings.c_cc[ VTIME ] = 0 ;
+    dataBuffer.empty() ;
+    if ( 0 == numOfBytes ) {
+        //
+        // Read all available data.
+        //
+        while( this->IsDataAvailable() ) {
+            dataBuffer.push_back( ReadByte(msTimeout) ) ;
+        }
     } else {
         //
-        // Set the read timeout to the specified number of
-        // milliseconds.
-        // ------------------------------------------------------------
-        // :MAGIC_NUMBER: 100
-        // ------------------------------------------------------------
-        // VTIME is specified in deciseconds. In order to convert
-        // milliseconds to deciseconds, we divide msTimeout by 100.
+        // Set the read timeout for each byte. 
         //
-        port_settings.c_cc[ VMIN ]  = 0 ;
-        port_settings.c_cc[ VTIME ] = msTimeout / 100 ;
+        if ( 0 == msTimeout ) {
+            this->SetReadTimeout( 0,
+                                  numOfBytes ) ;
+        } else {
+            this->SetReadTimeout( msTimeout,
+                                  0 ) ;
+        }
+        //
+        bool is_read_failed = false ;
+        for(int i=0; i<numOfBytes; ++i) {
+            //
+            // Read the next byte; keep retrying if EAGAIN error is
+            // triggered by the call to read().
+            //
+            int num_of_bytes_read   = -1 ;
+            unsigned char next_byte = 0 ;
+            do {
+                num_of_bytes_read = read( mFileDescriptor, 
+                                          &next_byte, 
+                                          1 ) ;
+            } while( (num_of_bytes_read < 0) &&
+                     (EAGAIN == errno) ) ;
+            //
+            // Copy the data into dataBuffer if there was no error.
+            //
+            if ( 1 == num_of_bytes_read ) {
+                dataBuffer.push_back( next_byte ) ;
+            } else {
+                //
+                // If num_of_bytes_read is negative, then we had an
+                // error while reading. Otherwise, the read timed out.
+                // 
+                if ( num_of_bytes_read < 0 ) {
+                    is_read_failed = true ;
+                }
+                break ;
+            }
+        }
+        //
+        // Check if there was an error or timeout while reading data.
+        // 
+        if ( is_read_failed ) {
+            throw std::runtime_error( strerror(errno) ) ;            
+        } 
+        //
+        // Check if the read timed out. 
+        //
+        if ( dataBuffer.size() < numOfBytes ) {
+            throw SerialPort::ReadTimeout() ;
+        }
     }
-    //
-    // Write the modified settings.
-    //
-    if ( tcsetattr( mFileDescriptor, 
-                    TCSANOW, 
-                    &port_settings ) < 0 ) {
-        throw std::invalid_argument( strerror(errno) ) ;
-    }    
-    //
-    // Read one byte of data. Keep trying again if EAGAIN error is
-    // received.
-    //
-    unsigned char data_byte ; 
-    int num_of_bytes_read = -1 ; 
-    do {
-        num_of_bytes_read = read( mFileDescriptor,
-                                  &data_byte, 
-                                  1 ) ;
-    } while ( ( num_of_bytes_read < 0 ) &&
-              ( EAGAIN == errno ) ) ;
-    //
-    // Check if there was an error or timeout while reading data.
-    // 
-    if ( num_of_bytes_read < 0 ) {
-        throw std::runtime_error( strerror(errno) ) ;
-    } else if ( 0 == num_of_bytes_read ) {
-        throw SerialPort::ReadTimeout() ;
-    }
-    return data_byte ;
+    return ;
 }
 
 void
 SerialPortImpl::WriteByte( const unsigned char dataByte )
     throw( SerialPort::NotOpen,
+           std::runtime_error ) 
+{
+    //
+    // Make sure that the serial port is open. 
+    //
+    if ( ! this->IsOpen() ) {
+        throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
+    }    
+    //
+    // Write the byte to the serial port. 
+    //
+    this->Write( &dataByte, 
+                 1 ) ;
+    return ;
+}
+
+void 
+SerialPortImpl::Write(const SerialPort::DataBuffer& dataBuffer)
+    throw( SerialPort::NotOpen, 
+           std::runtime_error ) 
+{
+    //
+    // Make sure that the serial port is open. 
+    //
+    if ( ! this->IsOpen() ) {
+        throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
+    }    
+    //
+    // Nothing needs to be done if there is no data in the buffer.
+    //
+    if ( 0 == dataBuffer.size() ) {
+        return ;
+    }
+    //
+    // Allocate memory for storing the contents of the
+    // dataBuffer. This allows us to write all the data using a single
+    // call to write() instead of writing one byte at a time.
+    //
+    unsigned char* local_buffer = new unsigned char[dataBuffer.size()] ;
+    if ( 0 == local_buffer ) {
+            throw std::runtime_error( std::string(__FUNCTION__) +
+                                      ": Cannot allocate memory while writing"
+                                      "data to the serial port." ) ;
+    }
+    //
+    // Copy the data into local_buffer.
+    //
+    std::copy( dataBuffer.begin(), 
+               dataBuffer.end(),
+               local_buffer ) ;
+    //
+    // Write data to the serial port. 
+    //
+    try {
+        this->Write( local_buffer, 
+                     dataBuffer.size() ) ;
+    } catch( ... ) {
+        //
+        // Free the allocated memory.
+        //
+        delete [] local_buffer ;
+        throw ;
+    }
+    //
+    // Free the allocated memory.
+    //
+    delete [] local_buffer ;
+    return ;
+}
+
+void 
+SerialPortImpl::Write( const unsigned char* dataBuffer, 
+                       const unsigned int   bufferSize )
+    throw( SerialPort::NotOpen, 
            std::runtime_error ) 
 {
     //
@@ -964,13 +1159,60 @@ SerialPortImpl::WriteByte( const unsigned char dataByte )
     int num_of_bytes_written = -1 ;
     do {
         num_of_bytes_written = write( mFileDescriptor, 
-                                      &dataByte,
-                                      1 ) ;
+                                      dataBuffer, 
+                                      bufferSize ) ;
     } while ( ( num_of_bytes_written < 0 ) &&
               ( EAGAIN == errno ) ) ;
     //
     if ( num_of_bytes_written < 0 ) {
         throw std::runtime_error( strerror(errno) ) ;
+    }    
+    //
+    // :TODO: What happens if num_of_bytes_written < bufferSize ?
+    //
+    return ;
+}
+
+void
+SerialPortImpl::SetReadTimeout( const unsigned int msTimeout,
+                                const unsigned int numOfBytes ) 
+    throw( std::invalid_argument, 
+           std::runtime_error ) 
+{
+    //
+    // Read the current serial port settings. 
+    //
+    termios port_settings ;
+    if ( tcgetattr( mFileDescriptor, 
+                    &port_settings ) < 0 ) {
+        throw std::runtime_error( strerror(errno) ) ;
     }
+    //
+    // Wait till data is available if msTimeout is zero.
+    //
+    if ( 0 == msTimeout ) {
+        port_settings.c_cc[ VMIN ]  = numOfBytes ;
+        port_settings.c_cc[ VTIME ] = 0 ;
+    } else {
+        //
+        // Set the read timeout to the specified number of
+        // milliseconds.
+        // ------------------------------------------------------------
+        // :MAGIC_NUMBER: 100
+        // ------------------------------------------------------------
+        // VTIME is specified in deciseconds. In order to convert
+        // milliseconds to deciseconds, we divide msTimeout by 100.
+        //
+        port_settings.c_cc[ VMIN ]  = numOfBytes ;
+        port_settings.c_cc[ VTIME ] = msTimeout / 100 ;
+    }
+    //
+    // Write the modified settings.
+    //
+    if ( tcsetattr( mFileDescriptor, 
+                    TCSANOW, 
+                    &port_settings ) < 0 ) {
+        throw std::invalid_argument( strerror(errno) ) ;
+    }    
     return ;
 }
