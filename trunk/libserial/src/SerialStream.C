@@ -6,6 +6,7 @@
 #include "SerialStream.h"
 
 using namespace LibSerial ;
+using namespace std ;
 
 SerialStream::SerialStream(const string filename, ios_base::openmode mode) :
   mIOBuffer(0), iostream(0) {

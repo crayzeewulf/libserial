@@ -1,7 +1,7 @@
 /*
- * Time-stamp: <00/12/18 13:35:14 jay>
+ * Time-stamp: <02/11/08 11:25:35 pagey>
  *
- * $Id: SerialStream.h,v 1.2 2000-12-18 21:43:55 pagey Exp $ 
+ * $Id: SerialStream.h,v 1.3 2002-11-08 19:35:34 pagey Exp $ 
  *
  *
  */
@@ -42,10 +42,10 @@ extern "C++" {
 	document as SUS-2.
 	
 	@author $Author: pagey $ <A HREF="pagey@drcsdca.com">Manish P. Pagey</A>
-	@version $Id: SerialStream.h,v 1.2 2000-12-18 21:43:55 pagey Exp $
+	@version $Id: SerialStream.h,v 1.3 2002-11-08 19:35:34 pagey Exp $
      
     */
-    class SerialStream : public iostream {
+    class SerialStream : public std::iostream {
     public:
       /** @name Typedefs
        */
@@ -101,8 +101,9 @@ extern "C++" {
 	  @param mode     The openmode for the serial port file. 
 
        */
-      explicit SerialStream( const string       filename, 
-			     ios_base::openmode mode = ios::in|ios::out) ;
+      explicit SerialStream( const std::string  filename, 
+			     std::ios_base::openmode mode =
+			     std::ios::in|std::ios::out) ;
 
       /** Create a new SerialStream object but do not open it. The
 	  Open() method will need to be called explicitly on the
@@ -125,7 +126,9 @@ extern "C++" {
 	  s and the specified mode, mode.
 
        */
-      void Open(const string filename, ios_base::openmode mode = ios_base::in | ios_base::out) ;
+      void Open(const std::string filename, 
+		std::ios_base::openmode mode = 
+		std::ios_base::in | std::ios_base::out) ;
 
       /** Close the serial port. No communications can occur with the
 	  serial port after calling this routine.
@@ -266,7 +269,7 @@ extern "C++" {
 
     inline
     SerialStream::SerialStream() : 
-      mIOBuffer(0), iostream(0) {
+      mIOBuffer(0), std::iostream(0) {
       //
       // Close the stream
       //
@@ -286,7 +289,8 @@ extern "C++" {
 
     inline
     void 
-    SerialStream::Open(const string filename, ios_base::openmode mode) {
+    SerialStream::Open(const std::string filename, 
+		       std::ios_base::openmode mode) {
       //
       // Create a new SerialStreamBuf if one does not exist. 
       //

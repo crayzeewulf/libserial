@@ -1,7 +1,7 @@
 /*
- * Time-stamp: <00/08/08 17:58:12 pagey>
+ * Time-stamp: <02/11/08 11:29:22 pagey>
  *
- * $Id: SerialStreamBuf.h,v 1.1.1.1 2000-08-17 09:30:20 pagey Exp $ 
+ * $Id: SerialStreamBuf.h,v 1.2 2002-11-08 19:35:34 pagey Exp $ 
  *
  *
  */
@@ -12,17 +12,8 @@
 #include <unistd.h>
 #include <iosfwd>
 #include <streambuf>
-/* We need to figure out if we are using STLPORT implementation of the
-   C++ Standard Template Library. If so, we need to start using the
-   __STLPORT_STD namespace.
+#include <string>
 
-*/
-#ifdef __STLPORT_STD
-using namespace __STLPORT_STD ;
-#define LIBSERIAL_STD __STLPORT_STD 
-#else
-#define LIBSERIAL_STD std
-#endif
 
 extern "C++" {
   namespace LibSerial {
@@ -40,9 +31,9 @@ extern "C++" {
      *  setbuf() will be ignored.
      *
      * @author $Author: pagey $ <A HREF="pagey@drcsdca.com">Manish P. Pagey</A>
-     * @version $Id: SerialStreamBuf.h,v 1.1.1.1 2000-08-17 09:30:20 pagey Exp $
+     * @version $Id: SerialStreamBuf.h,v 1.2 2002-11-08 19:35:34 pagey Exp $
      * */
-    class SerialStreamBuf : public LIBSERIAL_STD::streambuf {
+    class SerialStreamBuf : public std::streambuf {
     public:
       /** @name Typedefs
        */
@@ -226,9 +217,9 @@ extern "C++" {
 	  returns a null pointer.
 
       */
-      SerialStreamBuf* open( const string filename, 
-			     ios_base::openmode mode = 
-			     ios_base::in | ios_base::out ) ;
+      SerialStreamBuf* open( const std::string filename, 
+			     std::ios_base::openmode mode = 
+			     std::ios_base::in | std::ios_base::out ) ;
 
       /** If is_open() == false, returns a null pointer. If a put area
 	  exists, calls overflow(EOF) to flush characters. Finally it
@@ -369,7 +360,7 @@ extern "C++" {
 	  present.
 
       */
-      virtual streambuf* setbuf(char_type *, streamsize) ;
+      virtual std::streambuf* setbuf(char_type *, std::streamsize) ;
 
       /** Reads upto n characters from the serial port and returns
 	  them through the character array located at s.
@@ -377,7 +368,7 @@ extern "C++" {
 	  @return The number of characters actually read from the
 	  serial port. 
       */
-      virtual streamsize xsgetn(char_type *s, streamsize n) ;
+      virtual std::streamsize xsgetn(char_type *s, std::streamsize n) ;
 
       /** Reads and returns the next character from the associated
 	  serial port if one otherwise returns traits::eof(). This
@@ -412,7 +403,7 @@ extern "C++" {
 	  @return The number of characters that were successfully
 	  written to the serial port. 
       */
-      virtual streamsize xsputn(const char_type* s, streamsize n) ;
+      virtual std::streamsize xsputn(const char_type* s, std::streamsize n) ;
 
       /** Writes the specified character to the associated
 	  serial port. 
@@ -477,9 +468,9 @@ extern "C++" {
     }
     
     inline
-    LIBSERIAL_STD::streambuf* 
-    SerialStreamBuf::setbuf(char_type *, streamsize) {
-      return LIBSERIAL_STD::streambuf::setbuf(0, 0) ;
+    std::streambuf* 
+    SerialStreamBuf::setbuf(char_type *, std::streamsize) {
+      return std::streambuf::setbuf(0, 0) ;
     }
 
     inline
@@ -513,7 +504,7 @@ extern "C++" {
     }
     
     inline
-    streambuf::int_type
+    std::streambuf::int_type
     SerialStreamBuf::uflow() {
       int_type next_ch = underflow() ;
       mPutbackAvailable = false ;
