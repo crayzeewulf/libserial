@@ -3,11 +3,14 @@ lib_LTLIBRARIES = libserial.la
 
 include_HEADERS = \
     SerialStreamBuf.h \
-    SerialStream.h
+    SerialStream.h \
+    SerialPort.h 
 
 libserial_la_SOURCES = \
 	SerialStreamBuf.cc \
 	SerialStreamBuf.h \
 	SerialStream.cc \
-	SerialStream.h 
+	SerialStream.h \
+    SerialPort.cpp \
+    SerialPort.h
 
