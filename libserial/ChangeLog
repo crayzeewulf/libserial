@@ -1,0 +1,42 @@
+2000-08-04  Manish P. Pagey  <pagey@drcsdca.com>
+
+	* src/GPIBController.h: Made the Prefix and Postfix routines const
+	correct and also made the secondary address of the device an
+	optional parameter. 
+
+2000-07-23  Manish P. Pagey  <pagey@drcsdca.com>
+
+	* SerialStream.C: The serial port can be used as any other stream
+ 	object through this class. The basic functionality seems to be
+ 	implemented correctly now. We need to test it with GPIBController
+ 	next.
+
+2000-07-06  Edward Taw  <etaw@drcsdca.com>
+
+	* Agilent4279A.h: The basic implementation of drivers for
+	Agilent4279A is complete. The code seems to compile for now. 
+
+2000-07-05  Manish P. Pagey  <pagey@drcsdca.com>
+
+	* ReferenceCount.h: The ReferenceCount class is used by
+	CountedPointer to keep track of the number of reference to a
+	particular object. 
+
+	* CountedPointer.h: Added the CountedPointer class to reduce the
+	use of pointers in the package whenever possible. 
+
+	* GPIBController.h: Reorganized the GPIBController interface
+	so it is const-correct and uses references instead of
+	pointers. Also reorganized the header file so that it looks like
+	the standard template generated from the make-cpp-header script
+	under emacs. 
+
+	* configure.in: Added a line to generated doxygen.conf from
+	doxygen.conf.in. 
+
+2000-06-29  Manish P. Pagey  <pagey@drcsdca.com>
+
+	* CVS: Entered the package into CVS repository. Removed all
+	dependence on GNOME libraries. This package will be a standalone
+	package while the GUI will be part of a separate package. 
+
