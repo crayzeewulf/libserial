@@ -1,6 +1,4 @@
 
-INCLUDES = -I../nienet/`../config.guess`/include/
-
 lib_LTLIBRARIES = libserial.la
 
 include_HEADERS = SerialStreamBuf.h \
