@@ -396,10 +396,10 @@ SerialStreamBuf::SetNumOfStopBits(short stop_bits) {
   }
   switch( stop_bits ) {
   case 1:
-    term_setting.c_cflag |= CSTOPB ;
+    term_setting.c_cflag &= ~CSTOPB ;
     break ;
   case 2:
-    term_setting.c_cflag &= ~CSTOPB ;
+    term_setting.c_cflag |= CSTOPB ;
     break ;
   default: 
     return 0 ;
