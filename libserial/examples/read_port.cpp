@@ -1,14 +1,18 @@
-#include <SerialStream.h>
-#include <ios>
-#include <iostream>
+#ifndef _std_iostream_INCLUDED_
+#    include <iostream>
+#    define _std_iostream_INCLUDED_
+#endif
 
+#ifndef _SerialStream_h_
+#    include <SerialStream.h>
+#endif
 
 int
-main( int    argc, 
+main( int    argc,
       char** argv  )
 {
     //
-    // Open the serial port. 
+    // Open the serial port.
     //
     using namespace LibSerial ;
     SerialStream serial_port ;
@@ -18,7 +22,7 @@ main( int    argc,
         exit(1) ;
     }
     //
-    // Set the baud rate of the serial port. 
+    // Set the baud rate of the serial port.
     //
     serial_port.SetBaudRate( SerialStreamBuf::BAUD_115200 ) ;
     if ( ! serial_port.good() ) {
@@ -36,7 +40,7 @@ main( int    argc,
     }
 
     //
-    // Disable parity. 
+    // Disable parity.
     //
     serial_port.SetParity( SerialStreamBuf::PARITY_NONE ) ;
     if ( ! serial_port.good() ) {
@@ -45,11 +49,11 @@ main( int    argc,
     }
 
     //
-    // Set the number of stop bits. 
+    // Set the number of stop bits.
     //
     serial_port.SetNumOfStopBits( 1 ) ;
     if ( ! serial_port.good() ) {
-        std::cerr << "Error: Could not set the number of stop bits." 
+        std::cerr << "Error: Could not set the number of stop bits."
                   << std::endl ;
         exit(1) ;
     }
@@ -59,13 +63,13 @@ main( int    argc,
     //
     serial_port.SetFlowControl( SerialStreamBuf::FLOW_CONTROL_HARD ) ;
     if ( ! serial_port.good() ) {
-        std::cerr << "Error: Could not use hardware flow control." 
+        std::cerr << "Error: Could not use hardware flow control."
                   << std::endl ;
         exit(1) ;
     }
     //
-    // Do not skip whitespace characters while reading from the 
-    // serial port. 
+    // Do not skip whitespace characters while reading from the
+    // serial port.
     //
     // serial_port.unsetf( std::ios_base::skipws ) ;
     //
