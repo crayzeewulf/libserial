@@ -98,6 +98,11 @@ public:
             runtime_error(whatArg) { }
     } ;
 
+    class ReadTimeout : public std::runtime_error {
+    public:
+        ReadTimeout() : runtime_error( "Read timeout" ) { }
+    } ;
+
     /**
      * Constructor for a serial port. 
      */
@@ -289,15 +294,15 @@ public:
         throw(NotOpen) ;
 
     /**
-     * Read a single byte from the serial port. This method will block
-     * till data is available.
-     *
-     * @throw NotOpen Thrown if this method is called while the serial
-     * port is not open.
+     * Read a single byte from the serial port. If no data is
+     * available in the specified number of milliseconds (msTimeout),
+     * then this method will throw ReadTimeout exception. If msTimeout
+     * is 0, then this method will block till data is available.
      */
     unsigned char
-    ReadByte() 
-        throw( NotOpen,
+    ReadByte( const unsigned int msTimeout = 0 ) 
+        throw( NotOpen, 
+               ReadTimeout,
                std::runtime_error ) ;
 
     /**

@@ -143,8 +143,9 @@ public:
                std::runtime_error ) ;
 
     unsigned char
-    ReadByte()
+    ReadByte(const unsigned int msTimeout = 0 )
         throw( SerialPort::NotOpen,
+               SerialPort::ReadTimeout,
                std::runtime_error ) ;
 
     void
@@ -216,10 +217,11 @@ SerialPort::Open( const BaudRate      baudRate,
     mSerialPortImpl->Open() ;
     //
     // Set the various parameters of the serial port if it is open.
+    this->SetBaudRate(baudRate) ;
     this->SetCharSize(charSize) ;
     this->SetParity(parityType) ;
     this->SetNumOfStopBits(stopBits) ;
-    this->SetFlowControl( flowControl ) ;
+    this->SetFlowControl(flowControl) ;
     //
     // All done.
     return ;
@@ -330,11 +332,12 @@ SerialPort::IsDataAvailable() const
 }
 
 unsigned char
-SerialPort::ReadByte()
-    throw( SerialPort::NotOpen,
+SerialPort::ReadByte( const unsigned int msTimeout )
+    throw( NotOpen,
+           ReadTimeout,
            std::runtime_error )
 {
-    return mSerialPortImpl->ReadByte() ;
+    return mSerialPortImpl->ReadByte(msTimeout) ;
 }
 
 void
@@ -385,7 +388,7 @@ SerialPortImpl::Open()
      * not able to open it.
      */
     mFileDescriptor = open( mSerialPortName.c_str(), 
-                            O_RDWR | O_NOCTTY | O_NONBLOCK ) ;
+                            O_RDWR | O_NOCTTY ) ; 
     if ( mFileDescriptor < 0 ) {
         throw SerialPort::OpenFailed( strerror(errno) )  ;
     }
@@ -406,6 +409,7 @@ SerialPortImpl::Open()
     //
     // Zero out all local and output flags. 
     //
+    port_settings.c_iflag = 0 ;
     port_settings.c_lflag = 0 ;
     port_settings.c_oflag = 0 ;
     
@@ -547,15 +551,15 @@ SerialPortImpl::GetBaudRate() const
     //
     // Read the current serial port settings. 
     //
-    termios current_settings ;
+    termios port_settings ;
     if ( tcgetattr( mFileDescriptor, 
-                    &current_settings ) < 0 ) {
+                    &port_settings ) < 0 ) {
         throw std::runtime_error( strerror(errno) ) ;
     }
     //
     // Obtain the input baud rate from the current settings.
     //
-    return SerialPort::BaudRate(cfgetispeed( &current_settings )) ;
+    return SerialPort::BaudRate(cfgetispeed( &port_settings )) ;
 }
 
 void
@@ -873,8 +877,9 @@ SerialPortImpl::IsDataAvailable() const
 }
 
 unsigned char
-SerialPortImpl::ReadByte()
+SerialPortImpl::ReadByte(const unsigned int msTimeout)
     throw( SerialPort::NotOpen,
+           SerialPort::ReadTimeout,
            std::runtime_error )
 {
     //
@@ -884,17 +889,59 @@ SerialPortImpl::ReadByte()
         throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
     }
     //
-    // Wait till data is available.
+    // Read the current serial port settings. 
     //
-    while( ! this->IsDataAvailable() ) ;
+    termios port_settings ;
+    if ( tcgetattr( mFileDescriptor, 
+                    &port_settings ) < 0 ) {
+        throw std::runtime_error( strerror(errno) ) ;
+    }
     //
-    // Read one byte of data.
+    // Wait till data is available if msTimeout is zero.
+    //
+    if ( 0 == msTimeout ) {
+        port_settings.c_cc[ VMIN ]  = 1 ;
+        port_settings.c_cc[ VTIME ] = 0 ;
+    } else {
+        //
+        // Set the read timeout to the specified number of
+        // milliseconds.
+        // ------------------------------------------------------------
+        // :MAGIC_NUMBER: 100
+        // ------------------------------------------------------------
+        // VTIME is specified in deciseconds. In order to convert
+        // milliseconds to deciseconds, we divide msTimeout by 100.
+        //
+        port_settings.c_cc[ VMIN ]  = 0 ;
+        port_settings.c_cc[ VTIME ] = msTimeout / 100 ;
+    }
+    //
+    // Write the modified settings.
+    //
+    if ( tcsetattr( mFileDescriptor, 
+                    TCSANOW, 
+                    &port_settings ) < 0 ) {
+        throw std::invalid_argument( strerror(errno) ) ;
+    }    
+    //
+    // Read one byte of data. Keep trying again if EAGAIN error is
+    // received.
     //
     unsigned char data_byte ; 
-    if ( read( mFileDescriptor,
-               &data_byte, 
-               1 ) < 0 ) {
+    int num_of_bytes_read = -1 ; 
+    do {
+        num_of_bytes_read = read( mFileDescriptor,
+                                  &data_byte, 
+                                  1 ) ;
+    } while ( ( num_of_bytes_read < 0 ) &&
+              ( EAGAIN == errno ) ) ;
+    //
+    // Check if there was an error or timeout while reading data.
+    // 
+    if ( num_of_bytes_read < 0 ) {
         throw std::runtime_error( strerror(errno) ) ;
+    } else if ( 0 == num_of_bytes_read ) {
+        throw SerialPort::ReadTimeout() ;
     }
     return data_byte ;
 }
@@ -911,11 +958,18 @@ SerialPortImpl::WriteByte( const unsigned char dataByte )
         throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
     }
     //
-    // Write the data to the serial port.
+    // Write the data to the serial port. Keep retrying if EAGAIN
+    // error is received.
     //
-    if ( write( mFileDescriptor, 
-                &dataByte,
-                1 ) < 0 ) {
+    int num_of_bytes_written = -1 ;
+    do {
+        num_of_bytes_written = write( mFileDescriptor, 
+                                      &dataByte,
+                                      1 ) ;
+    } while ( ( num_of_bytes_written < 0 ) &&
+              ( EAGAIN == errno ) ) ;
+    //
+    if ( num_of_bytes_written < 0 ) {
         throw std::runtime_error( strerror(errno) ) ;
     }
     return ;
