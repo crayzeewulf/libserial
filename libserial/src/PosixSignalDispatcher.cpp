@@ -10,25 +10,10 @@
 //
 //
 #include "PosixSignalDispatcher.h"
-
-#ifndef _PosixSignalHandler_h_
-#    include <PosixSignalHandler.h>
-#endif
-
-#ifndef _std_map_INCLUDED_
-#    include <map>
-#    define _std_map_INCLUDED_
-#endif
-
-#ifndef _errno_h_INCLUDED_
-#    include <errno.h>
-#    define _errno_h_INCLUDED_
-#endif
-
-#ifndef _signal_h_INCLUDED_
-#    include <signal.h>
-#    define _signal_h_INCLUDED_
-#endif
+#include "PosixSignalHandler.h"
+#include <map>
+#include <errno.h>
+#include <signal.h>
 
 namespace {
     /**
