@@ -1,3 +1,22 @@
+/***************************************************************************
+ *   Copyright (C) 2004 by Manish Pagey                                    *
+ *   crayzeewulf@users.sourceforge.net
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
 #ifndef _SerialPort_h_
 #    include <SerialPort.h>
 #endif
@@ -166,13 +185,13 @@ public:
                std::runtime_error ) ;
 
     void 
-    SerialPortImpl::Write(const SerialPort::DataBuffer& dataBuffer)
+    Write(const SerialPort::DataBuffer& dataBuffer)
         throw( SerialPort::NotOpen, 
                std::runtime_error ) ;
 
     void 
-    SerialPortImpl::Write( const unsigned char* dataBuffer, 
-                           const unsigned int   bufferSize )
+    Write( const unsigned char* dataBuffer, 
+           const unsigned int   bufferSize )
         throw( SerialPort::NotOpen, 
                std::runtime_error ) ; 
 private:
@@ -479,7 +498,7 @@ SerialPortImpl::Open()
                             O_RDWR | O_NOCTTY ) ; 
     if ( mFileDescriptor < 0 ) {
         throw SerialPort::OpenFailed( strerror(errno) )  ;
-    } 
+    }
     /*
      * Save the current settings of the serial port so they can be
      * restored when the serial port is closed.
@@ -625,6 +644,7 @@ SerialPortImpl::SetBaudRate( const SerialPort::BaudRate baudRate )
     return ;
 }
 
+inline
 SerialPort::BaudRate
 SerialPortImpl::GetBaudRate() const
     throw( SerialPort::NotOpen, 
@@ -650,6 +670,7 @@ SerialPortImpl::GetBaudRate() const
     return SerialPort::BaudRate(cfgetispeed( &port_settings )) ;
 }
 
+inline
 void
 SerialPortImpl::SetCharSize( const SerialPort::CharacterSize charSize )
     throw( SerialPort::NotOpen, 
@@ -686,6 +707,7 @@ SerialPortImpl::SetCharSize( const SerialPort::CharacterSize charSize )
     return ;
 }
 
+inline
 SerialPort::CharacterSize
 SerialPortImpl::GetCharSize() const 
     throw( SerialPort::NotOpen, 
@@ -711,6 +733,7 @@ SerialPortImpl::GetCharSize() const
     return SerialPort::CharacterSize( port_settings.c_cflag & CSIZE ) ;
 }
 
+inline
 void
 SerialPortImpl::SetParity( const SerialPort::Parity parityType )
     throw( SerialPort::NotOpen,
@@ -760,6 +783,7 @@ SerialPortImpl::SetParity( const SerialPort::Parity parityType )
     return ;
 }
 
+inline
 SerialPort::Parity
 SerialPortImpl::GetParity() const 
     throw(SerialPort::NotOpen) 
@@ -797,6 +821,7 @@ SerialPortImpl::GetParity() const
     return SerialPort::PARITY_NONE ;
 }
 
+inline
 void
 SerialPortImpl::SetNumOfStopBits( const SerialPort::StopBits numOfStopBits ) 
     throw( SerialPort::NotOpen,
@@ -841,6 +866,7 @@ SerialPortImpl::SetNumOfStopBits( const SerialPort::StopBits numOfStopBits )
     return ;
 }
 
+inline
 SerialPort::StopBits
 SerialPortImpl::GetNumOfStopBits() const 
     throw(SerialPort::NotOpen) 
@@ -869,6 +895,7 @@ SerialPortImpl::GetNumOfStopBits() const
     return SerialPort::STOP_BITS_1 ;
 }
 
+inline
 void
 SerialPortImpl::SetFlowControl( const SerialPort::FlowControl   flowControl ) 
     throw( SerialPort::NotOpen,
@@ -913,6 +940,7 @@ SerialPortImpl::SetFlowControl( const SerialPort::FlowControl   flowControl )
     return ;
 }
 
+inline
 SerialPort::FlowControl
 SerialPortImpl::GetFlowControl() const 
     throw( SerialPort::NotOpen ) 
@@ -941,6 +969,7 @@ SerialPortImpl::GetFlowControl() const
     return SerialPort::FLOW_CONTROL_NONE ;
 }
 
+inline
 bool
 SerialPortImpl::IsDataAvailable() const 
     throw( SerialPort::NotOpen, 
@@ -964,6 +993,7 @@ SerialPortImpl::IsDataAvailable() const
     return (num_of_bytes_available ? true : false) ;
 }
 
+inline
 unsigned char
 SerialPortImpl::ReadByte(const unsigned int msTimeout)
     throw( SerialPort::NotOpen,
@@ -986,6 +1016,7 @@ SerialPortImpl::ReadByte(const unsigned int msTimeout)
     return data_buffer[0] ;
 }
 
+inline
 void
 SerialPortImpl::Read( SerialPort::DataBuffer& dataBuffer,
                       const unsigned int      numOfBytes, 
@@ -1001,15 +1032,23 @@ SerialPortImpl::Read( SerialPort::DataBuffer& dataBuffer,
         throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
     }
     //
-    dataBuffer.empty() ;
+    // Empty the data buffer. 
+    //
+    dataBuffer.resize(0) ;
+    //
     if ( 0 == numOfBytes ) {
         //
-        // Read all available data.
+        // Read all available data if numOfBytes is zero.
         //
         while( this->IsDataAvailable() ) {
             dataBuffer.push_back( ReadByte(msTimeout) ) ;
         }
     } else {
+        //
+        // Reserve enough space in the buffer to store the incoming
+        // data. 
+        //
+        dataBuffer.reserve( numOfBytes ) ;
         //
         // Set the read timeout for each byte. 
         //
@@ -1022,7 +1061,8 @@ SerialPortImpl::Read( SerialPort::DataBuffer& dataBuffer,
         }
         //
         bool is_read_failed = false ;
-        for(int i=0; i<numOfBytes; ++i) {
+#if 0
+        for(unsigned int i=0; i<numOfBytes; ++i) {
             //
             // Read the next byte; keep retrying if EAGAIN error is
             // triggered by the call to read().
@@ -1051,6 +1091,22 @@ SerialPortImpl::Read( SerialPort::DataBuffer& dataBuffer,
                 break ;
             }
         }
+#else
+        // :DEBUGGING:
+        unsigned char data_buffer[1024] ;
+        int num_of_bytes_read = read( mFileDescriptor, 
+                                      data_buffer, 
+                                      numOfBytes ) ;
+        if ( numOfBytes == num_of_bytes_read ) {
+            dataBuffer.resize( num_of_bytes_read ) ;
+            std::copy( data_buffer, 
+                       data_buffer + num_of_bytes_read, 
+                       dataBuffer.begin() ) ;
+        }
+        if ( num_of_bytes_read < 0 ) {
+            is_read_failed = true ;
+        }
+#endif
         //
         // Check if there was an error or timeout while reading data.
         // 
@@ -1067,6 +1123,7 @@ SerialPortImpl::Read( SerialPort::DataBuffer& dataBuffer,
     return ;
 }
 
+inline
 void
 SerialPortImpl::WriteByte( const unsigned char dataByte )
     throw( SerialPort::NotOpen,
@@ -1086,6 +1143,7 @@ SerialPortImpl::WriteByte( const unsigned char dataByte )
     return ;
 }
 
+inline
 void 
 SerialPortImpl::Write(const SerialPort::DataBuffer& dataBuffer)
     throw( SerialPort::NotOpen, 
@@ -1140,6 +1198,7 @@ SerialPortImpl::Write(const SerialPort::DataBuffer& dataBuffer)
     return ;
 }
 
+inline
 void 
 SerialPortImpl::Write( const unsigned char* dataBuffer, 
                        const unsigned int   bufferSize )
@@ -1173,6 +1232,7 @@ SerialPortImpl::Write( const unsigned char* dataBuffer,
     return ;
 }
 
+inline
 void
 SerialPortImpl::SetReadTimeout( const unsigned int msTimeout,
                                 const unsigned int numOfBytes ) 
