@@ -1,7 +1,7 @@
 /*
- * Time-stamp: <00/08/10 23:12:35 pagey>
+ * Time-stamp: <00/12/18 13:35:14 jay>
  *
- * $Id: SerialStream.h,v 1.1.1.1 2000-08-17 09:30:21 pagey Exp $ 
+ * $Id: SerialStream.h,v 1.2 2000-12-18 21:43:55 pagey Exp $ 
  *
  *
  */
@@ -42,7 +42,7 @@ extern "C++" {
 	document as SUS-2.
 	
 	@author $Author: pagey $ <A HREF="pagey@drcsdca.com">Manish P. Pagey</A>
-	@version $Id: SerialStream.h,v 1.1.1.1 2000-08-17 09:30:21 pagey Exp $
+	@version $Id: SerialStream.h,v 1.2 2000-12-18 21:43:55 pagey Exp $
      
     */
     class SerialStream : public iostream {
@@ -133,6 +133,11 @@ extern "C++" {
        */
       void Close() ;
 
+      /** Returns true if the Stream is in a good open state, false otherwise
+
+       */
+      const bool IsOpen() const ;
+
       /** Set the baud rate for serial communications. 
 
        */
@@ -143,8 +148,10 @@ extern "C++" {
 	  current settings and returns the baud rate that is being
 	  used by the serial port. 
 	  
-	  @return The current baud rate for the serial port.  
-	  
+	  @return The current baud rate for the serial port.  Note:
+	  this is not a constant function because it checks to see
+	  that it is dealing with a SerialStream with a non-null
+	  buffer.  If the buffer is null, it attempts to set the state of the stream accordingly.
       */
       const SerialStreamBuf::BaudRateEnum BaudRate() ;
 
@@ -191,14 +198,12 @@ extern "C++" {
       /** Use the specified flow control. 
 
        */
-      void
-      SetFlowControl(const SerialStreamBuf::FlowControlEnum flow_c) ;
+      void SetFlowControl(const SerialStreamBuf::FlowControlEnum flow_c) ;
 
       /** Return the current flow control setting. 
 
        */
-      const SerialStreamBuf::FlowControlEnum 
-      FlowControl() ;
+      const SerialStreamBuf::FlowControlEnum FlowControl() ;
 
       //@}
 
@@ -308,6 +313,20 @@ extern "C++" {
 	delete mIOBuffer ;
 	mIOBuffer = 0 ;
       }
+    }
+
+    inline
+    const bool
+    SerialStream::IsOpen() const {
+      //
+      // Checks to see if mIOBuffer is a null buffer, if not,
+      // calls the is_open() function on this streams SerialStreamBuf,
+      // mIOBuffer
+      //
+      if ( ! mIOBuffer ) {
+	return false ;
+      }
+      return mIOBuffer->is_open() ;
     }
 
   } ; // namespace LibSerial
