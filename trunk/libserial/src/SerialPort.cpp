@@ -17,62 +17,19 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef _SerialPort_h_
-#    include "SerialPort.h"
-#endif
 
-#ifndef _PosixSignalDispatcher_h_
-#    include "PosixSignalDispatcher.h"
-#endif
-
-#ifndef _PosixSignalHandler_h_
-#    include "PosixSignalHandler.h"
-#endif
-
-#ifndef _std_queue_INCLUDED_
-#    include <queue>
-#    define _std_queue_INCLUDED_
-#endif
-
-#ifndef _std_map_INCLUDED_
-#    include <map>
-#    define _std_map_INCLUDED_
-#endif
-
-#ifndef _std_cerrno_INCLUDED_
-#    include <cerrno>
-#    define _std_cerrno_INCLUDED_
-#endif
-
-#ifndef _std_cassert_INCLUDED_
-#    include <cassert>
-#    define _std_cassert_INCLUDED_
-#endif
-
-#ifndef _termios_h_INCLUDED_
-#    include <termios.h>
-#    define _termios_h_INCLUDED_
-#endif
-
-#ifndef _fcntl_h_INCLUDED_
-#    include <fcntl.h>
-#    define _fcntl_h_INCLUDED_
-#endif
-
-#ifndef _sys__ioctl_h_INCLUDED_
-#    include <sys/ioctl.h>
-#    define _sys__ioctl_h_INCLUDED_
-#endif
-
-#ifndef _sys__time_h_INCLUDED_
-#    include <sys/time.h>
-#    define _sys__time_h_INCLUDED_
-#endif
-
-#ifndef _signal_h_INCLUDED_
-#    include <signal.h>
-#    define _signal_h_INCLUDED_
-#endif
+#include "SerialPort.h"
+#include "PosixSignalDispatcher.h"
+#include "PosixSignalHandler.h"
+#include <queue>
+#include <map>
+#include <cerrno>
+#include <cassert>
+#include <termios.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <sys/time.h>
+#include <signal.h>
 
 namespace {
     //
@@ -90,14 +47,16 @@ namespace {
     /*
      * Return the difference between the two specified timeval values. 
      * This method subtracts secondOperand from firstOperand and returns
-     * the result as a timeval.
+     * the result as a timeval. The time represented by firstOperand must 
+     * be later than the time represented by secondOperand. Otherwise, 
+     * the result of this operator may be undefined.
      */    
     const struct timeval 
     operator-( const struct timeval& firstOperand, 
                const struct timeval& secondOperand ) ;
 } ;
 
-class SerialPortImpl : public PosixSignalHandler {
+class SerialPort::SerialPortImpl : public PosixSignalHandler {
 public:
     /**
      * Constructor.
@@ -493,7 +452,7 @@ SerialPort::Write(const std::string& dataString)
 
 /* ------------------------------------------------------------ */
 inline
-SerialPortImpl::SerialPortImpl( const std::string& serialPortName ) :
+SerialPort::SerialPortImpl::SerialPortImpl( const std::string& serialPortName ) :
     mSerialPortName(serialPortName),
     mIsOpen(false),
     mFileDescriptor(-1), 
@@ -503,7 +462,7 @@ SerialPortImpl::SerialPortImpl( const std::string& serialPortName ) :
 }
 
 inline
-SerialPortImpl::~SerialPortImpl()
+SerialPort::SerialPortImpl::~SerialPortImpl()
 {
     //
     // Close the serial port if it is open.
@@ -516,7 +475,7 @@ SerialPortImpl::~SerialPortImpl()
 
 inline
 void
-SerialPortImpl::Open()
+SerialPort::SerialPortImpl::Open()
     throw( SerialPort::OpenFailed,
            SerialPort::AlreadyOpen ) 
 {
@@ -625,14 +584,14 @@ SerialPortImpl::Open()
 
 inline
 bool
-SerialPortImpl::IsOpen() const
+SerialPort::SerialPortImpl::IsOpen() const
 {
     return mIsOpen ;
 }
 
 inline
 void
-SerialPortImpl::Close() 
+SerialPort::SerialPortImpl::Close() 
     throw( SerialPort::NotOpen )
 {
     //
@@ -665,7 +624,7 @@ SerialPortImpl::Close()
 
 inline
 void
-SerialPortImpl::SetBaudRate( const SerialPort::BaudRate baudRate )
+SerialPort::SerialPortImpl::SetBaudRate( const SerialPort::BaudRate baudRate )
     throw( SerialPort::NotOpen, 
            SerialPort::UnsupportedBaudRate,
            std::invalid_argument,
@@ -710,7 +669,7 @@ SerialPortImpl::SetBaudRate( const SerialPort::BaudRate baudRate )
 
 inline
 SerialPort::BaudRate
-SerialPortImpl::GetBaudRate() const
+SerialPort::SerialPortImpl::GetBaudRate() const
     throw( SerialPort::NotOpen, 
            std::runtime_error )
 {
@@ -736,7 +695,7 @@ SerialPortImpl::GetBaudRate() const
 
 inline
 void
-SerialPortImpl::SetCharSize( const SerialPort::CharacterSize charSize )
+SerialPort::SerialPortImpl::SetCharSize( const SerialPort::CharacterSize charSize )
     throw( SerialPort::NotOpen, 
            std::invalid_argument,
            std::runtime_error ) 
@@ -773,7 +732,7 @@ SerialPortImpl::SetCharSize( const SerialPort::CharacterSize charSize )
 
 inline
 SerialPort::CharacterSize
-SerialPortImpl::GetCharSize() const 
+SerialPort::SerialPortImpl::GetCharSize() const 
     throw( SerialPort::NotOpen, 
            std::runtime_error ) 
 {
@@ -799,7 +758,7 @@ SerialPortImpl::GetCharSize() const
 
 inline
 void
-SerialPortImpl::SetParity( const SerialPort::Parity parityType )
+SerialPort::SerialPortImpl::SetParity( const SerialPort::Parity parityType )
     throw( SerialPort::NotOpen,
            std::invalid_argument, 
            std::runtime_error ) 
@@ -852,7 +811,7 @@ SerialPortImpl::SetParity( const SerialPort::Parity parityType )
 
 inline
 SerialPort::Parity
-SerialPortImpl::GetParity() const 
+SerialPort::SerialPortImpl::GetParity() const 
     throw(SerialPort::NotOpen) 
 {
     //
@@ -890,7 +849,7 @@ SerialPortImpl::GetParity() const
 
 inline
 void
-SerialPortImpl::SetNumOfStopBits( const SerialPort::StopBits numOfStopBits ) 
+SerialPort::SerialPortImpl::SetNumOfStopBits( const SerialPort::StopBits numOfStopBits ) 
     throw( SerialPort::NotOpen,
            std::invalid_argument ) 
 {
@@ -935,7 +894,7 @@ SerialPortImpl::SetNumOfStopBits( const SerialPort::StopBits numOfStopBits )
 
 inline
 SerialPort::StopBits
-SerialPortImpl::GetNumOfStopBits() const 
+SerialPort::SerialPortImpl::GetNumOfStopBits() const 
     throw(SerialPort::NotOpen) 
 {
     //
@@ -964,7 +923,7 @@ SerialPortImpl::GetNumOfStopBits() const
 
 inline
 void
-SerialPortImpl::SetFlowControl( const SerialPort::FlowControl   flowControl ) 
+SerialPort::SerialPortImpl::SetFlowControl( const SerialPort::FlowControl   flowControl ) 
     throw( SerialPort::NotOpen,
            std::invalid_argument ) 
 {
@@ -1009,7 +968,7 @@ SerialPortImpl::SetFlowControl( const SerialPort::FlowControl   flowControl )
 
 inline
 SerialPort::FlowControl
-SerialPortImpl::GetFlowControl() const 
+SerialPort::SerialPortImpl::GetFlowControl() const 
     throw( SerialPort::NotOpen ) 
 {
     //
@@ -1038,7 +997,7 @@ SerialPortImpl::GetFlowControl() const
 
 inline
 bool
-SerialPortImpl::IsDataAvailable() const 
+SerialPort::SerialPortImpl::IsDataAvailable() const 
     throw( SerialPort::NotOpen, 
            std::runtime_error ) 
 {
@@ -1056,7 +1015,7 @@ SerialPortImpl::IsDataAvailable() const
 
 inline
 unsigned char
-SerialPortImpl::ReadByte(const unsigned int msTimeout)
+SerialPort::SerialPortImpl::ReadByte(const unsigned int msTimeout)
     throw( SerialPort::NotOpen,
            SerialPort::ReadTimeout,
            std::runtime_error )
@@ -1127,7 +1086,7 @@ SerialPortImpl::ReadByte(const unsigned int msTimeout)
 
 inline
 void
-SerialPortImpl::Read( SerialPort::DataBuffer& dataBuffer,
+SerialPort::SerialPortImpl::Read( SerialPort::DataBuffer& dataBuffer,
                       const unsigned int      numOfBytes, 
                       const unsigned int      msTimeout ) 
     throw( SerialPort::NotOpen, 
@@ -1169,7 +1128,7 @@ SerialPortImpl::Read( SerialPort::DataBuffer& dataBuffer,
 
 inline
 const std::string 
-SerialPortImpl::ReadLine( const unsigned int msTimeout,
+SerialPort::SerialPortImpl::ReadLine( const unsigned int msTimeout,
                           const char         lineTerminator ) 
     throw( SerialPort::NotOpen, 
            SerialPort::ReadTimeout,
@@ -1186,7 +1145,7 @@ SerialPortImpl::ReadLine( const unsigned int msTimeout,
 
 inline
 void
-SerialPortImpl::WriteByte( const unsigned char dataByte )
+SerialPort::SerialPortImpl::WriteByte( const unsigned char dataByte )
     throw( SerialPort::NotOpen,
            std::runtime_error ) 
 {
@@ -1206,7 +1165,7 @@ SerialPortImpl::WriteByte( const unsigned char dataByte )
 
 inline
 void 
-SerialPortImpl::Write(const SerialPort::DataBuffer& dataBuffer)
+SerialPort::SerialPortImpl::Write(const SerialPort::DataBuffer& dataBuffer)
     throw( SerialPort::NotOpen, 
            std::runtime_error ) 
 {
@@ -1261,7 +1220,7 @@ SerialPortImpl::Write(const SerialPort::DataBuffer& dataBuffer)
 
 inline
 void 
-SerialPortImpl::Write( const unsigned char* dataBuffer, 
+SerialPort::SerialPortImpl::Write( const unsigned char* dataBuffer, 
                        const unsigned int   bufferSize )
     throw( SerialPort::NotOpen, 
            std::runtime_error ) 
@@ -1295,7 +1254,7 @@ SerialPortImpl::Write( const unsigned char* dataBuffer,
 
 inline
 void 
-SerialPortImpl::HandlePosixSignal( int signalNumber )
+SerialPort::SerialPortImpl::HandlePosixSignal( int signalNumber )
 {
     //
     // We only want to deal with SIGIO signals here.

@@ -20,27 +20,12 @@
 #ifndef _SerialPort_h_
 #define _SerialPort_h_
 
-#ifndef _std_string_INCLUDED_
-#    include <string>
-#    define _std_string_INCLUDED_
-#endif
 
-#ifndef _std_vector_INCLUDED_
-#    include <vector>
-#    define _std_vector_INCLUDED_
-#endif
+#include <string>
+#include <vector>
+#include <stdexcept>
+#include <termios.h>
 
-#ifndef _std_stdexcept_INCLUDED_
-#    include <stdexcept>
-#    define _std_stdexcept_INCLUDED_
-#endif
-
-#ifndef _termios_h_INCLUDED_
-#    include <termios.h>
-#    define _termios_h_INCLUDED_
-#endif
-
-class SerialPortImpl ;
 
 /**
  *
@@ -401,6 +386,7 @@ public:
 private:
     SerialPort( const SerialPort& otherSerialPort ) ;
     SerialPort& operator=(const SerialPort& otherSerialPort ) ;
+    class SerialPortImpl ;
     SerialPortImpl* mSerialPortImpl ;
 } ;
 

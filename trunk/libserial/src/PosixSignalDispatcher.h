@@ -12,10 +12,8 @@
 #ifndef _PosixSignalDispatcher_h_
 #define _PosixSignalDispatcher_h_
 
-#ifndef _std_stdexcept_INCLUDED_
-#    include <stdexcept>
-#    define _std_stdexcept_INCLUDED_
-#endif
+#include <stdexcept>
+
 /*
  * Forward declarations.
  */
