@@ -1,4 +1,4 @@
-AC_REVISION($Revision: 1.1.1.1 $)
+AC_REVISION($Revision: 1.2 $)
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(src/SerialStream.C)
 
@@ -7,16 +7,16 @@ AM_CONFIG_HEADER(config.h)
 dnl
 dnl Indicate the package name and the version to automake
 dnl
-dnl $Id: configure.in,v 1.1.1.1 2000-08-17 09:30:12 pagey Exp $
-AM_INIT_AUTOMAKE(libserial, 0.1)
+dnl $Id: configure.in,v 1.2 2002-11-08 19:38:13 pagey Exp $
+AM_INIT_AUTOMAKE(libserial, 0.2)
 
 AM_MAINTAINER_MODE
 
 dnl Checks for programs.
+AC_ISC_POSIX
 AC_PROG_YACC
 AC_PROG_CC
 AC_PROG_CXX
-AC_ISC_POSIX
 AC_HEADER_STDC
 AC_ARG_PROGRAM
 AM_PROG_LEX
@@ -38,10 +38,6 @@ AC_CHECK_HEADERS(fcntl.h unistd.h)
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_INLINE
-
-AC_ARG_WITH(stldir,
-[  --with-stldir=DIR       directory under which STL or STLport is installed ],
-[ STLDIR=$withval ]) 
 
 AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
