@@ -1,4 +1,4 @@
-SUBDIRS=src doc
+SUBDIRS=src doc examples
 
 EXTRA_DIST = doxygen.conf.in
 

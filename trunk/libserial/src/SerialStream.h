@@ -1,7 +1,7 @@
 /*
- * Time-stamp: <03/12/30 03:39:34 pagey>
+ * Time-stamp: <04/05/05 15:25:22 pagey>
  *
- * $Id: SerialStream.h,v 1.4 2003-12-30 11:47:32 pagey Exp $ 
+ * $Id: SerialStream.h,v 1.5 2004-05-06 18:32:02 crayzeewulf Exp $ 
  *
  *
  */
@@ -29,21 +29,24 @@
 
 extern "C++" {
     namespace LibSerial {
-        /** A stream class for accessing serial ports on POSIX operating
-            systems. A lot of the functionality of this class has been
-            obtained by looking at the code of libserial package by Linas
-            Vepstas (linas@linas.org) and the excellent document on serial
-            programming by Michael R. Sweet. This document can be found at
-            <a href="http://www.easysw.com/~mike/serial/serial.html">
-            http://www.easysw.com/~mike/serial/serial.html</a>. The libserial 
-            package can be found at <a href="http://www.linas.org/serial/">
-            http://www.linas.org/serial/</a>. This class
-            allows one to set various parameters of a serial port and then
-            access it like a simple fstream. In fact, that is exactly what
-            it does. It sets the parameters of the serial port by
+        /** A stream class for accessing serial ports on POSIX
+            operating systems. A lot of the functionality of this
+            class has been obtained by looking at the code of
+            libserial package by Linas Vepstas (linas@linas.org) and
+            the excellent document on serial programming by Michael
+            R. Sweet. This document can be found at <a
+            href="http://www.easysw.com/~mike/serial/serial.html">
+            http://www.easysw.com/~mike/serial/serial.html</a>. The
+            libserial package can be found at <a
+            href="http://www.linas.org/serial/">
+            http://www.linas.org/serial/</a>. This class allows one to
+            set various parameters of a serial port and then access it
+            like a simple fstream. In fact, that is exactly what it
+            does. It sets the parameters of the serial port by
             maintaining a file descriptor for the port and uses the
-            basic_fstream functions for the IO. We have not implemented
-            any file locking yet but it will be added soon. 
+            basic_fstream functions for the IO. We have not
+            implemented any file locking yet but it will be added
+            soon.
 
             Make sure you read the documentation of the standard fstream
             template before using this class because most of the
@@ -55,8 +58,8 @@ extern "C++" {
             http://www.UNIX-systems.org/</a>. We will refer to this
             document as SUS-2.
 	
-            @author $Author: pagey $ <A HREF="pagey@drcsdca.com">Manish P. Pagey</A>
-            @version $Id: SerialStream.h,v 1.4 2003-12-30 11:47:32 pagey Exp $
+            @author $Author: crayzeewulf $ <A HREF="pagey@gnudom.org">Manish P. Pagey</A>
+            @version $Id: SerialStream.h,v 1.5 2004-05-06 18:32:02 crayzeewulf Exp $
      
         */
         class SerialStream : public std::iostream {
@@ -74,9 +77,9 @@ extern "C++" {
 
             //@}
 
-            /* ----------------------------------------------------------------------
+            /* ------------------------------------------------------------
              * Public Static Members
-             * ---------------------------------------------------------------------- */
+             * ------------------------------------------------------------
             /** @name Public static members. 
              */
             //@{
@@ -94,16 +97,19 @@ extern "C++" {
             //@{
 
             /** This constructor takes a filename and an openmode to
-                construct a SerialStream object. This results in a call to
-                basic_fstream::open(s,mode). This is the only way to
-                contruct an object of this class. We have to enforce this
-                instead of providing a default constructor because we want
-                to get a file descriptor whenever the basic_fstream::open()
-                function is called. However, this function is not made
-                virtual in the STL hence it is probably not very safe to
-                overload it. We may decide to overload it later but the
-                users of this class will have to make sure that this class
-                is not used as an fstream class. 
+                construct a SerialStream object. This results in a
+                call to basic_fstream::open(s,mode). This is the only
+                way to contruct an object of this class. We have to
+                enforce this instead of providing a default
+                constructor because we want to get a file descriptor
+                whenever the basic_fstream::open() function is
+                called. However, this function is not made virtual in
+                the STL hence it is probably not very safe to overload
+                it. We may decide to overload it later but the users
+                of this class will have to make sure that this class
+                is not used as an fstream class. The SerialStream will
+                be in the "open" state (same state as after calling
+                the Open() method) after calling this constructor.
 
                 If the constructor has problems opening the serial port or
                 getting the file-descriptor for the port, it will set the
@@ -216,7 +222,8 @@ extern "C++" {
             /** Use the specified flow control. 
 
             */
-            void SetFlowControl(const SerialStreamBuf::FlowControlEnum flow_c) ;
+            void 
+            SetFlowControl(const SerialStreamBuf::FlowControlEnum flow_c) ;
 
             /** Return the current flow control setting. 
 
@@ -231,23 +238,23 @@ extern "C++" {
 
             //@}
 
-            /* ----------------------------------------------------------------------
+            /* ------------------------------------------------------------
              * Friends
-             * ----------------------------------------------------------------------
+             * ------------------------------------------------------------
              */
         protected:
-            /* ----------------------------------------------------------------------
+            /* ------------------------------------------------------------
              * Protected Data Members
-             * ----------------------------------------------------------------------
+             * ------------------------------------------------------------
              */
-            /* ----------------------------------------------------------------------
+            /* ------------------------------------------------------------
              * Protected Methods
-             * ----------------------------------------------------------------------
+             * ------------------------------------------------------------
              */
         private:
-            /* ----------------------------------------------------------------------
+            /* ------------------------------------------------------------
              * Private Data Members
-             * ----------------------------------------------------------------------
+             * ------------------------------------------------------------
              */
             /** The SerialStreamBuf object that will be used by the stream
                 to communicate with the serial port.
@@ -255,9 +262,9 @@ extern "C++" {
             */
             SerialStreamBuf *mIOBuffer ;
 
-            /* ----------------------------------------------------------------------
+            /* ----------------------------------------------------------------
              * Private Methods
-             * ----------------------------------------------------------------------
+             * ----------------------------------------------------------------
              */
             /* Set the serial port to ignore the modem status lines. If the
                specified boolean parameter is false then the meaning of
@@ -299,25 +306,6 @@ extern "C++" {
             //
             if( mIOBuffer ) {
                 delete mIOBuffer ;
-            }
-        }
-
-        inline
-        void 
-        SerialStream::Open(const std::string filename, 
-                           std::ios_base::openmode mode) {
-            //
-            // Create a new SerialStreamBuf if one does not exist. 
-            //
-            if( ! mIOBuffer ) {
-                this->rdbuf(mIOBuffer=new SerialStreamBuf) ;
-                assert(mIOBuffer!=0) ;
-            }
-            //
-            // Open the serial port. 
-            //
-            if( 0 == mIOBuffer->open(filename, mode) ) {
-                setstate(badbit) ;    
             }
         }
 

@@ -1,7 +1,7 @@
 /*
- * Time-stamp: <03/12/30 03:42:38 pagey>
+ * Time-stamp: <04/05/05 16:21:47 pagey>
  *
- * $Id: SerialStreamBuf.h,v 1.3 2003-12-30 11:47:32 pagey Exp $ 
+ * $Id: SerialStreamBuf.h,v 1.4 2004-05-06 18:32:02 crayzeewulf Exp $ 
  *
  *
  */
@@ -10,7 +10,7 @@
 
 #ifndef _termios_h_INCLUDED_
 #    include <termios.h>
-#    define _SerialStreamBuf_h_
+#    define _termios_h_INCLUDED_
 #endif
 
 #ifndef _unistd_h_INCLUDED_
@@ -49,8 +49,8 @@ extern "C++" {
          *  At present, this class uses unbuffered I/O and all calls to
          *  setbuf() will be ignored.
          *
-         * @author $Author: pagey $ <A HREF="pagey@drcsdca.com">Manish P. Pagey</A>
-         * @version $Id: SerialStreamBuf.h,v 1.3 2003-12-30 11:47:32 pagey Exp $
+         * @author $Author: crayzeewulf $ <A HREF="pagey@gnudom.org">Manish P. Pagey</A>
+         * @version $Id: SerialStreamBuf.h,v 1.4 2004-05-06 18:32:02 crayzeewulf Exp $
          * */
         class SerialStreamBuf : public std::streambuf {
         public:
@@ -86,6 +86,8 @@ extern "C++" {
                 BAUD_9600  = B9600,       //!< 9600 baud.
                 BAUD_19200 = B19200,      //!< 19200 baud.
                 BAUD_38400 = B38400,      //!< 38400 baud.
+                BAUD_57600 = B57600,      //!< 57600 baud.
+                BAUD_115200 = B115200,    //!< 115200 baud.
                 BAUD_INVALID              //!< Invalid baud rate.
             } ;
 
@@ -119,13 +121,14 @@ extern "C++" {
             enum FlowControlEnum {
                 FLOW_CONTROL_HARD,   //!< Hardware flow control.
                 FLOW_CONTROL_SOFT,   //!< Software flow control. 
+                FLOW_CONTROL_NONE,   //!< No flow control.
                 FLOW_CONTROL_INVALID //!< Invalid flow control setting. 
             } ;
             //@}
 
-            /* ----------------------------------------------------------------------
+            /* ------------------------------------------------------------
              * Public Static Members
-             * ----------------------------------------------------------------------
+             * ------------------------------------------------------------
              */
             /** @name Public static members. 
 
@@ -342,14 +345,14 @@ extern "C++" {
 
             //@}
 
-            /* ----------------------------------------------------------------------
+            /* ------------------------------------------------------------
              * Friends
-             * ----------------------------------------------------------------------
+             * ------------------------------------------------------------
              */
         protected:
-            /* ----------------------------------------------------------------------
+            /* ------------------------------------------------------------
              * Protected Data Members
-             * ----------------------------------------------------------------------
+             * ------------------------------------------------------------
              */
             /** Character used to signal that I/O can start while using
                 software flow control with the serial port.
@@ -362,9 +365,9 @@ extern "C++" {
 
             */
             static const char CTRL_S = 0x13 ;
-            /* ----------------------------------------------------------------------
+            /* ------------------------------------------------------------
              * Protected Methods
-             * ----------------------------------------------------------------------
+             * ------------------------------------------------------------
              */
             /** Performs an operation that is defined separately for each
                 class derived from streambuf. The default behavior is to do
@@ -379,7 +382,8 @@ extern "C++" {
                 present.
 
             */
-            virtual std::streambuf* setbuf(char_type *, std::streamsize) ;
+            virtual std::streambuf* setbuf( char_type*, 
+                                            std::streamsize ) ;
 
             /** Reads upto n characters from the serial port and returns
                 them through the character array located at s.
@@ -387,7 +391,8 @@ extern "C++" {
                 @return The number of characters actually read from the
                 serial port. 
             */
-            virtual std::streamsize xsgetn(char_type *s, std::streamsize n) ;
+            virtual std::streamsize xsgetn( char_type*      s, 
+                                            std::streamsize n ) ;
 
             /** Reads and returns the next character from the associated
                 serial port if one otherwise returns traits::eof(). This
@@ -396,7 +401,7 @@ extern "C++" {
 
                 @return The next character from the serial port. 
             */
-            virtual int_type   underflow() ;
+            virtual int_type underflow() ;
 
             /** Reads and returns the next character from the associated
                 serial port if one otherwise returns traits::eof(). This
@@ -416,25 +421,26 @@ extern "C++" {
             */
             virtual int_type pbackfail(int_type c = traits_type::eof()) ;
 
-            /** Writes upto n characters from tha character sequence at s to
+            /** Writes upto n characters from the character sequence at s to
                 the serial port associated with the buffer. 
 
                 @return The number of characters that were successfully
                 written to the serial port. 
             */
-            virtual std::streamsize xsputn(const char_type* s, std::streamsize n) ;
+            virtual std::streamsize xsputn( const char_type* s, 
+                                            std::streamsize  n ) ;
 
             /** Writes the specified character to the associated
                 serial port. 
 
                 @return The character c. 
             */
-            virtual int_type   overflow(int_type c) ;
+            virtual int_type overflow(int_type c) ;
 
         private:
-            /* ----------------------------------------------------------------------
+            /* ------------------------------------------------------------
              * Private Data Members
-             * ----------------------------------------------------------------------
+             * ------------------------------------------------------------
              */
             /** We use unbuffered I/O for the serial port. However, we need
                 to provide the putback of atleast one character. This
@@ -452,9 +458,9 @@ extern "C++" {
 
             */
             int mFileDescriptor ;
-            /* ----------------------------------------------------------------------
+            /* ------------------------------------------------------------
              * Private Methods
-             * ----------------------------------------------------------------------
+             * ------------------------------------------------------------
              */
             /** This routine is called by open() in order to initialize some
                 parameters of the serial port and setting its parameters to
@@ -469,32 +475,39 @@ extern "C++" {
         SerialStreamBuf::SerialStreamBuf() :
             mPutbackChar(0),
             mPutbackAvailable(false),
-            mFileDescriptor(-1) {
+            mFileDescriptor(-1) 
+        {
             setbuf(0, 0) ;
+            return ;
         }
 
         inline 
-        SerialStreamBuf::~SerialStreamBuf() {
+        SerialStreamBuf::~SerialStreamBuf() 
+        {
             if( this->is_open() ) {
                 this->close() ;
             }
+            return ;
         }
 
         inline
         bool
-        SerialStreamBuf::is_open() const {
+        SerialStreamBuf::is_open() const 
+        {
             return (-1 != mFileDescriptor) ;
         }
     
         inline
         std::streambuf* 
-        SerialStreamBuf::setbuf(char_type *, std::streamsize) {
+        SerialStreamBuf::setbuf(char_type *, std::streamsize) 
+        {
             return std::streambuf::setbuf(0, 0) ;
         }
 
         inline
         SerialStreamBuf*
-        SerialStreamBuf::close() {
+        SerialStreamBuf::close() 
+        {
             //
             // Return a null pointer if the serial port is not currently open. 
             //
@@ -524,7 +537,8 @@ extern "C++" {
     
         inline
         std::streambuf::int_type
-        SerialStreamBuf::uflow() {
+        SerialStreamBuf::uflow() 
+        {
             int_type next_ch = underflow() ;
             mPutbackAvailable = false ;
             return next_ch ;
