@@ -1,0 +1,6 @@
+2003-12-30  Manish P. Pagey  <pagey@pagey.info>
+
+	* src/SerialStreamBuf.cc: Interchanged "case 1" and "case 2" in
+	SerialStreamBuf::SetNumOfStopBits() to make sure that stop bits
+	are set correctly. This bug was pointed out by Olivier Chambard.
+
