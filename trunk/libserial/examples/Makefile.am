@@ -13,7 +13,7 @@ xmodem_rx_SOURCES = xmodem_rx.cpp xmodem.cpp xmodem.h crc16.cpp crc16.h byte_xfe
 
 xmodem_tx_SOURCES = xmodem_tx.cpp xmodem.cpp xmodem.h crc16.cpp crc16.h byte_xfer.cpp byte_xfer.h
 
-INCLUDES = -I../src
+INCLUDES = -I@top_srcdir@/src
 
 readport_LDADD = ../src/libserial.la
 writeport_LDADD = ../src/libserial.la
