@@ -31,10 +31,33 @@ using namespace LibSerial ;
 using namespace std ;
 
 SerialStream::SerialStream(const string filename, ios_base::openmode mode) :
-    mIOBuffer(0), iostream(0) {
-    Open(filename, mode) ;
+    mIOBuffer(0), iostream(0) 
+{
+    this->Open(filename, mode) ;
     return ;
 }
+
+
+void 
+SerialStream::Open( const std::string       filename, 
+                    std::ios_base::openmode mode ) 
+{
+    //
+    // Create a new SerialStreamBuf if one does not exist. 
+    //
+    if( ! mIOBuffer ) {
+        this->rdbuf(mIOBuffer=new SerialStreamBuf) ;
+        assert(mIOBuffer!=0) ;
+    }
+    //
+    // Open the serial port. 
+    //
+    if( 0 == mIOBuffer->open(filename, mode) ) {
+        setstate(badbit) ;    
+    }
+    return ;
+}
+
 
 
 void 

@@ -51,7 +51,7 @@ const SerialStreamBuf::ParityEnum
 SerialStreamBuf::DEFAULT_PARITY          = PARITY_NONE        ;
 
 const SerialStreamBuf::FlowControlEnum
-SerialStreamBuf::DEFAULT_FLOW_CONTROL    = FLOW_CONTROL_HARD  ;
+SerialStreamBuf::DEFAULT_FLOW_CONTROL    = FLOW_CONTROL_NONE  ;
 
 
 SerialStreamBuf*
@@ -220,6 +220,8 @@ SerialStreamBuf::SetBaudRate(const BaudRateEnum baud_rate) {
     case BAUD_9600: 
     case BAUD_19200:
     case BAUD_38400:
+    case BAUD_57600:
+    case BAUD_115200:
         //
         // Get the current terminal settings. 
         //
@@ -315,6 +317,10 @@ SerialStreamBuf::BaudRate() const {
         return BAUD_19200 ; break ;
     case B38400:
         return BAUD_38400 ; break ;
+    case B57600:
+        return BAUD_57600 ; break ;
+    case B115200:
+        return BAUD_115200 ; break ;
     default:
         return BAUD_INVALID ; // we return an invalid value in this case. 
         break ;
@@ -562,11 +568,14 @@ SerialStreamBuf::SetFlowControl(const FlowControlEnum flow_c) {
         tset.c_cflag |= CRTSCTS;
         tset.c_cc[VSTART] = _POSIX_VDISABLE;
         tset.c_cc[VSTOP] = _POSIX_VDISABLE;
-    } else {
+    } else if ( FLOW_CONTROL_SOFT == flow_c ) {
         tset.c_iflag |= IXON|IXOFF;
         tset.c_cflag &= ~CRTSCTS;
         tset.c_cc[VSTART] = CTRL_Q ; // 0x11 (021) ^q
         tset.c_cc[VSTOP]  = CTRL_S ; // 0x13 (023) ^s
+    } else {
+        tset.c_iflag &= ~(IXON|IXOFF);        
+        tset.c_cflag &= ~CRTSCTS;
     }
     retval = tcsetattr(mFileDescriptor, TCSANOW, &tset);
     if (-1 == retval) {
@@ -599,12 +608,16 @@ SerialStreamBuf::FlowControl() const {
         return FLOW_CONTROL_SOFT ;
     } else if ( ! ( (tset.c_iflag & IXON) ||
                     (tset.c_iflag & IXOFF) ) ) {
-        //
-        // If neither IXON or IXOFF is set then we must have hardware flow
-        // control.
-        //
-        return FLOW_CONTROL_HARD ;
-    } 
+        if ( tset.c_cflag & CRTSCTS ) {
+            //
+            // If neither IXON or IXOFF is set then we must have hardware flow
+            // control.
+            //
+            return FLOW_CONTROL_HARD ;
+        } else {
+            return FLOW_CONTROL_NONE ;
+        }
+    }
     //
     // If none of the above conditions are satisfied then the serial
     // port is using a flow control setup which we do not support at
