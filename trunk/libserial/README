@@ -1,0 +1,43 @@
+libserial
+------------------------------------------------------------
+
+This library can be used to access the serial ports on POSIX
+systems. You will need to following tools to compile this library: 
+
+1. STLport: Libserial requires an STL implementation that complies
+            with the C++ standard. We have been using the STLport
+            implementation. It can be obtained from: 
+
+		http://www.stlport.org/
+
+	    Make sure that you specify the location of you STLport
+            installation using the --with-stldir option when running
+            configure.	
+
+2. Doxygen: The class documentation for the library can be generated
+            using the doxygen program. You can obtain it from: 
+
+		http://www.stack.nl/~dimitri/doxygen/index.html
+
+	    Once you have installed doxygen, type "make dox" in the
+	    top level directory and the documentation will be
+	    generated under "doc/html". 
+
+When you have installed the above tools, run the following commands:
+
+------------------------------------------------------------
+./configure --with-stldir=<YOUR STL LOCATION>
+make
+make dox
+make install
+------------------------------------------------------------
+
+Note: The html documentation will not be installed by "make
+install". I will fix this in the future release.	
+
+This is a pre-alpha release. Things may not work as expected. 
+
+Please send comments, suggestions, bugs to pagey@san.rr.com. 
+
+Enjoy, 
+Manish P. Pagey
