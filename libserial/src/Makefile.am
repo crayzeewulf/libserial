@@ -1,10 +1,5 @@
 
-INCLUDES = -I@STLDIR@/include/stlport \
-           -D_STREAM_COMPAT -I../nienet/`../config.guess`/include/
-
-CFLAGS = -g
-CXXFLAGS = -g 
-LDFLAGS = -L@STLDIR@/lib -lstlport_gcc
+INCLUDES = -I../nienet/`../config.guess`/include/
 
 lib_LTLIBRARIES = libserial.la
 

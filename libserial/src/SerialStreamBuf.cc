@@ -6,6 +6,7 @@
 #include <iostream>
 #include "SerialStreamBuf.h"
 
+using namespace std ;
 using namespace LibSerial ;
 
 //
@@ -39,7 +40,16 @@ SerialStreamBuf::open( const string filename,
   // with the open() system call.
   //
   int flags ;
-  switch( mode ) {
+  if ( mode == (ios_base::in|ios_base::out) ) {
+    flags = O_RDWR ;
+  } else if ( mode == ios_base::in ) {
+    flags = O_RDONLY ;
+  } else if ( mode == ios_base::out ) {
+    flags = O_WRONLY ;
+  } else {
+    return 0 ;
+  }
+  /* switch( mode ) {
   case ios_base::in:
     flags = O_RDONLY ;
     break ;
@@ -52,7 +62,7 @@ SerialStreamBuf::open( const string filename,
   default:
     return 0 ;
     break ;
-  }
+    } */
   //
   // Since we are dealing with the serial port we need to use the
   // O_NOCTTY option.
