@@ -34,24 +34,9 @@
 #    define _std_queue_INCLUDED_
 #endif
 
-#ifndef _termios_h_INCLUDED_
-#    include <termios.h>
-#    define _termios_h_INCLUDED_
-#endif
-
-#ifndef _fcntl_h_INCLUDED_
-#    include <fcntl.h>
-#    define _fcntl_h_INCLUDED_
-#endif
-
-#ifndef _unistd_h_INCLUDED_
-#    include <unistd.h>
-#    define _unistd_h_INCLUDED_
-#endif
-
-#ifndef _sys__ioctl_h_INCLUDED_
-#    include <sys/ioctl.h>
-#    define _sys__ioctl_h_INCLUDED_
+#ifndef _std_map_INCLUDED_
+#    include <map>
+#    define _std_map_INCLUDED_
 #endif
 
 #ifndef _std_cerrno_INCLUDED_
@@ -64,9 +49,24 @@
 #    define _std_cassert_INCLUDED_
 #endif
 
-#ifndef _std_map_INCLUDED_
-#    include <map>
-#    define _std_map_INCLUDED_
+#ifndef _termios_h_INCLUDED_
+#    include <termios.h>
+#    define _termios_h_INCLUDED_
+#endif
+
+#ifndef _fcntl_h_INCLUDED_
+#    include <fcntl.h>
+#    define _fcntl_h_INCLUDED_
+#endif
+
+#ifndef _sys__ioctl_h_INCLUDED_
+#    include <sys/ioctl.h>
+#    define _sys__ioctl_h_INCLUDED_
+#endif
+
+#ifndef _sys__time_h_INCLUDED_
+#    include <sys/time.h>
+#    define _sys__time_h_INCLUDED_
 #endif
 
 #ifndef _signal_h_INCLUDED_
@@ -86,6 +86,15 @@ namespace {
     const std::string ERR_MSG_INVALID_PARITY    = "Invalid parity setting." ;
     const std::string ERR_MSG_INVALID_STOP_BITS = "Invalid number of stop bits." ;
     const std::string ERR_MSG_INVALID_FLOW_CONTROL = "Invalid flow control." ;
+
+    /*
+     * Return the difference between the two specified timeval values. 
+     * This method subtracts secondOperand from firstOperand and returns
+     * the result as a timeval.
+     */    
+    const struct timeval 
+    operator-( const struct timeval& firstOperand, 
+               const struct timeval& secondOperand ) ;
 } ;
 
 class SerialPortImpl : public PosixSignalHandler {
@@ -201,7 +210,14 @@ public:
         throw( SerialPort::NotOpen, 
                SerialPort::ReadTimeout, 
                std::runtime_error  ) ;
-        
+
+    const std::string 
+    ReadLine( const unsigned int msTimeout = 0,
+              const char         lineTerminator = '\n' ) 
+        throw( SerialPort::NotOpen, 
+               SerialPort::ReadTimeout,
+               std::runtime_error ) ;
+                                      
     void
     WriteByte( const unsigned char dataByte )
         throw( SerialPort::NotOpen,
@@ -252,20 +268,6 @@ private:
      * asynchronously so we do not let tty buffer get filled. 
      */
     std::queue<unsigned char> mInputBuffer ;
-    
-    /**
-     * Set the timeout for the next read to msTimeout milliseconds. If
-     * msTimeout is zero, then the reads will block until atleast
-     * numOfBytes bytes are received. 
-     *
-     * :TRICKY: This method does not check if the serial port is
-     * currently open. Hence, it should not be called without making
-     * sure that the serial port is open.
-     */
-    void SetReadTimeout( const unsigned int msTimeout,
-                         const unsigned int numOfBytes = 0 ) 
-        throw( std::invalid_argument, 
-               std::runtime_error ) ;
     
 } ;
 
@@ -447,6 +449,7 @@ SerialPort::Read( SerialPort::DataBuffer& dataBuffer,
                                   msTimeout ) ;
 }
 
+
 const std::string 
 SerialPort::ReadLine( const unsigned int msTimeout,
                       const char         lineTerminator ) 
@@ -454,14 +457,10 @@ SerialPort::ReadLine( const unsigned int msTimeout,
            ReadTimeout,
            std::runtime_error ) 
 {
-    std::string result ;
-    char next_char = 0 ; 
-    do {
-        next_char = this->ReadByte( msTimeout ) ;
-        result += next_char ;
-    } while( next_char != lineTerminator ) ;
-    return result ;
+    return mSerialPortImpl->ReadLine( msTimeout,
+                                      lineTerminator ) ;
 }
+
 
 void
 SerialPort::WriteByte( const unsigned char dataByte )
@@ -1068,15 +1067,55 @@ SerialPortImpl::ReadByte(const unsigned int msTimeout)
     if ( ! this->IsOpen() ) {
         throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
     }
+    //
+    // Get the current time. Throw an exception if we are unable
+    // to read the current time.
+    //
+    struct timeval entry_time ;
+    if ( gettimeofday( &entry_time,
+                       NULL ) < 0 )
+    {
+        throw std::runtime_error( strerror(errno) ) ;
+    }
     // 
     // Wait for data to be available.
     //
-    // :TODO: The msTimeout parameter is not used here yet. 
-    // We need to implemented timeouts during reads.
+    const int MICROSECONDS_PER_MS  = 1000 ;
+    const int MILLISECONDS_PER_SEC = 1000 ;
     //
-    while( 0 == mInputBuffer.size() ) 
+    while( 0 == mInputBuffer.size() )
     {
-        usleep( 1000 ) ;
+        //
+        // Read the current time. 
+        //
+        struct timeval curr_time ;
+        if ( gettimeofday( &curr_time, 
+                           NULL ) < 0 )
+        {
+            throw std::runtime_error( strerror(errno) ) ;
+        }
+        //
+        // Obtain the elapsed time.
+        //
+        struct timeval elapsed_time = curr_time - entry_time ;
+        //
+        // Increase the elapsed number of milliseconds. 
+        //
+        int elapsed_ms = ( elapsed_time.tv_sec  * MILLISECONDS_PER_SEC + 
+                           elapsed_time.tv_usec / MICROSECONDS_PER_MS ) ;    
+        //
+        // If more than msTimeout milliseconds have elapsed while
+        // waiting for data, then we throw a ReadTimeout exception.
+        //
+        if ( ( msTimeout > 0 ) &&
+             ( elapsed_ms > msTimeout ) ) 
+        {
+            throw SerialPort::ReadTimeout() ;
+        }
+        //
+        // Wait for 1ms (1000us) for data to arrive. 
+        //
+        usleep( MICROSECONDS_PER_MS ) ;
     }
     //
     // Return the first byte and remove it from the queue.
@@ -1119,78 +1158,30 @@ SerialPortImpl::Read( SerialPort::DataBuffer& dataBuffer,
         // data. 
         //
         dataBuffer.reserve( numOfBytes ) ;
-        //
-        // Set the read timeout for each byte. 
-        //
-        if ( 0 == msTimeout ) {
-            this->SetReadTimeout( 0,
-                                  numOfBytes ) ;
-        } else {
-            this->SetReadTimeout( msTimeout,
-                                  0 ) ;
-        }
-        //
-        bool is_read_failed = false ;
-#if 1
-        for(unsigned int i=0; i<numOfBytes; ++i) {
-            //
-            // Read the next byte; keep retrying if EAGAIN error is
-            // triggered by the call to read().
-            //
-            int num_of_bytes_read   = -1 ;
-            unsigned char next_byte = 0 ;
-            do {
-                num_of_bytes_read = read( mFileDescriptor, 
-                                          &next_byte, 
-                                          1 ) ;
-            } while( (num_of_bytes_read < 0) &&
-                     (EAGAIN == errno) ) ;
-            //
-            // Copy the data into dataBuffer if there was no error.
-            //
-            if ( 1 == num_of_bytes_read ) {
-                dataBuffer.push_back( next_byte ) ;
-            } else {
-                //
-                // If num_of_bytes_read is negative, then we had an
-                // error while reading. Otherwise, the read timed out.
-                // 
-                if ( num_of_bytes_read < 0 ) {
-                    is_read_failed = true ;
-                }
-                break ;
-            }
-        }
-#else
-        // :DEBUGGING:
-        unsigned char data_buffer[1024] ;
-        int num_of_bytes_read = read( mFileDescriptor, 
-                                      data_buffer, 
-                                      numOfBytes ) ;
-        if ( numOfBytes == num_of_bytes_read ) {
-            dataBuffer.resize( num_of_bytes_read ) ;
-            std::copy( data_buffer, 
-                       data_buffer + num_of_bytes_read, 
-                       dataBuffer.begin() ) ;
-        }
-        if ( num_of_bytes_read < 0 ) {
-            is_read_failed = true ;
-        }
-#endif
-        //
-        // Check if there was an error or timeout while reading data.
-        // 
-        if ( is_read_failed ) {
-            throw std::runtime_error( strerror(errno) ) ;            
-        } 
-        //
-        // Check if the read timed out. 
-        //
-        if ( dataBuffer.size() < numOfBytes ) {
-            throw SerialPort::ReadTimeout() ;
+        //        
+        for(int i=0; i<numOfBytes; ++i)
+        {
+            dataBuffer.push_back( ReadByte(msTimeout) ) ;
         }
     }
     return ;
+}
+
+inline
+const std::string 
+SerialPortImpl::ReadLine( const unsigned int msTimeout,
+                          const char         lineTerminator ) 
+    throw( SerialPort::NotOpen, 
+           SerialPort::ReadTimeout,
+           std::runtime_error ) 
+{
+    std::string result ;
+    char next_char = 0 ; 
+    do {
+        next_char = this->ReadByte( msTimeout ) ;
+        result += next_char ;
+    } while( next_char != lineTerminator ) ;
+    return result ;
 }
 
 inline
@@ -1303,51 +1294,6 @@ SerialPortImpl::Write( const unsigned char* dataBuffer,
 }
 
 inline
-void
-SerialPortImpl::SetReadTimeout( const unsigned int msTimeout,
-                                const unsigned int numOfBytes ) 
-    throw( std::invalid_argument, 
-           std::runtime_error ) 
-{
-    //
-    // Read the current serial port settings. 
-    //
-    termios port_settings ;
-    if ( tcgetattr( mFileDescriptor, 
-                    &port_settings ) < 0 ) {
-        throw std::runtime_error( strerror(errno) ) ;
-    }
-    //
-    // Wait till data is available if msTimeout is zero.
-    //
-    if ( 0 == msTimeout ) {
-        port_settings.c_cc[ VMIN ]  = numOfBytes ;
-        port_settings.c_cc[ VTIME ] = 0 ;
-    } else {
-        //
-        // Set the read timeout to the specified number of
-        // milliseconds.
-        // ------------------------------------------------------------
-        // :MAGIC_NUMBER: 100
-        // ------------------------------------------------------------
-        // VTIME is specified in deciseconds. In order to convert
-        // milliseconds to deciseconds, we divide msTimeout by 100.
-        //
-        port_settings.c_cc[ VMIN ]  = numOfBytes ;
-        port_settings.c_cc[ VTIME ] = msTimeout / 100 ;
-    }
-    //
-    // Write the modified settings.
-    //
-    if ( tcsetattr( mFileDescriptor, 
-                    TCSANOW, 
-                    &port_settings ) < 0 ) {
-        throw std::invalid_argument( strerror(errno) ) ;
-    }    
-    return ;
-}
-
-inline
 void 
 SerialPortImpl::HandlePosixSignal( int signalNumber )
 {
@@ -1391,3 +1337,39 @@ SerialPortImpl::HandlePosixSignal( int signalNumber )
     }
     return ;
 }
+
+namespace
+{
+    const struct timeval
+    operator-( const struct timeval& firstOperand,
+               const struct timeval& secondOperand )
+    {
+        /*
+         * This implementation may result in undefined behavior if the
+         * platform uses unsigned values for storing tv_sec and tv_usec
+         * members of struct timeval.
+         */
+        //
+        // Number of microseconds in a second.
+        //
+        const int MICROSECONDS_PER_SECOND = 1000000 ;
+        struct timeval result ;
+        //
+        // Take the difference of individual members of the two operands.
+        //
+        result.tv_sec  = firstOperand.tv_sec - secondOperand.tv_sec ;
+        result.tv_usec = firstOperand.tv_usec - secondOperand.tv_usec ;
+        //
+        // If abs(result.tv_usec) is larger than MICROSECONDS_PER_SECOND, 
+        // then increment/decrement result.tv_sec accordingly.
+        //
+        if ( abs( result.tv_usec ) > MICROSECONDS_PER_SECOND )
+        {
+            int num_of_seconds = (result.tv_usec / MICROSECONDS_PER_SECOND ) ;
+            result.tv_sec  += num_of_seconds ;
+            result.tv_usec -= ( MICROSECONDS_PER_SECOND * num_of_seconds ) ;
+        }
+        return result ;
+    }
+} ;
+
