@@ -18,7 +18,12 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #ifndef _SerialPort_h_
-#    include <SerialPort.h>
+#    include "SerialPort.h"
+#endif
+
+#ifndef _std_queue_INCLUDED_
+#    include <queue>
+#    define _std_queue_INCLUDED_
 #endif
 
 #ifndef _termios_h_INCLUDED_
@@ -51,6 +56,16 @@
 #    define _std_cassert_INCLUDED_
 #endif
 
+#ifndef _std_map_INCLUDED_
+#    include <map>
+#    define _std_map_INCLUDED_
+#endif
+
+#ifndef _signal_h_INCLUDED_
+#    include <signal.h>
+#    define _signal_h_INCLUDED_
+#endif
+
 namespace {
     //
     // Various error messages used in this file while throwing
@@ -63,6 +78,22 @@ namespace {
     const std::string ERR_MSG_INVALID_PARITY    = "Invalid parity setting." ;
     const std::string ERR_MSG_INVALID_STOP_BITS = "Invalid number of stop bits." ;
     const std::string ERR_MSG_INVALID_FLOW_CONTROL = "Invalid flow control." ;
+
+    //
+    // :DEBUGGING: The asynchronous I/O implementation if for testing
+    // purpose only. The final design will have a signal dispatcher
+    // class. 
+    //     
+    void 
+    SignalHandler( int signalNumber ) ;
+                   
+    //
+    // :DEBUGGING: List of input buffers associated with a
+    // file descriptor. The signal handler dumps the incoming
+    // data into the corresponding buffer.
+    //
+    std::queue<unsigned char> sInputBuffer ;
+    int sFileDescriptor = -1 ;
 } ;
 
 class SerialPortImpl {
@@ -217,7 +248,13 @@ private:
      * serial port is closed.
      */
     termios mOldPortSettings ;
-
+    
+    /**
+     * Circular buffer used to store the received data. This is done
+     * asynchronously so we do not let tty buffer get filled. 
+     */
+    // CircularBuffer<unsigned char> mInputBuffer ;
+    
     /**
      * Set the timeout for the next read to msTimeout milliseconds. If
      * msTimeout is zero, then the reads will block until atleast
@@ -274,6 +311,7 @@ SerialPort::Open( const BaudRate      baudRate,
     mSerialPortImpl->Open() ;
     //
     // Set the various parameters of the serial port if it is open.
+    //
     this->SetBaudRate(baudRate) ;
     this->SetCharSize(charSize) ;
     this->SetParity(parityType) ;
@@ -281,6 +319,7 @@ SerialPort::Open( const BaudRate      baudRate,
     this->SetFlowControl(flowControl) ;
     //
     // All done.
+    //
     return ;
 }
 
@@ -493,12 +532,59 @@ SerialPortImpl::Open()
     /*
      * Try to open the serial port and throw an exception if we are
      * not able to open it.
+     *
+     * :FIXME: Exception thrown by this method after opening the
+     * serial port might leave the port open even though mIsOpen
+     * is false. We need to close the port before throwing an
+     * exception or close it next time this method is called before
+     * calling open() again.
      */
     mFileDescriptor = open( mSerialPortName.c_str(), 
-                            O_RDWR | O_NOCTTY ) ; 
+                            O_RDWR | O_NOCTTY | O_NONBLOCK ) ; 
     if ( mFileDescriptor < 0 ) {
         throw SerialPort::OpenFailed( strerror(errno) )  ;
     }
+    //
+    // :DEBUGGING:
+    //
+    sFileDescriptor = mFileDescriptor ;
+
+    /*
+     * Attach a signal handler to be called whenever data is available
+     * at the serial port.
+     */
+    struct sigaction signal_handler_spec ;
+    signal_handler_spec.sa_handler = SignalHandler ;
+    sigemptyset( &signal_handler_spec.sa_mask ) ;
+    signal_handler_spec.sa_flags = 0 ;
+    signal_handler_spec.sa_restorer = NULL ;
+    if ( sigaction( SIGIO,
+                    &signal_handler_spec,
+                    NULL ) < 0 )
+    {
+        throw SerialPort::OpenFailed( strerror(errno) ) ;
+    }
+                           
+    /*
+     * Direct all SIGIO and SIGURG signals for the port to the current
+     * process.
+     */
+    if ( fcntl( mFileDescriptor, 
+                F_SETOWN, 
+                getpid() ) < 0 ) {
+        throw SerialPort::OpenFailed( strerror(errno) ) ;
+    }
+
+    /*
+     * Enable asynchronous I/O with the serial port.
+     */
+    if ( fcntl( mFileDescriptor,
+                F_SETFL,
+                FASYNC ) < 0 )
+    {
+        throw SerialPort::OpenFailed( strerror(errno) ) ;
+    }
+    
     /*
      * Save the current settings of the serial port so they can be
      * restored when the serial port is closed.
@@ -509,17 +595,12 @@ SerialPortImpl::Open()
     }
 
     //
-    // Copy the old settings and modify them as necessary.
+    // Start assembling the new port settings.
     //
-    termios port_settings = mOldPortSettings ;
-    
-    //
-    // Zero out all local and output flags. 
-    //
-    port_settings.c_iflag = 0 ;
-    port_settings.c_lflag = 0 ;
-    port_settings.c_oflag = 0 ;
-    
+    termios port_settings ;
+    bzero( &port_settings, 
+           sizeof( port_settings ) ) ;
+
     //
     // Enable the receiver (CREAD) and ignore modem control lines
     // (CLOCAL).
@@ -535,8 +616,15 @@ SerialPortImpl::Open()
     // available characters.
     //
     port_settings.c_cc[ VMIN  ] = 0 ;
-    port_settings.c_cc[ VTIME ] = 0 ;
-    
+    port_settings.c_cc[ VTIME ] = 0 ;    
+    /*
+     * Flush the input buffer associated with the port.
+     */
+    if ( tcflush( mFileDescriptor, 
+                  TCIFLUSH ) < 0 )
+    {
+        throw SerialPort::OpenFailed( strerror(errno) ) ;
+    }
     /*
      * Write the new settings to the port.
      */
@@ -545,17 +633,7 @@ SerialPortImpl::Open()
                     &port_settings ) < 0 ) {
         throw SerialPort::OpenFailed( strerror(errno) ) ;
     }
-
-    /*
-     * Direct all SIGIO and SIGURG signals for the port to the current
-     * process.
-     */
-    if ( fcntl( mFileDescriptor, 
-                F_SETOWN, 
-                getpid() ) < 0 ) {
-        throw SerialPort::OpenFailed( strerror(errno) ) ;
-    }
-
+     
     /*
      * The serial port is open at this point.
      */
@@ -761,12 +839,15 @@ SerialPortImpl::SetParity( const SerialPort::Parity parityType )
     case SerialPort::PARITY_EVEN:
         port_settings.c_cflag |= PARENB ;
         port_settings.c_cflag &= ~PARODD ;
+        port_settings.c_iflag |= INPCK ;
         break ;
     case SerialPort::PARITY_ODD:
         port_settings.c_cflag |= ( PARENB | PARODD ) ;
+        port_settings.c_iflag |= INPCK ;
         break ;
     case SerialPort::PARITY_NONE:
         port_settings.c_cflag &= ~(PARENB) ;
+        port_settings.c_iflag |= IGNPAR ;
         break ;
     default:
         throw std::invalid_argument( ERR_MSG_INVALID_PARITY ) ;
@@ -982,15 +1063,9 @@ SerialPortImpl::IsDataAvailable() const
         throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
     }
     //
-    // Check if any data is available at the serial port. 
+    // Check if any data is available in the input buffer.
     //
-    int num_of_bytes_available = 0 ;
-    if ( ioctl( mFileDescriptor, 
-                FIONREAD, 
-                &num_of_bytes_available ) < 0 ) {
-        throw std::runtime_error( strerror(errno) ) ;
-    }
-    return (num_of_bytes_available ? true : false) ;
+    return ( sInputBuffer.size() > 0 ? true : false ) ;
 }
 
 inline
@@ -1000,20 +1075,28 @@ SerialPortImpl::ReadByte(const unsigned int msTimeout)
            SerialPort::ReadTimeout,
            std::runtime_error )
 {
-    SerialPort::DataBuffer data_buffer ; 
     //
-    // Read a single byte. 
+    // Make sure that the serial port is open. 
     //
-    this->Read( data_buffer, 
-                1, 
-                msTimeout ) ;
+    if ( ! this->IsOpen() ) {
+        throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
+    }
+    // 
+    // Wait for data to be available.
     //
-    // If the above Read() does not throw an exception, then we should
-    // have exactly one byte in data_buffer.
+    // :TODO: The msTimeout parameter is not used here yet. 
+    // We need to implemented timeouts during reads.
     //
-    assert( 1 == data_buffer.size() ) ;
+    while( 0 == sInputBuffer.size() ) 
+    {
+        usleep( 1000 ) ;
+    }
     //
-    return data_buffer[0] ;
+    // Return the first byte and remove it from the queue.
+    //
+    unsigned char next_char = sInputBuffer.front() ;
+    sInputBuffer.pop() ;
+    return next_char ;
 }
 
 inline
@@ -1061,7 +1144,7 @@ SerialPortImpl::Read( SerialPort::DataBuffer& dataBuffer,
         }
         //
         bool is_read_failed = false ;
-#if 0
+#if 1
         for(unsigned int i=0; i<numOfBytes; ++i) {
             //
             // Read the next byte; keep retrying if EAGAIN error is
@@ -1227,7 +1310,7 @@ SerialPortImpl::Write( const unsigned char* dataBuffer,
         throw std::runtime_error( strerror(errno) ) ;
     }    
     //
-    // :TODO: What happens if num_of_bytes_written < bufferSize ?
+    // :FIXME: What happens if num_of_bytes_written < bufferSize ?
     //
     return ;
 }
@@ -1276,3 +1359,47 @@ SerialPortImpl::SetReadTimeout( const unsigned int msTimeout,
     }    
     return ;
 }
+
+namespace
+{
+    void 
+    SignalHandler( int signalNumber )
+    {
+        //
+        // The file descriptor for the serial port.
+        //
+        int file_descriptor = sFileDescriptor ;
+        //
+        // Check if any data is available at the specified file 
+        // descriptor. 
+        //
+        int num_of_bytes_available = 0 ;
+        if ( ioctl( file_descriptor,
+                    FIONREAD, 
+                    &num_of_bytes_available ) < 0 ) {
+            /* 
+             * Ignore any errors and return immediately.
+             */
+            return ;
+        }
+        //
+        // If data is available, read all available data and shove 
+        // it into the corresponding input buffer. 
+        //
+        for(int i=0; i<num_of_bytes_available; ++i)
+        {
+            unsigned char next_byte ; 
+            if ( read( file_descriptor, 
+                       &next_byte,
+                       1 ) > 0 )
+            {
+                sInputBuffer.push( next_byte ) ;
+            }
+            else
+            {
+                break ;
+            }
+        }
+        return ;
+    }
+} ;

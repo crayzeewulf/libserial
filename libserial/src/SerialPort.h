@@ -42,6 +42,19 @@
 
 class SerialPortImpl ;
 
+/**
+ *
+ * @note This class attaches a handler to the SIGIO signal to detect
+ * the data arriving at a serial port. However, this signal handler
+ * will also call any signal handler that is already attached to 
+ * this signal. However, if other parts of the application attach a
+ * signal handler to SIGIO after constructing an instance of SIGIO, 
+ * they must ensure that they call the existing signal handler. 
+ * Otherwise, it may not be possible to receive any data through
+ * the serial port using this class.
+ * 
+ * :FIXME: Provide examples of the above potential problem. 
+ */
 class SerialPort {
 public:
     /**
