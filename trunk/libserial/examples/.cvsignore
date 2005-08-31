@@ -2,4 +2,6 @@
 .libs
 Makefile
 Makefile.in
+readport
+writeport
 
