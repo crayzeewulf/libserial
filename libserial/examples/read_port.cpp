@@ -59,6 +59,15 @@ main( int    argc,
     }
 
     //
+    // Set timeout in microseconds.
+    //
+    serial_port.SetTimeout( 100000 );
+    if ( ! serial_port.good() ) {
+        std::cerr << "Error: Could not adjust timeout." << std::endl;
+        exit(1) ;
+    }
+
+    //
     // Turn on hardware flow control.
     //
     serial_port.SetFlowControl( SerialStreamBuf::FLOW_CONTROL_HARD ) ;
@@ -75,10 +84,11 @@ main( int    argc,
     //
     // Keep reading data from serial port and print it to the screen.
     //
-    char next_byte ;
-    while( serial_port.get(next_byte) ) {
-        std::cerr << std::hex << (int)next_byte << " " ;
-    }
+    while( serial_port.rdbuf()->in_avail() > 0  ) {
+      char next_byte;
+      serial_port.get(next_byte);
+      std::cerr << std::hex << (int)next_byte << " ";
+    };	    
     std::cerr << std::endl ;
     return EXIT_SUCCESS ;
 }
