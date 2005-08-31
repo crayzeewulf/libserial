@@ -313,15 +313,71 @@ SerialStream::SetFlowControl(const SerialStreamBuf::FlowControlEnum flow_c) {
     return ;
 }
 
-void
+const short
+SerialStream::SetVMin( short vmin ) {
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
+    if ( my_buffer ) {
+      if ( -1 == my_buffer->SetVMin( vmin ) ) {
+        setstate(badbit) ;
+        return -1;
+      };
+    } else {
+      setstate(badbit) ;
+      return -1;
+    };
+    return vmin;
+}
+
+const short
+SerialStream::VMin() {
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
+    if ( my_buffer ) {
+      return my_buffer->VMin();
+    } else {
+      setstate(badbit) ;
+      return -1;
+    };
+}
+
+const short
+SerialStream::SetVTime( short vmin ) {
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
+    if ( my_buffer ) {
+      if ( -1 == my_buffer->SetVTime( vmin ) ) {
+        setstate(badbit) ;
+        return -1;
+      };
+    } else {
+      setstate(badbit) ;
+      return -1;
+    };
+    return vmin;
+}
+
+const short
+SerialStream::VTime() {
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
+    if ( my_buffer ) {
+      return my_buffer->VTime();
+    } else {
+      setstate(badbit) ;
+      return -1;
+    };
+}
+
+const int
 SerialStream::SetTimeout( int milliseconds ) {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     if ( my_buffer ) {
-      if ( -1 == my_buffer->SetTimeout( milliseconds ) )
+      if ( -1 == my_buffer->SetTimeout( milliseconds ) ) {
         setstate(badbit) ;
-    } else
+        return -1;
+      };
+    } else {
       setstate(badbit) ;
-    return ;
+      return -1;
+    };
+    return milliseconds;
 }
 
 const int

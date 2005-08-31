@@ -1,7 +1,7 @@
 /*
  * Time-stamp: <04/05/05 15:25:22 pagey>
  *
- * $Id: SerialStream.h,v 1.6 2005-08-31 12:48:24 wedesoft Exp $
+ * $Id: SerialStream.h,v 1.7 2005-08-31 14:17:43 wedesoft Exp $
  *
  *
  */
@@ -230,9 +230,29 @@ extern "C++" {
             */
             const SerialStreamBuf::FlowControlEnum FlowControl() ;
 
+            /** Set character buffer size.
+                
+            */
+            const short SetVMin( short vtime ) ;
+
+            /** Get current size of character buffer.
+                
+            */
+            const short VMin() ;
+
+            /** Set character buffer timing in 10th of a second.
+                
+            */
+            const short SetVTime( short vtime ) ;
+
+            /** Get current timing of character buffer in 10th of a second.
+                
+            */
+            const short VTime() ;
+
             /** Set timeout for reading from port.
                 INT_MAX means no timeout. */
-            void SetTimeout( int microseconds ) ;
+            const int SetTimeout( int microseconds ) ;
 
             /// Return current timeout setting.
             const int Timeout() ;
