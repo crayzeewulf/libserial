@@ -1,7 +1,7 @@
 /*
  * Time-stamp: <04/05/05 15:25:22 pagey>
  *
- * $Id: SerialStream.h,v 1.5 2004-05-06 18:32:02 crayzeewulf Exp $ 
+ * $Id: SerialStream.h,v 1.6 2005-08-31 12:48:24 wedesoft Exp $
  *
  *
  */
@@ -58,8 +58,8 @@ extern "C++" {
             http://www.UNIX-systems.org/</a>. We will refer to this
             document as SUS-2.
 	
-            @author $Author: crayzeewulf $ <A HREF="pagey@gnudom.org">Manish P. Pagey</A>
-            @version $Id: SerialStream.h,v 1.5 2004-05-06 18:32:02 crayzeewulf Exp $
+            @author $Author: wedesoft $ <A HREF="pagey@gnudom.org">Manish P. Pagey</A>
+            @version $Id: SerialStream.h,v 1.5 2004/05/06 18:32:02 crayzeewulf
      
         */
         class SerialStream : public std::iostream {
@@ -79,7 +79,7 @@ extern "C++" {
 
             /* ------------------------------------------------------------
              * Public Static Members
-             * ------------------------------------------------------------
+             * ------------------------------------------------------------ */
             /** @name Public static members. 
              */
             //@{
@@ -230,6 +230,13 @@ extern "C++" {
             */
             const SerialStreamBuf::FlowControlEnum FlowControl() ;
 
+            /** Set timeout for reading from port.
+                INT_MAX means no timeout. */
+            void SetTimeout( int microseconds ) ;
+
+            /// Return current timeout setting.
+            const int Timeout() ;
+
             //@}
 
             /** @name Operators
@@ -291,7 +298,7 @@ extern "C++" {
 
         inline
         SerialStream::SerialStream() : 
-            mIOBuffer(0), std::iostream(0) {
+          std::iostream(0), mIOBuffer(0) {
             //
             // Close the stream
             //
