@@ -27,6 +27,10 @@
 #    include <fstream>
 #    define _std_fstream_INCLUDED_
 #endif
+#ifndef _limits_h_INCLUDED_
+#    include <limits.h>
+#    define _limits_h_INCLUDED_
+#endif
 
 #ifndef _SerialStreamBuf_h_
 #    include "SerialStreamBuf.h"
@@ -111,6 +115,8 @@ SerialStreamBuf::open( const string filename,
     if( -1 == this->InitializeSerialPort() ) {
         return 0 ;
     }
+
+    return this;
 }
 
 int
@@ -626,6 +632,31 @@ SerialStreamBuf::FlowControl() const {
     return FLOW_CONTROL_INVALID ;
 }
 
+int SerialStreamBuf::SetTimeout( int microseconds )
+{
+  if ( microseconds < 0 ) {
+    return -1;
+  } else {
+    if ( microseconds != INT_MAX ) {
+      mTimeval.tv_usec = microseconds % 1000000;
+      mTimeval.tv_sec = microseconds / 1000000;
+      mTimeout = true;
+      return mTimeout;
+    } else {
+      mTimeout = false;
+      return INT_MAX;
+    };
+  };
+}
+
+const int SerialStreamBuf::Timeout()
+{
+  if ( mTimeout )
+    return (int)( mTimeval.tv_sec * 1000000 + mTimeval.tv_usec );
+  else
+    return INT_MAX;
+}
+
 streamsize
 SerialStreamBuf::xsgetn(char_type *s, streamsize n) {
     //
@@ -661,7 +692,13 @@ SerialStreamBuf::xsgetn(char_type *s, streamsize n) {
         // starting from &s[1].
         //
         if( n > 1 ) {
-            retval = read(mFileDescriptor, &s[1], n-1) ;
+	  fd_set readfs;
+	  FD_SET( mFileDescriptor, &readfs);
+	  struct timeval *tv = mTimeout ? &mTimeval : (struct timeval *)NULL;
+	  if ( select( mFileDescriptor+1, &readfs, NULL, NULL, tv ) >0 )
+	    retval = read(mFileDescriptor, &s[1], n-1) ;
+	  else
+	    retval = 0;
             //
             // If read was successful, then we need to increment retval by
             // one to indicate that the putback character was prepended to
@@ -676,7 +713,13 @@ SerialStreamBuf::xsgetn(char_type *s, streamsize n) {
         // If no putback character is available then we try to read n
         // characters.
         //
-        retval = read(mFileDescriptor, s, n) ;
+      fd_set readfs;
+      FD_SET( mFileDescriptor, &readfs);
+      struct timeval *tv = mTimeout ? &mTimeval : (struct timeval *)NULL;
+      if ( select( mFileDescriptor+1, &readfs, NULL, NULL, tv ) >0 )
+        retval = read(mFileDescriptor, s, n);
+      else
+        retval = 0;
     }
     // 
     // If retval == -1 then the read call had an error, otherwise, if
@@ -693,6 +736,48 @@ SerialStreamBuf::xsgetn(char_type *s, streamsize n) {
     // port.
     //
     return retval ;
+}
+
+std::streamsize SerialStreamBuf::showmanyc() {
+
+  int retval = -1;
+
+  if ( -1 == mFileDescriptor ) {
+    return -1;
+  };
+
+  if ( mPutbackAvailable ) {
+
+    // We still have a character left in the buffer.
+    retval = 1;
+
+  } else {
+
+    // Switch to non-blocking read.
+    int flags = fcntl(this->mFileDescriptor, F_GETFL, 0) ;
+    if( -1 == fcntl( this->mFileDescriptor, 
+                     F_SETFL, 
+                     flags | O_NONBLOCK ) ) {
+        return -1;
+    }
+
+    // Try to read a character.
+    retval = read(mFileDescriptor, &mPutbackChar, 1);
+
+    if ( retval == 1 ) {
+      mPutbackAvailable = true;
+    } else
+      retval = 0;
+
+    // Switch back to blocking read.
+    if( -1 == fcntl( this->mFileDescriptor, 
+                     F_SETFL, 
+                     flags ) ) {
+        return -1;
+    }
+  };
+  return retval;    
+
 }
 
 streambuf::int_type
@@ -721,7 +806,14 @@ SerialStreamBuf::underflow() {
         // If no putback character is available then we need to read one
         // character from the serial port.
         //
-        retval = read(mFileDescriptor, &next_ch, 1) ;
+        fd_set readfs;
+	FD_SET( mFileDescriptor, &readfs);
+   struct timeval *tv = mTimeout ? &mTimeval : (struct timeval *)NULL;
+	if ( select( mFileDescriptor+1, &readfs, NULL, NULL, tv ) > 0 )
+	  retval = read(mFileDescriptor, &next_ch, 1);
+	else
+	  retval = 0;
+
         //
         // Make the next character the putback character. This has the
         // effect of returning the next character without changing gptr()

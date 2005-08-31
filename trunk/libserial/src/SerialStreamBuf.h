@@ -1,7 +1,7 @@
 /*
  * Time-stamp: <04/05/05 16:21:47 pagey>
  *
- * $Id: SerialStreamBuf.h,v 1.4 2004-05-06 18:32:02 crayzeewulf Exp $ 
+ * $Id: SerialStreamBuf.h,v 1.5 2005-08-31 12:48:24 wedesoft Exp $
  *
  *
  */
@@ -49,8 +49,8 @@ extern "C++" {
          *  At present, this class uses unbuffered I/O and all calls to
          *  setbuf() will be ignored.
          *
-         * @author $Author: crayzeewulf $ <A HREF="pagey@gnudom.org">Manish P. Pagey</A>
-         * @version $Id: SerialStreamBuf.h,v 1.4 2004-05-06 18:32:02 crayzeewulf Exp $
+         * @author $Author: wedesoft $ <A HREF="pagey@gnudom.org">Manish P. Pagey</A>
+         * @version $Id: SerialStreamBuf.h,v 1.5 2005-08-31 12:48:24 wedesoft Exp $
          * */
         class SerialStreamBuf : public std::streambuf {
         public:
@@ -337,6 +337,14 @@ extern "C++" {
 
             */
             const FlowControlEnum FlowControl() const ;
+
+            /** Set timeout for reading from port.
+                INT_MAX means no timeout. */
+            int SetTimeout( int milliseconds ) ;
+
+            /// Return current timeout setting.
+            const int Timeout() ;
+
             //@}
 
             /** @name Operators
@@ -393,6 +401,17 @@ extern "C++" {
             */
             virtual std::streamsize xsgetn( char_type*      s, 
                                             std::streamsize n ) ;
+
+	    /** Check, wether input is available on the port.
+		If you call \c SerialStream::in_avail, this method will be
+		called to check for available input.
+		\code
+		while( serial_port.rdbuf()->in_avail() > 0  ) {
+  		  serial_port.get(ch);
+		  ...
+		}
+		\endcode */
+	    virtual std::streamsize showmanyc();
 
             /** Reads and returns the next character from the associated
                 serial port if one otherwise returns traits::eof(). This
@@ -458,6 +477,12 @@ extern "C++" {
 
             */
             int mFileDescriptor ;
+
+            /// Value for timeout.
+            timeval mTimeval;
+
+            /// Boolean, wether timeout is enabled or not.
+            bool mTimeout;
             /* ------------------------------------------------------------
              * Private Methods
              * ------------------------------------------------------------
@@ -475,7 +500,8 @@ extern "C++" {
         SerialStreamBuf::SerialStreamBuf() :
             mPutbackChar(0),
             mPutbackAvailable(false),
-            mFileDescriptor(-1) 
+            mFileDescriptor(-1),
+            mTimeout(false)
         {
             setbuf(0, 0) ;
             return ;
