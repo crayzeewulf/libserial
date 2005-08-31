@@ -57,6 +57,15 @@ SerialStreamBuf::DEFAULT_PARITY          = PARITY_NONE        ;
 const SerialStreamBuf::FlowControlEnum
 SerialStreamBuf::DEFAULT_FLOW_CONTROL    = FLOW_CONTROL_NONE  ;
 
+const int
+SerialStreamBuf::DEFAULT_TIMEOUT         = INT_MAX            ;
+
+const short
+SerialStreamBuf::DEFAULT_VMIN            = 0                  ;
+
+const short
+SerialStreamBuf::DEFAULT_VTIME           = 1                  ;
+
 
 SerialStreamBuf*
 SerialStreamBuf::open( const string filename, 
@@ -169,6 +178,26 @@ SerialStreamBuf::InitializeSerialPort() {
 
 int
 SerialStreamBuf::SetParametersToDefault() {
+
+    if( -1 == mFileDescriptor ) {
+        return -1 ;
+    }
+    //
+    // Set all values (also the ones, which are not covered by the
+    // parametrisation-functions of this library).
+    //
+    struct termios tio;
+    tio.c_iflag = IGNBRK;
+    tio.c_oflag = 0;
+    tio.c_cflag = B19200 | CS8 | CLOCAL | CREAD;
+    tio.c_lflag = 0;
+    tio.c_line = '\n';
+    bzero( &tio.c_cc, sizeof(tio.c_cc) );
+    tio.c_cc[VTIME] = 1;
+    tio.c_cc[VMIN]  = 0;
+    if ( -1 == tcsetattr(mFileDescriptor,TCSANOW,&tio) ) {
+      return -1 ;
+    }
     //
     // Baud rate
     //
@@ -199,6 +228,24 @@ SerialStreamBuf::SetParametersToDefault() {
     if( -1 == SetFlowControl(DEFAULT_FLOW_CONTROL) ) {
         return -1 ;
     }
+    //
+    // VMin
+    //
+    if ( -1 == SetVMin(DEFAULT_VMIN) ) {
+        return -1 ;
+    }
+    //
+    // VTime
+    //
+    if ( -1 == SetVTime(DEFAULT_VTIME) ) {
+        return -1 ;
+    }
+    //
+    // Timeout.
+    //
+    if ( -1 == SetTimeout(DEFAULT_TIMEOUT) ) {
+        return -1 ;
+    };
     //
     // All done. Return a value other than -1. 
     //
@@ -632,7 +679,93 @@ SerialStreamBuf::FlowControl() const {
     return FLOW_CONTROL_INVALID ;
 }
 
-int SerialStreamBuf::SetTimeout( int microseconds )
+const short SerialStreamBuf::SetVMin( short vmin ) {
+    if( -1 == mFileDescriptor ) {
+        return -1 ;
+    }
+
+    if ( vmin < 0 || vmin > 255 ) {
+        return -1 ;
+    };
+
+    //
+    // Get the current terminal settings. 
+    //
+    struct termios term_setting ;
+    if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
+        return -1 ;
+    }
+
+    term_setting.c_cc[VMIN] = (cc_t)vmin;
+    //
+    // Set the new settings for the serial port. 
+    //
+    if( -1 == tcsetattr(mFileDescriptor, TCSANOW, &term_setting) ) {
+        return -1 ;
+    } 
+
+    return vmin;
+}
+
+const short SerialStreamBuf::VMin() const {
+    if( -1 == mFileDescriptor ) {
+        return -1 ;
+    }
+    //
+    // Get the current terminal settings. 
+    //
+    struct termios term_setting ;
+    if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
+        return -1 ;
+    }
+
+    return term_setting.c_cc[VMIN];
+}
+
+const short SerialStreamBuf::SetVTime( short vtime ) {
+    if( -1 == mFileDescriptor ) {
+        return -1 ;
+    }
+
+    if ( vtime < 0 || vtime > 255 ) {
+        return -1 ;
+    };
+
+    //
+    // Get the current terminal settings. 
+    //
+    struct termios term_setting ;
+    if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
+        return -1 ;
+    }
+
+    term_setting.c_cc[VTIME] = (cc_t)vtime;
+    //
+    // Set the new settings for the serial port. 
+    //
+    if( -1 == tcsetattr(mFileDescriptor, TCSANOW, &term_setting) ) {
+        return -1 ;
+    }
+
+    return vtime;
+}
+
+const short SerialStreamBuf::VTime() const {
+    if( -1 == mFileDescriptor ) {
+        return -1 ;
+    }
+    //
+    // Get the current terminal settings. 
+    //
+    struct termios term_setting ;
+    if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
+        return -1 ;
+    }
+
+    return term_setting.c_cc[VTIME];
+}
+
+const int SerialStreamBuf::SetTimeout( int microseconds )
 {
   if ( microseconds < 0 ) {
     return -1;
