@@ -1,6 +1,6 @@
 SUBDIRS=src doc examples
 
-EXTRA_DIST = doxygen.conf.in
+EXTRA_DIST = doxygen.conf.in Makefile.dist
 
 docs: 
 	make dox
