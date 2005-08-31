@@ -1,4 +1,4 @@
-AC_REVISION($Revision: 1.8 $)
+AC_REVISION($Revision: 1.9 $)
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(src/SerialStream.cc)
 
@@ -7,7 +7,7 @@ AM_CONFIG_HEADER(config.h)
 dnl
 dnl Indicate the package name and the version to automake
 dnl
-dnl $Id: configure.in,v 1.8 2004-11-17 01:32:12 crayzeewulf Exp $
+dnl $Id: configure.in,v 1.9 2005-08-31 12:53:47 wedesoft Exp $
 AM_INIT_AUTOMAKE(libserial, 0.4.1)
 
 AM_MAINTAINER_MODE
@@ -19,9 +19,7 @@ AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
-AM_PROG_LIBTOOL
-
+AC_PROG_LIBTOOL
 
 dnl Checks for header files.
 AC_CHECK_HEADERS(fcntl.h unistd.h)
