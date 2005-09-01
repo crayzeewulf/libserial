@@ -191,7 +191,7 @@ SerialStreamBuf::SetParametersToDefault() {
     tio.c_oflag = 0;
     tio.c_cflag = B19200 | CS8 | CLOCAL | CREAD;
     tio.c_lflag = 0;
-    tio.c_line = '\n';
+    tio.c_line = '\0';
     bzero( &tio.c_cc, sizeof(tio.c_cc) );
     tio.c_cc[VTIME] = 0;
     tio.c_cc[VMIN]  = 1;
