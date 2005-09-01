@@ -193,8 +193,8 @@ SerialStreamBuf::SetParametersToDefault() {
     tio.c_lflag = 0;
     tio.c_line = '\n';
     bzero( &tio.c_cc, sizeof(tio.c_cc) );
-    tio.c_cc[VTIME] = 1;
-    tio.c_cc[VMIN]  = 0;
+    tio.c_cc[VTIME] = 0;
+    tio.c_cc[VMIN]  = 1;
     if ( -1 == tcsetattr(mFileDescriptor,TCSANOW,&tio) ) {
       return -1 ;
     }
