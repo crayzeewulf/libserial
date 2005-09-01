@@ -61,10 +61,10 @@ const int
 SerialStreamBuf::DEFAULT_TIMEOUT         = INT_MAX            ;
 
 const short
-SerialStreamBuf::DEFAULT_VMIN            = 0                  ;
+SerialStreamBuf::DEFAULT_VMIN            = 1                  ;
 
 const short
-SerialStreamBuf::DEFAULT_VTIME           = 1                  ;
+SerialStreamBuf::DEFAULT_VTIME           = 0                  ;
 
 
 SerialStreamBuf*
