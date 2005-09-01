@@ -1,7 +1,7 @@
 /*
  * Time-stamp: <04/05/05 15:25:22 pagey>
  *
- * $Id: SerialStream.h,v 1.7 2005-08-31 14:17:43 wedesoft Exp $
+ * $Id: SerialStream.h,v 1.8 2005-09-01 10:19:18 wedesoft Exp $
  *
  *
  */
@@ -236,6 +236,8 @@ extern "C++" {
             const short SetVMin( short vtime ) ;
 
             /** Get current size of character buffer.
+                Look <A HREF="http://www.unixwiz.net/techtips/termios-vmin-vtime.html">here</A>
+                for more documentation about VTIME and VMIN.
                 
             */
             const short VMin() ;
@@ -246,6 +248,8 @@ extern "C++" {
             const short SetVTime( short vtime ) ;
 
             /** Get current timing of character buffer in 10th of a second.
+                Look <A HREF="http://www.unixwiz.net/techtips/termios-vmin-vtime.html">here</A>
+                for more documentation about VTIME and VMIN.
                 
             */
             const short VTime() ;
