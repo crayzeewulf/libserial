@@ -59,15 +59,6 @@ main( int    argc,
     }
 
     //
-    // Set timeout in microseconds.
-    //
-    serial_port.SetTimeout( 100000 );
-    if ( ! serial_port.good() ) {
-        std::cerr << "Error: Could not adjust timeout." << std::endl;
-        exit(1) ;
-    }
-
-    //
     // Turn on hardware flow control.
     //
     serial_port.SetFlowControl( SerialStreamBuf::FLOW_CONTROL_HARD ) ;

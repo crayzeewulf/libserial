@@ -1,7 +1,7 @@
 /*
  * Time-stamp: <04/05/05 15:25:22 pagey>
  *
- * $Id: SerialStream.h,v 1.8 2005-09-01 10:19:18 wedesoft Exp $
+ * $Id: SerialStream.h,v 1.9 2005-09-05 14:19:55 wedesoft Exp $
  *
  *
  */
@@ -253,13 +253,6 @@ extern "C++" {
                 
             */
             const short VTime() ;
-
-            /** Set timeout for reading from port.
-                INT_MAX means no timeout. */
-            const int SetTimeout( int microseconds ) ;
-
-            /// Return current timeout setting.
-            const int Timeout() ;
 
             //@}
 
