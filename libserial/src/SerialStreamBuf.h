@@ -1,7 +1,7 @@
 /*
  * Time-stamp: <04/05/05 16:21:47 pagey>
  *
- * $Id: SerialStreamBuf.h,v 1.6 2005-08-31 14:17:43 wedesoft Exp $
+ * $Id: SerialStreamBuf.h,v 1.7 2005-09-05 14:19:55 wedesoft Exp $
  *
  *
  */
@@ -50,7 +50,7 @@ extern "C++" {
          *  setbuf() will be ignored.
          *
          * @author $Author: wedesoft $ <A HREF="pagey@gnudom.org">Manish P. Pagey</A>
-         * @version $Id: SerialStreamBuf.h,v 1.6 2005-08-31 14:17:43 wedesoft Exp $
+         * @version $Id: SerialStreamBuf.h,v 1.7 2005-09-05 14:19:55 wedesoft Exp $
          * */
         class SerialStreamBuf : public std::streambuf {
         public:
@@ -170,10 +170,6 @@ extern "C++" {
             */
             static const short DEFAULT_VTIME ;
 
-            /** The default timeout value.
-
-            */
-            static const int DEFAULT_TIMEOUT ;
             //@}
 
 
@@ -373,13 +369,6 @@ extern "C++" {
             */
             const short VTime() const;
 
-            /** Set timeout for reading from port.
-                INT_MAX means no timeout. */
-            const int SetTimeout( int milliseconds ) ;
-
-            /// Return current timeout setting.
-            const int Timeout() ;
-
             //@}
 
             /** @name Operators
@@ -512,12 +501,6 @@ extern "C++" {
 
             */
             int mFileDescriptor ;
-
-            /// Value for timeout.
-            timeval mTimeval;
-
-            /// Boolean, wether timeout is enabled or not.
-            bool mTimeout;
             /* ------------------------------------------------------------
              * Private Methods
              * ------------------------------------------------------------
@@ -535,8 +518,7 @@ extern "C++" {
         SerialStreamBuf::SerialStreamBuf() :
             mPutbackChar(0),
             mPutbackAvailable(false),
-            mFileDescriptor(-1),
-            mTimeout(false)
+            mFileDescriptor(-1)
         {
             setbuf(0, 0) ;
             return ;

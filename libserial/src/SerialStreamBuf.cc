@@ -1,3 +1,5 @@
+#include <iostream>
+
 #ifndef _sys_types_h_INCLUDED_
 #    include <sys/types.h>
 #    define _sys_types_h_INCLUDED_
@@ -56,9 +58,6 @@ SerialStreamBuf::DEFAULT_PARITY          = PARITY_NONE        ;
 
 const SerialStreamBuf::FlowControlEnum
 SerialStreamBuf::DEFAULT_FLOW_CONTROL    = FLOW_CONTROL_NONE  ;
-
-const int
-SerialStreamBuf::DEFAULT_TIMEOUT         = INT_MAX            ;
 
 const short
 SerialStreamBuf::DEFAULT_VMIN            = 1                  ;
@@ -240,12 +239,6 @@ SerialStreamBuf::SetParametersToDefault() {
     if ( -1 == SetVTime(DEFAULT_VTIME) ) {
         return -1 ;
     }
-    //
-    // Timeout.
-    //
-    if ( -1 == SetTimeout(DEFAULT_TIMEOUT) ) {
-        return -1 ;
-    };
     //
     // All done. Return a value other than -1. 
     //
@@ -765,31 +758,6 @@ const short SerialStreamBuf::VTime() const {
     return term_setting.c_cc[VTIME];
 }
 
-const int SerialStreamBuf::SetTimeout( int microseconds )
-{
-  if ( microseconds < 0 ) {
-    return -1;
-  } else {
-    if ( microseconds != INT_MAX ) {
-      mTimeval.tv_usec = microseconds % 1000000;
-      mTimeval.tv_sec = microseconds / 1000000;
-      mTimeout = true;
-      return mTimeout;
-    } else {
-      mTimeout = false;
-      return INT_MAX;
-    };
-  };
-}
-
-const int SerialStreamBuf::Timeout()
-{
-  if ( mTimeout )
-    return (int)( mTimeval.tv_sec * 1000000 + mTimeval.tv_usec );
-  else
-    return INT_MAX;
-}
-
 streamsize
 SerialStreamBuf::xsgetn(char_type *s, streamsize n) {
     //
@@ -825,13 +793,9 @@ SerialStreamBuf::xsgetn(char_type *s, streamsize n) {
         // starting from &s[1].
         //
         if( n > 1 ) {
-	  fd_set readfs;
-	  FD_SET( mFileDescriptor, &readfs);
-	  struct timeval *tv = mTimeout ? &mTimeval : (struct timeval *)NULL;
-	  if ( select( mFileDescriptor+1, &readfs, NULL, NULL, tv ) >0 )
-	    retval = read(mFileDescriptor, &s[1], n-1) ;
-	  else
-	    retval = 0;
+
+          retval = read(mFileDescriptor, &s[1], n-1) ;
+
             //
             // If read was successful, then we need to increment retval by
             // one to indicate that the putback character was prepended to
@@ -846,13 +810,9 @@ SerialStreamBuf::xsgetn(char_type *s, streamsize n) {
         // If no putback character is available then we try to read n
         // characters.
         //
-      fd_set readfs;
-      FD_SET( mFileDescriptor, &readfs);
-      struct timeval *tv = mTimeout ? &mTimeval : (struct timeval *)NULL;
-      if ( select( mFileDescriptor+1, &readfs, NULL, NULL, tv ) >0 )
-        retval = read(mFileDescriptor, s, n);
-      else
-        retval = 0;
+
+      retval = read(mFileDescriptor, s, n);
+
     }
     // 
     // If retval == -1 then the read call had an error, otherwise, if
@@ -939,13 +899,8 @@ SerialStreamBuf::underflow() {
         // If no putback character is available then we need to read one
         // character from the serial port.
         //
-        fd_set readfs;
-	FD_SET( mFileDescriptor, &readfs);
-   struct timeval *tv = mTimeout ? &mTimeval : (struct timeval *)NULL;
-	if ( select( mFileDescriptor+1, &readfs, NULL, NULL, tv ) > 0 )
-	  retval = read(mFileDescriptor, &next_ch, 1);
-	else
-	  retval = 0;
+
+        retval = read(mFileDescriptor, &next_ch, 1);
 
         //
         // Make the next character the putback character. This has the

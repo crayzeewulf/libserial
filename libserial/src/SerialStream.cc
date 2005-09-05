@@ -365,32 +365,6 @@ SerialStream::VTime() {
     };
 }
 
-const int
-SerialStream::SetTimeout( int milliseconds ) {
-    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
-    if ( my_buffer ) {
-      if ( -1 == my_buffer->SetTimeout( milliseconds ) ) {
-        setstate(badbit) ;
-        return -1;
-      };
-    } else {
-      setstate(badbit) ;
-      return -1;
-    };
-    return milliseconds;
-}
-
-const int
-SerialStream::Timeout() {
-    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
-    if ( my_buffer ) {
-      return my_buffer->Timeout();
-    } else {
-      setstate(badbit) ;
-      return -1;
-    };
-}
-
 const SerialStreamBuf::FlowControlEnum
 SerialStream::FlowControl() {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
