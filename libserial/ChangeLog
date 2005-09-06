@@ -1,3 +1,11 @@
+2005-09-06  Jan Wedekind <jan@wedesoft.de>
+
+	* examples/write_port.cpp: An example for writing commands to
+	the serial port was added.
+	* src/SerialStream.h: Functions for adjusting the port's VTIME-
+	and VMIN-parameter where added.
+	* src/SerialStreamBuf.cc: Missing return statement was added.
+
 2003-12-30  Manish P. Pagey  <pagey@pagey.info>
 
 	* src/SerialStreamBuf.cc: Interchanged "case 1" and "case 2" in
