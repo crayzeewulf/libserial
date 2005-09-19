@@ -31,16 +31,17 @@
  *
  * @note This class attaches a handler to the SIGIO signal to detect
  * the data arriving at a serial port. However, this signal handler
- * will also call any signal handler that is already attached to 
+ * will also call any signal handler that is already attached to
  * this signal. However, if other parts of the application attach a
- * signal handler to SIGIO after constructing an instance of SIGIO, 
- * they must ensure that they call the existing signal handler. 
+ * signal handler to SIGIO after constructing an instance of SIGIO,
+ * they must ensure that they call the existing signal handler.
  * Otherwise, it may not be possible to receive any data through
  * the serial port using this class.
- * 
- * :FIXME: Provide examples of the above potential problem. 
+ *
+ * :FIXME: Provide examples of the above potential problem.
  */
-class SerialPort {
+class SerialPort
+{
 public:
     /**
      * The allowed set of baud rates.
@@ -62,17 +63,17 @@ public:
         BAUD_19200   = B19200,
         BAUD_38400   = B38400,
         BAUD_57600   = B57600,
-        BAUD_115200  = B115200, 
+        BAUD_115200  = B115200,
         BAUD_230400  = B230400,
         BAUD_460800  = B460800,
         BAUD_DEFAULT = BAUD_57600
     } ;
 
     enum CharacterSize {
-        CHAR_SIZE_5  = CS5, //!< 5 bit characters. 
-        CHAR_SIZE_6  = CS6, //!< 6 bit characters. 
-        CHAR_SIZE_7  = CS7, //!< 7 bit characters. 
-        CHAR_SIZE_8  = CS8, //!< 8 bit characters.         
+        CHAR_SIZE_5  = CS5, //!< 5 bit characters.
+        CHAR_SIZE_6  = CS6, //!< 6 bit characters.
+        CHAR_SIZE_7  = CS7, //!< 7 bit characters.
+        CHAR_SIZE_8  = CS8, //!< 8 bit characters.
         CHAR_SIZE_DEFAULT = CHAR_SIZE_8
     } ;
 
@@ -83,57 +84,62 @@ public:
     } ;
 
     enum Parity {
-        PARITY_EVEN,     //!< Even parity.  
+        PARITY_EVEN,     //!< Even parity.
         PARITY_ODD,      //!< Odd parity.
         PARITY_NONE,     //!< No parity i.e. parity checking disabled.
         PARITY_DEFAULT = PARITY_NONE
-    } ;      
+    } ;
 
     enum FlowControl {
-        FLOW_CONTROL_HARD, 
+        FLOW_CONTROL_HARD,
         // FLOW_CONTROL_SOFT,
         FLOW_CONTROL_NONE,
         FLOW_CONTROL_DEFAULT = FLOW_CONTROL_NONE
     } ;
 
-    class NotOpen : public std::logic_error {
+    class NotOpen : public std::logic_error
+    {
     public:
         NotOpen(const std::string& whatArg) :
             logic_error(whatArg) { }
     } ;
-    
-    class OpenFailed : public std::runtime_error {
+
+    class OpenFailed : public std::runtime_error
+    {
     public:
         OpenFailed(const std::string& whatArg) :
             runtime_error(whatArg) { }
     } ;
 
-    class AlreadyOpen : public std::logic_error {
+    class AlreadyOpen : public std::logic_error
+    {
     public:
         AlreadyOpen( const std::string& whatArg ) :
             logic_error(whatArg) { }
     } ;
 
-    class UnsupportedBaudRate : public std::runtime_error {
+    class UnsupportedBaudRate : public std::runtime_error
+    {
     public:
         UnsupportedBaudRate( const std::string& whatArg ) :
             runtime_error(whatArg) { }
     } ;
 
-    class ReadTimeout : public std::runtime_error {
+    class ReadTimeout : public std::runtime_error
+    {
     public:
         ReadTimeout() : runtime_error( "Read timeout" ) { }
     } ;
 
     /**
-     * Constructor for a serial port. 
+     * Constructor for a serial port.
      */
-    SerialPort( const std::string& serialPortName ) ;
+    explicit SerialPort( const std::string& serialPortName ) ;
 
     /**
      * Destructor.
      */
-    virtual ~SerialPort() throw() ;
+    ~SerialPort() throw() ;
 
     /**
      * Open the serial port with the specified settings. A serial port
@@ -149,20 +155,20 @@ public:
      * invalid parameter value is specified.
      */
     void
-    Open( const BaudRate      baudRate    = BAUD_DEFAULT, 
-          const CharacterSize charSize    = CHAR_SIZE_DEFAULT, 
+    Open( const BaudRate      baudRate    = BAUD_DEFAULT,
+          const CharacterSize charSize    = CHAR_SIZE_DEFAULT,
           const Parity        parityType  = PARITY_DEFAULT,
           const StopBits      stopBits    = STOP_BITS_DEFAULT,
-          const FlowControl   flowControl = FLOW_CONTROL_DEFAULT ) 
-        throw( AlreadyOpen, 
-               OpenFailed, 
+          const FlowControl   flowControl = FLOW_CONTROL_DEFAULT )
+        throw( AlreadyOpen,
+               OpenFailed,
                UnsupportedBaudRate,
                std::invalid_argument ) ;
-    
+
     /**
-     * Check if the serial port is open for I/O. 
+     * Check if the serial port is open for I/O.
      */
-    bool 
+    bool
     IsOpen() const ;
 
     /**
@@ -173,8 +179,8 @@ public:
      * port is not open.
      *
      */
-    void 
-    Close() 
+    void
+    Close()
         throw(NotOpen) ;
 
     /**
@@ -188,9 +194,9 @@ public:
      * specified.
      */
     void
-    SetBaudRate( const BaudRate baudRate ) 
+    SetBaudRate( const BaudRate baudRate )
         throw( UnsupportedBaudRate,
-               NotOpen, 
+               NotOpen,
                std::invalid_argument ) ;
 
     /**
@@ -200,12 +206,12 @@ public:
      * port is not open.
      */
     BaudRate
-    GetBaudRate() const 
+    GetBaudRate() const
         throw( NotOpen,
                std::runtime_error ) ;
 
     /**
-     * Set the character size for the serial port. 
+     * Set the character size for the serial port.
      *
      * @throw NotOpen Thrown if this method is called while the serial
      * port is not open.
@@ -214,22 +220,22 @@ public:
      * size is specified.
      */
     void
-    SetCharSize( const CharacterSize charSize ) 
+    SetCharSize( const CharacterSize charSize )
         throw( NotOpen,
                std::invalid_argument ) ;
     /**
-     * Get the current character size for the serial port. 
+     * Get the current character size for the serial port.
      *
      * @throw NotOpen Thrown if this method is called while the serial
      * port is not open.
      *
      */
     CharacterSize
-    GetCharSize() const 
+    GetCharSize() const
         throw(NotOpen) ;
 
     /**
-     * Set the parity type for the serial port. 
+     * Set the parity type for the serial port.
      *
      * @throw NotOpen Thrown if this method is called while the serial
      * port is not open.
@@ -238,7 +244,7 @@ public:
      * specified.
      */
     void
-    SetParity( const Parity parityType ) 
+    SetParity( const Parity parityType )
         throw( NotOpen,
                std::invalid_argument ) ;
 
@@ -250,7 +256,7 @@ public:
      *
      */
     Parity
-    GetParity() const 
+    GetParity() const
         throw(NotOpen) ;
 
     /**
@@ -263,7 +269,7 @@ public:
      * stop bits is specified.
      */
     void
-    SetNumOfStopBits( const StopBits numOfStopBits ) 
+    SetNumOfStopBits( const StopBits numOfStopBits )
         throw( NotOpen,
                std::invalid_argument ) ;
 
@@ -274,9 +280,9 @@ public:
      * @throw NotOpen Thrown if this method is called while the serial
      * port is not open.
      *
-     */ 
+     */
     StopBits
-    GetNumOfStopBits() const 
+    GetNumOfStopBits() const
         throw(NotOpen) ;
 
     /**
@@ -289,7 +295,7 @@ public:
      * is specified.
      */
     void
-    SetFlowControl( const FlowControl   flowControl ) 
+    SetFlowControl( const FlowControl   flowControl )
         throw( NotOpen,
                std::invalid_argument ) ;
 
@@ -301,7 +307,7 @@ public:
      *
      */
     FlowControl
-    GetFlowControl() const 
+    GetFlowControl() const
         throw( NotOpen ) ;
 
     /**
@@ -312,7 +318,7 @@ public:
      *
      */
     bool
-    IsDataAvailable() const 
+    IsDataAvailable() const
         throw(NotOpen) ;
 
     /**
@@ -322,8 +328,8 @@ public:
      * is 0, then this method will block till data is available.
      */
     unsigned char
-    ReadByte( const unsigned int msTimeout = 0 ) 
-        throw( NotOpen, 
+    ReadByte( const unsigned int msTimeout = 0 )
+        throw( NotOpen,
                ReadTimeout,
                std::runtime_error ) ;
 
@@ -340,9 +346,9 @@ public:
     typedef std::vector<unsigned char> DataBuffer ;
     void
     Read( DataBuffer&        dataBuffer,
-          const unsigned int numOfBytes = 0, 
-          const unsigned int msTimeout  = 0 ) 
-        throw( NotOpen, 
+          const unsigned int numOfBytes = 0,
+          const unsigned int msTimeout  = 0 )
+        throw( NotOpen,
                ReadTimeout,
                std::runtime_error ) ;
 
@@ -350,38 +356,38 @@ public:
     /**
      * Read a line of characters from the serial port.
      */
-    const std::string 
+    const std::string
     ReadLine( const unsigned int msTimeout = 0,
-              const char         lineTerminator = '\n' ) 
-        throw( NotOpen, 
+              const char         lineTerminator = '\n' )
+        throw( NotOpen,
                ReadTimeout,
                std::runtime_error ) ;
 
     /**
-     * Send a single byte to the serial port. 
+     * Send a single byte to the serial port.
      *
      * @throw NotOpen Thrown if this method is called while the serial
      * port is not open.
      */
-    void 
-    WriteByte(const unsigned char dataByte) 
-        throw( NotOpen, 
+    void
+    WriteByte(const unsigned char dataByte)
+        throw( NotOpen,
                std::runtime_error ) ;
 
     /**
-     * Write the data from the specified vector to the serial port. 
+     * Write the data from the specified vector to the serial port.
      */
-    void 
+    void
     Write(const DataBuffer& dataBuffer)
-        throw( NotOpen, 
+        throw( NotOpen,
                std::runtime_error ) ;
 
     /**
      * Write a string to the serial port.
      */
     void
-    Write(const std::string& dataString) 
-        throw( NotOpen, 
+    Write(const std::string& dataString)
+        throw( NotOpen,
                std::runtime_error ) ;
 private:
     SerialPort( const SerialPort& otherSerialPort ) ;
