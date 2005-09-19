@@ -15,9 +15,10 @@
 #include <errno.h>
 #include <signal.h>
 
-namespace {
+namespace
+{
     /**
-     * Implementation class for the PosixSignalDispatcher. 
+     * Implementation class for the PosixSignalDispatcher.
      */
     class PosixSignalDispatcherImpl
     {
@@ -28,68 +29,68 @@ namespace {
          * be obtained using this method.
          */
         static
-        PosixSignalDispatcherImpl& 
+        PosixSignalDispatcherImpl&
         Instance() ;
-        
+
         /*
-         * Implementation of PosixSignalDispatcher::AttachHandler() 
+         * Implementation of PosixSignalDispatcher::AttachHandler()
          */
-        void 
+        void
         AttachHandler( const int           posixSignalNumber,
-                       PosixSignalHandler& signalHandler ) 
-            throw( PosixSignalDispatcher::CannotAttachHandler ) ;
-                
+                       PosixSignalHandler& signalHandler )
+        throw( PosixSignalDispatcher::CannotAttachHandler ) ;
+
         /*
          * Implementation of PosixSignalDispatcher::DetachHandler()
          */
-        void 
+        void
         DetachHandler( const int                 posixSignalNumber,
-                       const PosixSignalHandler& signalHandler ) 
-            throw( PosixSignalDispatcher::CannotDetachHandler,
-                   std::logic_error ) ;
-    private:        
+                       const PosixSignalHandler& signalHandler )
+        throw( PosixSignalDispatcher::CannotDetachHandler,
+               std::logic_error ) ;
+    private:
         /*
          * List of signal handlers that are currently associated
          * with the dispatcher.
          */
-        typedef std::multimap<int, PosixSignalHandler*> SignalHandlerList ; 
+        typedef std::multimap<int, PosixSignalHandler*> SignalHandlerList ;
         static SignalHandlerList mSignalHandlerList ;
-        
+
         /*
          * List of signal handlers that were originally attached
          * to the corresponding signals.
          */
         typedef std::map<int, struct sigaction> OriginalSigactionList ;
         static OriginalSigactionList mOriginalSigactionList ;
-          
+
         /*
          * Default constructor.
          */
         PosixSignalDispatcherImpl() ;
-        
+
         /*
          * Destuctor.
          */
         ~PosixSignalDispatcherImpl() ;
-        
+
         /*
-         * Static function that is used to attach the signal 
+         * Static function that is used to attach the signal
          * dispatcher to a signal using sigaction().
          */
         static
-        void 
+        void
         SigactionHandler( int signalNumber ) ;
     } ;
-    
+
     //
     // Initialization of static members of class PosixSignalDispatcherImpl.
     //
-    PosixSignalDispatcherImpl::SignalHandlerList 
-        PosixSignalDispatcherImpl::mSignalHandlerList ;
-        
-    PosixSignalDispatcherImpl::OriginalSigactionList 
-        PosixSignalDispatcherImpl::mOriginalSigactionList ;
-    
+    PosixSignalDispatcherImpl::SignalHandlerList
+    PosixSignalDispatcherImpl::mSignalHandlerList ;
+
+    PosixSignalDispatcherImpl::OriginalSigactionList
+    PosixSignalDispatcherImpl::mOriginalSigactionList ;
+
 } ;
 
 PosixSignalDispatcher::PosixSignalDispatcher()
@@ -109,42 +110,40 @@ PosixSignalDispatcher::Instance()
     return single_instance ;
 }
 
-void 
-PosixSignalDispatcher::AttachHandler( 
-    const int           posixSignalNumber,
-    PosixSignalHandler& signalHandler ) 
-    throw( CannotAttachHandler ) 
+void
+PosixSignalDispatcher::AttachHandler( const int           posixSignalNumber,
+                                      PosixSignalHandler& signalHandler )
+    throw( CannotAttachHandler )
 {
     PosixSignalDispatcherImpl::Instance().AttachHandler( posixSignalNumber,
-                                                         signalHandler ) ;
+            signalHandler ) ;
     return ;
 }
 
-void 
-PosixSignalDispatcher::DetachHandler( 
-    const int                 posixSignalNumber,
-    const PosixSignalHandler& signalHandler ) 
-    throw( CannotDetachHandler, 
-           std::logic_error ) 
+void
+PosixSignalDispatcher::DetachHandler( const int                 posixSignalNumber,
+                                      const PosixSignalHandler& signalHandler )
+    throw( CannotDetachHandler,
+           std::logic_error )
 {
     PosixSignalDispatcherImpl::Instance().DetachHandler( posixSignalNumber,
-                                                         signalHandler ) ;
-} 
+            signalHandler ) ;
+}
 
-namespace 
+namespace
 {
     inline
     PosixSignalDispatcherImpl::PosixSignalDispatcherImpl()
     {
         /* empty */
     }
-    
+
     inline
     PosixSignalDispatcherImpl::~PosixSignalDispatcherImpl()
     {
         /* empty */
     }
-    
+
     inline
     PosixSignalDispatcherImpl&
     PosixSignalDispatcherImpl::Instance()
@@ -152,13 +151,13 @@ namespace
         static PosixSignalDispatcherImpl single_instance ;
         return single_instance ;
     }
-    
+
     inline
-    void 
-    PosixSignalDispatcherImpl::AttachHandler( 
+    void
+    PosixSignalDispatcherImpl::AttachHandler(
         const int           posixSignalNumber,
         PosixSignalHandler& signalHandler )
-        throw( PosixSignalDispatcher::CannotAttachHandler ) 
+    throw( PosixSignalDispatcher::CannotAttachHandler )
     {
         /*
          * Attach this instance of PosixSignalDispatcher to the specified
@@ -172,7 +171,7 @@ namespace
         /*
          * Install the handler and get a copy of the previous handler.
          */
-        struct sigaction old_action ; 
+        struct sigaction old_action ;
         if ( sigaction( posixSignalNumber,
                         &sigaction_info,
                         &old_action ) < 0 )
@@ -184,40 +183,40 @@ namespace
          */
         if ( PosixSignalDispatcherImpl::SigactionHandler != old_action.sa_handler )
         {
-            mOriginalSigactionList.insert( 
+            mOriginalSigactionList.insert(
                 OriginalSigactionList::value_type( posixSignalNumber,
-                                                   old_action ) ) ;                
-        }                                    
+                                                   old_action ) ) ;
+        }
         /*
          * Add the specified handler to the list of handlers associated with the signal.
          */
-        mSignalHandlerList.insert( 
+        mSignalHandlerList.insert(
             SignalHandlerList::value_type( posixSignalNumber,
-                                           &signalHandler ) ) ;        
+                                           &signalHandler ) ) ;
         return ;
     }
-    
+
     inline
-    void 
-    PosixSignalDispatcherImpl::DetachHandler( 
+    void
+    PosixSignalDispatcherImpl::DetachHandler(
         const int                 posixSignalNumber,
         const PosixSignalHandler& signalHandler )
-        throw( PosixSignalDispatcher::CannotDetachHandler,
-               std::logic_error )
+    throw( PosixSignalDispatcher::CannotDetachHandler,
+           std::logic_error )
     {
         /*
          * Get the range of values in the SignalHandlerList corresponding
          * to the specified signal number.
          */
-        std::pair<SignalHandlerList::iterator, SignalHandlerList::iterator> 
-            iterator_range = mSignalHandlerList.equal_range( posixSignalNumber ) ;
+        std::pair<SignalHandlerList::iterator, SignalHandlerList::iterator>
+        iterator_range = mSignalHandlerList.equal_range( posixSignalNumber ) ;
         /*
          * Check if signalHandler is attached to the posixSignalNumber signal.
-         */        
-        SignalHandlerList::iterator sig_handler_location = mSignalHandlerList.end() ;         
+         */
+        SignalHandlerList::iterator sig_handler_location = mSignalHandlerList.end() ;
         for( SignalHandlerList::iterator i=iterator_range.first ;
-             i != iterator_range.second ; 
-             ++i )
+                i != iterator_range.second ;
+                ++i )
         {
             if ( i->second == &signalHandler )
             {
@@ -240,12 +239,12 @@ namespace
             {
                 /*
                  * Retrieve the original sigaction corresponding to the signal.
-                 */ 
+                 */
                 OriginalSigactionList::iterator original_sigaction =
                     mOriginalSigactionList.find( posixSignalNumber ) ;
                 /*
-                 * If the signal dispatcher implementation is correct, 
-                 * then we should always find the original sigaction. 
+                 * If the signal dispatcher implementation is correct,
+                 * then we should always find the original sigaction.
                  * If we do not find one, we throw an exception.
                  */
                 if ( mOriginalSigactionList.end() == original_sigaction )
@@ -253,7 +252,7 @@ namespace
                     throw std::logic_error( "Signal dispatcher in invalid state." ) ;
                 }
                 /*
-                 * Install the original handler. Throw an exception if we 
+                 * Install the original handler. Throw an exception if we
                  * encounter any error.
                  */
                 if ( sigaction( posixSignalNumber,
@@ -261,41 +260,41 @@ namespace
                                 NULL ) < 0 )
                 {
                     throw PosixSignalDispatcher::CannotDetachHandler( strerror(errno) ) ;
-                }               
+                }
             }
         }
         return ;
     }
 
-           
-    void 
+
+    void
     PosixSignalDispatcherImpl::SigactionHandler( int signalNumber )
     {
         /*
          * Get a list of handlers associated with signalNumber.
-         */    
-        std::pair<SignalHandlerList::iterator, SignalHandlerList::iterator> 
-            iterator_range = mSignalHandlerList.equal_range( signalNumber ) ;
+         */
+        std::pair<SignalHandlerList::iterator, SignalHandlerList::iterator>
+        iterator_range = mSignalHandlerList.equal_range( signalNumber ) ;
         /*
          * Call each handler.
          */
         for( SignalHandlerList::iterator i=iterator_range.first ;
-             i != iterator_range.second ; 
-             ++i )
+                i != iterator_range.second ;
+                ++i )
         {
             i->second->HandlePosixSignal( signalNumber ) ;
-        }      
-#if 0 
+        }
+#if 0
         /*
          * Get the original handler that was associated with the
          * signal and call it if possible.
-         */ 
+         */
         OriginalSigactionList::iterator original_sigaction =
-            mOriginalSigactionList.find( posixSignalNumber ) ;         
+            mOriginalSigactionList.find( posixSignalNumber ) ;
         if ( ( mOriginalSigactionList.end() != original_sigaction ) &&
-             ( SIG_DFL != original_sigaction->second.sa_handler ) &&
-             ( SIG_IGN != original_sigaction->second.sa_handler ) &&
-             ( 0 != original_sigaction->second.sa_handler ) )
+                ( SIG_DFL != original_sigaction->second.sa_handler ) &&
+                ( SIG_IGN != original_sigaction->second.sa_handler ) &&
+                ( 0 != original_sigaction->second.sa_handler ) )
         {
             original_sigaction->second.sa_handler( signalNumber ) ;
         }
