@@ -1,31 +1,17 @@
 /*
  * Time-stamp: <04/05/05 15:25:22 pagey>
  *
- * $Id: SerialStream.h,v 1.9 2005-09-05 14:19:55 wedesoft Exp $
+ * $Id: SerialStream.h,v 1.10 2005-10-01 21:24:21 crayzeewulf Exp $
  *
  *
  */
 #ifndef _SerialStream_h_
 #define _SerialStream_h_
 
-#ifndef _std_string_INCLUDED_
-#    include <string>
-#    define _std_string_INCLUDED_
-#endif
-
-#ifndef _std_fstream_INCLUDED_
-#    include <fstream>
-#    define _std_string_INCLUDED_
-#endif
-
-#ifndef _std_cassert_INCLUDED_
-#    include <cassert>
-#    define _std_cassert_INCLUDED_
-#endif
-
-#ifndef SerialStreamBuf_h
-#    include <SerialStreamBuf.h>
-#endif
+#include <string>
+#include <fstream>
+#include <cassert>
+#include <SerialStreamBuf.h>
 
 extern "C++" {
     namespace LibSerial {
@@ -58,7 +44,7 @@ extern "C++" {
             http://www.UNIX-systems.org/</a>. We will refer to this
             document as SUS-2.
 	
-            @author $Author: wedesoft $ <A HREF="pagey@gnudom.org">Manish P. Pagey</A>
+            @author $Author: crayzeewulf $ <A HREF="pagey@gnudom.org">Manish P. Pagey</A>
             @version $Id: SerialStream.h,v 1.5 2004/05/06 18:32:02 crayzeewulf
      
         */

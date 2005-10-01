@@ -1,37 +1,18 @@
 /*
  * Time-stamp: <04/05/05 16:21:47 pagey>
  *
- * $Id: SerialStreamBuf.h,v 1.7 2005-09-05 14:19:55 wedesoft Exp $
+ * $Id: SerialStreamBuf.h,v 1.8 2005-10-01 21:24:21 crayzeewulf Exp $
  *
  *
  */
 #ifndef _SerialStreamBuf_h_
 #define _SerialStreamBuf_h_
 
-#ifndef _termios_h_INCLUDED_
-#    include <termios.h>
-#    define _termios_h_INCLUDED_
-#endif
-
-#ifndef _unistd_h_INCLUDED_
-#    include <unistd.h>
-#    define _unistd_h_INCLUDED_
-#endif
-
-#ifndef _std_iosfwd_INCLUDED_
-#    include <iosfwd>
-#    define _std_iosfwd_INCLUDED_
-#endif
-
-#ifndef _std_streambuf_INCLUDED_
-#    include <streambuf>
-#    define _std_streambuf_INCLUDED_
-#endif
-
-#ifndef _std_string_INCLUDED_
-#    include <string>
-#    define _std_string_INCLUDED_
-#endif
+#include <termios.h>
+#include <unistd.h>
+#include <iosfwd>
+#include <streambuf>
+#include <string>
 
 extern "C++" {
     namespace LibSerial {
@@ -49,8 +30,8 @@ extern "C++" {
          *  At present, this class uses unbuffered I/O and all calls to
          *  setbuf() will be ignored.
          *
-         * @author $Author: wedesoft $ <A HREF="pagey@gnudom.org">Manish P. Pagey</A>
-         * @version $Id: SerialStreamBuf.h,v 1.7 2005-09-05 14:19:55 wedesoft Exp $
+         * @author $Author: crayzeewulf $ <A HREF="pagey@gnudom.org">Manish P. Pagey</A>
+         * @version $Id: SerialStreamBuf.h,v 1.8 2005-10-01 21:24:21 crayzeewulf Exp $
          * */
         class SerialStreamBuf : public std::streambuf {
         public:
