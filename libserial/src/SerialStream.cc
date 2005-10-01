@@ -1,31 +1,9 @@
-#ifndef _fcntl_h_INCLUDED_
-#    include <fcntl.h>
-#    define _fcntl_h_INCLUDED_
-#endif
-
-#ifndef _std_cstdio_INCLUDED_
-#    include <cstdio>
-#    define _std_cstdio_INCLUDED_
-#endif
-
-#ifndef _termios_h_INCLUDED_
-#    include <termios.h>
-#    define _termios_h_INCLUDED_
-#endif
-
-#ifndef _std_fstream_INCLUDED_
-#    include <fstream>
-#    define _std_fstream_INCLUDED_
-#endif
-
-#ifndef _std_cassert_INCLUDED_
-#    include <cassert>
-#    define _std_cassert_INCLUDED_
-#endif
-
-#ifndef _SerialStream_h_
-#    include "SerialStream.h"
-#endif
+#include <fcntl.h>
+#include <cstdio>
+#include <termios.h>
+#include <fstream>
+#include <cassert>
+#include "SerialStream.h"
 
 using namespace LibSerial ;
 using namespace std ;

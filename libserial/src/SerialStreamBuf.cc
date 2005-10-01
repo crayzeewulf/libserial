@@ -1,42 +1,12 @@
 #include <iostream>
-
-#ifndef _sys_types_h_INCLUDED_
-#    include <sys/types.h>
-#    define _sys_types_h_INCLUDED_
-#endif
-
-#ifndef _sys_stat_h_INCLUDED_
-#    include <sys/stat.h>
-#    define _sys_stat_h_INCLUDED_
-#endif
-
-#ifndef _fcntl_h_INCLUDED_
-#    include <fcntl.h>
-#    define _fcntl_h_INCLUDED_
-#endif
-
-#ifndef _unistd_h_INCLUDED_
-#    include <unistd.h>
-#    define _unistd_h_INCLUDED_
-#endif
-
-#ifndef _std_cassert_INCLUDED_
-#    include <cassert>
-#    define _std_cassert_INCLUDED_
-#endif
-
-#ifndef _std_fstream_INCLUDED_
-#    include <fstream>
-#    define _std_fstream_INCLUDED_
-#endif
-#ifndef _limits_h_INCLUDED_
-#    include <limits.h>
-#    define _limits_h_INCLUDED_
-#endif
-
-#ifndef _SerialStreamBuf_h_
-#    include "SerialStreamBuf.h"
-#endif
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <cassert>
+#include <fstream>
+#include <limits.h>
+#include "SerialStreamBuf.h"
 
 using namespace std ;
 using namespace LibSerial ;
