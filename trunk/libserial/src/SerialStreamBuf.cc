@@ -160,7 +160,14 @@ SerialStreamBuf::SetParametersToDefault() {
     tio.c_oflag = 0;
     tio.c_cflag = B19200 | CS8 | CLOCAL | CREAD;
     tio.c_lflag = 0;
+    //
+    // :TRICKY:
+    // termios.c_line is not a standard element of the termios structure (as 
+    // per the Single Unix Specification 2. This is only present under Linux.
+    //
+    #ifdef __linux__
     tio.c_line = '\0';
+    #endif
     bzero( &tio.c_cc, sizeof(tio.c_cc) );
     tio.c_cc[VTIME] = 0;
     tio.c_cc[VMIN]  = 1;
