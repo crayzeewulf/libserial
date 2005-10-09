@@ -65,7 +65,14 @@ public:
         BAUD_57600   = B57600,
         BAUD_115200  = B115200,
         BAUD_230400  = B230400,
+        //
+        // Bug#1318912
+        // B460800 is defined on Linux but not on Mac OS X. What about other
+        // operating systems ?
+        //
+#ifdef __linux__       
         BAUD_460800  = B460800,
+#endif
         BAUD_DEFAULT = BAUD_57600
     } ;
 
