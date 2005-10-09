@@ -167,7 +167,6 @@ namespace
         sigaction_info.sa_handler = PosixSignalDispatcherImpl::SigactionHandler ;
         sigemptyset( &sigaction_info.sa_mask ) ;
         sigaction_info.sa_flags = 0 ;
-        sigaction_info.sa_restorer = NULL ;
         /*
          * Install the handler and get a copy of the previous handler.
          */
