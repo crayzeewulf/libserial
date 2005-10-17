@@ -1,7 +1,7 @@
 /*
  * Time-stamp: <04/05/05 16:21:47 pagey>
  *
- * $Id: SerialStreamBuf.h,v 1.8 2005-10-01 21:24:21 crayzeewulf Exp $
+ * $Id: SerialStreamBuf.h,v 1.9 2005-10-17 00:19:12 crayzeewulf Exp $
  *
  *
  */
@@ -31,7 +31,7 @@ extern "C++" {
          *  setbuf() will be ignored.
          *
          * @author $Author: crayzeewulf $ <A HREF="pagey@gnudom.org">Manish P. Pagey</A>
-         * @version $Id: SerialStreamBuf.h,v 1.8 2005-10-01 21:24:21 crayzeewulf Exp $
+         * @version $Id: SerialStreamBuf.h,v 1.9 2005-10-17 00:19:12 crayzeewulf Exp $
          * */
         class SerialStreamBuf : public std::streambuf {
         public:
@@ -188,7 +188,7 @@ extern "C++" {
                 pointer. Otherwise, initializes the <tt>streambuf</tt> as
                 required. It then opens a file, if possible, whose name is
                 given as the string <tt>filename</tt> using the system call
-                <tt>std::open(filename.data(), flags)</tt>. The value of
+                <tt>std::open(filename.c_str(), flags)</tt>. The value of
                 parameter <tt>flags</tt> is obtained from the value of the
                 parameter mode. At present, only <tt>ios_base::in</tt>,
                 <tt>ios_base::out</tt>, and
