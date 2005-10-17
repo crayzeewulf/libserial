@@ -83,7 +83,7 @@ SerialStreamBuf::open( const string filename,
     //
     // Try to open the serial port. 
     //
-    this->mFileDescriptor = ::open(filename.data(), flags) ;
+    this->mFileDescriptor = ::open(filename.c_str(), flags) ;
     if( -1 == this->mFileDescriptor ) {
         return 0 ;
     }
