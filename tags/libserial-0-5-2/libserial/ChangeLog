@@ -1,0 +1,35 @@
+2005-09-19    <pagey@pagey.info>
+
+	* configure.in: Released version 0.5.0. 
+
+	* src/PosixSignalDispatcher.cpp (Repository): Formatting changes
+	only. No logical changes.
+
+	* src/PosixSignalDispatcher.h (Repository): Formatting changes
+	only. No logical changes.
+
+	* src/SerialPort.cpp (Repository): Formatting changes only. No
+	logical changes.
+
+2005-09-18    <pagey@pagey.info>
+
+	* src/SerialPort.h (class SerialPort): The constructor for the
+	class is now "explicit" to make sure that a std::string does not
+	get converted to a SerialPort object through implicit
+	conversion. The destructor is not virtual anymore as this class is
+	not designed to be polymorphic.
+
+2005-09-06  Jan Wedekind <jan@wedesoft.de>
+
+	* examples/write_port.cpp: An example for writing commands to
+	the serial port was added.
+	* src/SerialStream.h: Functions for adjusting the port's VTIME-
+	and VMIN-parameter where added.
+	* src/SerialStreamBuf.cc: Missing return statement was added.
+
+2003-12-30  Manish P. Pagey  <pagey@pagey.info>
+
+	* src/SerialStreamBuf.cc: Interchanged "case 1" and "case 2" in
+	SerialStreamBuf::SetNumOfStopBits() to make sure that stop bits
+	are set correctly. This bug was pointed out by Olivier Chambard.
+
