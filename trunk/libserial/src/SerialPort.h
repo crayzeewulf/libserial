@@ -397,9 +397,26 @@ public:
         throw( NotOpen,
                std::runtime_error ) ;
 private:
+	/**
+	 * Prevent copying of objects of this class by declaring the copy 
+     * constructor private. This method is never defined. 
+     */
     SerialPort( const SerialPort& otherSerialPort ) ;
+    
+    /**
+     * Prevent copying of objects of this class by declaring the assignment
+     * operator private. This method is never defined. 
+     */
     SerialPort& operator=(const SerialPort& otherSerialPort ) ;
+    
+    /*
+     * Forward declaration of the implementation class folowing the PImpl idiom.
+     */
     class SerialPortImpl ;
+    
+    /**
+     * Pointer to implementation class instance.
+     */
     SerialPortImpl* mSerialPortImpl ;
 } ;
 
