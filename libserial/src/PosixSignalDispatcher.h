@@ -48,8 +48,8 @@ public:
     {
     public:
         CannotAttachHandler( const std::string& whatArg ) :
-            runtime_error(whatArg) { }}
-        ;
+            runtime_error(whatArg) { }
+    } ;
 
     /**
      * Exception thrown when DetachHandler() fails due to a runtime
@@ -59,8 +59,8 @@ public:
     {
     public:
         CannotDetachHandler( const std::string& whatArg ) :
-            runtime_error(whatArg) { }}
-        ;
+            runtime_error(whatArg) { }
+    } ;
 
     /**
      * Attach a signal handler to the signal dispatcher. The signal
@@ -131,6 +131,6 @@ private:
      */
     const PosixSignalDispatcher&
     operator=( const PosixSignalDispatcher& otherInstance ) ;
-};
+} ;
 
 #endif

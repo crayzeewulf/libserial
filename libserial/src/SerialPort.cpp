@@ -226,7 +226,14 @@ private:
 
     /**
      * Circular buffer used to store the received data. This is done
-     * asynchronously so we do not let tty buffer get filled.
+     * asynchronously and helps prevent overflow of the corresponding 
+     * tty's input buffer.
+     * 
+     * :TODO: The size of this buffer is allowed to increase indefinitely. If 
+     * data keeps arriving at the serial port and is never read then this 
+     * buffer will continue occupying more and more memory. We need to put a 
+     * cap on the size of this buffer. It might even be worth providing a 
+     * method to set the size of this buffer.  
      */
     std::queue<unsigned char> mInputBuffer ;
 
