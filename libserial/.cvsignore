@@ -14,3 +14,7 @@ stamp-h
 .settings
 .project
 .cdtproject
+GTAGS
+GPATH
+GRTAGS
+GSYMS
