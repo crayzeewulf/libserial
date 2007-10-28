@@ -11,3 +11,6 @@ doxygen.conf
 libtool
 stamp-h
 
+.settings
+.project
+.cdtproject
