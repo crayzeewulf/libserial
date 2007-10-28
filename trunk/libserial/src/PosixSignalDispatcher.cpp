@@ -283,6 +283,11 @@ namespace
         {
             i->second->HandlePosixSignal( signalNumber ) ;
         }
+        //
+        // :TODO: Why is the following code commented out using "#if 0" ?
+        // Check and remove this code if it is not necessary. Otherwise, if 
+        // it has been commented out due to a bug then debug and correct it. 
+        //
 #if 0
         /*
          * Get the original handler that was associated with the

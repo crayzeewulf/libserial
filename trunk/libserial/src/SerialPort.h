@@ -39,6 +39,13 @@
  * the serial port using this class.
  *
  * :FIXME: Provide examples of the above potential problem.
+ *
+ * @todo The current implementation does not check if another process has 
+ * locked the serial port device and does not lock the serial port device after
+ * opening it. This has been observed to cause problems while using this 
+ * library while other programs such as minicom are also accessing the same device. 
+ * It will be useful to lock the serial port device when it is being used by
+ * this class. 
  */
 class SerialPort
 {
