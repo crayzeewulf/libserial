@@ -1,6 +1,7 @@
 Makefile
 Makefile.in
 aclocal.m4
+autom4te.cache
 config.cache
 config.h
 config.h.in
@@ -10,7 +11,7 @@ configure
 doxygen.conf
 libtool
 stamp-h
-
+stamp-h1
 .settings
 .project
 .cdtproject

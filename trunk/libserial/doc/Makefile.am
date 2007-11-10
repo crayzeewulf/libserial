@@ -1,11 +1,15 @@
 SUBDIRS=UML 
 
-noinst_PROGRAMS: UserManual.pdf
+if HAVE_DOCBOOK2PDF
+noinst_DATA = UserManual.pdf
+else
+noinst_DATA = 
+endif
 
-UserManual_pdf_SOURCES = UserManual.sgml UserManual.dsl
-
-UserManual.pdf: UserManual.sgml UserManual.dsl
-	docbook2pdf -d UserManual.dsl UserManual.sgml
+EXTRA_DIST = UserManual.sgml UserManual.dsl
 
 CLEANFILES = UserManual.pdf
+
+UserManual.pdf: UserManual.sgml UserManual.dsl
+	$(DOCBOOK2PDF) -d UserManual.dsl UserManual.sgml
 
