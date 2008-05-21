@@ -1,4 +1,4 @@
-AC_REVISION($Revision: 1.13 $)
+AC_REVISION($Revision: 1.14 $)
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(src/SerialStream.cc)
 
@@ -7,7 +7,7 @@ AM_CONFIG_HEADER(config.h)
 dnl
 dnl Indicate the package name and the version to automake
 dnl
-dnl $Id: configure.in,v 1.13 2007-11-10 16:36:20 wedesoft Exp $
+dnl $Id: configure.in,v 1.14 2008-05-21 23:11:15 crayzeewulf Exp $
 AM_INIT_AUTOMAKE(libserial, 0.5.2)
 
 AM_MAINTAINER_MODE
@@ -39,10 +39,11 @@ AC_C_CONST
 AC_C_INLINE
 
 
-AC_OUTPUT([./Makefile
-./doxygen.conf
-./libserial.spec
-./doc/UML/Makefile
-./doc/Makefile
-./examples/Makefile
-./src/Makefile])
+AC_OUTPUT([Makefile
+doxygen.conf
+libserial.spec
+doc/UML/Makefile
+doc/Makefile
+examples/Makefile
+src/Makefile
+libserial.pc])

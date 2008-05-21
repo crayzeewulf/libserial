@@ -1,11 +1,11 @@
-prefix=/home/pagey/LocalSoftware/i486-pc-linux-gnu/.install_dir/libserial/cvs/
+prefix=@prefix@
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
 Name: libserial
 Description: C++ Serial port library
-Version: 0.5.2
+Version: @VERSION@
 Libs: -L${libdir} -lserial
 Cflags: -I${includedir}
 
