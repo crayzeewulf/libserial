@@ -420,6 +420,41 @@ public:
         throw( NotOpen,
                std::runtime_error ) ;
 
+    /**
+     * Set the RTS line to the specified value.
+     */
+    void
+    SetRts( const bool rtsState = true )
+        throw( NotOpen,
+               std::runtime_error ) ;
+
+    /**
+     * Get the status of the RTS line.
+     */
+    bool
+    GetRts() const 
+        throw( NotOpen,
+               std::runtime_error ) ;
+
+    void
+    SetCts( const bool ctsState )
+        throw( NotOpen,
+               std::runtime_error ) ;
+    
+    bool
+    GetCts() const 
+        throw( NotOpen,
+               std::runtime_error ) ;
+
+    void
+    SetDsr( const bool dsrState )
+        throw( NotOpen,
+               std::runtime_error ) ;
+    
+    bool
+    GetDsr() const 
+        throw( NotOpen,
+               std::runtime_error ) ;
 private:
 	/**
 	 * Prevent copying of objects of this class by declaring the copy 
