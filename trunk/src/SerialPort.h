@@ -403,6 +403,23 @@ public:
     Write(const std::string& dataString)
         throw( NotOpen,
                std::runtime_error ) ;
+
+    /**
+     * Set the DTR line to the specified value.
+     */
+    void
+    SetDtr( const bool dtrState = true )
+        throw( NotOpen,
+               std::runtime_error ) ;
+
+    /**
+     * Get the status of the DTR line.
+     */
+    bool
+    GetDtr() const 
+        throw( NotOpen,
+               std::runtime_error ) ;
+
 private:
 	/**
 	 * Prevent copying of objects of this class by declaring the copy 
