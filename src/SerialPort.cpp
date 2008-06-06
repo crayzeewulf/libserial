@@ -30,6 +30,7 @@
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <signal.h>
+#include <strings.h>
 
 namespace
 {
@@ -195,8 +196,19 @@ public:
         throw( SerialPort::NotOpen,
                std::runtime_error ) ;
 
+    void
+    SetDtr( const bool dtrState )
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
+    
+    bool
+    GetDtr() const 
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
+
     /*
-     * This method must be defined by all subclasses of PosixSignalHandler.
+     * This method must be defined by all subclasses of
+     * PosixSignalHandler.
      */
     void
     HandlePosixSignal(int signalNumber) ;
@@ -467,7 +479,8 @@ SerialPort::SerialPortImpl::SerialPortImpl( const std::string& serialPortName ) 
     mSerialPortName(serialPortName),
     mIsOpen(false),
     mFileDescriptor(-1),
-    mOldPortSettings()
+    mOldPortSettings(),
+    mInputBuffer()
 {
     /* empty */
 }
@@ -1323,6 +1336,73 @@ SerialPort::SerialPortImpl::Write( const unsigned char* dataBuffer,
     // :FIXME: What happens if num_of_bytes_written < bufferSize ?
     //
     return ;
+}
+
+inline
+void
+SerialPort::SerialPortImpl::SetDtr( const bool dtrState )
+    throw( SerialPort::NotOpen,
+           std::runtime_error )
+{
+    //
+    // Make sure that the serial port is open.
+    //
+    if ( ! this->IsOpen() )
+    {
+        throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
+    }
+    //
+    // Set or unset the DTR bit according to the value of dtrState.
+    //
+    int ioctl_result = -1 ;
+    if ( true == dtrState )
+    {
+        int set_dtr_mask = TIOCM_DTR ;
+        ioctl_result = ioctl( mFileDescriptor, 
+                              TIOCMBIS,
+                              &set_dtr_mask ) ;
+    }
+    else
+    {
+        int reset_dtr_mask = ~TIOCM_DTR ;
+        ioctl_result = ioctl( mFileDescriptor, 
+                              TIOCMBIC,
+                              &reset_dtr_mask ) ;
+    }
+    //
+    // Check for errors. 
+    //
+    if ( -1 == ioctl_result )
+    {
+        throw std::runtime_error( strerror(errno) ) ;
+    }
+    return ;
+}
+
+inline
+bool
+SerialPort::SerialPortImpl::GetDtr() const
+    throw( SerialPort::NotOpen,
+           std::runtime_error )
+{
+    //
+    // Make sure that the serial port is open.
+    //
+    if ( ! this->IsOpen() )
+    {
+        throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
+    }
+    //
+    // Use an ioctl() call to get the state of the DTR line.
+    //
+    int serial_port_state = 0 ;
+    if ( -1 == ioctl( mFileDescriptor,
+                      TIOCMGET,
+                      &serial_port_state ) )
+    {
+        throw std::runtime_error( strerror(errno) ) ;
+    }
+    return ( serial_port_state & TIOCM_DTR ) ;    
 }
 
 inline
