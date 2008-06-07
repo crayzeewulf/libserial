@@ -1,3 +1,4 @@
+AM_CXXFLAGS = -Weffc++
 
 lib_LTLIBRARIES = libserial.la
 
