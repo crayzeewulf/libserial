@@ -6,6 +6,7 @@
 #include <cassert>
 #include <fstream>
 #include <limits.h>
+#include <strings.h>
 #include "SerialStreamBuf.h"
 
 using namespace std ;
