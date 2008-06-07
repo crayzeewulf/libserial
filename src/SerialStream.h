@@ -1,5 +1,5 @@
 /*
- * Time-stamp: <04/05/05 15:25:22 pagey>
+ * Time-stamp: <08/06/01 09:34:26 pagey>
  *
  * $Id: SerialStream.h,v 1.10 2005-10-01 21:24:21 crayzeewulf Exp $
  *
@@ -221,6 +221,7 @@ extern "C++" {
             */
             const short SetVMin( short vtime ) ;
 
+
             /** Get current size of character buffer.
                 Look <A HREF="http://www.unixwiz.net/techtips/termios-vmin-vtime.html">here</A>
                 for more documentation about VTIME and VMIN.
@@ -266,6 +267,14 @@ extern "C++" {
              * Private Data Members
              * ------------------------------------------------------------
              */
+            //
+            // The copy constructor and the assignment operator are declared
+            // but never defined. This allows the compiler to catch any
+            // attempts to copy instances of this class.
+            //
+            SerialStream( const SerialStream& ) ;
+            SerialStream& operator=( const SerialStream& ) ;
+
             /** The SerialStreamBuf object that will be used by the stream
                 to communicate with the serial port.
 
