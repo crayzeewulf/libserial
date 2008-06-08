@@ -48,7 +48,8 @@ def main():
     #
     makefile = sipconfig.SIPModuleMakefile( config,
                                             build_file=build_file,
-                                            threaded=1 )
+                                            threaded=1,
+                                            makefile="Makefile.sip" )
     #
     # Add the library we are wrapping.  The name doesn't include any platform
     # specific prefixes or extensions (e.g. the "lib" prefix on UNIX, or the
@@ -61,7 +62,6 @@ def main():
     # Generate the Makefile itself.
     #
     makefile.generate()
-    logging.info( "Type 'make' to compile the module." )
 ###############################################################################
 # The script starts here.
 ###############################################################################
