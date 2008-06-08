@@ -19,7 +19,6 @@
         if ( PyArg_Parse( sipPy, "s", &str_val ) )
         {
             std::string* ret_val = new std::string( str_val ) ;
-            std::cout << *ret_val  << std::endl ;
             if ( 0 == ret_val )
             {
                 *sipIsErr = 1 ;
@@ -42,16 +41,17 @@
         PyObject *uobj = 
             PyUnicode_FromUnicode( NULL, sipCpp->length() );
     
-        if ( NULL == uobj )
+        if ( 0 == uobj )
         {
-            return NULL;
+            return 0 ;
         }
 
         Py_UNICODE *pyu = PyUnicode_AS_UNICODE( uobj ) ;
 
-        for (unsigned int i = 0; i < sipCpp->length(); ++i)
-            *pyu++ = sipCpp->at(i) ;
-
+        for( unsigned int i=0; i<sipCpp->length(); ++i, ++pyu )
+        {
+            *pyu = sipCpp->at(i) ;
+        }
         return uobj;	
 %End
 

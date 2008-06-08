@@ -1,15 +1,15 @@
 #! /usr/bin/env python
-import libserial
+from libserial import SerialPort
 import errno
 import sys
 
 def main():
-    serial_port = libserial.SerialPort( "/dev/ttyUSB1" )
-    serial_port.Open( libserial.SerialPort.BAUD_115200,
-                      libserial.SerialPort.CHAR_SIZE_DEFAULT,
-                      libserial.SerialPort.PARITY_DEFAULT,
-                      libserial.SerialPort.STOP_BITS_DEFAULT,
-                      libserial.SerialPort.FLOW_CONTROL_HARD )
+    serial_port = SerialPort( "/dev/ttyUSB1" )
+    serial_port.Open( SerialPort.BAUD_115200,
+                      SerialPort.CHAR_SIZE_DEFAULT,
+                      SerialPort.PARITY_DEFAULT,
+                      SerialPort.STOP_BITS_DEFAULT,
+                      SerialPort.FLOW_CONTROL_HARD )
     try:
         while True:
             sys.stdout.write( serial_port.ReadByte() )
