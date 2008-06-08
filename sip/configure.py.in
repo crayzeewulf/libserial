@@ -55,8 +55,8 @@ def main():
     # specific prefixes or extensions (e.g. the "lib" prefix on UNIX, or the
     # ".dll" extension on Windows).
     #
-    makefile.extra_include_dirs = [ "../src" ]
-    makefile.extra_lib_dirs     = [ "../src/.libs" ]
+    makefile.extra_include_dirs = [ "@top_srcdir@/src" ]
+    makefile.extra_lib_dirs     = [ "@top_srcdir@/src/.libs" ]
     makefile.extra_libs         = [ "serial" ]
     #
     # Generate the Makefile itself.

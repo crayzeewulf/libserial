@@ -46,4 +46,6 @@ doc/UML/Makefile
 doc/Makefile
 examples/Makefile
 src/Makefile
+sip/configure.py
+sip/Makefile
 libserial.pc])
