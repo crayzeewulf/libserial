@@ -1,9 +1,16 @@
 #! /usr/bin/env python
-import binascii
+import sys
 import libserial
 serial_port = libserial.SerialPort( libserial.std.string ( "/dev/ttyUSB0" ) )
-serial_port.Open( libserial.SerialPort.BAUD_115200 )
-while True:
-    for i in range( 65, 91 ):
-        serial_port.WriteByte( chr(i) )
-    
+serial_port.Open( libserial.SerialPort.BAUD_115200,
+                  libserial.SerialPort.CHAR_SIZE_DEFAULT,
+                  libserial.SerialPort.PARITY_DEFAULT,
+                  libserial.SerialPort.STOP_BITS_DEFAULT,
+                  libserial.SerialPort.FLOW_CONTROL_HARD )
+try:
+    while True:
+        for i in range( 65, 91 ):
+            serial_port.WriteByte( chr(i) )
+            sys.stdout.write( chr(i) )
+except KeyboardInterrupt:
+    sys.exit(0)    
