@@ -436,20 +436,20 @@ public:
         throw( NotOpen,
                std::runtime_error ) ;
 
-    void
-    SetCts( const bool ctsState )
-        throw( NotOpen,
-               std::runtime_error ) ;
+    //void
+    //SetCts( const bool ctsState = true )
+    //    throw( NotOpen,
+    //           std::runtime_error ) ;
     
     bool
     GetCts() const 
         throw( NotOpen,
                std::runtime_error ) ;
 
-    void
-    SetDsr( const bool dsrState )
-        throw( NotOpen,
-               std::runtime_error ) ;
+    //void
+    //SetDsr( const bool dsrState = true )
+    //    throw( NotOpen,
+    //           std::runtime_error ) ;
     
     bool
     GetDsr() const 

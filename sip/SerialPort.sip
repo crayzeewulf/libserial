@@ -232,20 +232,20 @@ public:
         throw( SerialPort::NotOpen,
                std::runtime_error ) ;
 
-    void
-    SetCts( const bool ctsState )
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
+    //void
+    //SetCts( const bool ctsState = true )
+    //    throw( SerialPort::NotOpen,
+    //           std::runtime_error ) ;
     
     bool
     GetCts() const 
         throw( SerialPort::NotOpen,
                std::runtime_error ) ;
 
-    void
-    SetDsr( const bool dsrState )
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
+    //void
+    //SetDsr( const bool dsrState = true )
+    //    throw( SerialPort::NotOpen,
+    //           std::runtime_error ) ;
     
     bool
     GetDsr() const 

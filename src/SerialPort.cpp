@@ -216,20 +216,11 @@ public:
         throw( SerialPort::NotOpen,
                std::runtime_error ) ;
 
-    void
-    SetCts( const bool ctsState )
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
-    
     bool
     GetCts() const 
         throw( SerialPort::NotOpen,
                std::runtime_error ) ;
 
-    void
-    SetDsr( const bool dsrState )
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
     
     bool
     GetDsr() const 
@@ -564,14 +555,6 @@ SerialPort::GetRts() const
     return mSerialPortImpl->GetRts() ;
 }
 
-void
-SerialPort::SetCts( const bool ctsState )
-    throw( SerialPort::NotOpen,
-           std::runtime_error ) 
-{
-    mSerialPortImpl->SetCts( ctsState ) ;
-    return ;
-}
 
 bool
 SerialPort::GetCts() const 
@@ -579,15 +562,6 @@ SerialPort::GetCts() const
            std::runtime_error ) 
 {
     return mSerialPortImpl->GetCts() ;
-}
-
-void
-SerialPort::SetDsr( const bool dsrState )
-    throw( SerialPort::NotOpen,
-           std::runtime_error ) 
-{
-    mSerialPortImpl->SetDsr( dsrState ) ;
-    return ;
 }
 
 bool
@@ -1503,16 +1477,6 @@ SerialPort::SerialPortImpl::GetRts() const
     return this->GetModemControlLine( TIOCM_RTS ) ;
 }    
 
-inline
-void
-SerialPort::SerialPortImpl::SetCts( const bool ctsState )
-    throw( SerialPort::NotOpen,
-           std::runtime_error )
-{
-    this->SetModemControlLine( TIOCM_CTS, 
-                               ctsState ) ;
-    return ;
-}
 
 inline
 bool
@@ -1523,16 +1487,6 @@ SerialPort::SerialPortImpl::GetCts() const
     return this->GetModemControlLine( TIOCM_CTS ) ;
 }    
 
-inline
-void
-SerialPort::SerialPortImpl::SetDsr( const bool dsrState )
-    throw( SerialPort::NotOpen,
-           std::runtime_error )
-{
-    this->SetModemControlLine( TIOCM_DSR, 
-                               dsrState ) ;
-    return ;
-}
 
 inline
 bool
@@ -1619,7 +1573,7 @@ SerialPort::SerialPortImpl::SetModemControlLine( const int  modemLine,
     }
     else
     {
-        int reset_line_mask = ~modemLine ;
+        int reset_line_mask = modemLine ;
         ioctl_result = ioctl( mFileDescriptor, 
                               TIOCMBIC,
                               &reset_line_mask ) ;
