@@ -1,4 +1,5 @@
 #include <iostream>
+#include <unistd.h>
 #include <SerialStream.h>
 
 int
@@ -10,7 +11,7 @@ main( int    argc,
     //
     using namespace LibSerial ;
     SerialStream serial_port ;
-    serial_port.Open( "/dev/ttyS0" ) ;
+    serial_port.Open( "/dev/ttyUSB0" ) ;
     if ( ! serial_port.good() ) 
     {
         std::cerr << "[" << __FILE__ << ":" << __LINE__ << "] "
@@ -21,7 +22,7 @@ main( int    argc,
     //
     // Set the baud rate of the serial port.
     //
-    serial_port.SetBaudRate( SerialStreamBuf::BAUD_57600 ) ;
+    serial_port.SetBaudRate( SerialStreamBuf::BAUD_115200 ) ;
     if ( ! serial_port.good() ) 
     {
         std::cerr << "Error: Could not set the baud rate." << std::endl ;
@@ -56,9 +57,9 @@ main( int    argc,
         exit(1) ;
     }
     //
-    // Turn on hardware flow control.
+    // Turn off hardware flow control.
     //
-    serial_port.SetFlowControl( SerialStreamBuf::FLOW_CONTROL_HARD ) ;
+    serial_port.SetFlowControl( SerialStreamBuf::FLOW_CONTROL_NONE ) ;
     if ( ! serial_port.good() ) 
     {
         std::cerr << "Error: Could not use hardware flow control."
@@ -71,13 +72,21 @@ main( int    argc,
     //
     // serial_port.unsetf( std::ios_base::skipws ) ;
     //
+    // Wait for some data to be available at the serial port.
+    //
+    while( serial_port.rdbuf()->in_avail() == 0 ) 
+    {
+        usleep(100) ;
+    }
+    //
     // Keep reading data from serial port and print it to the screen.
     //
     while( serial_port.rdbuf()->in_avail() > 0  ) 
     {
         char next_byte;
         serial_port.get(next_byte);
-        std::cerr << std::hex << (int)next_byte << " ";
+        std::cerr << std::hex << static_cast<int>(next_byte) << " ";
+        usleep(100) ;
     } 
     std::cerr << std::endl ;
     return EXIT_SUCCESS ;

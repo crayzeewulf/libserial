@@ -1,5 +1,5 @@
 /*
- * Time-stamp: <08/06/01 09:34:26 pagey>
+ * Time-stamp: <08/06/07 10:49:28 pagey>
  *
  * $Id: SerialStream.h,v 1.10 2005-10-01 21:24:21 crayzeewulf Exp $
  *
@@ -10,7 +10,6 @@
 
 #include <string>
 #include <fstream>
-#include <cassert>
 #include <SerialStreamBuf.h>
 
 extern "C++" {
@@ -50,33 +49,9 @@ extern "C++" {
         */
         class SerialStream : public std::iostream {
         public:
-            /** @name Typedefs
-             */
-            //@{
-
-            //@}
-
-
-            /** @name Enumerations
-             */
-            //@{
-
-            //@}
-
             /* ------------------------------------------------------------
              * Public Static Members
              * ------------------------------------------------------------ */
-            /** @name Public static members. 
-             */
-            //@{
-
-            //@}
-
-            /** @name Exceptions
-             */
-            //@{
-
-            //@}
 
             /** @name Constructors and Destructor
              */
@@ -103,12 +78,12 @@ extern "C++" {
                 stream is in a good state before using it for any further
                 I/O operations.
 
-                @param filename The filename of the serial port. 
-                @param mode     The openmode for the serial port file. 
+                @param fileName The filename of the serial port. 
+                @param openMode The openmode for the serial port file. 
 
             */
-            explicit SerialStream( const std::string  filename, 
-                                   std::ios_base::openmode mode =
+            explicit SerialStream( const std::string fileName, 
+                                   std::ios_base::openmode openMode =
                                    std::ios::in|std::ios::out) ;
 
             /** Create a new SerialStream object but do not open it. The
@@ -132,9 +107,9 @@ extern "C++" {
                 s and the specified mode, mode.
 
             */
-            void Open(const std::string filename, 
-                      std::ios_base::openmode mode = 
-                      std::ios_base::in | std::ios_base::out) ;
+            void Open( const std::string fileName, 
+                       std::ios_base::openmode openMode = 
+                       std::ios_base::in | std::ios_base::out) ;
 
             /** Close the serial port. No communications can occur with the
                 serial port after calling this routine.
@@ -150,7 +125,7 @@ extern "C++" {
             /** Set the baud rate for serial communications. 
 
             */
-            void SetBaudRate(SerialStreamBuf::BaudRateEnum baud_rate) ;
+            void SetBaudRate(SerialStreamBuf::BaudRateEnum baudRate ) ;
 
             /** Get the current baud rate being used for serial
                 communication. This routine queries the serial port for its
@@ -169,7 +144,7 @@ extern "C++" {
 	  
             @param size The character size will be set to this value. 
             */
-            void SetCharSize(const SerialStreamBuf::CharSizeEnum size) ;
+            void SetCharSize(const SerialStreamBuf::CharSizeEnum charSize ) ;
 
             /** Get the character size being used for serial communication. 
 	 

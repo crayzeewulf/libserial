@@ -1,3 +1,4 @@
+AM_CXXFLAGS = -Weffc++
 
 noinst_PROGRAMS = readport writeport
 # noinst_PROGRAMS = readport writeport xmodem_rx xmodem_tx process_rope_command test_echo
