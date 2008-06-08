@@ -1,4 +1,4 @@
-SUBDIRS=src doc examples
+SUBDIRS=src doc examples sip
 
 EXTRA_DIST = doxygen.conf.in Makefile.dist libserial.spec libserial.pc
 

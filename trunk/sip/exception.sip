@@ -1,14 +1,14 @@
 namespace std 
 {
-  class exception 
-  {
+    class exception 
+    {
 %TypeHeaderCode
 #include <exception>
 %End
-  public:
-    exception() throw() ;
-    virtual ~exception() throw();
+    public:
+        exception() throw() ;
+        virtual ~exception() throw();
 
-    virtual const char* what() const throw();
-  };
+        virtual const char* what() const throw();
+    } ;
 } ;
