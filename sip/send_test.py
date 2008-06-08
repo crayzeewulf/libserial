@@ -3,7 +3,7 @@ import sys
 import libserial
 
 def main():
-    serial_port = libserial.SerialPort( libserial.std.string ( "/dev/ttyUSB0" ) )
+    serial_port = libserial.SerialPort( "/dev/ttyUSB0" )
     serial_port.Open( libserial.SerialPort.BAUD_115200,
                       libserial.SerialPort.CHAR_SIZE_DEFAULT,
                       libserial.SerialPort.PARITY_DEFAULT,

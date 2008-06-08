@@ -1,69 +1,41 @@
-namespace std
+%MappedType std::string
 {
-    class string
-    {
 %TypeHeaderCode
 #include <string>
+#include <iostream>
 %End
-public:
-    string();
-    string(const char*);
-    string(const std::string&);
+
+%ConvertToTypeCode
+        //
+        // If sipIsErr is NULL then we must check the type of the
+        // Python object and return the result.
+        //
+        if ( ! sipIsErr )
+        {
+            return PyString_Check( sipPy ) ;
+        }
+
+        char *str_val = 0 ;
+        if ( PyArg_Parse( sipPy, "s", &str_val ) )
+        {
+            std::string* ret_val = new std::string( str_val ) ;
+            std::cout << *ret_val  << std::endl ;
+            if ( 0 == ret_val )
+            {
+                *sipIsErr = 1 ;
+                return 0 ;
+            }
+            *sipCppPtr = ret_val ;
+	}
+        else
+        {
+            *sipIsErr = 1 ;
+            return 0 ;
+        }
+	return sipGetState( sipTransferObj ) ;
+%End
     
-    bool empty();
-    int length();
-    int size();
-    void resize(int, char);
-    void resize(int);
-    int capacity();
-    void reserve(int =0);
-    
-    std::string& append(const std::string&);
-    std::string& append(const std::string&, int, int);
-    std::string& append(const char*);
-    std::string& append(const char*, int);
-    std::string& append(int, char);
-    
-    std::string& insert(int, const std::string&);
-    std::string& insert(int, const std::string&, int, int);
-    std::string& insert(int, const char*);
-    std::string& insert(int, const char*, int);
-    std::string& insert(int, int, char);
-    
-    int find(const std::string&, int = 0);
-    int find(const char*, int, int);
-    int find(const char*, int = 0);
-    int find(char, int = 0);
-    
-    int rfind(const std::string&, int = -1);
-    int rfind(const char*, int, int);
-    int rfind(const char*, int = -1);
-    int rfind(char, int = -1);
-    
-    int find_first_of(const std::string&, int = 0);
-    int find_first_of(const char*, int, int);
-    int find_first_of(const char*, int = 0);
-    int find_first_of(char, int = 0);
-    
-    int find_first_not_of(const std::string&, int = 0);
-    int find_first_not_of(const char*, int, int);
-    int find_first_not_of(const char*, int = 0);
-    int find_first_not_of(char, int = 0);
-    
-    int find_last_of(const std::string&, int = 0);
-    int find_last_of(const char*, int, int);
-    int find_last_of(const char*, int = 0);
-    int find_last_of(char, int = 0);
-    
-    int find_last_not_of(const std::string&, int = 0);
-    int find_last_not_of(const char*, int, int);
-    int find_last_not_of(const char*, int = 0);
-    int find_last_not_of(char, int = 0);
-    
-    std::string substr(int = 0, int = -1);
-    
-    SIP_PYOBJECT __str__();
-%MethodCode
+%ConvertFromTypeCode
         /*
          * Inspired by QtCore/qstring.cpp from PyQt4 source code.
          */
@@ -83,6 +55,5 @@ public:
         return uobj;	
 %End
 
-    }; /* class string */
 } ;
 
