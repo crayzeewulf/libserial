@@ -469,7 +469,8 @@ private:
     SerialPort& operator=(const SerialPort& otherSerialPort ) ;
     
     /*
-     * Forward declaration of the implementation class folowing the PImpl idiom.
+     * Forward declaration of the implementation class folowing the
+     * PImpl idiom.
      */
     class SerialPortImpl ;
     

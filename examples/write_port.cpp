@@ -19,7 +19,7 @@ main( int    argc,
     //
     // Open the serial port.
     //
-    const char* const SERIAL_PORT_DEVICE = "/dev/ttyS0" ;
+    const char* const SERIAL_PORT_DEVICE = "/dev/ttyUSB0" ;
     using namespace LibSerial ;    
     SerialStream serial_port ;
     serial_port.Open( SERIAL_PORT_DEVICE ) ;
@@ -33,7 +33,7 @@ main( int    argc,
     //
     // Set the baud rate of the serial port.
     //
-    serial_port.SetBaudRate( SerialStreamBuf::BAUD_9600 ) ;
+    serial_port.SetBaudRate( SerialStreamBuf::BAUD_115200 ) ;
     if ( ! serial_port.good() ) 
     {
         std::cerr << "Error: Could not set the baud rate." << std::endl ;
