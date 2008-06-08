@@ -14,10 +14,10 @@ $(SIPFILES)
 
 all: libserial.so
 
-libserial.so: $(SIPFILES) Makefile.sip @top_srcdir@/src/libserial.la
+libserial.so: Makefile.sip @top_srcdir@/src/libserial.la
 	make -f Makefile.sip
 
-Makefile.sip: configure.py
+Makefile.sip: configure.py $(SIPFILES) 
 	python ./configure.py
 
 clean-local: Makefile.sip
