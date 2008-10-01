@@ -18,6 +18,24 @@ SerialStream::SerialStream( const string       fileName,
 }
 
 
+SerialStream::SerialStream( const std::string fileName,
+                            const SerialStreamBuf::BaudRateEnum baudRate,
+                            const SerialStreamBuf::CharSizeEnum charSize,
+                            const SerialStreamBuf::ParityEnum parityType,
+                            const short numOfStopBits,
+                            const SerialStreamBuf::FlowControlEnum flowControlType ) :
+    iostream(0),
+    mIOBuffer(0)
+{
+    this->Open( fileName ) ;
+    this->SetBaudRate( baudRate ) ;
+    this->SetCharSize( charSize ) ;
+    this->SetParity( parityType ) ;
+    this->SetNumOfStopBits( numOfStopBits ) ;
+    this->SetFlowControl( flowControlType ) ;
+    return ;
+}
+
 void 
 SerialStream::Open( const std::string       fileName, 
                     std::ios_base::openmode openMode ) 

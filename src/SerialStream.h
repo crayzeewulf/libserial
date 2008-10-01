@@ -1,5 +1,5 @@
 /*
- * Time-stamp: <08/06/07 10:49:28 pagey>
+ * Time-stamp: <2008-09-30 18:20:47 pagey>
  *
  * $Id: SerialStream.h,v 1.10 2005-10-01 21:24:21 crayzeewulf Exp $
  *
@@ -85,6 +85,23 @@ extern "C++" {
             explicit SerialStream( const std::string fileName, 
                                    std::ios_base::openmode openMode =
                                    std::ios::in|std::ios::out) ;
+
+            /**
+             * Constructor that allows one to create a SerialStream
+             * instance and also initialize the corresponding serial
+             * port with the specified parameters. This was suggested
+             * by Witek Adamus (wit3k). 
+             * 
+             * See https://sourceforge.net/tracker/index.php?func=detail&aid=2137885&group_id=9432&atid=359432
+             *
+             * :TODO: Add documentation for all parameters here.
+             */
+            SerialStream( const std::string fileName,
+                          const SerialStreamBuf::BaudRateEnum baudRate,
+                          const SerialStreamBuf::CharSizeEnum charSize = SerialStreamBuf::CHAR_SIZE_8,
+                          const SerialStreamBuf::ParityEnum parityType = SerialStreamBuf::PARITY_NONE,
+                          const short numOfStopBits = 1,
+                          const SerialStreamBuf::FlowControlEnum flowControlType = SerialStreamBuf::FLOW_CONTROL_HARD ) ;
 
             /** Create a new SerialStream object but do not open it. The
                 Open() method will need to be called explicitly on the
