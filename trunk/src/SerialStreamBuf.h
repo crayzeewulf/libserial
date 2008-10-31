@@ -1,5 +1,5 @@
 /*
- * Time-stamp: <04/05/05 16:21:47 pagey>
+ * Time-stamp: <2008-10-30 17:08:05 pagey>
  *
  * $Id: SerialStreamBuf.h,v 1.9 2005-10-17 00:19:12 crayzeewulf Exp $
  *
@@ -163,21 +163,21 @@ extern "C++" {
             /** @name Constructors and Destructor
              */
             //@{
-            /** The default constructor.
-
-            */
+            /** 
+             * The default constructor.
+             */
             SerialStreamBuf() ;
 
-            /** The destructor.  
-
-            */
+            /**
+             *  The destructor.  
+             */
             ~SerialStreamBuf() ;
             //@}
 
             /** @name Other Public Methods
              */
             //@{
-            /** Returns true if a previos call to open() succeeded (returned
+            /** Returns true if a previous call to open() succeeded (returned
                 a non-null value) and there has been no intervening call to
                 close.
 
@@ -268,7 +268,7 @@ extern "C++" {
                 on success and BAUD_INVALID on failure. 
 
             */
-            const BaudRateEnum SetBaudRate(const BaudRateEnum baud_rate) ;
+            const BaudRateEnum SetBaudRate(const BaudRateEnum baudRate ) ;
 
             /** Return the current baud rate of the serial port. If the baud
                 rate is not set to a valid value then it returns
@@ -282,7 +282,7 @@ extern "C++" {
                 CHAR_SIZE_INVALID on failure.
 
             */
-            const CharSizeEnum SetCharSize(const CharSizeEnum char_size) ;
+            const CharSizeEnum SetCharSize(const CharSizeEnum charSize) ;
 
             /** Return the character size currently being used for serial
                 communication.
@@ -297,7 +297,7 @@ extern "C++" {
                 @return The number of stop bits or -1 on failure. 
 	  
             */
-            short SetNumOfStopBits(short stop_bits) ;
+            short SetNumOfStopBits(short numOfStopBits) ;
 
             /** Get the number of stop bits being used during serial
                 communication.
@@ -311,7 +311,7 @@ extern "C++" {
             @param parity The parity value. 
 	  
             */
-            const ParityEnum SetParity(const ParityEnum parity) ;
+            const ParityEnum SetParity(const ParityEnum parityType) ;
 
             /** Get the current parity setting for the serial port. 
 	  
@@ -323,31 +323,35 @@ extern "C++" {
             /** Use the specified flow control. 
 
             */
-            const FlowControlEnum SetFlowControl(const FlowControlEnum flow_c) ;
+            const FlowControlEnum SetFlowControl(const FlowControlEnum flowControlType) ;
 
             /** Return the current flow control setting. 
 
             */
             const FlowControlEnum FlowControl() const ;
 
-            /** Set character buffer size.
-                
-            */
+            /** 
+             * Set the minimum number of characters for non-canonical
+             * reads. See VMIN in man termios(3).
+             */
             const short SetVMin( short vtime ) ;
 
-            /** Get current size of character buffer.
-                
-            */
+            /**
+             * Get the VMIN value for the device. This represents the
+             * minimum number of characters for non-canonical reads.
+             */
             const short VMin() const;
 
-            /** Set character buffer timing in 10th of a second.
-                
-            */
+            /** 
+             * Set character buffer timeout in 10ths of a second. This
+             * applies to non-canonical reads.
+             */
             const short SetVTime( short vtime ) ;
 
-            /** Get current timing of character buffer in 10th of a second.
-                
-            */
+            /** 
+             * Get the current timeout value for non-canonical reads
+             * in deciseconds. 
+             */
             const short VTime() const;
 
             //@}
@@ -440,7 +444,7 @@ extern "C++" {
             /** This function is called when a putback of a character
                 fails. This must be implemented for unbuffered I/O as all
                 streambuf subclasses are required to provide putback of at
-                lease on character.
+                least on character.
 
             */
             virtual int_type pbackfail(int_type c = traits_type::eof()) ;
@@ -466,32 +470,43 @@ extern "C++" {
              * Private Data Members
              * ------------------------------------------------------------
              */
-            /** We use unbuffered I/O for the serial port. However, we need
-                to provide the putback of atleast one character. This
-                character contains the putback character.
+            //
+            // The copy constructor and the assignment operator are
+            // declared private but never defined. This allows the
+            // compiler to catch attempts to copy instances of this
+            // class.
+            //
+            SerialStreamBuf( const SerialStreamBuf& ) ;
+            SerialStreamBuf& operator=( const SerialStreamBuf& ) ;
 
-            */
+            /** 
+             * We use unbuffered I/O for the serial port. However, we
+             * need to provide the putback of atleast one
+             * character. This character contains the putback
+             * character.
+             */
             char mPutbackChar ;
 
-            /** True if a putback value is available in mPutbackChar. 
-
-            */
+            /** 
+             * True if a putback value is available in mPutbackChar. 
+             */
             bool mPutbackAvailable ;
       
-            /** The file descriptor associated with the serial port. 
-
-            */
+            /** 
+             * The file descriptor associated with the serial port. 
+             */
             int mFileDescriptor ;
             /* ------------------------------------------------------------
              * Private Methods
              * ------------------------------------------------------------
              */
-            /** This routine is called by open() in order to initialize some
-                parameters of the serial port and setting its parameters to
-                default values.
-
-                @return -1 on failure and some other value on success. 
-            */
+            /** 
+             * This routine is called by open() in order to
+             * initialize some parameters of the serial port and
+             * setting its parameters to default values.
+             * 
+             * @return -1 on failure and some other value on success. 
+             */
             int InitializeSerialPort() ;
         } ; // class SerialStreamBuf
 
@@ -508,7 +523,8 @@ extern "C++" {
         inline 
         SerialStreamBuf::~SerialStreamBuf() 
         {
-            if( this->is_open() ) {
+            if( this->is_open() ) 
+            {
                 this->close() ;
             }
             return ;
@@ -568,6 +584,6 @@ extern "C++" {
             return next_ch ;
         }
 
-    } ; // namespace LibSerial
+    } // namespace LibSerial
 } // extern "C++"
 #endif // #ifndef _SerialStreamBuf_h_
