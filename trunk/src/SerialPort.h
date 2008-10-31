@@ -153,7 +153,7 @@ public:
     /**
      * Destructor.
      */
-    ~SerialPort() throw() ;
+    virtual ~SerialPort() throw() ;
 
     /**
      * Open the serial port with the specified settings. A serial port
@@ -456,8 +456,8 @@ public:
         throw( NotOpen,
                std::runtime_error ) ;
 private:
-	/**
-	 * Prevent copying of objects of this class by declaring the copy 
+    /**
+     * Prevent copying of objects of this class by declaring the copy 
      * constructor private. This method is never defined. 
      */
     SerialPort( const SerialPort& otherSerialPort ) ;
