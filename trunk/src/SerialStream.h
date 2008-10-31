@@ -1,5 +1,5 @@
 /*
- * Time-stamp: <2008-09-30 18:20:47 pagey>
+ * Time-stamp: <2008-10-30 16:30:11 pagey>
  *
  * $Id: SerialStream.h,v 1.10 2005-10-01 21:24:21 crayzeewulf Exp $
  *
@@ -97,11 +97,11 @@ extern "C++" {
              * :TODO: Add documentation for all parameters here.
              */
             SerialStream( const std::string fileName,
-                          const SerialStreamBuf::BaudRateEnum baudRate,
-                          const SerialStreamBuf::CharSizeEnum charSize = SerialStreamBuf::CHAR_SIZE_8,
-                          const SerialStreamBuf::ParityEnum parityType = SerialStreamBuf::PARITY_NONE,
-                          const short numOfStopBits = 1,
-                          const SerialStreamBuf::FlowControlEnum flowControlType = SerialStreamBuf::FLOW_CONTROL_HARD ) ;
+                          const SerialStreamBuf::BaudRateEnum baudRate = SerialStreamBuf::DEFAULT_BAUD,
+                          const SerialStreamBuf::CharSizeEnum charSize = SerialStreamBuf::DEFAULT_CHAR_SIZE,
+                          const SerialStreamBuf::ParityEnum parityType = SerialStreamBuf::DEFAULT_PARITY,
+                          const short numOfStopBits = SerialStreamBuf::DEFAULT_NO_OF_STOP_BITS,
+                          const SerialStreamBuf::FlowControlEnum flowControlType = SerialStreamBuf::DEFAULT_FLOW_CONTROL ) ;
 
             /** Create a new SerialStream object but do not open it. The
                 Open() method will need to be called explicitly on the
@@ -120,8 +120,8 @@ extern "C++" {
             /** @name Other Public Methods
              */
             //@{
-            /** Open the serial port associated with the specified filename,
-                s and the specified mode, mode.
+            /** Open the serial port associated with the specified
+                filename, and the specified mode, mode.
 
             */
             void Open( const std::string fileName, 
@@ -134,14 +134,14 @@ extern "C++" {
             */
             void Close() ;
 
-            /** Returns true if the Stream is in a good open state, false otherwise
-
-            */
+            /** Returns true if the Stream is in a good open state,
+             * false otherwise
+             */
             const bool IsOpen() const ;
 
-            /** Set the baud rate for serial communications. 
-
-            */
+            /** 
+             * Set the baud rate for serial communications. 
+             */
             void SetBaudRate(SerialStreamBuf::BaudRateEnum baudRate ) ;
 
             /** Get the current baud rate being used for serial
@@ -175,7 +175,7 @@ extern "C++" {
                 @param stop_bits The number of stop bits. (1 or 2). 
 	  
             */
-            void SetNumOfStopBits(short stop_bits) ;
+            void SetNumOfStopBits(short numOfStopBits) ;
 
             /** Get the number of stop bits being used during serial
                 communication.
@@ -188,7 +188,7 @@ extern "C++" {
             @param parity The parity value. 
 	  
             */
-            void SetParity(const SerialStreamBuf::ParityEnum parity) ;
+            void SetParity(const SerialStreamBuf::ParityEnum parityType) ;
 
             /** Get the current parity setting for the serial port. 
 	  
@@ -201,7 +201,7 @@ extern "C++" {
 
             */
             void 
-            SetFlowControl(const SerialStreamBuf::FlowControlEnum flow_c) ;
+            SetFlowControl(const SerialStreamBuf::FlowControlEnum flowControlType) ;
 
             /** Return the current flow control setting. 
 
@@ -347,6 +347,6 @@ extern "C++" {
             return mIOBuffer->is_open() ;
         }
 
-    } ; // namespace LibSerial
+    } // namespace LibSerial
 } // extern "C++"
 #endif // #ifndef _SerialStream_h_
