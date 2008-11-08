@@ -13,22 +13,22 @@ using namespace std ;
 using namespace LibSerial ;
 
 //
-// Set the values of the static members of the SerialStream class. 
+// Set the values of the static members of the SerialStream class.
 //
-const SerialStreamBuf::BaudRateEnum  
-SerialStreamBuf::DEFAULT_BAUD            = BAUD_9600          ;
+const SerialStreamBuf::BaudRateEnum
+SerialStreamBuf::DEFAULT_BAUD            = SerialStreamBuf::BAUD_DEFAULT ;
 
-const SerialStreamBuf::CharSizeEnum  
-SerialStreamBuf::DEFAULT_CHAR_SIZE       = CHAR_SIZE_7        ;
+const SerialStreamBuf::CharSizeEnum
+SerialStreamBuf::DEFAULT_CHAR_SIZE       = SerialStreamBuf::CHAR_SIZE_DEFAULT ;
 
-const short                          
+const short
 SerialStreamBuf::DEFAULT_NO_OF_STOP_BITS = 1                  ;
 
-const SerialStreamBuf::ParityEnum    
-SerialStreamBuf::DEFAULT_PARITY          = PARITY_NONE        ;
+const SerialStreamBuf::ParityEnum
+SerialStreamBuf::DEFAULT_PARITY          = SerialStreamBuf::PARITY_DEFAULT ;
 
 const SerialStreamBuf::FlowControlEnum
-SerialStreamBuf::DEFAULT_FLOW_CONTROL    = FLOW_CONTROL_NONE  ;
+SerialStreamBuf::DEFAULT_FLOW_CONTROL    = SerialStreamBuf::FLOW_CONTROL_DEFAULT ;
 
 const short
 SerialStreamBuf::DEFAULT_VMIN            = 1                  ;
@@ -38,7 +38,7 @@ SerialStreamBuf::DEFAULT_VTIME           = 0                  ;
 
 
 SerialStreamBuf*
-SerialStreamBuf::open( const string filename, 
+SerialStreamBuf::open( const string filename,
                        ios_base::openmode mode ) {
     //
     // If the buffer is alreay open then we should not allow a call to
@@ -598,7 +598,7 @@ SerialStreamBuf::SetFlowControl(const FlowControlEnum flow_c) {
         tset.c_cc[VSTART] = CTRL_Q ; // 0x11 (021) ^q
         tset.c_cc[VSTOP]  = CTRL_S ; // 0x13 (023) ^s
     } else {
-        tset.c_iflag &= ~(IXON|IXOFF);        
+        tset.c_iflag &= ~(IXON|IXOFF);
         tset.c_cflag &= ~CRTSCTS;
     }
     retval = tcsetattr(mFileDescriptor, TCSANOW, &tset);

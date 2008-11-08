@@ -4,7 +4,7 @@ import errno
 import sys
 
 def main():
-    serial_port = SerialPort( "/dev/ttyUSB1" )
+    serial_port = SerialPort( "/dev/ttyUSB11" )
     serial_port.Open( SerialPort.BAUD_115200,
                       SerialPort.CHAR_SIZE_DEFAULT,
                       SerialPort.PARITY_DEFAULT,
