@@ -1,5 +1,5 @@
 /*
- * Time-stamp: <2008-10-30 17:08:05 pagey>
+ * Time-stamp: <02-Nov-2008 14:52:35 pagey>
  *
  * $Id: SerialStreamBuf.h,v 1.9 2005-10-17 00:19:12 crayzeewulf Exp $
  *
@@ -13,10 +13,12 @@
 #include <iosfwd>
 #include <streambuf>
 #include <string>
+#include <SerialPort.h>
 
 extern "C++" {
     namespace LibSerial {
-        /** This is the streambuf subclass used by SerialStream. This
+        /**
+         *  This is the streambuf subclass used by SerialStream. This
          *  subclass takes care of opening the serial port file in the
          *  required modes and providing the corresponding file
          *  descriptor to SerialStream so that various parameters
@@ -27,8 +29,8 @@ extern "C++" {
          *  associated with the serial port and the standard filebuf
          *  does not provide access to it.
          *
-         *  At present, this class uses unbuffered I/O and all calls to
-         *  setbuf() will be ignored.
+         *  At present, this class uses unbuffered I/O and all calls
+         *  to setbuf() will be ignored.
          *
          * @author $Author: crayzeewulf $ <A HREF="pagey@gnudom.org">Manish P. Pagey</A>
          * @version $Id: SerialStreamBuf.h,v 1.9 2005-10-17 00:19:12 crayzeewulf Exp $
@@ -44,65 +46,92 @@ extern "C++" {
             /** @name Enumerations
              */
             //@{
-            /** The baud rates currently supported by the SUS-2 general
-                terminal interface specification. Note that B0 is not
-                supported because it is not really a baud rate (it causes
-                the modem to hang up i.e. drop DTR). Use the close() method
-                instead.
-
-            */
+            /**
+             * The baud rates currently supported by the SUS-2 general
+             * terminal interface specification. Note that B0 is not
+             * supported because it is not really a baud rate (it
+             * causes the modem to hang up i.e. drop DTR). Use the
+             * close() method instead.
+             *
+             * @deprecated This enumeration will be removed in
+             * revision 0.7.x of libserial. It is here for backward
+             * compatibility with 0.5.x releases. Please use the
+             * corresponding enumeration from SerialPort class
+             * instead.
+             */
             enum BaudRateEnum {
-                BAUD_50    = B50,         //!< 50 baud. 
-                BAUD_75    = B75,         //!< 75 baud.
-                BAUD_110   = B110,        //!< 110 baud.
-                BAUD_134   = B134,        //!< 134.5 baud. Yes 134.5. I did not mistype that. 
-                BAUD_150   = B150,        //!< 150 baud.
-                BAUD_200   = B200,        //!< 200 baud.
-                BAUD_300   = B300,        //!< 300 baud.
-                BAUD_600   = B600,        //!< 600 baud. 
-                BAUD_1200  = B1200,       //!< 1200 baud. 
-                BAUD_1800  = B1800,       //!< 1800 baud.
-                BAUD_2400  = B2400,       //!< 2400 baud.
-                BAUD_4800  = B4800,       //!< 4800 baud.
-                BAUD_9600  = B9600,       //!< 9600 baud.
-                BAUD_19200 = B19200,      //!< 19200 baud.
-                BAUD_38400 = B38400,      //!< 38400 baud.
-                BAUD_57600 = B57600,      //!< 57600 baud.
-                BAUD_115200 = B115200,    //!< 115200 baud.
-                BAUD_INVALID              //!< Invalid baud rate.
+                BAUD_50    = SerialPort::BAUD_50,
+                BAUD_75    = SerialPort::BAUD_75,
+                BAUD_110   = SerialPort::BAUD_110,
+                BAUD_134   = SerialPort::BAUD_134,
+                BAUD_150   = SerialPort::BAUD_150,
+                BAUD_200   = SerialPort::BAUD_200,
+                BAUD_300   = SerialPort::BAUD_300,
+                BAUD_600   = SerialPort::BAUD_600,
+                BAUD_1200  = SerialPort::BAUD_1200,
+                BAUD_1800  = SerialPort::BAUD_1800,
+                BAUD_2400  = SerialPort::BAUD_2400,
+                BAUD_4800  = SerialPort::BAUD_4800,
+                BAUD_9600  = SerialPort::BAUD_9600,
+                BAUD_19200 = SerialPort::BAUD_19200,
+                BAUD_38400 = SerialPort::BAUD_38400,
+                BAUD_57600 = SerialPort::BAUD_57600,
+                BAUD_115200 = SerialPort::BAUD_115200,
+                BAUD_230400 = SerialPort::BAUD_230400,
+#ifdef __linux__
+                BAUD_460800 = SerialPort::BAUD_460800,
+#endif
+                BAUD_DEFAULT = SerialPort::BAUD_DEFAULT,
+                BAUD_INVALID
             } ;
 
-            /** The allowed values of character sizes that can be used
-                during the serial communication.
-
-            */
+            /**
+             * The allowed values of character sizes that can be used
+             * during the serial communication.
+             *
+             * @deprecated This enumeration is deprecated. It will be
+             * removed in version 0.7.0. It is here for backward
+             * compatibility with version 0.5.x. Please use
+             * SerialPort::CharacterSize instead.
+             */
             enum CharSizeEnum {
-                CHAR_SIZE_5 = CS5, //!< 5 bit characters. 
-                CHAR_SIZE_6 = CS6, //!< 6 bit characters. 
-                CHAR_SIZE_7 = CS7, //!< 7 bit characters. 
-                CHAR_SIZE_8 = CS8, //!< 8 bit characters. 
-                CHAR_SIZE_INVALID  //!< Invalid character size.  
+                CHAR_SIZE_5 = SerialPort::CHAR_SIZE_5,
+                CHAR_SIZE_6 = SerialPort::CHAR_SIZE_6,
+                CHAR_SIZE_7 = SerialPort::CHAR_SIZE_7,
+                CHAR_SIZE_8 = SerialPort::CHAR_SIZE_8,
+                CHAR_SIZE_DEFAULT = SerialPort::CHAR_SIZE_DEFAULT,
+                CHAR_SIZE_INVALID
             } ;
 
-            /** The allowed values of the parity associated with the serial
-                port communications.
-	  
-            */
+            /**
+             * The allowed values of the parity associated with the
+             * serial port communications.
+             *
+             * @deprecated This enumeration is deprecated and will be
+             * removed in version 0.7.0. Please use SerialPort::Parity
+             * instead.
+             */
             enum ParityEnum {
-                PARITY_EVEN,     //!< Even parity.  
-                PARITY_ODD,      //!< Odd parity.
-                PARITY_NONE,     //!< No parity i.e. parity checking disabled.
+                PARITY_EVEN = SerialPort::PARITY_EVEN,
+                PARITY_ODD  = SerialPort::PARITY_ODD,
+                PARITY_NONE = SerialPort::PARITY_NONE,
+                PARITY_DEFAULT = SerialPort::PARITY_DEFAULT,
                 PARITY_INVALID   //!< Invalid parity value.
-            } ;      
+            } ;
 
-            /** The values of the flow control settings for a serial
-                port.
-
-            */
+            /**
+             * The values of the flow control settings for a serial
+             * port.
+             *
+             * @deprecated This enumeration has been deprecated and
+             * will be removed in version 0.7.0. Please use
+             * SerialPort::FlowControl instead.
+             */
             enum FlowControlEnum {
-                FLOW_CONTROL_HARD,   //!< Hardware flow control.
-                FLOW_CONTROL_SOFT,   //!< Software flow control. 
-                FLOW_CONTROL_NONE,   //!< No flow control.
+                FLOW_CONTROL_HARD    = SerialPort::FLOW_CONTROL_HARD,
+                FLOW_CONTROL_SOFT    = SerialPort::FLOW_CONTROL_SOFT,
+                FLOW_CONTROL_NONE    = SerialPort::FLOW_CONTROL_NONE,
+                FLOW_CONTROL_DEFAULT = SerialPort::FLOW_CONTROL_DEFAULT,
                 FLOW_CONTROL_INVALID //!< Invalid flow control setting. 
             } ;
             //@}
@@ -115,55 +144,74 @@ extern "C++" {
 
             */
             //@{
-            /** The default value of the baud rate of the serial port. 
-
-            */
+            /**
+             * The default value of the baud rate of the serial port.
+             *
+             * @deprecated Please use SerialPort::BAUD_DEFAULT
+             * instead.
+             */
             static const BaudRateEnum DEFAULT_BAUD ;
 
-            /** The default value of the character size used during the
-                serial communication.
-
-            */
+            /** 
+             * The default value of the character size used during the
+             * serial communication.
+             * 
+             * @deprecated Please use SerialPort::CHAR_SIZE_DEFAULT
+             * instead.
+             */
             static const CharSizeEnum DEFAULT_CHAR_SIZE ;
 
-            /** The default number of stop bits used.  
-
-            */
+            /** 
+             * The default number of stop bits used.
+             *
+             * @deprecated Please use SerialPort::STOP_BITS_DEFAULT
+             * instead.
+             */
             static const short DEFAULT_NO_OF_STOP_BITS ;
 
-            /** The default parity setting. 
-	  
-            */
+            /** 
+             * The default parity setting.
+             *
+             * @deprecated Please use SerialPort::PARITY_DEFAULT
+             * instead.
+             */
             static const ParityEnum DEFAULT_PARITY ;
       
-            /** The default flow control setting.
-
-            */
+            /**
+             * The default flow control setting.
+             *
+             * @deprecated Please use SerialPort::FLOW_CONTROL_DEFAULT
+             * instead.
+             */
             static const FlowControlEnum DEFAULT_FLOW_CONTROL ;
 
-            /** The default character buffer size.
-
-            */
+            /**
+             * The default character buffer size.
+             *
+             * @deprecated VMIN and VTIME will not be supported
+             * starting from version 0.7.0. Methods of SerialPort
+             * class provide better mechanisms for implementing read
+             * and write timeouts.
+             */
             static const short DEFAULT_VMIN ;
 
-            /** The default character buffer timing.
-
-            */
+            /**
+             * The default character buffer timing.
+             *
+             * @deprecated VMIN and VTIME will not be supported
+             * starting from version 0.7.0. Methods of SerialPort
+             * class provide better mechanisms for implementing read
+             * and write timeouts.
+             */
             static const short DEFAULT_VTIME ;
 
             //@}
 
 
-            /** @name Exceptions
-             */
-            //@{
-
-            //@}
-
             /** @name Constructors and Destructor
              */
             //@{
-            /** 
+            /**
              * The default constructor.
              */
             SerialStreamBuf() ;
@@ -196,7 +244,7 @@ extern "C++" {
                 serial port and hence all other settings result in the call
                 to fail. The value of <tt>flags</tt> is obtained as:
                 <br>
-	  
+
                 <tt>flags = u_flags | O_NOCTTY</tt>
                 <br>
 
@@ -231,8 +279,8 @@ extern "C++" {
                 returns a null pointer.
 
             */
-            SerialStreamBuf* open( const std::string filename, 
-                                   std::ios_base::openmode mode = 
+            SerialStreamBuf* open( const std::string filename,
+                                   std::ios_base::openmode mode =
                                    std::ios_base::in | std::ios_base::out ) ;
 
             /** If is_open() == false, returns a null pointer. If a put area

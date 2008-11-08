@@ -40,12 +40,12 @@
  *
  * :FIXME: Provide examples of the above potential problem.
  *
- * @todo The current implementation does not check if another process has 
- * locked the serial port device and does not lock the serial port device after
- * opening it. This has been observed to cause problems while using this 
- * library while other programs such as minicom are also accessing the same device. 
- * It will be useful to lock the serial port device when it is being used by
- * this class. 
+ * @todo The current implementation does not check if another process
+ * has locked the serial port device and does not lock the serial port
+ * device after opening it. This has been observed to cause problems
+ * while using this library while other programs such as minicom are
+ * also accessing the same device.  It will be useful to lock the
+ * serial port device when it is being used by this class.
  */
 class SerialPort
 {
@@ -73,11 +73,10 @@ public:
         BAUD_115200  = B115200,
         BAUD_230400  = B230400,
         //
-        // Bug#1318912
-        // B460800 is defined on Linux but not on Mac OS X. What about other
-        // operating systems ?
+        // Bug#1318912: B460800 is defined on Linux but not on Mac OS
+        // X. What about other operating systems ?
         //
-#ifdef __linux__       
+#ifdef __linux__
         BAUD_460800  = B460800,
 #endif
         BAUD_DEFAULT = BAUD_57600
@@ -106,7 +105,7 @@ public:
 
     enum FlowControl {
         FLOW_CONTROL_HARD,
-        // FLOW_CONTROL_SOFT,
+        FLOW_CONTROL_SOFT,
         FLOW_CONTROL_NONE,
         FLOW_CONTROL_DEFAULT = FLOW_CONTROL_NONE
     } ;
@@ -416,7 +415,7 @@ public:
      * Get the status of the DTR line.
      */
     bool
-    GetDtr() const 
+    GetDtr() const
         throw( NotOpen,
                std::runtime_error ) ;
 
@@ -432,7 +431,7 @@ public:
      * Get the status of the RTS line.
      */
     bool
-    GetRts() const 
+    GetRts() const
         throw( NotOpen,
                std::runtime_error ) ;
 
@@ -440,9 +439,9 @@ public:
     //SetCts( const bool ctsState = true )
     //    throw( NotOpen,
     //           std::runtime_error ) ;
-    
+
     bool
-    GetCts() const 
+    GetCts() const
         throw( NotOpen,
                std::runtime_error ) ;
 
@@ -450,30 +449,30 @@ public:
     //SetDsr( const bool dsrState = true )
     //    throw( NotOpen,
     //           std::runtime_error ) ;
-    
+
     bool
-    GetDsr() const 
+    GetDsr() const
         throw( NotOpen,
                std::runtime_error ) ;
 private:
     /**
-     * Prevent copying of objects of this class by declaring the copy 
-     * constructor private. This method is never defined. 
+     * Prevent copying of objects of this class by declaring the copy
+     * constructor private. This method is never defined.
      */
     SerialPort( const SerialPort& otherSerialPort ) ;
-    
+
     /**
      * Prevent copying of objects of this class by declaring the assignment
-     * operator private. This method is never defined. 
+     * operator private. This method is never defined.
      */
     SerialPort& operator=(const SerialPort& otherSerialPort ) ;
-    
+
     /*
      * Forward declaration of the implementation class folowing the
      * PImpl idiom.
      */
     class SerialPortImpl ;
-    
+
     /**
      * Pointer to implementation class instance.
      */
