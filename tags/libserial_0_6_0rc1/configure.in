@@ -1,0 +1,51 @@
+AC_REVISION($Revision: 1.14 $)
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(src/SerialStream.cc)
+
+AM_CONFIG_HEADER(config.h)
+
+dnl
+dnl Indicate the package name and the version to automake
+dnl
+dnl $Id: configure.in,v 1.14 2008-05-21 23:11:15 crayzeewulf Exp $
+AM_INIT_AUTOMAKE(libserial, 0.6.0rc1)
+
+AM_MAINTAINER_MODE
+
+dnl Checks for programs.
+AC_PROG_CXX
+AC_PROG_AWK
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_LIBTOOL
+
+AC_CHECK_PROG(DOCBOOK2PDF,docbook2pdf,docbook2pdf,no)
+if test "x$DOCBOOK2PDF" == "xno"; then
+      AC_MSG_WARN([Could not find docbook2pdf. Disabling creation of user manual therefore.])
+      HAVE_DOCBOOK2PDF="no"
+else
+      HAVE_DOCBOOK2PDF="yes"
+fi
+AC_SUBST(DOCBOOK2PDF)
+AM_CONDITIONAL(HAVE_DOCBOOK2PDF, test x$HAVE_DOCBOOK2PDF = xyes)
+
+dnl Checks for header files.
+AC_CHECK_HEADERS(fcntl.h unistd.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_INLINE
+
+
+AC_OUTPUT([Makefile
+doxygen.conf
+libserial.spec
+doc/UML/Makefile
+doc/Makefile
+examples/Makefile
+src/Makefile
+sip/configure.py
+sip/Makefile
+libserial.pc])
