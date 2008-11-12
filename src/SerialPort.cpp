@@ -31,6 +31,8 @@
 #include <sys/time.h>
 #include <signal.h>
 #include <strings.h>
+#include <cstring>
+#include <cstdlib>
 
 namespace
 {

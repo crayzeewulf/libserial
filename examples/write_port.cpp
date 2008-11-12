@@ -1,6 +1,7 @@
+#include <SerialStream.h>
 #include <iostream>
 #include <fstream>
-#include <SerialStream.h>
+#include <cstdlib>
 
 //
 // This example reads the contents of a file and writes the entire 
