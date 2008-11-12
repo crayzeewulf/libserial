@@ -1,9 +1,0 @@
-all:
-	aclocal
-	autoheader
-	libtoolize --force
-	automake -a --foreign
-	autoconf
-
-configure:
-	./configure
