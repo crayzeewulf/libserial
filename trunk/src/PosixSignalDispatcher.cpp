@@ -14,6 +14,8 @@
 #include <map>
 #include <errno.h>
 #include <signal.h>
+#include <cstring>
+
 
 namespace
 {
