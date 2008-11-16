@@ -1,5 +1,5 @@
 /*
- * Time-stamp: <02-Nov-2008 14:52:35 pagey>
+ * Time-stamp: <2008-11-15 13:06:59 pagey>
  *
  * $Id: SerialStreamBuf.h,v 1.9 2005-10-17 00:19:12 crayzeewulf Exp $
  *
@@ -8,44 +8,41 @@
 #ifndef _SerialStreamBuf_h_
 #define _SerialStreamBuf_h_
 
-#include <termios.h>
-#include <unistd.h>
-#include <iosfwd>
+#include <SerialPort.h>
+#include <boost/scoped_ptr.hpp>
 #include <streambuf>
 #include <string>
-#include <SerialPort.h>
 
-extern "C++" {
-    namespace LibSerial {
+extern "C++" 
+{
+    namespace LibSerial 
+    {
         /**
-         *  This is the streambuf subclass used by SerialStream. This
-         *  subclass takes care of opening the serial port file in the
-         *  required modes and providing the corresponding file
-         *  descriptor to SerialStream so that various parameters
-         *  associated with the serial port can be set. Several
-         *  features of this streambuf class resemble those of
-         *  std::filebuf, however this class it not made a subclass of
-         *  filebuf because we need access to the file descriptor
-         *  associated with the serial port and the standard filebuf
-         *  does not provide access to it.
+         * This is the streambuf subclass used by SerialStream. This
+         * subclass takes care of opening the serial port file in the
+         * required modes and providing the corresponding file
+         * descriptor to SerialStream so that various parameters
+         * associated with the serial port can be set. Several
+         * features of this streambuf class resemble those of
+         * std::filebuf, however this class it not made a subclass of
+         * filebuf because we need access to the file descriptor
+         * associated with the serial port and the standard filebuf
+         * does not provide access to it.
          *
-         *  At present, this class uses unbuffered I/O and all calls
-         *  to setbuf() will be ignored.
+         * At present, this class uses unbuffered I/O and all calls
+         * to setbuf() will be ignored.
          *
          * @author $Author: crayzeewulf $ <A HREF="pagey@gnudom.org">Manish P. Pagey</A>
          * @version $Id: SerialStreamBuf.h,v 1.9 2005-10-17 00:19:12 crayzeewulf Exp $
          * */
-        class SerialStreamBuf : public std::streambuf {
+        class SerialStreamBuf : public std::streambuf 
+        {
         public:
-            /** @name Typedefs
+            /* 
+             * -----------------------------------------------------------------
+             * Enumerations.
+             * -----------------------------------------------------------------
              */
-            //@{
-
-            //@}
-
-            /** @name Enumerations
-             */
-            //@{
             /**
              * The baud rates currently supported by the SUS-2 general
              * terminal interface specification. Note that B0 is not
@@ -59,7 +56,8 @@ extern "C++" {
              * corresponding enumeration from SerialPort class
              * instead.
              */
-            enum BaudRateEnum {
+            enum BaudRateEnum 
+            {
                 BAUD_50    = SerialPort::BAUD_50,
                 BAUD_75    = SerialPort::BAUD_75,
                 BAUD_110   = SerialPort::BAUD_110,
@@ -94,7 +92,8 @@ extern "C++" {
              * compatibility with version 0.5.x. Please use
              * SerialPort::CharacterSize instead.
              */
-            enum CharSizeEnum {
+            enum CharSizeEnum 
+            {
                 CHAR_SIZE_5 = SerialPort::CHAR_SIZE_5,
                 CHAR_SIZE_6 = SerialPort::CHAR_SIZE_6,
                 CHAR_SIZE_7 = SerialPort::CHAR_SIZE_7,
@@ -111,7 +110,8 @@ extern "C++" {
              * removed in version 0.7.0. Please use SerialPort::Parity
              * instead.
              */
-            enum ParityEnum {
+            enum ParityEnum 
+            {
                 PARITY_EVEN = SerialPort::PARITY_EVEN,
                 PARITY_ODD  = SerialPort::PARITY_ODD,
                 PARITY_NONE = SerialPort::PARITY_NONE,
@@ -127,23 +127,19 @@ extern "C++" {
              * will be removed in version 0.7.0. Please use
              * SerialPort::FlowControl instead.
              */
-            enum FlowControlEnum {
+            enum FlowControlEnum 
+            {
                 FLOW_CONTROL_HARD    = SerialPort::FLOW_CONTROL_HARD,
                 FLOW_CONTROL_SOFT    = SerialPort::FLOW_CONTROL_SOFT,
                 FLOW_CONTROL_NONE    = SerialPort::FLOW_CONTROL_NONE,
                 FLOW_CONTROL_DEFAULT = SerialPort::FLOW_CONTROL_DEFAULT,
                 FLOW_CONTROL_INVALID //!< Invalid flow control setting. 
             } ;
-            //@}
 
             /* ------------------------------------------------------------
              * Public Static Members
              * ------------------------------------------------------------
              */
-            /** @name Public static members. 
-
-            */
-            //@{
             /**
              * The default value of the baud rate of the serial port.
              *
@@ -205,12 +201,10 @@ extern "C++" {
              */
             static const short DEFAULT_VTIME ;
 
-            //@}
-
-
-            /** @name Constructors and Destructor
+            /* -----------------------------------------------------------------
+             * Constructors and Destructor
+             * -----------------------------------------------------------------
              */
-            //@{
             /**
              * The default constructor.
              */
@@ -220,11 +214,11 @@ extern "C++" {
              *  The destructor.  
              */
             ~SerialStreamBuf() ;
-            //@}
 
-            /** @name Other Public Methods
+            /* -----------------------------------------------------------------
+             * Other Public Methods
+             * -----------------------------------------------------------------
              */
-            //@{
             /** Returns true if a previous call to open() succeeded (returned
                 a non-null value) and there has been no intervening call to
                 close.
@@ -402,13 +396,10 @@ extern "C++" {
              */
             const short VTime() const;
 
-            //@}
-
-            /** @name Operators
+            /* -----------------------------------------------------------------
+             * Operators
+             * -----------------------------------------------------------------
              */
-            //@{
-
-            //@}
 
             /* ------------------------------------------------------------
              * Friends
@@ -527,111 +518,9 @@ extern "C++" {
             SerialStreamBuf( const SerialStreamBuf& ) ;
             SerialStreamBuf& operator=( const SerialStreamBuf& ) ;
 
-            /** 
-             * We use unbuffered I/O for the serial port. However, we
-             * need to provide the putback of atleast one
-             * character. This character contains the putback
-             * character.
-             */
-            char mPutbackChar ;
-
-            /** 
-             * True if a putback value is available in mPutbackChar. 
-             */
-            bool mPutbackAvailable ;
-      
-            /** 
-             * The file descriptor associated with the serial port. 
-             */
-            int mFileDescriptor ;
-            /* ------------------------------------------------------------
-             * Private Methods
-             * ------------------------------------------------------------
-             */
-            /** 
-             * This routine is called by open() in order to
-             * initialize some parameters of the serial port and
-             * setting its parameters to default values.
-             * 
-             * @return -1 on failure and some other value on success. 
-             */
-            int InitializeSerialPort() ;
+            class Implementation ;
+            boost::scoped_ptr<Implementation> mImpl ;
         } ; // class SerialStreamBuf
-
-        inline 
-        SerialStreamBuf::SerialStreamBuf() :
-            mPutbackChar(0),
-            mPutbackAvailable(false),
-            mFileDescriptor(-1)
-        {
-            setbuf(0, 0) ;
-            return ;
-        }
-
-        inline 
-        SerialStreamBuf::~SerialStreamBuf() 
-        {
-            if( this->is_open() ) 
-            {
-                this->close() ;
-            }
-            return ;
-        }
-
-        inline
-        bool
-        SerialStreamBuf::is_open() const 
-        {
-            return (-1 != mFileDescriptor) ;
-        }
-    
-        inline
-        std::streambuf* 
-        SerialStreamBuf::setbuf(char_type *, std::streamsize) 
-        {
-            return std::streambuf::setbuf(0, 0) ;
-        }
-
-        inline
-        SerialStreamBuf*
-        SerialStreamBuf::close() 
-        {
-            //
-            // Return a null pointer if the serial port is not currently open. 
-            //
-            if( this->is_open() == false ) {
-                return 0 ;
-            }
-            //
-            // Otherwise, close the serial port and set the file descriptor
-            // to an invalid value.
-            //
-            if( -1 == ::close(mFileDescriptor) ) {
-                //
-                // If the close failed then return a null pointer. 
-                //
-                return 0 ;
-            } else {
-                //
-                // Set the file descriptor to an invalid value, -1. 
-                //
-                mFileDescriptor = -1 ;
-                //
-                // On success, return "this" as required by the C++ standard.
-                //
-                return this ;
-            }
-        }
-    
-        inline
-        std::streambuf::int_type
-        SerialStreamBuf::uflow() 
-        {
-            int_type next_ch = underflow() ;
-            mPutbackAvailable = false ;
-            return next_ch ;
-        }
-
     } // namespace LibSerial
 } // extern "C++"
 #endif // #ifndef _SerialStreamBuf_h_
