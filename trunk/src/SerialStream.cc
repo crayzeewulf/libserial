@@ -1,12 +1,62 @@
+#include "SerialStream.h"
 #include <fcntl.h>
 #include <cstdio>
 #include <termios.h>
 #include <fstream>
 #include <cassert>
-#include "SerialStream.h"
+
 
 using namespace LibSerial ;
 using namespace std ;
+
+SerialStream::SerialStream() : 
+    std::iostream(0), mIOBuffer(0) 
+{
+    //
+    // Close the stream
+    //
+    Close() ;
+}
+
+
+SerialStream::~SerialStream() 
+{
+    // 
+    // If a SerialStreamBuf is associated with this SerialStream
+    // then we need to destroy it here.
+    //
+    if( mIOBuffer ) {
+        delete mIOBuffer ;
+    }
+}
+
+
+void 
+SerialStream::Close() 
+{
+    //
+    // If a SerialStreamBuf is associated with the SerialStream then
+    // destroy it.
+    //
+    if( mIOBuffer ) {
+        delete mIOBuffer ;
+        mIOBuffer = 0 ;
+    }
+}
+
+const bool
+SerialStream::IsOpen() const 
+{
+    //
+    // Checks to see if mIOBuffer is a null buffer, if not,
+    // calls the is_open() function on this streams SerialStreamBuf,
+    // mIOBuffer
+    //
+    if ( ! mIOBuffer ) {
+        return false ;
+    }
+    return mIOBuffer->is_open() ;
+}
 
 SerialStream::SerialStream( const string       fileName, 
                             ios_base::openmode openMode ) :
@@ -16,7 +66,6 @@ SerialStream::SerialStream( const string       fileName,
     this->Open( fileName, openMode ) ;
     return ;
 }
-
 
 SerialStream::SerialStream( const std::string fileName,
                             const SerialStreamBuf::BaudRateEnum baudRate,

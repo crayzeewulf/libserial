@@ -1,3 +1,4 @@
+#include "SerialStreamBuf.h"
 #include <iostream>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -7,7 +8,7 @@
 #include <fstream>
 #include <limits.h>
 #include <strings.h>
-#include "SerialStreamBuf.h"
+
 
 using namespace std ;
 using namespace LibSerial ;
@@ -37,14 +38,183 @@ const short
 SerialStreamBuf::DEFAULT_VTIME           = 0                  ;
 
 
+class SerialStreamBuf::Implementation
+{
+public:
+    Implementation() ;
+
+    ~Implementation() { /* empty */ }
+
+    const SerialStreamBuf::BaudRateEnum
+    SetBaudRate(const SerialStreamBuf::BaudRateEnum baud_rate) ;
+
+    const SerialStreamBuf::BaudRateEnum
+    BaudRate() const ;
+
+    const SerialStreamBuf::CharSizeEnum
+    SetCharSize(const SerialStreamBuf::CharSizeEnum char_size) ;
+
+    const SerialStreamBuf::CharSizeEnum
+    CharSize() const ;
+
+    short SetNumOfStopBits(short numOfStopBits) ;
+    short NumOfStopBits() const ; 
+
+    const SerialStreamBuf::ParityEnum 
+    SetParity(const SerialStreamBuf::ParityEnum parityType) ;
+
+    const SerialStreamBuf::ParityEnum 
+    Parity() const ;
+
+    const SerialStreamBuf::FlowControlEnum 
+    SetFlowControl(const SerialStreamBuf::FlowControlEnum flowControlType) ;
+    
+    const SerialStreamBuf::FlowControlEnum 
+    FlowControl() const ;
+
+    const short SetVMin( short vtime ) ;
+    const short VMin() const;
+
+    const short SetVTime( short vtime ) ;
+    const short VTime() const;
+
+    streamsize
+    xsgetn(char_type *s, streamsize n) ;
+
+    streamsize 
+    showmanyc() ;
+
+    streambuf::int_type
+    underflow() ;
+
+    streambuf::int_type
+    pbackfail(int_type c) ;
+
+    streamsize
+    xsputn(const char_type *s, streamsize n) ;
+
+    streambuf::int_type
+    overflow(int_type c) ;
+
+public: // Yes. "public"
+    /** 
+     * We use unbuffered I/O for the serial port. However, we
+     * need to provide the putback of atleast one
+     * character. This character contains the putback
+     * character.
+     */
+    char mPutbackChar ;
+
+    /** 
+     * True if a putback value is available in mPutbackChar. 
+     */
+    bool mPutbackAvailable ;
+      
+    /** 
+     * The file descriptor associated with the serial port. 
+     */
+    int mFileDescriptor ;
+
+    /* ------------------------------------------------------------
+     * Private Methods
+     * ------------------------------------------------------------
+     */
+    /** 
+     * This routine is called by open() in order to
+     * initialize some parameters of the serial port and
+     * setting its parameters to default values.
+     * 
+     * @return -1 on failure and some other value on success. 
+     */
+    int InitializeSerialPort() ;
+
+    int SetParametersToDefault() ;
+} ;
+
+SerialStreamBuf::SerialStreamBuf() :
+    mImpl( new Implementation )
+{
+    setbuf(0, 0) ;
+    return ;
+}
+
+ 
+SerialStreamBuf::~SerialStreamBuf() 
+{
+    if( this->is_open() ) 
+    {
+        this->close() ;
+    }
+    return ;
+}
+
+
+bool
+SerialStreamBuf::is_open() const 
+{
+    return (-1 != mImpl->mFileDescriptor) ;
+}
+    
+
+std::streambuf* 
+SerialStreamBuf::setbuf(char_type *, std::streamsize) 
+{
+    return std::streambuf::setbuf(0, 0) ;
+}
+
+
+SerialStreamBuf*
+SerialStreamBuf::close() 
+{
+    //
+    // Return a null pointer if the serial port is not currently open. 
+    //
+    if( this->is_open() == false ) 
+    {
+        return 0 ;
+    }
+    //
+    // Otherwise, close the serial port and set the file descriptor
+    // to an invalid value.
+    //
+    if( -1 == ::close(mImpl->mFileDescriptor) ) 
+    {
+        //
+        // If the close failed then return a null pointer. 
+        //
+        return 0 ;
+    } 
+    else 
+    {
+        //
+        // Set the file descriptor to an invalid value, -1. 
+        //
+        mImpl->mFileDescriptor = -1 ;
+        //
+        // On success, return "this" as required by the C++ standard.
+        //
+        return this ;
+    }
+}
+    
+std::streambuf::int_type
+SerialStreamBuf::uflow() 
+{
+    int_type next_ch = underflow() ;
+    mImpl->mPutbackAvailable = false ;
+    return next_ch ;
+}
+
 SerialStreamBuf*
 SerialStreamBuf::open( const string filename,
-                       ios_base::openmode mode ) {
+                       ios_base::openmode mode ) 
+{
     //
     // If the buffer is alreay open then we should not allow a call to
     // another open().
     //
-    if( is_open() != false ) {
+    if( is_open() != false ) 
+    {
         return 0 ;
     }
     //
@@ -53,13 +223,20 @@ SerialStreamBuf::open( const string filename,
     // with the open() system call.
     //
     int flags ;
-    if ( mode == (ios_base::in|ios_base::out) ) {
+    if ( mode == (ios_base::in|ios_base::out) ) 
+    {
         flags = O_RDWR ;
-    } else if ( mode == ios_base::in ) {
+    } 
+    else if ( mode == ios_base::in ) 
+    {
         flags = O_RDONLY ;
-    } else if ( mode == ios_base::out ) {
+    } 
+    else if ( mode == ios_base::out ) 
+    {
         flags = O_WRONLY ;
-    } else {
+    } 
+    else 
+    {
         return 0 ;
     }
     /* switch( mode ) {
@@ -84,71 +261,238 @@ SerialStreamBuf::open( const string filename,
     //
     // Try to open the serial port. 
     //
-    this->mFileDescriptor = ::open(filename.c_str(), flags) ;
-    if( -1 == this->mFileDescriptor ) {
+    mImpl->mFileDescriptor = ::open(filename.c_str(), flags) ;
+    if( -1 == mImpl->mFileDescriptor ) 
+    {
         return 0 ;
     }
     //
     // Initialize the serial port. 
     //
-    if( -1 == this->InitializeSerialPort() ) {
+    if( -1 == mImpl->InitializeSerialPort() ) 
+    {
         return 0 ;
     }
-
     return this;
 }
 
+
 int
-SerialStreamBuf::InitializeSerialPort() {
-    //
-    // If we do not have a valid file descriptor then return with
-    // failure.
-    //
-    if( -1 == this->mFileDescriptor ) {
-        return -1 ;
-    }
-    //
-    // Use non-blocking mode while configuring the serial port. 
-    //
-    int flags = fcntl(this->mFileDescriptor, F_GETFL, 0) ;
-    if( -1 == fcntl( this->mFileDescriptor, 
-                     F_SETFL, 
-                     flags | O_NONBLOCK ) ) {
-        return -1 ;
-    }
-    //
-    // Flush out any garbage left behind in the buffers associated
-    // with the port from any previous operations. 
-    //
-    if( -1 == tcflush(this->mFileDescriptor, TCIOFLUSH) ) {
-        return -1 ;
-    }
-    //
-    // Set up the default configuration for the serial port. 
-    //
-    if( -1 == this->SetParametersToDefault() ) {
-        return -1 ;
-    }
-    //
-    // Allow all further communications to happen in blocking 
-    // mode. 
-    //
-    flags = fcntl(this->mFileDescriptor, F_GETFL, 0) ;
-    if( -1 == fcntl( this->mFileDescriptor, 
-                     F_SETFL, 
-                     flags & ~O_NONBLOCK ) ) {
-        return -1 ;
-    }
-    //
-    // If we get here without problems then we are good; return a value
-    // different from -1.
-    //
-    return 0 ;
+SerialStreamBuf::SetParametersToDefault() 
+{
+    return mImpl->SetParametersToDefault() ;
 }
 
-int
-SerialStreamBuf::SetParametersToDefault() {
 
+const SerialStreamBuf::BaudRateEnum
+SerialStreamBuf::SetBaudRate(const BaudRateEnum baud_rate) 
+{
+    mImpl->SetBaudRate( baud_rate ) ;
+}
+
+const SerialStreamBuf::BaudRateEnum
+SerialStreamBuf::BaudRate() const 
+{
+    return mImpl->BaudRate() ;
+}
+
+
+const SerialStreamBuf::CharSizeEnum
+SerialStreamBuf::SetCharSize(const CharSizeEnum char_size) 
+{
+    return mImpl->SetCharSize( char_size ) ;
+}
+
+
+const SerialStreamBuf::CharSizeEnum
+SerialStreamBuf::CharSize() const 
+{
+    return mImpl->CharSize() ;
+}
+
+
+short
+SerialStreamBuf::SetNumOfStopBits(short stop_bits) 
+{
+    return mImpl->SetNumOfStopBits( stop_bits ) ;
+}
+
+
+short 
+SerialStreamBuf::NumOfStopBits() const 
+{
+    return mImpl->NumOfStopBits() ;
+}
+
+
+const SerialStreamBuf::ParityEnum
+SerialStreamBuf::SetParity(const ParityEnum parity) 
+{
+    return mImpl->SetParity( parity ) ;
+}
+
+const SerialStreamBuf::ParityEnum
+SerialStreamBuf::Parity() const 
+{
+    return mImpl->Parity() ;
+}
+
+const SerialStreamBuf::FlowControlEnum
+SerialStreamBuf::SetFlowControl(const FlowControlEnum flow_c) 
+{
+    return mImpl->SetFlowControl( flow_c ) ;
+}
+
+const SerialStreamBuf::FlowControlEnum
+SerialStreamBuf::Implementation::SetFlowControl(const SerialStreamBuf::FlowControlEnum flow_c) 
+{
+    if( -1 == mFileDescriptor ) 
+    {
+        return FLOW_CONTROL_INVALID ;
+    }
+    //
+    // Flush any unwritten, unread data from the serial port. 
+    //
+    if( -1 == tcflush(mFileDescriptor, TCIOFLUSH) ) 
+    {
+        return FLOW_CONTROL_INVALID ;
+    }
+    //
+    // Get the current terminal settings. 
+    //
+    struct termios tset;
+    int retval = tcgetattr(mFileDescriptor, &tset);
+    if (-1 == retval) {
+        return FLOW_CONTROL_INVALID ;
+    }
+    //
+    // Set the flow control. Hardware flow control uses the RTS (Ready
+    // To Send) and CTS (clear to Send) lines. Software flow control
+    // uses IXON|IXOFF
+    //
+    if ( FLOW_CONTROL_HARD == flow_c ) {
+        tset.c_iflag &= ~ (IXON|IXOFF);
+        tset.c_cflag |= CRTSCTS;
+        tset.c_cc[VSTART] = _POSIX_VDISABLE;
+        tset.c_cc[VSTOP] = _POSIX_VDISABLE;
+    } else if ( FLOW_CONTROL_SOFT == flow_c ) {
+        tset.c_iflag |= IXON|IXOFF;
+        tset.c_cflag &= ~CRTSCTS;
+        tset.c_cc[VSTART] = CTRL_Q ; // 0x11 (021) ^q
+        tset.c_cc[VSTOP]  = CTRL_S ; // 0x13 (023) ^s
+    } else {
+        tset.c_iflag &= ~(IXON|IXOFF);
+        tset.c_cflag &= ~CRTSCTS;
+    }
+    retval = tcsetattr(mFileDescriptor, TCSANOW, &tset);
+    if (-1 == retval) {
+        return FLOW_CONTROL_INVALID ;
+    }
+    return FlowControl() ;
+}
+
+const SerialStreamBuf::FlowControlEnum
+SerialStreamBuf::FlowControl() const 
+{
+    return mImpl->FlowControl() ;
+}
+
+
+const short 
+SerialStreamBuf::SetVMin( short vmin ) 
+{
+    return mImpl->SetVMin( vmin ) ;
+}
+
+
+const short 
+SerialStreamBuf::VMin() const 
+{
+    return mImpl->VMin() ;
+}
+
+const short 
+SerialStreamBuf::Implementation::VMin() const 
+{
+    if( -1 == mFileDescriptor ) {
+        return -1 ;
+    }
+    //
+    // Get the current terminal settings. 
+    //
+    struct termios term_setting ;
+    if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
+        return -1 ;
+    }
+
+    return term_setting.c_cc[VMIN];
+}
+
+const short 
+SerialStreamBuf::SetVTime( short vtime ) 
+{
+    return mImpl->SetVTime( vtime ) ;
+}
+
+const short 
+SerialStreamBuf::VTime() const 
+{
+    return mImpl->VTime() ;
+}
+
+
+streamsize
+SerialStreamBuf::xsgetn(char_type *s, streamsize n) 
+{
+    return mImpl->xsgetn( s, n ) ;
+}
+
+std::streamsize
+SerialStreamBuf::showmanyc() 
+{
+    return mImpl->showmanyc() ;
+}
+
+streambuf::int_type
+SerialStreamBuf::underflow() 
+{
+    return mImpl->underflow() ;
+}
+
+
+
+streambuf::int_type
+SerialStreamBuf::pbackfail(int_type c) 
+{
+    return mImpl->pbackfail(c) ;
+}
+
+
+streamsize
+SerialStreamBuf::xsputn(const char_type *s, streamsize n) 
+{
+    return mImpl->xsputn( s, n ) ;
+}
+
+streambuf::int_type
+SerialStreamBuf::overflow(int_type c) 
+{
+    return mImpl->overflow(c) ;
+}
+
+inline
+SerialStreamBuf::Implementation::Implementation() :
+    mPutbackChar(0),
+    mPutbackAvailable(false),
+    mFileDescriptor(-1)
+{
+    /* empty */
+}
+
+inline
+int 
+SerialStreamBuf::Implementation::SetParametersToDefault()
+{
     if( -1 == mFileDescriptor ) {
         return -1 ;
     }
@@ -166,14 +510,14 @@ SerialStreamBuf::SetParametersToDefault() {
     // termios.c_line is not a standard element of the termios structure (as 
     // per the Single Unix Specification 2. This is only present under Linux.
     //
-    #ifdef __linux__
+#ifdef __linux__
     tio.c_line = '\0';
-    #endif
+#endif
     bzero( &tio.c_cc, sizeof(tio.c_cc) );
     tio.c_cc[VTIME] = 0;
     tio.c_cc[VMIN]  = 1;
     if ( -1 == tcsetattr(mFileDescriptor,TCSANOW,&tio) ) {
-      return -1 ;
+        return -1 ;
     }
     //
     // Baud rate
@@ -223,8 +567,60 @@ SerialStreamBuf::SetParametersToDefault() {
     return 0 ;
 }
 
+inline
+int
+SerialStreamBuf::Implementation::InitializeSerialPort() 
+{
+    //
+    // If we do not have a valid file descriptor then return with
+    // failure.
+    //
+    if( -1 == this->mFileDescriptor ) {
+        return -1 ;
+    }
+    //
+    // Use non-blocking mode while configuring the serial port. 
+    //
+    int flags = fcntl(this->mFileDescriptor, F_GETFL, 0) ;
+    if( -1 == fcntl( this->mFileDescriptor, 
+                     F_SETFL, 
+                     flags | O_NONBLOCK ) ) {
+        return -1 ;
+    }
+    //
+    // Flush out any garbage left behind in the buffers associated
+    // with the port from any previous operations. 
+    //
+    if( -1 == tcflush(this->mFileDescriptor, TCIOFLUSH) ) {
+        return -1 ;
+    }
+    //
+    // Set up the default configuration for the serial port. 
+    //
+    if( -1 == this->SetParametersToDefault() ) {
+        return -1 ;
+    }
+    //
+    // Allow all further communications to happen in blocking 
+    // mode. 
+    //
+    flags = fcntl(this->mFileDescriptor, F_GETFL, 0) ;
+    if( -1 == fcntl( this->mFileDescriptor, 
+                     F_SETFL, 
+                     flags & ~O_NONBLOCK ) ) {
+        return -1 ;
+    }
+    //
+    // If we get here without problems then we are good; return a value
+    // different from -1.
+    //
+    return 0 ;
+}
+
+inline
 const SerialStreamBuf::BaudRateEnum
-SerialStreamBuf::SetBaudRate(const BaudRateEnum baud_rate) {
+SerialStreamBuf::Implementation::SetBaudRate( const SerialStreamBuf::BaudRateEnum baud_rate )
+{
     if( -1 == mFileDescriptor ) {
         return BAUD_INVALID ;
     }
@@ -286,8 +682,10 @@ SerialStreamBuf::SetBaudRate(const BaudRateEnum baud_rate) {
     return BaudRate() ;
 }
 
+inline
 const SerialStreamBuf::BaudRateEnum
-SerialStreamBuf::BaudRate() const {
+SerialStreamBuf::Implementation::BaudRate() const 
+{
     if( -1 == mFileDescriptor ) {
         return BAUD_INVALID ;
     }
@@ -358,8 +756,10 @@ SerialStreamBuf::BaudRate() const {
     return BAUD_INVALID ;
 }
 
+inline
 const SerialStreamBuf::CharSizeEnum
-SerialStreamBuf::SetCharSize(const CharSizeEnum char_size) {
+SerialStreamBuf::Implementation::SetCharSize(const SerialStreamBuf::CharSizeEnum char_size) 
+{
     if( -1 == mFileDescriptor ) {
         return CHAR_SIZE_INVALID ;
     }
@@ -406,8 +806,10 @@ SerialStreamBuf::SetCharSize(const CharSizeEnum char_size) {
     return this->CharSize() ;
 }
 
+inline
 const SerialStreamBuf::CharSizeEnum
-SerialStreamBuf::CharSize() const {
+SerialStreamBuf::Implementation::CharSize() const 
+{
     if( -1 == mFileDescriptor ) {
         return CHAR_SIZE_INVALID ;
     }
@@ -442,8 +844,10 @@ SerialStreamBuf::CharSize() const {
     return CHAR_SIZE_INVALID ;
 }
 
+inline
 short
-SerialStreamBuf::SetNumOfStopBits(short stop_bits) {
+SerialStreamBuf::Implementation::SetNumOfStopBits(short stop_bits) 
+{
     if( -1 == mFileDescriptor ) {
         return 0 ;
     }
@@ -474,8 +878,10 @@ SerialStreamBuf::SetNumOfStopBits(short stop_bits) {
     return this->NumOfStopBits() ;
 }
 
+inline
 short 
-SerialStreamBuf::NumOfStopBits() const {
+SerialStreamBuf::Implementation::NumOfStopBits() const 
+{
     if( -1 == mFileDescriptor ) {
         return 0 ;
     }
@@ -497,8 +903,10 @@ SerialStreamBuf::NumOfStopBits() const {
     }
 }
 
+inline
 const SerialStreamBuf::ParityEnum
-SerialStreamBuf::SetParity(const ParityEnum parity) {
+SerialStreamBuf::Implementation::SetParity(const SerialStreamBuf::ParityEnum parity) 
+{
     if( -1 == mFileDescriptor ) {
         return PARITY_INVALID ;
     }
@@ -536,8 +944,11 @@ SerialStreamBuf::SetParity(const ParityEnum parity) {
     return Parity() ;
 }
 
+
+inline
 const SerialStreamBuf::ParityEnum
-SerialStreamBuf::Parity() const {
+SerialStreamBuf::Implementation::Parity() const 
+{
     if( -1 == mFileDescriptor ) {
         return PARITY_INVALID ;
     }
@@ -563,53 +974,10 @@ SerialStreamBuf::Parity() const {
     return PARITY_INVALID ; // execution should never reach here. 
 }
 
+inline
 const SerialStreamBuf::FlowControlEnum
-SerialStreamBuf::SetFlowControl(const FlowControlEnum flow_c) {
-    if( -1 == mFileDescriptor ) {
-        return FLOW_CONTROL_INVALID ;
-    }
-    //
-    // Flush any unwritten, unread data from the serial port. 
-    //
-    if( -1 == tcflush(mFileDescriptor, TCIOFLUSH) ) {
-        return FLOW_CONTROL_INVALID ;
-    }
-    //
-    // Get the current terminal settings. 
-    //
-    struct termios tset;
-    int retval = tcgetattr(mFileDescriptor, &tset);
-    if (-1 == retval) {
-        return FLOW_CONTROL_INVALID ;
-    }
-    //
-    // Set the flow control. Hardware flow control uses the RTS (Ready
-    // To Send) and CTS (clear to Send) lines. Software flow control
-    // uses IXON|IXOFF
-    //
-    if ( FLOW_CONTROL_HARD == flow_c ) {
-        tset.c_iflag &= ~ (IXON|IXOFF);
-        tset.c_cflag |= CRTSCTS;
-        tset.c_cc[VSTART] = _POSIX_VDISABLE;
-        tset.c_cc[VSTOP] = _POSIX_VDISABLE;
-    } else if ( FLOW_CONTROL_SOFT == flow_c ) {
-        tset.c_iflag |= IXON|IXOFF;
-        tset.c_cflag &= ~CRTSCTS;
-        tset.c_cc[VSTART] = CTRL_Q ; // 0x11 (021) ^q
-        tset.c_cc[VSTOP]  = CTRL_S ; // 0x13 (023) ^s
-    } else {
-        tset.c_iflag &= ~(IXON|IXOFF);
-        tset.c_cflag &= ~CRTSCTS;
-    }
-    retval = tcsetattr(mFileDescriptor, TCSANOW, &tset);
-    if (-1 == retval) {
-        return FLOW_CONTROL_INVALID ;
-    }
-    return FlowControl() ;
-}
-
-const SerialStreamBuf::FlowControlEnum
-SerialStreamBuf::FlowControl() const {
+SerialStreamBuf::Implementation::FlowControl() const 
+{
     if( -1 == mFileDescriptor ) {
         return FLOW_CONTROL_INVALID ;
     }
@@ -650,7 +1018,10 @@ SerialStreamBuf::FlowControl() const {
     return FLOW_CONTROL_INVALID ;
 }
 
-const short SerialStreamBuf::SetVMin( short vmin ) {
+inline
+const short 
+SerialStreamBuf::Implementation::SetVMin( short vmin ) 
+{
     if( -1 == mFileDescriptor ) {
         return -1 ;
     }
@@ -678,22 +1049,10 @@ const short SerialStreamBuf::SetVMin( short vmin ) {
     return vmin;
 }
 
-const short SerialStreamBuf::VMin() const {
-    if( -1 == mFileDescriptor ) {
-        return -1 ;
-    }
-    //
-    // Get the current terminal settings. 
-    //
-    struct termios term_setting ;
-    if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
-        return -1 ;
-    }
-
-    return term_setting.c_cc[VMIN];
-}
-
-const short SerialStreamBuf::SetVTime( short vtime ) {
+inline
+const short 
+SerialStreamBuf::Implementation::SetVTime( short vtime ) 
+{
     if( -1 == mFileDescriptor ) {
         return -1 ;
     }
@@ -721,7 +1080,10 @@ const short SerialStreamBuf::SetVTime( short vtime ) {
     return vtime;
 }
 
-const short SerialStreamBuf::VTime() const {
+inline
+const short 
+SerialStreamBuf::Implementation::VTime() const 
+{
     if( -1 == mFileDescriptor ) {
         return -1 ;
     }
@@ -736,8 +1098,10 @@ const short SerialStreamBuf::VTime() const {
     return term_setting.c_cc[VTIME];
 }
 
+inline
 streamsize
-SerialStreamBuf::xsgetn(char_type *s, streamsize n) {
+SerialStreamBuf::Implementation::xsgetn(char_type *s, streamsize n) 
+{
     //
     // If mFileDescriptor is -1 then we do not have a valid serial port
     // associated with this buffer. Hence, we cannot read any characters
@@ -772,7 +1136,7 @@ SerialStreamBuf::xsgetn(char_type *s, streamsize n) {
         //
         if( n > 1 ) {
 
-          retval = read(mFileDescriptor, &s[1], n-1) ;
+            retval = read(mFileDescriptor, &s[1], n-1) ;
 
             //
             // If read was successful, then we need to increment retval by
@@ -789,7 +1153,7 @@ SerialStreamBuf::xsgetn(char_type *s, streamsize n) {
         // characters.
         //
 
-      retval = read(mFileDescriptor, s, n);
+        retval = read(mFileDescriptor, s, n);
 
     }
     // 
@@ -809,50 +1173,53 @@ SerialStreamBuf::xsgetn(char_type *s, streamsize n) {
     return retval ;
 }
 
-std::streamsize SerialStreamBuf::showmanyc() {
+inline
+std::streamsize
+SerialStreamBuf::Implementation::showmanyc() 
+{
 
-  int retval = -1;
+    int retval = -1;
 
-  if ( -1 == mFileDescriptor ) {
-    return -1;
-  };
-
-  if ( mPutbackAvailable ) {
-
-    // We still have a character left in the buffer.
-    retval = 1;
-
-  } else {
-
-    // Switch to non-blocking read.
-    int flags = fcntl(this->mFileDescriptor, F_GETFL, 0) ;
-    if( -1 == fcntl( this->mFileDescriptor, 
-                     F_SETFL, 
-                     flags | O_NONBLOCK ) ) {
+    if ( -1 == mFileDescriptor ) {
         return -1;
-    }
+    };
 
-    // Try to read a character.
-    retval = read(mFileDescriptor, &mPutbackChar, 1);
+    if ( mPutbackAvailable ) {
 
-    if ( retval == 1 ) {
-      mPutbackAvailable = true;
-    } else
-      retval = 0;
+        // We still have a character left in the buffer.
+        retval = 1;
 
-    // Switch back to blocking read.
-    if( -1 == fcntl( this->mFileDescriptor, 
-                     F_SETFL, 
-                     flags ) ) {
-        return -1;
-    }
-  };
-  return retval;    
+    } else {
+        // Switch to non-blocking read.
+        int flags = fcntl(this->mFileDescriptor, F_GETFL, 0) ;
+        if( -1 == fcntl( this->mFileDescriptor, 
+                         F_SETFL, 
+                         flags | O_NONBLOCK ) ) {
+            return -1;
+        }
 
+        // Try to read a character.
+        retval = read(mFileDescriptor, &mPutbackChar, 1);
+
+        if ( retval == 1 ) {
+            mPutbackAvailable = true;
+        } else
+            retval = 0;
+
+        // Switch back to blocking read.
+        if( -1 == fcntl( this->mFileDescriptor, 
+                         F_SETFL, 
+                         flags ) ) {
+            return -1;
+        }
+    };
+    return retval;    
 }
 
+inline
 streambuf::int_type
-SerialStreamBuf::underflow() {
+SerialStreamBuf::Implementation::underflow() 
+{
     //
     // If we do not have a valid file handler for the serial port, we
     // cannot do much.
@@ -909,9 +1276,10 @@ SerialStreamBuf::underflow() {
     return traits_type::to_int_type(next_ch) ;
 }
 
-
+inline
 streambuf::int_type
-SerialStreamBuf::pbackfail(int_type c) {
+SerialStreamBuf::Implementation::pbackfail(int_type c) 
+{
     //
     // If we do not have a valid file descriptor, then we return eof. 
     //
@@ -942,8 +1310,10 @@ SerialStreamBuf::pbackfail(int_type c) {
     }
 }
 
+inline
 streamsize
-SerialStreamBuf::xsputn(const char_type *s, streamsize n) {
+SerialStreamBuf::Implementation::xsputn(const char_type *s, streamsize n) 
+{
     //
     // If we do not have a valid file descriptor, then we cannot do much
     // here. Similarly if n is non-positive then we have nothing to do
@@ -970,8 +1340,10 @@ SerialStreamBuf::xsputn(const char_type *s, streamsize n) {
     return retval ;
 }
 
+inline
 streambuf::int_type
-SerialStreamBuf::overflow(int_type c) {
+SerialStreamBuf::Implementation::overflow(int_type c) 
+{
     //
     // If we do not have a valid file descriptor then we cannot do much
     // here.
@@ -1005,4 +1377,5 @@ SerialStreamBuf::overflow(int_type c) {
         //
         return traits_type::not_eof(c) ;
     }
+    assert( 0 == "The code should never reach here." ) ;
 }

@@ -1,5 +1,5 @@
 /*
- * Time-stamp: <2008-10-30 16:30:11 pagey>
+ * Time-stamp: <2008-11-15 11:16:39 pagey>
  *
  * $Id: SerialStream.h,v 1.10 2005-10-01 21:24:21 crayzeewulf Exp $
  *
@@ -8,12 +8,14 @@
 #ifndef _SerialStream_h_
 #define _SerialStream_h_
 
+#include <SerialStreamBuf.h>
 #include <string>
 #include <fstream>
-#include <SerialStreamBuf.h>
 
-extern "C++" {
-    namespace LibSerial {
+extern "C++" 
+{
+    namespace LibSerial 
+    {
         /** A stream class for accessing serial ports on POSIX
             operating systems. A lot of the functionality of this
             class has been obtained by looking at the code of
@@ -47,16 +49,13 @@ extern "C++" {
             @version $Id: SerialStream.h,v 1.5 2004/05/06 18:32:02 crayzeewulf
      
         */
-        class SerialStream : public std::iostream {
+        class SerialStream : public std::iostream 
+        {
         public:
             /* ------------------------------------------------------------
              * Public Static Members
-             * ------------------------------------------------------------ */
-
-            /** @name Constructors and Destructor
+             * ------------------------------------------------------------ 
              */
-            //@{
-
             /** This constructor takes a filename and an openmode to
                 construct a SerialStream object. This results in a
                 call to basic_fstream::open(s,mode). This is the only
@@ -115,11 +114,11 @@ extern "C++" {
 	  
             */
             virtual ~SerialStream() ; 
-            //@}
 
-            /** @name Other Public Methods
+            /* -----------------------------------------------------------------
+             * Other Public Methods
+             * -----------------------------------------------------------------
              */
-            //@{
             /** Open the serial port associated with the specified
                 filename, and the specified mode, mode.
 
@@ -233,13 +232,6 @@ extern "C++" {
             */
             const short VTime() ;
 
-            //@}
-
-            /** @name Operators
-             */
-            //@{
-
-            //@}
 
             /* ------------------------------------------------------------
              * Friends
@@ -299,53 +291,6 @@ extern "C++" {
             //void EnableReceiver(bool enable=true) ;
 
         } ; // class SerialStream
-
-        inline
-        SerialStream::SerialStream() : 
-          std::iostream(0), mIOBuffer(0) {
-            //
-            // Close the stream
-            //
-            Close() ;
-        }
-
-        inline
-        SerialStream::~SerialStream() {
-            // 
-            // If a SerialStreamBuf is associated with this SerialStream
-            // then we need to destroy it here.
-            //
-            if( mIOBuffer ) {
-                delete mIOBuffer ;
-            }
-        }
-
-        inline
-        void 
-        SerialStream::Close() {
-            //
-            // If a SerialStreamBuf is associated with the SerialStream then
-            // destroy it.
-            //
-            if( mIOBuffer ) {
-                delete mIOBuffer ;
-                mIOBuffer = 0 ;
-            }
-        }
-
-        inline
-        const bool
-        SerialStream::IsOpen() const {
-            //
-            // Checks to see if mIOBuffer is a null buffer, if not,
-            // calls the is_open() function on this streams SerialStreamBuf,
-            // mIOBuffer
-            //
-            if ( ! mIOBuffer ) {
-                return false ;
-            }
-            return mIOBuffer->is_open() ;
-        }
 
     } // namespace LibSerial
 } // extern "C++"
