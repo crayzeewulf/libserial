@@ -1122,9 +1122,14 @@ SerialStreamBuf::Implementation::xsgetn(char_type *s, streamsize n)
     //
     if( mPutbackAvailable ) {
         //
-        // Put the mPutbackChar at the beginning of the array, s. 
+        // Put the mPutbackChar at the beginning of the array,
+        // s. Increment retval to indicate that a character has been
+        // placed in s.
+        // 
+        // (Corrected Bug#2364846 by incrementing retval below)
         //
-        s[0] = mPutbackChar ;
+        s[0] = mPutbackChar ; 
+        ++retval ;
         //
         // The putback character is no longer available. 
         //
