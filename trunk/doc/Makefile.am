@@ -6,10 +6,10 @@ else
 noinst_DATA = 
 endif
 
-EXTRA_DIST = UserManual.sgml UserManual.dsl
+EXTRA_DIST = UserManual.xml 
 
 CLEANFILES = UserManual.pdf
 
-UserManual.pdf: UserManual.sgml UserManual.dsl
-	$(DOCBOOK2PDF) -d UserManual.dsl UserManual.sgml
+UserManual.pdf: UserManual.xml 
+	$(DOCBOOK2PDF) UserManual.xml
 
