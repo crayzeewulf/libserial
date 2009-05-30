@@ -1,9 +1,6 @@
 all:
-	aclocal
-	autoheader
-	libtoolize --force
-	automake -a --foreign
-	autoconf
+	mkdir -pv m4
+	autoreconf -i --force  --verbose
 
 configure:
 	./configure
