@@ -498,9 +498,12 @@ SerialStreamBuf::Implementation::SetParametersToDefault()
     }
     //
     // Set all values (also the ones, which are not covered by the
-    // parametrisation-functions of this library).
+    // parameter-functions of this library).
     //
     struct termios tio;
+    if ( -1 == tcgetattr(mFileDescriptor, &tio) ) {
+    	return -1 ;
+    }
     tio.c_iflag = IGNBRK;
     tio.c_oflag = 0;
     tio.c_cflag = B19200 | CS8 | CLOCAL | CREAD;
