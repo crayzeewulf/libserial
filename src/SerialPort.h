@@ -77,7 +77,18 @@ public:
         // X. What about other operating systems ?
         //
 #ifdef __linux__
-        BAUD_460800  = B460800,
+        BAUD_460800 = B460800,
+        BAUD_500000 = B500000,
+        BAUD_576000 = B576000,
+        BAUD_921600 = B921600,
+        BAUD_1000000 = B1000000, 
+        BAUD_1152000 = B1152000, 
+        BAUD_1500000 = B1500000,
+        BAUD_2000000 = B2000000,
+        BAUD_2500000 = B2500000,
+        BAUD_3000000 = B3000000,
+        BAUD_3500000 = B3500000,
+        BAUD_4000000 = B4000000,
 #endif
         BAUD_DEFAULT = BAUD_57600
     } ;

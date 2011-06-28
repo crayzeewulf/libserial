@@ -78,9 +78,20 @@ extern "C++"
                 BAUD_230400 = SerialPort::BAUD_230400,
 #ifdef __linux__
                 BAUD_460800 = SerialPort::BAUD_460800,
+                BAUD_500000 = SerialPort::BAUD_500000, 
+                BAUD_576000 = SerialPort::BAUD_576000, 
+                BAUD_921600 = SerialPort::BAUD_921600, 
+                BAUD_1000000 = SerialPort::BAUD_1000000, 
+                BAUD_1152000 = SerialPort::BAUD_1152000, 
+                BAUD_1500000 = SerialPort::BAUD_1500000, 
+                BAUD_2000000 = SerialPort::BAUD_2000000, 
+                BAUD_2500000 = SerialPort::BAUD_2500000, 
+                BAUD_3000000 = SerialPort::BAUD_3000000, 
+                BAUD_3500000 = SerialPort::BAUD_3500000, 
+                BAUD_4000000 = SerialPort::BAUD_4000000, 
 #endif
                 BAUD_DEFAULT = SerialPort::BAUD_DEFAULT,
-                BAUD_INVALID
+                BAUD_INVALID = -1
             } ;
 
             /**
