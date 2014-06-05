@@ -13,12 +13,5 @@ make
 make install
 ------------------------------------------------------------
 
-Note: The html documentation will not be installed by "make
-install". I will fix this in the future release.	
-
-This is an alpha release. Things may not work as expected. 
-
-Please send comments, suggestions, bugs to pagey@san.rr.com. 
-
 Enjoy, 
-Manish P. Pagey
+CrayzeeWulf
