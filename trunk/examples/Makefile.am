@@ -17,8 +17,8 @@ writeport_SOURCES = write_port.cpp
 
 INCLUDES = -I@top_srcdir@/src
 
-readport_LDADD = ../src/libserial.la
-writeport_LDADD = ../src/libserial.la
+readport_LDADD = ../src/libserial.la -lpthread
+writeport_LDADD = ../src/libserial.la -lpthread
 # xmodem_rx_LDADD = ../src/libserial.la
 # xmodem_tx_LDADD = ../src/libserial.la
 # test_echo_LDADD = ../src/libserial.la
