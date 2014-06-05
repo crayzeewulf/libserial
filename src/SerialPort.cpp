@@ -34,6 +34,7 @@
 #include <strings.h>
 #include <cstring>
 #include <cstdlib>
+#include <iostream>
 
 namespace
 {
@@ -272,6 +273,24 @@ private:
      */
     std::queue<unsigned char> mInputBuffer ;
 
+    /*
+     * In order to be thread save, a second queue is implemented to store
+     * byte which are received while the queue is locked by the
+     * ReadByte method. The content must be transfered to mInputBuffer
+     * before further bytes are stored into it.
+     */
+    std::queue<unsigned char> shadowInputBuffer ;
+
+    /*
+     * Mutex to control threaded access to mInputBuffer
+     */
+    pthread_mutex_t queue_mutex;
+
+    /*
+     * Indicates if unread bytes are available within the queue
+     */
+    volatile bool queueDataAvailable;
+
     /**
      * Set the specified modem control line to the specified value. 
      *
@@ -350,6 +369,7 @@ SerialPort::Open( const BaudRate      baudRate,
     this->SetParity(parityType) ;
     this->SetNumOfStopBits(stopBits) ;
     this->SetFlowControl(flowControl) ;
+
     //
     // All done.
     //
@@ -584,7 +604,10 @@ SerialPort::SerialPortImpl::SerialPortImpl( const std::string& serialPortName ) 
     mOldPortSettings(),
     mInputBuffer()
 {
-    /* empty */
+	//Initializing the mutex
+	if(pthread_mutex_init(&queue_mutex, NULL) != 0) {
+		std::cerr << "SerialPort.cpp: Could not initialize mutex!" << std::endl;
+	}
 }
 
 inline
@@ -711,6 +734,10 @@ SerialPort::SerialPortImpl::Open()
      * The serial port is open at this point.
      */
     mIsOpen = true ;
+
+    //Reset flag
+    queueDataAvailable = false;
+
     return ;
 }
 
@@ -1179,7 +1206,9 @@ SerialPort::SerialPortImpl::IsDataAvailable() const
     //
     // Check if any data is available in the input buffer.
     //
-    return ( mInputBuffer.size() > 0 ? true : false ) ;
+    //return ( mInputBuffer.size() > 0 ? true : false ) ;
+    //Here comes an (almost) thread safe alternative
+    return queueDataAvailable;
 }
 
 inline
@@ -1189,6 +1218,9 @@ SerialPort::SerialPortImpl::ReadByte(const unsigned int msTimeout)
            SerialPort::ReadTimeout,
            std::runtime_error )
 {
+	pthread_mutex_lock(&queue_mutex);
+	int queueSize = mInputBuffer.size();
+	pthread_mutex_unlock(&queue_mutex);
     //
     // Make sure that the serial port is open.
     //
@@ -1211,8 +1243,8 @@ SerialPort::SerialPortImpl::ReadByte(const unsigned int msTimeout)
     //
     const int MICROSECONDS_PER_MS  = 1000 ;
     const int MILLISECONDS_PER_SEC = 1000 ;
-    //
-    while( 0 == mInputBuffer.size() )
+
+    while(queueSize == 0 )
     {
         //
         // Read the current time.
@@ -1237,7 +1269,7 @@ SerialPort::SerialPortImpl::ReadByte(const unsigned int msTimeout)
         // waiting for data, then we throw a ReadTimeout exception.
         //
         if ( ( msTimeout > 0 ) &&
-             ( elapsed_ms > msTimeout ) )
+             ( elapsed_ms > (int)msTimeout ) )
         {
             throw SerialPort::ReadTimeout() ;
         }
@@ -1245,12 +1277,25 @@ SerialPort::SerialPortImpl::ReadByte(const unsigned int msTimeout)
         // Wait for 1ms (1000us) for data to arrive.
         //
         usleep( MICROSECONDS_PER_MS ) ;
+        pthread_mutex_lock(&queue_mutex);
+		queueSize = mInputBuffer.size();
+		pthread_mutex_unlock(&queue_mutex);
     }
     //
     // Return the first byte and remove it from the queue.
     //
+    pthread_mutex_lock(&queue_mutex);
     unsigned char next_char = mInputBuffer.front() ;
     mInputBuffer.pop() ;
+
+
+    //Updating flag if queue is empty by now
+    if( mInputBuffer.size() == 0) {
+    	queueDataAvailable = false;
+    }
+    pthread_mutex_unlock(&queue_mutex);
+
+
     return next_char ;
 }
 
@@ -1293,7 +1338,7 @@ SerialPort::SerialPortImpl::Read( SerialPort::DataBuffer& dataBuffer,
         //
         dataBuffer.reserve( numOfBytes ) ;
         //
-        for(int i=0; i<numOfBytes; ++i)
+        for(unsigned int i=0; i<numOfBytes; ++i)
         {
             dataBuffer.push_back( ReadByte(msTimeout) ) ;
         }
@@ -1525,23 +1570,65 @@ SerialPort::SerialPortImpl::HandlePosixSignal( int signalNumber )
          */
         return ;
     }
-    //
-    // If data is available, read all available data and shove
-    // it into the corresponding input buffer.
-    //
-    for(int i=0; i<num_of_bytes_available; ++i)
-    {
-        unsigned char next_byte ;
-        if ( read( mFileDescriptor,
-                   &next_byte,
-                   1 ) > 0 )
-        {
-            mInputBuffer.push( next_byte ) ;
-        }
-        else
-        {
-            break ;
-        }
+
+    //Try to get the mutex
+    if (pthread_mutex_trylock(&queue_mutex) == 0){
+    	// First of all, any pending data within the shadowInputBuffer
+    	// must be transfered into the regular buffer.
+    	while(!shadowInputBuffer.empty())
+		{
+    		//Transfering to actual input buffer
+    		mInputBuffer.push(shadowInputBuffer.front());
+    		//Removing from shadow buffer
+    		shadowInputBuffer.pop();
+		}
+
+		//
+		// If data is available, read all available data and shove
+		// it into the corresponding input buffer.
+		//
+		for(int i=0; i<num_of_bytes_available; ++i)
+		{
+			unsigned char next_byte ;
+			if ( read( mFileDescriptor,
+					   &next_byte,
+					   1 ) > 0 )
+			{
+				mInputBuffer.push( next_byte );
+			}
+			else
+			{
+				//Updating flag
+				pthread_mutex_unlock(&queue_mutex);
+				break ;
+			}
+		}
+
+		//Updating flag
+		queueDataAvailable = true;
+
+		//Release the mutex
+		pthread_mutex_unlock(&queue_mutex);
+    } else {
+    	//Mutex is locked - using shadowQueue to avoid a deadlock!
+    	//
+		// If data is available, read all available data and shove
+		// it temporarily into the shadow buffer.
+		//
+		for(int i=0; i<num_of_bytes_available; ++i)
+		{
+			unsigned char next_byte ;
+			if ( read( mFileDescriptor,
+					   &next_byte,
+					   1 ) > 0 )
+			{
+				shadowInputBuffer.push( next_byte );
+			}
+			else
+			{
+				break ;
+			}
+		}
     }
     return ;
 }
