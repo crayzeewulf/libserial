@@ -11,6 +11,7 @@
 //
 #include "PosixSignalDispatcher.h"
 #include "PosixSignalHandler.h"
+#include <sstream>
 #include <map>
 #include <errno.h>
 #include <signal.h>
@@ -271,6 +272,18 @@ namespace
     void
     PosixSignalDispatcherImpl::SigactionHandler( int signalNumber )
     {
+        /*
+         * If we got a signal other than SIGIO here then throw an exception. 
+         * This was suggested by Oliver Schwaneberg via the patch at:
+         *
+         * https://sourceforge.net/p/libserial/patches/3/
+         */
+        if (signalNumber != SIGIO) {
+            std::stringstream err_msg ; 
+            err_msg << "Invalid or unexpected signal: " << signalNumber ;
+            throw std::runtime_error(err_msg.str()) ;
+        }
+
         /*
          * Get a list of handlers associated with signalNumber.
          */
