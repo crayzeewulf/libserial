@@ -8,7 +8,7 @@ dnl
 dnl Indicate the package name and the version to automake
 dnl
 dnl $Id: configure.in,v 1.14 2008-05-21 23:11:15 crayzeewulf Exp $
-AM_INIT_AUTOMAKE(libserial, 0.6.0rc2)
+AM_INIT_AUTOMAKE(libserial, 0.6.0rc3)
 
 AM_MAINTAINER_MODE
 
