@@ -15,7 +15,7 @@ writeport_SOURCES = write_port.cpp
 
 # process_rope_command_SOURCES = process_rope_command.cpp
 
-INCLUDES = -I@top_srcdir@/src
+AM_CPPFLAGS = -I@top_srcdir@/src
 
 readport_LDADD = ../src/libserial.la -lpthread
 writeport_LDADD = ../src/libserial.la -lpthread

@@ -1,15 +1,12 @@
 AC_REVISION($Revision: 1.14 $)
-dnl Process this file with autoconf to produce a configure script.
-AC_INIT(src/SerialStream.cc)
-AM_CONFIG_HEADER(config.h)
-AC_CONFIG_MACRO_DIR([m4])
-
 dnl
 dnl Indicate the package name and the version to automake
 dnl
-dnl $Id: configure.in,v 1.14 2008-05-21 23:11:15 crayzeewulf Exp $
-AM_INIT_AUTOMAKE(libserial, 0.6.0rc3)
-
+AC_INIT([libserial], [0.6.0rc3])
+AC_CONFIG_SRCDIR([src/SerialStream.cc])
+AM_CONFIG_HEADER(config.h)
+AC_CONFIG_MACRO_DIR([m4])
+AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 
 dnl Checks for programs.
