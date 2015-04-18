@@ -283,17 +283,17 @@ private:
      * ReadByte method. The content must be transfered to mInputBuffer
      * before further bytes are stored into it.
      */
-    std::queue<unsigned char> shadowInputBuffer ;
+    std::queue<unsigned char> mShadowInputBuffer ;
 
     /*
      * Mutex to control threaded access to mInputBuffer
      */
-    pthread_mutex_t queue_mutex;
+    pthread_mutex_t mQueueMutex;
 
     /*
      * Indicates if unread bytes are available within the queue
      */
-    volatile bool queueDataAvailable;
+    volatile bool mIsQueueDataAvailable;
 
     /**
      * Set the specified modem control line to the specified value. 
@@ -613,10 +613,13 @@ SerialPort::SerialPortImpl::SerialPortImpl( const std::string& serialPortName ) 
     mIsOpen(false),
     mFileDescriptor(-1),
     mOldPortSettings(),
-    mInputBuffer()
+    mInputBuffer(),
+    mShadowInputBuffer(), 
+    mQueueMutex(),
+    mIsQueueDataAvailable(false)
 {
 	//Initializing the mutex
-	if(pthread_mutex_init(&queue_mutex, NULL) != 0) {
+	if(pthread_mutex_init(&mQueueMutex, NULL) != 0) {
 		std::cerr << "SerialPort.cpp: Could not initialize mutex!" << std::endl;
 	}
 }
@@ -747,7 +750,7 @@ SerialPort::SerialPortImpl::Open()
     mIsOpen = true ;
 
     //Reset flag
-    queueDataAvailable = false;
+    mIsQueueDataAvailable = false;
 
     return ;
 }
@@ -1219,7 +1222,7 @@ SerialPort::SerialPortImpl::IsDataAvailable() const
     //
     //return ( mInputBuffer.size() > 0 ? true : false ) ;
     //Here comes an (almost) thread safe alternative
-    return queueDataAvailable;
+    return mIsQueueDataAvailable;
 }
 
 inline
@@ -1229,9 +1232,9 @@ SerialPort::SerialPortImpl::ReadByte(const unsigned int msTimeout)
            SerialPort::ReadTimeout,
            std::runtime_error )
 {
-	pthread_mutex_lock(&queue_mutex);
+	pthread_mutex_lock(&mQueueMutex);
 	int queueSize = mInputBuffer.size();
-	pthread_mutex_unlock(&queue_mutex);
+	pthread_mutex_unlock(&mQueueMutex);
     //
     // Make sure that the serial port is open.
     //
@@ -1288,23 +1291,23 @@ SerialPort::SerialPortImpl::ReadByte(const unsigned int msTimeout)
         // Wait for 1ms (1000us) for data to arrive.
         //
         usleep( MICROSECONDS_PER_MS ) ;
-        pthread_mutex_lock(&queue_mutex);
+        pthread_mutex_lock(&mQueueMutex);
 		queueSize = mInputBuffer.size();
-		pthread_mutex_unlock(&queue_mutex);
+		pthread_mutex_unlock(&mQueueMutex);
     }
     //
     // Return the first byte and remove it from the queue.
     //
-    pthread_mutex_lock(&queue_mutex);
+    pthread_mutex_lock(&mQueueMutex);
     unsigned char next_char = mInputBuffer.front() ;
     mInputBuffer.pop() ;
 
 
     //Updating flag if queue is empty by now
     if( mInputBuffer.size() == 0) {
-    	queueDataAvailable = false;
+    	mIsQueueDataAvailable = false;
     }
-    pthread_mutex_unlock(&queue_mutex);
+    pthread_mutex_unlock(&mQueueMutex);
 
 
     return next_char ;
@@ -1594,15 +1597,15 @@ SerialPort::SerialPortImpl::HandlePosixSignal( int signalNumber )
     }
 
     //Try to get the mutex
-    if (pthread_mutex_trylock(&queue_mutex) == 0){
-    	// First of all, any pending data within the shadowInputBuffer
+    if (pthread_mutex_trylock(&mQueueMutex) == 0){
+    	// First of all, any pending data within the mShadowInputBuffer
     	// must be transfered into the regular buffer.
-    	while(!shadowInputBuffer.empty())
+    	while(!mShadowInputBuffer.empty())
 		{
     		//Transfering to actual input buffer
-    		mInputBuffer.push(shadowInputBuffer.front());
+    		mInputBuffer.push(mShadowInputBuffer.front());
     		//Removing from shadow buffer
-    		shadowInputBuffer.pop();
+    		mShadowInputBuffer.pop();
 		}
 
 		//
@@ -1621,16 +1624,16 @@ SerialPort::SerialPortImpl::HandlePosixSignal( int signalNumber )
 			else
 			{
 				//Updating flag
-				pthread_mutex_unlock(&queue_mutex);
+				pthread_mutex_unlock(&mQueueMutex);
 				break ;
 			}
 		}
 
 		//Updating flag
-		queueDataAvailable = true;
+		mIsQueueDataAvailable = true;
 
 		//Release the mutex
-		pthread_mutex_unlock(&queue_mutex);
+		pthread_mutex_unlock(&mQueueMutex);
     } else {
     	//Mutex is locked - using shadowQueue to avoid a deadlock!
     	//
@@ -1644,7 +1647,7 @@ SerialPort::SerialPortImpl::HandlePosixSignal( int signalNumber )
 					   &next_byte,
 					   1 ) > 0 )
 			{
-				shadowInputBuffer.push( next_byte );
+				mShadowInputBuffer.push( next_byte );
 			}
 			else
 			{
