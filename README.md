@@ -11,7 +11,7 @@ If you get the source from github, you need to generate the configure script fir
 make -f Makefile.dist
 ```
 
-Once you have the `configure` script, run the following commands:
+You can skip this step if you are using a release package (which already contains the `configure` script). Once you have the `configure` script, run the following commands:
 
 ```shell
 ./configure 
