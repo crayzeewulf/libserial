@@ -465,25 +465,6 @@ public:
     GetDsr() const
         throw( NotOpen,
                std::runtime_error ) ;
-
-    /**
-     * Get the low-level file descriptor associated with the serial port. 
-     *
-     * \warning This is for advanced/power users only. Messing with this file
-     * descriptor (such as closing it) will probably cause problems.  Be
-     * careful when you use it. Using this file descriptor after the
-     * controlling serial port has been closed or deleted (for example, when it
-     * goes out of scope) will result in undefined behavior. You have been 
-     * warned!
-     *
-     * @return The low-level file descriptor corresponding to the serial 
-     * port.
-     *
-     * @throw This method will throw NotOpen if the serial port is not currently
-     * open.
-     */
-    int GetFileDescriptor() const ;
-
 private:
     /**
      * Prevent copying of objects of this class by declaring the copy

@@ -230,10 +230,6 @@ public:
     GetDsr() const 
         throw( SerialPort::NotOpen,
                std::runtime_error ) ;
-
-
-    int GetFileDescriptor() const ;
-
     /*
      * This method must be defined by all subclasses of
      * PosixSignalHandler.
@@ -598,13 +594,6 @@ SerialPort::GetDsr() const
 {
     return mSerialPortImpl->GetDsr() ;
 }
-
-int
-SerialPort::GetFileDescriptor() const 
-{
-    return mSerialPortImpl->GetFileDescriptor() ;
-}
-
 
 /* ------------------------------------------------------------ */
 inline
@@ -1558,17 +1547,6 @@ SerialPort::SerialPortImpl::GetDsr() const
 {
     return this->GetModemControlLine( TIOCM_DSR ) ;
 }    
-
-inline
-int 
-SerialPort::SerialPortImpl::GetFileDescriptor() const
-{ 
-    if (! this->IsOpen()) 
-    {
-        throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
-    }
-    return mFileDescriptor ;
-}
 
 inline
 void
