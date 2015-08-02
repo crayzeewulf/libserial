@@ -18,6 +18,9 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 
+dnl LibSerial now requires at least C++11 features in the compiler.
+AX_CXX_COMPILE_STDCXX_11(noext, mandatory)
+
 AC_CHECK_PROG(DOCBOOK2PDF,docbook2pdf,docbook2pdf,no)
 if test "x$DOCBOOK2PDF" == "xno"; then
       AC_MSG_WARN([Could not find docbook2pdf. Disabling creation of user manual therefore.])
@@ -35,7 +38,6 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_INLINE
 
-
 AC_OUTPUT([Makefile
 doxygen.conf
 libserial.spec
@@ -43,6 +45,4 @@ doc/UML/Makefile
 doc/Makefile
 examples/Makefile
 src/Makefile
-sip/configure.py
-sip/Makefile
 libserial.pc])

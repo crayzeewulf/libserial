@@ -17,8 +17,8 @@ writeport_SOURCES = write_port.cpp
 
 AM_CPPFLAGS = -I@top_srcdir@/src
 
-readport_LDADD = ../src/libserial.la -lpthread
-writeport_LDADD = ../src/libserial.la -lpthread
+readport_LDADD = @top_srcdir@/src/libserial.la -lpthread
+writeport_LDADD = @top_srcdir@/src/libserial.la -lpthread
 # xmodem_rx_LDADD = ../src/libserial.la
 # xmodem_tx_LDADD = ../src/libserial.la
 # test_echo_LDADD = ../src/libserial.la

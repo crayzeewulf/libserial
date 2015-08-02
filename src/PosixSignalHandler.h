@@ -14,19 +14,14 @@ public:
      * received by the PosixSignalDispatcher that is managing
      * this handler.
      */
-    virtual void HandlePosixSignal( int signalNumber ) = 0 ;
+    virtual void HandlePosixSignal(int signalNumber) = 0 ;
      
     /**
      * Destructor is declared virtual as we expect this class to be
      * subclassed. It is also declared pure abstract to make this
      * class a pure abstract class.
      */
-    virtual ~PosixSignalHandler() = 0 ;
+    virtual ~PosixSignalHandler() = default ;
 } ;
 
-inline
-PosixSignalHandler::~PosixSignalHandler()
-{
-    /* empty */
-}
 #endif // #ifndef _PosixSignalHandler_h_
