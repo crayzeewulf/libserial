@@ -19,5 +19,4 @@ make
 make install
 ```
 
-Enjoy, 
-CrayzeeWulf
+Complete documentation is available [here](http://crayzeewulf.github.io/libserial).
