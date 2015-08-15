@@ -2,7 +2,7 @@ libserial
 =========
 
 This library can be used to access the serial ports on POSIX
-systems. You will need the latest gcc release (anything after gcc-3.2
+systems. You will need a recent g++ release (anything after gcc-3.2
 should work) to compile libserial.
 
 If you get the source from github, you need to generate the configure script first:
