@@ -85,11 +85,13 @@ extern "C++"
                 BAUD_1152000 = SerialPort::BAUD_1152000, 
                 BAUD_1500000 = SerialPort::BAUD_1500000, 
                 BAUD_2000000 = SerialPort::BAUD_2000000, 
+#if __MAX_BAUD > B2000000
                 BAUD_2500000 = SerialPort::BAUD_2500000, 
                 BAUD_3000000 = SerialPort::BAUD_3000000, 
                 BAUD_3500000 = SerialPort::BAUD_3500000, 
                 BAUD_4000000 = SerialPort::BAUD_4000000, 
 #endif
+#endif /* __linux__ */
                 BAUD_DEFAULT = SerialPort::BAUD_DEFAULT,
                 BAUD_INVALID = -1
             } ;
