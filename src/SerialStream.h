@@ -8,7 +8,7 @@
 #ifndef _SerialStream_h_
 #define _SerialStream_h_
 
-#include <SerialStreamBuf.h>
+#include "SerialStreamBuf.h"
 #include <string>
 #include <fstream>
 
@@ -96,7 +96,7 @@ extern "C++"
              * :TODO: Add documentation for all parameters here.
              */
             SerialStream( const std::string fileName,
-                          const SerialStreamBuf::BaudRateEnum baudRate = SerialStreamBuf::DEFAULT_BAUD,
+                          const BaudRate baudRate = SerialStreamBuf::DEFAULT_BAUD,
                           const SerialStreamBuf::CharSizeEnum charSize = SerialStreamBuf::DEFAULT_CHAR_SIZE,
                           const SerialStreamBuf::ParityEnum parityType = SerialStreamBuf::DEFAULT_PARITY,
                           const short numOfStopBits = SerialStreamBuf::DEFAULT_NO_OF_STOP_BITS,
@@ -141,7 +141,7 @@ extern "C++"
             /** 
              * Set the baud rate for serial communications. 
              */
-            void SetBaudRate(SerialStreamBuf::BaudRateEnum baudRate ) ;
+            void SetBaudRate(BaudRate baudRate) ;
 
             /** Get the current baud rate being used for serial
                 communication. This routine queries the serial port for its
@@ -154,7 +154,7 @@ extern "C++"
                 with a non-null buffer.  If the buffer is null, it
                 attempts to set the state of the stream accordingly.
             */
-            const SerialStreamBuf::BaudRateEnum BaudRate() ;
+            const BaudRate GetBaudRate() ;
 
             /** Set the character size associated with the serial port. 
 	  

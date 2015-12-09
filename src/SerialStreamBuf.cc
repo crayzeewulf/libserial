@@ -11,1352 +11,1356 @@
 
 
 using namespace std ;
-using namespace LibSerial ;
 
-class SerialStreamBuf::Implementation
+namespace LibSerial
 {
-public:
-    Implementation() ;
-
-    ~Implementation() { /* empty */ }
-
-    SerialStreamBuf::BaudRateEnum
-    SetBaudRate(const SerialStreamBuf::BaudRateEnum baud_rate) ;
-
-    SerialStreamBuf::BaudRateEnum
-    BaudRate() const ;
-
-    SerialStreamBuf::CharSizeEnum
-    SetCharSize(const SerialStreamBuf::CharSizeEnum char_size) ;
-
-    SerialStreamBuf::CharSizeEnum
-    CharSize() const ;
-
-    short SetNumOfStopBits(short numOfStopBits) ;
-    short NumOfStopBits() const ; 
-
-    SerialStreamBuf::ParityEnum 
-    SetParity(const SerialStreamBuf::ParityEnum parityType) ;
-
-    SerialStreamBuf::ParityEnum 
-    Parity() const ;
-
-    SerialStreamBuf::FlowControlEnum 
-    SetFlowControl(const SerialStreamBuf::FlowControlEnum flowControlType) ;
-    
-    SerialStreamBuf::FlowControlEnum 
-    FlowControl() const ;
-
-    short SetVMin( short vtime ) ;
-    short VMin() const;
-
-    short SetVTime( short vtime ) ;
-    short VTime() const;
-
-    streamsize
-    xsgetn(char_type *s, streamsize n) ;
-
-    streamsize 
-    showmanyc() ;
-
-    streambuf::int_type
-    underflow() ;
-
-    streambuf::int_type
-    pbackfail(int_type c) ;
-
-    streamsize
-    xsputn(const char_type *s, streamsize n) ;
-
-    streambuf::int_type
-    overflow(int_type c) ;
-
-public: // Yes. "public"
-    /** 
-     * We use unbuffered I/O for the serial port. However, we
-     * need to provide the putback of atleast one
-     * character. This character contains the putback
-     * character.
-     */
-    char mPutbackChar ;
-
-    /** 
-     * True if a putback value is available in mPutbackChar. 
-     */
-    bool mPutbackAvailable ;
-      
-    /** 
-     * The file descriptor associated with the serial port. 
-     */
-    int mFileDescriptor ;
-
-    /* ------------------------------------------------------------
-     * Private Methods
-     * ------------------------------------------------------------
-     */
-    /** 
-     * This routine is called by open() in order to
-     * initialize some parameters of the serial port and
-     * setting its parameters to default values.
-     * 
-     * @return -1 on failure and some other value on success. 
-     */
-    int InitializeSerialPort() ;
-
-    int SetParametersToDefault() ;
-} ;
-
-SerialStreamBuf::SerialStreamBuf() :
-    mImpl(new Implementation)
-{
-    setbuf(0, 0) ;
-    return ;
-}
-
- 
-SerialStreamBuf::~SerialStreamBuf() 
-{
-    if( this->is_open() ) 
+    class SerialStreamBuf::Implementation
     {
-        this->close() ;
-    }
-    return ;
-}
+    public:
+        Implementation() ;
 
+        ~Implementation() { /* empty */ }
 
-bool
-SerialStreamBuf::is_open() const 
-{
-    return (-1 != mImpl->mFileDescriptor) ;
-}
-    
+        BaudRate
+        SetBaudRate(const BaudRate baud_rate) ;
 
-std::streambuf* 
-SerialStreamBuf::setbuf(char_type *, std::streamsize) 
-{
-    return std::streambuf::setbuf(0, 0) ;
-}
+        BaudRate
+        GetBaudRate() const ;
 
+        SerialStreamBuf::CharSizeEnum
+        SetCharSize(const SerialStreamBuf::CharSizeEnum char_size) ;
 
-SerialStreamBuf*
-SerialStreamBuf::close() 
-{
-    //
-    // Return a null pointer if the serial port is not currently open. 
-    //
-    if( this->is_open() == false ) 
-    {
-        return 0 ;
-    }
-    //
-    // Otherwise, close the serial port and set the file descriptor
-    // to an invalid value.
-    //
-    if( -1 == ::close(mImpl->mFileDescriptor) ) 
-    {
-        //
-        // If the close failed then return a null pointer. 
-        //
-        return 0 ;
-    } 
-    else 
-    {
-        //
-        // Set the file descriptor to an invalid value, -1. 
-        //
-        mImpl->mFileDescriptor = -1 ;
-        //
-        // On success, return "this" as required by the C++ standard.
-        //
-        return this ;
-    }
-}
-    
-std::streambuf::int_type
-SerialStreamBuf::uflow() 
-{
-    int_type next_ch = underflow() ;
-    mImpl->mPutbackAvailable = false ;
-    return next_ch ;
-}
+        SerialStreamBuf::CharSizeEnum
+        CharSize() const ;
 
-SerialStreamBuf*
-SerialStreamBuf::open( const string filename,
-                       ios_base::openmode mode ) 
-{
-    //
-    // If the buffer is alreay open then we should not allow a call to
-    // another open().
-    //
-    if( is_open() != false ) 
-    {
-        return 0 ;
-    }
-    //
-    // We only allow three different combinations of ios_base::openmode
-    // so we can use a switch here to construct the flags to be used
-    // with the open() system call.
-    //
-    int flags ;
-    if ( mode == (ios_base::in|ios_base::out) ) 
-    {
-        flags = O_RDWR ;
-    } 
-    else if ( mode == ios_base::in ) 
-    {
-        flags = O_RDONLY ;
-    } 
-    else if ( mode == ios_base::out ) 
-    {
-        flags = O_WRONLY ;
-    } 
-    else 
-    {
-        return 0 ;
-    }
-    /* switch( mode ) {
-       case ios_base::in:
-       flags = O_RDONLY ;
-       break ;
-       case ios_base::out:
-       flags = O_WRONLY ;
-       break ;
-       case (ios_base::in|ios_base::out):
-       flags = O_RDWR ;
-       break ;
-       default:
-       return 0 ;
-       break ;
-       } */
-    //
-    // Since we are dealing with the serial port we need to use the
-    // O_NOCTTY option.
-    //
-    flags |= O_NOCTTY ;
-    //
-    // Try to open the serial port. 
-    //
-    mImpl->mFileDescriptor = ::open(filename.c_str(), flags) ;
-    if( -1 == mImpl->mFileDescriptor ) 
-    {
-        return 0 ;
-    }
-    //
-    // Initialize the serial port. 
-    //
-    if( -1 == mImpl->InitializeSerialPort() ) 
-    {
-        return 0 ;
-    }
-    return this;
-}
+        short SetNumOfStopBits(short numOfStopBits) ;
+        short NumOfStopBits() const ; 
 
+        SerialStreamBuf::ParityEnum 
+        SetParity(const SerialStreamBuf::ParityEnum parityType) ;
 
-int
-SerialStreamBuf::SetParametersToDefault() 
-{
-    return mImpl->SetParametersToDefault() ;
-}
+        SerialStreamBuf::ParityEnum 
+        Parity() const ;
 
+        SerialStreamBuf::FlowControlEnum 
+        SetFlowControl(const SerialStreamBuf::FlowControlEnum flowControlType) ;
 
-SerialStreamBuf::BaudRateEnum
-SerialStreamBuf::SetBaudRate(const BaudRateEnum baud_rate) 
-{
-    return mImpl->SetBaudRate( baud_rate ) ;
-}
+        SerialStreamBuf::FlowControlEnum 
+        FlowControl() const ;
 
-SerialStreamBuf::BaudRateEnum
-SerialStreamBuf::BaudRate() const 
-{
-    return mImpl->BaudRate() ;
-}
+        short SetVMin( short vtime ) ;
+        short VMin() const;
 
+        short SetVTime( short vtime ) ;
+        short VTime() const;
 
-SerialStreamBuf::CharSizeEnum
-SerialStreamBuf::SetCharSize(const CharSizeEnum char_size) 
-{
-    return mImpl->SetCharSize( char_size ) ;
-}
+        streamsize
+        xsgetn(char_type *s, streamsize n) ;
 
+        streamsize 
+        showmanyc() ;
 
-SerialStreamBuf::CharSizeEnum
-SerialStreamBuf::CharSize() const 
-{
-    return mImpl->CharSize() ;
-}
+        streambuf::int_type
+        underflow() ;
 
+        streambuf::int_type
+        pbackfail(int_type c) ;
 
-short
-SerialStreamBuf::SetNumOfStopBits(short stop_bits) 
-{
-    return mImpl->SetNumOfStopBits( stop_bits ) ;
-}
+        streamsize
+        xsputn(const char_type *s, streamsize n) ;
 
+        streambuf::int_type
+        overflow(int_type c) ;
 
-short 
-SerialStreamBuf::NumOfStopBits() const 
-{
-    return mImpl->NumOfStopBits() ;
-}
+    public: // Yes. "public"
+        /** 
+         * We use unbuffered I/O for the serial port. However, we
+         * need to provide the putback of atleast one
+         * character. This character contains the putback
+         * character.
+         */
+        char mPutbackChar ;
 
+        /** 
+         * True if a putback value is available in mPutbackChar. 
+         */
+        bool mPutbackAvailable ;
 
-SerialStreamBuf::ParityEnum
-SerialStreamBuf::SetParity(const ParityEnum parity) 
-{
-    return mImpl->SetParity( parity ) ;
-}
+        /** 
+         * The file descriptor associated with the serial port. 
+         */
+        int mFileDescriptor ;
 
-SerialStreamBuf::ParityEnum
-SerialStreamBuf::Parity() const 
-{
-    return mImpl->Parity() ;
-}
+        /* ------------------------------------------------------------
+         * Private Methods
+         * ------------------------------------------------------------
+         */
+        /** 
+         * This routine is called by open() in order to
+         * initialize some parameters of the serial port and
+         * setting its parameters to default values.
+         * 
+         * @return -1 on failure and some other value on success. 
+         */
+        int InitializeSerialPort() ;
 
-SerialStreamBuf::FlowControlEnum
-SerialStreamBuf::SetFlowControl(const FlowControlEnum flow_c) 
-{
-    return mImpl->SetFlowControl( flow_c ) ;
-}
-
-SerialStreamBuf::FlowControlEnum
-SerialStreamBuf::Implementation::SetFlowControl(const SerialStreamBuf::FlowControlEnum flow_c)
-{
-    if( -1 == mFileDescriptor ) 
-    {
-        return FLOW_CONTROL_INVALID ;
-    }
-    //
-    // Flush any unwritten, unread data from the serial port. 
-    //
-    if( -1 == tcflush(mFileDescriptor, TCIOFLUSH) ) 
-    {
-        return FLOW_CONTROL_INVALID ;
-    }
-    //
-    // Get the current terminal settings. 
-    //
-    struct termios tset;
-    int retval = tcgetattr(mFileDescriptor, &tset);
-    if (-1 == retval) {
-        return FLOW_CONTROL_INVALID ;
-    }
-    //
-    // Set the flow control. Hardware flow control uses the RTS (Ready
-    // To Send) and CTS (clear to Send) lines. Software flow control
-    // uses IXON|IXOFF
-    //
-    if ( FLOW_CONTROL_HARD == flow_c ) {
-        tset.c_iflag &= ~ (IXON|IXOFF);
-        tset.c_cflag |= CRTSCTS;
-        tset.c_cc[VSTART] = _POSIX_VDISABLE;
-        tset.c_cc[VSTOP] = _POSIX_VDISABLE;
-    } else if ( FLOW_CONTROL_SOFT == flow_c ) {
-        tset.c_iflag |= IXON|IXOFF;
-        tset.c_cflag &= ~CRTSCTS;
-        tset.c_cc[VSTART] = CTRL_Q ; // 0x11 (021) ^q
-        tset.c_cc[VSTOP]  = CTRL_S ; // 0x13 (023) ^s
-    } else {
-        tset.c_iflag &= ~(IXON|IXOFF);
-        tset.c_cflag &= ~CRTSCTS;
-    }
-    retval = tcsetattr(mFileDescriptor, TCSANOW, &tset);
-    if (-1 == retval) {
-        return FLOW_CONTROL_INVALID ;
-    }
-    return FlowControl() ;
-}
-
-SerialStreamBuf::FlowControlEnum
-SerialStreamBuf::FlowControl() const 
-{
-    return mImpl->FlowControl() ;
-}
-
-
-short 
-SerialStreamBuf::SetVMin( short vmin ) 
-{
-    return mImpl->SetVMin( vmin ) ;
-}
-
-
-short 
-SerialStreamBuf::VMin() const 
-{
-    return mImpl->VMin() ;
-}
-
-short 
-SerialStreamBuf::Implementation::VMin() const 
-{
-    if( -1 == mFileDescriptor ) {
-        return -1 ;
-    }
-    //
-    // Get the current terminal settings. 
-    //
-    struct termios term_setting ;
-    if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
-        return -1 ;
-    }
-
-    return term_setting.c_cc[VMIN];
-}
-
-short 
-SerialStreamBuf::SetVTime( short vtime ) 
-{
-    return mImpl->SetVTime( vtime ) ;
-}
-
-short 
-SerialStreamBuf::VTime() const 
-{
-    return mImpl->VTime() ;
-}
-
-streamsize
-SerialStreamBuf::xsgetn(char_type *s, streamsize n) 
-{
-    return mImpl->xsgetn( s, n ) ;
-}
-
-std::streamsize
-SerialStreamBuf::showmanyc() 
-{
-    return mImpl->showmanyc() ;
-}
-
-streambuf::int_type
-SerialStreamBuf::underflow() 
-{
-    return mImpl->underflow() ;
-}
-
-
-streambuf::int_type
-SerialStreamBuf::pbackfail(int_type c) 
-{
-    return mImpl->pbackfail(c) ;
-}
-
-
-streamsize
-SerialStreamBuf::xsputn(const char_type *s, streamsize n) 
-{
-    return mImpl->xsputn( s, n ) ;
-}
-
-streambuf::int_type
-SerialStreamBuf::overflow(int_type c) 
-{
-    return mImpl->overflow(c) ;
-}
-
-inline
-SerialStreamBuf::Implementation::Implementation() :
-    mPutbackChar(0),
-    mPutbackAvailable(false),
-    mFileDescriptor(-1)
-{
-    /* empty */
-}
-
-inline
-int 
-SerialStreamBuf::Implementation::SetParametersToDefault()
-{
-    if( -1 == mFileDescriptor ) {
-        return -1 ;
-    }
-    //
-    // Set all values (also the ones, which are not covered by the
-    // parameter-functions of this library).
-    //
-    struct termios tio;
-    if ( -1 == tcgetattr(mFileDescriptor, &tio) ) {
-    	return -1 ;
-    }
-    tio.c_iflag = IGNBRK;
-    tio.c_oflag = 0;
-    tio.c_cflag = B19200 | CS8 | CLOCAL | CREAD;
-    tio.c_lflag = 0;
-    //
-    // :TRICKY:
-    // termios.c_line is not a standard element of the termios structure (as 
-    // per the Single Unix Specification 2. This is only present under Linux.
-    //
-#ifdef __linux__
-    tio.c_line = '\0';
-#endif
-    bzero( &tio.c_cc, sizeof(tio.c_cc) );
-    tio.c_cc[VTIME] = 0;
-    tio.c_cc[VMIN]  = 1;
-    if ( -1 == tcsetattr(mFileDescriptor,TCSANOW,&tio) ) {
-        return -1 ;
-    }
-    //
-    // Baud rate
-    //
-    if( BAUD_INVALID == SetBaudRate(DEFAULT_BAUD) ) {
-        return -1 ;
+        int SetParametersToDefault() ;
     } ;
-    //
-    // Character size. 
-    //
-    if( -1 == SetCharSize(DEFAULT_CHAR_SIZE) ) {
-        return -1 ;
-    }
-    //
-    // Number of stop bits. 
-    //
-    if( -1 == SetNumOfStopBits(DEFAULT_NO_OF_STOP_BITS) ) {
-        return -1 ;
-    }
-    //
-    // Parity
-    //
-    if( -1 == SetParity(DEFAULT_PARITY) ) {
-        return -1 ;
-    }
-    //
-    // Flow control
-    //
-    if( -1 == SetFlowControl(DEFAULT_FLOW_CONTROL) ) {
-        return -1 ;
-    }
-    //
-    // VMin
-    //
-    if ( -1 == SetVMin(DEFAULT_VMIN) ) {
-        return -1 ;
-    }
-    //
-    // VTime
-    //
-    if ( -1 == SetVTime(DEFAULT_VTIME) ) {
-        return -1 ;
-    }
-    //
-    // All done. Return a value other than -1. 
-    //
-    return 0 ;
-}
 
-inline
-int
-SerialStreamBuf::Implementation::InitializeSerialPort() 
-{
-    //
-    // If we do not have a valid file descriptor then return with
-    // failure.
-    //
-    if( -1 == this->mFileDescriptor ) {
-        return -1 ;
+    SerialStreamBuf::SerialStreamBuf() :
+        mImpl(new Implementation)
+    {
+        setbuf(0, 0) ;
+        return ;
     }
-    //
-    // Use non-blocking mode while configuring the serial port. 
-    //
-    int flags = fcntl(this->mFileDescriptor, F_GETFL, 0) ;
-    if( -1 == fcntl( this->mFileDescriptor, 
-                     F_SETFL, 
-                     flags | O_NONBLOCK ) ) {
-        return -1 ;
-    }
-    //
-    // Flush out any garbage left behind in the buffers associated
-    // with the port from any previous operations. 
-    //
-    if( -1 == tcflush(this->mFileDescriptor, TCIOFLUSH) ) {
-        return -1 ;
-    }
-    //
-    // Set up the default configuration for the serial port. 
-    //
-    if( -1 == this->SetParametersToDefault() ) {
-        return -1 ;
-    }
-    //
-    // Allow all further communications to happen in blocking 
-    // mode. 
-    //
-    flags = fcntl(this->mFileDescriptor, F_GETFL, 0) ;
-    if( -1 == fcntl( this->mFileDescriptor, 
-                     F_SETFL, 
-                     flags & ~O_NONBLOCK ) ) {
-        return -1 ;
-    }
-    //
-    // If we get here without problems then we are good; return a value
-    // different from -1.
-    //
-    return 0 ;
-}
 
-inline
-SerialStreamBuf::BaudRateEnum
-SerialStreamBuf::Implementation::SetBaudRate( const SerialStreamBuf::BaudRateEnum baud_rate )
-{
-    if( -1 == mFileDescriptor ) {
-        return BAUD_INVALID ;
+
+    SerialStreamBuf::~SerialStreamBuf() 
+    {
+        if( this->is_open() ) 
+        {
+            this->close() ;
+        }
+        return ;
     }
-    switch (baud_rate) {
-    case BAUD_50:
-    case BAUD_75:   
-    case BAUD_110:  
-    case BAUD_134:  
-    case BAUD_150:  
-    case BAUD_200:  
-    case BAUD_300:  
-    case BAUD_600:  
-    case BAUD_1200: 
-    case BAUD_1800: 
-    case BAUD_2400: 
-    case BAUD_4800: 
-    case BAUD_9600: 
-    case BAUD_19200:
-    case BAUD_38400:
-    case BAUD_57600:
-    case BAUD_115200:
+
+
+    bool
+    SerialStreamBuf::is_open() const 
+    {
+        return (-1 != mImpl->mFileDescriptor) ;
+    }
+
+
+    std::streambuf* 
+    SerialStreamBuf::setbuf(char_type *, std::streamsize) 
+    {
+        return std::streambuf::setbuf(0, 0) ;
+    }
+
+
+    SerialStreamBuf*
+    SerialStreamBuf::close() 
+    {
         //
-        // Get the current terminal settings. 
+        // Return a null pointer if the serial port is not currently open. 
         //
-        struct termios term_setting ;
-        if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
-            return BAUD_INVALID ;
+        if( this->is_open() == false ) 
+        {
+            return 0 ;
         }
         //
-        // Modify the baud rate in the term_setting structure.
+        // Otherwise, close the serial port and set the file descriptor
+        // to an invalid value.
         //
-        cfsetispeed( &term_setting, baud_rate ) ;
-        cfsetospeed( &term_setting, baud_rate ) ;
-        //
-        // Apply the modified termios structure to the serial 
-        // port. 
-        //
-        if( -1 == tcsetattr(mFileDescriptor, TCSANOW, &term_setting) ) {
-            return BAUD_INVALID ;
-        }
-        break ;
-    default:
-        //
-        // :TODO: Thu Jul 13 16:30:14 2000 Pagey
-        //
-        // There is obviously a problem if we reach here. The method
-        // must have been called with an invalid value of the baud
-        // rate. We should probably throw an exception here. I will
-        // print something on cerr for the time being but leave the
-        // stream in "good" state. 
-        //
-        return BAUD_INVALID ;
-        break ;
-    } ;
-    //
-    // If we succeeded in setting the baud rate then we need to return
-    // the baud rate. 
-    //
-    return BaudRate() ;
-}
-
-inline
-SerialStreamBuf::BaudRateEnum
-SerialStreamBuf::Implementation::BaudRate() const 
-{
-    if( -1 == mFileDescriptor ) {
-        return BAUD_INVALID ;
-    }
-    //
-    // Get the current terminal settings. 
-    //
-    struct termios term_setting ;
-    if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
-        return BAUD_INVALID ;
-    }
-    //
-    // Read the input and output baud rates. 
-    //
-    speed_t input_baud = cfgetispeed( &term_setting ) ;
-    speed_t output_baud = cfgetospeed( &term_setting ) ;
-    //
-    // Make sure that the input and output baud rates are
-    // equal. Otherwise, we do not know which one to return.
-    //
-    if( input_baud != output_baud ) {
-        return BAUD_INVALID ; 
-    }
-    switch( input_baud ) {
-    case B50: 
-        return BAUD_50 ; break ;
-    case B75:
-        return BAUD_75 ; break ;
-    case B110: 
-        return BAUD_110 ; break ;
-    case B134: 
-        return BAUD_134 ; break ;
-    case B150:
-        return BAUD_150 ; break ;
-    case B200: 
-        return BAUD_200 ; break ;
-    case B300:
-        return BAUD_300 ; break ;
-    case B600:
-        return BAUD_600 ; break ;
-    case B1200:
-        return BAUD_1200 ; break ;
-    case B1800:
-        return BAUD_1800 ; break ;
-    case B2400: 
-        return BAUD_2400 ; break ;
-    case B4800:
-        return BAUD_4800 ; break ;
-    case B9600:
-        return BAUD_9600 ; break ;
-    case B19200:
-        return BAUD_19200 ; break ;
-    case B38400:
-        return BAUD_38400 ; break ;
-    case B57600:
-        return BAUD_57600 ; break ;
-    case B115200:
-        return BAUD_115200 ; break ;
-    default:
-        return BAUD_INVALID ; // we return an invalid value in this case. 
-        break ;
-    }
-    //
-    // The code should never reach here due to the fact that the default
-    // section of the above switch statement returns. So we force an
-    // abort here using an assertion which will always fail.
-    //
-    assert( false ) ;
-    return BAUD_INVALID ;
-}
-
-inline
-SerialStreamBuf::CharSizeEnum
-SerialStreamBuf::Implementation::SetCharSize(const SerialStreamBuf::CharSizeEnum char_size) 
-{
-    if( -1 == mFileDescriptor ) {
-        return CHAR_SIZE_INVALID ;
-    }
-    switch(char_size) {
-    case CHAR_SIZE_5:
-    case CHAR_SIZE_6:
-    case CHAR_SIZE_7:
-    case CHAR_SIZE_8:
-        //
-        // Get the current terminal settings. 
-        //
-        struct termios term_setting ;
-        if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
-            return CHAR_SIZE_INVALID ;
-        }
-        //
-        // Set the character size to the specified value. If the character
-        // size is not 8 then it is also important to set ISTRIP. Setting
-        // ISTRIP causes all but the 7 low-order bits to be set to
-        // zero. Otherwise they are set to unspecified values and may
-        // cause problems. At the same time, we should clear the ISTRIP
-        // flag when the character size is 8 otherwise the MSB will always
-        // be set to zero (ISTRIP does not check the character size
-        // setting; it just sets every bit above the low 7 bits to zero).
-        //
-        if( char_size == CHAR_SIZE_8 ) {
-            term_setting.c_iflag &= ~ISTRIP ; // clear the ISTRIP flag.
-        } else {
-            term_setting.c_iflag |= ISTRIP ;  // set the ISTRIP flag.
-        }
-        term_setting.c_cflag &= ~CSIZE ;     // clear all the CSIZE bits.
-        term_setting.c_cflag |= char_size ;  // set the character size. 
-        //
-        // Set the new settings for the serial port. 
-        //
-        if( -1 == tcsetattr(mFileDescriptor, TCSANOW, &term_setting) ) {
-            return CHAR_SIZE_INVALID ;
+        if( -1 == ::close(mImpl->mFileDescriptor) ) 
+        {
+            //
+            // If the close failed then return a null pointer. 
+            //
+            return 0 ;
         } 
-        break ;
-    default:
-        return CHAR_SIZE_INVALID ;
-        break ;
-    }
-    return this->CharSize() ;
-}
-
-inline
-SerialStreamBuf::CharSizeEnum
-SerialStreamBuf::Implementation::CharSize() const 
-{
-    if( -1 == mFileDescriptor ) {
-        return CHAR_SIZE_INVALID ;
-    }
-    //
-    // Get the current terminal settings. 
-    //
-    struct termios term_setting ;
-    if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
-        return CHAR_SIZE_INVALID ;
-    }
-    //
-    // Extract the character size from the terminal settings. 
-    //
-    int char_size = (term_setting.c_cflag & CSIZE) ;
-    switch( char_size ) {
-    case CS5:
-        return CHAR_SIZE_5 ; break ;
-    case CS6:
-        return CHAR_SIZE_6 ; break ;
-    case CS7: 
-        return CHAR_SIZE_7 ; break ;
-    case CS8:
-        return CHAR_SIZE_8 ; break ;
-    default:
-        //
-        // If we get an invalid character, we set the badbit for the
-        // stream associated with the serial port.
-        //
-        return CHAR_SIZE_INVALID ;
-        break ;
-    } ;
-    return CHAR_SIZE_INVALID ;
-}
-
-inline
-short
-SerialStreamBuf::Implementation::SetNumOfStopBits(short stop_bits) 
-{
-    if( -1 == mFileDescriptor ) {
-        return 0 ;
-    }
-    //
-    // Get the current terminal settings. 
-    //
-    struct termios term_setting ;
-    if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
-        return 0 ;
-    }
-    switch( stop_bits ) {
-    case 1:
-        term_setting.c_cflag &= ~CSTOPB ;
-        break ;
-    case 2:
-        term_setting.c_cflag |= CSTOPB ;
-        break ;
-    default: 
-        return 0 ;
-        break ;
-    }
-    //
-    // Set the new settings for the serial port. 
-    //
-    if( -1 == tcsetattr(mFileDescriptor, TCSANOW, &term_setting) ) {
-        return 0 ;
-    } 
-    return this->NumOfStopBits() ;
-}
-
-inline
-short 
-SerialStreamBuf::Implementation::NumOfStopBits() const 
-{
-    if( -1 == mFileDescriptor ) {
-        return 0 ;
-    }
-    //
-    // Get the current terminal settings. 
-    //
-    struct termios term_setting ;
-    if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
-        return 0 ;
-    }
-    //
-    // If CSTOPB is set then the number of stop bits is 2 otherwise it
-    // is 1.
-    //
-    if( term_setting.c_cflag & CSTOPB ) {
-        return 2 ; 
-    } else {
-        return 1 ;
-    }
-}
-
-inline
-SerialStreamBuf::ParityEnum
-SerialStreamBuf::Implementation::SetParity(const SerialStreamBuf::ParityEnum parity) 
-{
-    if( -1 == mFileDescriptor ) {
-        return PARITY_INVALID ;
-    }
-    //
-    // Get the current terminal settings. 
-    //
-    struct termios term_setting ;
-    if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
-        return PARITY_INVALID ;
-    }
-    //
-    // Set the parity in the termios structure. 
-    //
-    switch( parity ) {
-    case PARITY_EVEN:
-        term_setting.c_cflag |= PARENB ;
-        term_setting.c_cflag &= ~PARODD ;
-        break ;
-    case PARITY_ODD:
-        term_setting.c_cflag |= PARENB ;
-        term_setting.c_cflag |= PARODD ;
-        break ;
-    case PARITY_NONE:
-        term_setting.c_cflag &= ~PARENB ;
-        break ;
-    default:
-        return PARITY_INVALID ;
-    }
-    //
-    // Write the settings back to the serial port. 
-    //
-    if( -1 == tcsetattr(mFileDescriptor, TCSANOW, &term_setting) ) {
-        return PARITY_INVALID ;
-    } 
-    return Parity() ;
-}
-
-
-inline
-SerialStreamBuf::ParityEnum
-SerialStreamBuf::Implementation::Parity() const 
-{
-    if( -1 == mFileDescriptor ) {
-        return PARITY_INVALID ;
-    }
-    //
-    // Get the current terminal settings. 
-    //
-    struct termios term_setting ;
-    if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
-        return PARITY_INVALID ;
-    }
-    //
-    // Get the parity setting from the termios structure. 
-    //
-    if( term_setting.c_cflag & PARENB ) {   // parity is enabled.
-        if( term_setting.c_cflag & PARODD ) { // odd parity
-            return PARITY_ODD ; 
-        } else {                              // even parity
-            return PARITY_EVEN ;
+        else 
+        {
+            //
+            // Set the file descriptor to an invalid value, -1. 
+            //
+            mImpl->mFileDescriptor = -1 ;
+            //
+            // On success, return "this" as required by the C++ standard.
+            //
+            return this ;
         }
-    } else {                                // no parity.
-        return PARITY_NONE ;
     }
-    return PARITY_INVALID ; // execution should never reach here. 
-}
 
-inline
-SerialStreamBuf::FlowControlEnum
-SerialStreamBuf::Implementation::FlowControl() const 
-{
-    if( -1 == mFileDescriptor ) {
-        return FLOW_CONTROL_INVALID ;
+    std::streambuf::int_type
+    SerialStreamBuf::uflow() 
+    {
+        int_type next_ch = underflow() ;
+        mImpl->mPutbackAvailable = false ;
+        return next_ch ;
     }
-    //
-    // Get the current terminal settings.
-    //
-    struct termios tset ;
-    if( -1 == tcgetattr(mFileDescriptor, &tset) ) {
-        return FLOW_CONTROL_INVALID ;
+
+    SerialStreamBuf*
+    SerialStreamBuf::open( const string filename,
+                           ios_base::openmode mode ) 
+    {
+        //
+        // If the buffer is alreay open then we should not allow a call to
+        // another open().
+        //
+        if( is_open() != false ) 
+        {
+            return 0 ;
+        }
+        //
+        // We only allow three different combinations of ios_base::openmode
+        // so we can use a switch here to construct the flags to be used
+        // with the open() system call.
+        //
+        int flags ;
+        if ( mode == (ios_base::in|ios_base::out) ) 
+        {
+            flags = O_RDWR ;
+        } 
+        else if ( mode == ios_base::in ) 
+        {
+            flags = O_RDONLY ;
+        } 
+        else if ( mode == ios_base::out ) 
+        {
+            flags = O_WRONLY ;
+        } 
+        else 
+        {
+            return 0 ;
+        }
+        /* switch( mode ) {
+           case ios_base::in:
+           flags = O_RDONLY ;
+           break ;
+           case ios_base::out:
+           flags = O_WRONLY ;
+           break ;
+           case (ios_base::in|ios_base::out):
+           flags = O_RDWR ;
+           break ;
+           default:
+           return 0 ;
+           break ;
+           } */
+        //
+        // Since we are dealing with the serial port we need to use the
+        // O_NOCTTY option.
+        //
+        flags |= O_NOCTTY ;
+        //
+        // Try to open the serial port. 
+        //
+        mImpl->mFileDescriptor = ::open(filename.c_str(), flags) ;
+        if( -1 == mImpl->mFileDescriptor ) 
+        {
+            return 0 ;
+        }
+        //
+        // Initialize the serial port. 
+        //
+        if( -1 == mImpl->InitializeSerialPort() ) 
+        {
+            return 0 ;
+        }
+        return this;
     }
-    //
-    // Check if IXON and IXOFF are set in c_iflag. If both are set and
-    // VSTART and VSTOP are set to 0x11 (^Q) and 0x13 (^S) respectively,
-    // then we are using software flow control.
-    //
-    if( (tset.c_iflag & IXON)         &&
-        (tset.c_iflag & IXOFF)        &&
-        (CTRL_Q == tset.c_cc[VSTART]) &&
-        (CTRL_S == tset.c_cc[VSTOP] ) ) {
-        return FLOW_CONTROL_SOFT ;
-    } else if ( ! ( (tset.c_iflag & IXON) ||
-                    (tset.c_iflag & IXOFF) ) ) {
-        if ( tset.c_cflag & CRTSCTS ) {
-            //
-            // If neither IXON or IXOFF is set then we must have hardware flow
-            // control.
-            //
-            return FLOW_CONTROL_HARD ;
+
+
+    int
+    SerialStreamBuf::SetParametersToDefault() 
+    {
+        return mImpl->SetParametersToDefault() ;
+    }
+
+
+    BaudRate
+    SerialStreamBuf::SetBaudRate(const BaudRate baud_rate) 
+    {
+        return mImpl->SetBaudRate( baud_rate ) ;
+    }
+
+    BaudRate
+    SerialStreamBuf::GetBaudRate() const 
+    {
+        return mImpl->GetBaudRate() ;
+    }
+
+
+    SerialStreamBuf::CharSizeEnum
+    SerialStreamBuf::SetCharSize(const CharSizeEnum char_size) 
+    {
+        return mImpl->SetCharSize( char_size ) ;
+    }
+
+
+    SerialStreamBuf::CharSizeEnum
+    SerialStreamBuf::CharSize() const 
+    {
+        return mImpl->CharSize() ;
+    }
+
+
+    short
+    SerialStreamBuf::SetNumOfStopBits(short stop_bits) 
+    {
+        return mImpl->SetNumOfStopBits( stop_bits ) ;
+    }
+
+
+    short 
+    SerialStreamBuf::NumOfStopBits() const 
+    {
+        return mImpl->NumOfStopBits() ;
+    }
+
+
+    SerialStreamBuf::ParityEnum
+    SerialStreamBuf::SetParity(const ParityEnum parity) 
+    {
+        return mImpl->SetParity( parity ) ;
+    }
+
+    SerialStreamBuf::ParityEnum
+    SerialStreamBuf::Parity() const 
+    {
+        return mImpl->Parity() ;
+    }
+
+    SerialStreamBuf::FlowControlEnum
+    SerialStreamBuf::SetFlowControl(const FlowControlEnum flow_c) 
+    {
+        return mImpl->SetFlowControl( flow_c ) ;
+    }
+
+    SerialStreamBuf::FlowControlEnum
+    SerialStreamBuf::Implementation::SetFlowControl(const SerialStreamBuf::FlowControlEnum flow_c)
+    {
+        if( -1 == mFileDescriptor ) 
+        {
+            return FLOW_CONTROL_INVALID ;
+        }
+        //
+        // Flush any unwritten, unread data from the serial port. 
+        //
+        if( -1 == tcflush(mFileDescriptor, TCIOFLUSH) ) 
+        {
+            return FLOW_CONTROL_INVALID ;
+        }
+        //
+        // Get the current terminal settings. 
+        //
+        struct termios tset;
+        int retval = tcgetattr(mFileDescriptor, &tset);
+        if (-1 == retval) {
+            return FLOW_CONTROL_INVALID ;
+        }
+        //
+        // Set the flow control. Hardware flow control uses the RTS (Ready
+        // To Send) and CTS (clear to Send) lines. Software flow control
+        // uses IXON|IXOFF
+        //
+        if ( FLOW_CONTROL_HARD == flow_c ) {
+            tset.c_iflag &= ~ (IXON|IXOFF);
+            tset.c_cflag |= CRTSCTS;
+            tset.c_cc[VSTART] = _POSIX_VDISABLE;
+            tset.c_cc[VSTOP] = _POSIX_VDISABLE;
+        } else if ( FLOW_CONTROL_SOFT == flow_c ) {
+            tset.c_iflag |= IXON|IXOFF;
+            tset.c_cflag &= ~CRTSCTS;
+            tset.c_cc[VSTART] = CTRL_Q ; // 0x11 (021) ^q
+            tset.c_cc[VSTOP]  = CTRL_S ; // 0x13 (023) ^s
         } else {
-            return FLOW_CONTROL_NONE ;
+            tset.c_iflag &= ~(IXON|IXOFF);
+            tset.c_cflag &= ~CRTSCTS;
         }
-    }
-    //
-    // If none of the above conditions are satisfied then the serial
-    // port is using a flow control setup which we do not support at
-    // present.
-    //
-    return FLOW_CONTROL_INVALID ;
-}
-
-inline
-short 
-SerialStreamBuf::Implementation::SetVMin( short vmin ) 
-{
-    if( -1 == mFileDescriptor ) {
-        return -1 ;
+        retval = tcsetattr(mFileDescriptor, TCSANOW, &tset);
+        if (-1 == retval) {
+            return FLOW_CONTROL_INVALID ;
+        }
+        return FlowControl() ;
     }
 
-    if ( vmin < 0 || vmin > 255 ) {
-        return -1 ;
-    };
-
-    //
-    // Get the current terminal settings. 
-    //
-    struct termios term_setting ;
-    if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
-        return -1 ;
+    SerialStreamBuf::FlowControlEnum
+    SerialStreamBuf::FlowControl() const 
+    {
+        return mImpl->FlowControl() ;
     }
 
-    term_setting.c_cc[VMIN] = (cc_t)vmin;
-    //
-    // Set the new settings for the serial port. 
-    //
-    if( -1 == tcsetattr(mFileDescriptor, TCSANOW, &term_setting) ) {
-        return -1 ;
-    } 
 
-    return vmin;
-}
-
-inline
-short 
-SerialStreamBuf::Implementation::SetVTime( short vtime ) 
-{
-    if( -1 == mFileDescriptor ) {
-        return -1 ;
+    short 
+    SerialStreamBuf::SetVMin( short vmin ) 
+    {
+        return mImpl->SetVMin( vmin ) ;
     }
 
-    if ( vtime < 0 || vtime > 255 ) {
-        return -1 ;
-    };
 
-    //
-    // Get the current terminal settings. 
-    //
-    struct termios term_setting ;
-    if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
-        return -1 ;
+    short 
+    SerialStreamBuf::VMin() const 
+    {
+        return mImpl->VMin() ;
     }
 
-    term_setting.c_cc[VTIME] = (cc_t)vtime;
-    //
-    // Set the new settings for the serial port. 
-    //
-    if( -1 == tcsetattr(mFileDescriptor, TCSANOW, &term_setting) ) {
-        return -1 ;
+    short 
+    SerialStreamBuf::Implementation::VMin() const 
+    {
+        if( -1 == mFileDescriptor ) {
+            return -1 ;
+        }
+        //
+        // Get the current terminal settings. 
+        //
+        struct termios term_setting ;
+        if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
+            return -1 ;
+        }
+
+        return term_setting.c_cc[VMIN];
     }
 
-    return vtime;
-}
-
-inline
-short 
-SerialStreamBuf::Implementation::VTime() const 
-{
-    if( -1 == mFileDescriptor ) {
-        return -1 ;
-    }
-    //
-    // Get the current terminal settings. 
-    //
-    struct termios term_setting ;
-    if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
-        return -1 ;
+    short 
+    SerialStreamBuf::SetVTime( short vtime ) 
+    {
+        return mImpl->SetVTime( vtime ) ;
     }
 
-    return term_setting.c_cc[VTIME];
-}
+    short 
+    SerialStreamBuf::VTime() const 
+    {
+        return mImpl->VTime() ;
+    }
 
-inline
-streamsize
-SerialStreamBuf::Implementation::xsgetn(char_type *s, streamsize n) 
-{
-    //
-    // If mFileDescriptor is -1 then we do not have a valid serial port
-    // associated with this buffer. Hence, we cannot read any characters
-    // from the serial port. Similarly, if the parameter n is less than
-    // or equal to 0, then we do not need to do anything here.
-    // 
-    if( (-1 == mFileDescriptor) ||
-        (n <= 0) ) {
+    streamsize
+    SerialStreamBuf::xsgetn(char_type *s, streamsize n) 
+    {
+        return mImpl->xsgetn( s, n ) ;
+    }
+
+    std::streamsize
+    SerialStreamBuf::showmanyc() 
+    {
+        return mImpl->showmanyc() ;
+    }
+
+    streambuf::int_type
+    SerialStreamBuf::underflow() 
+    {
+        return mImpl->underflow() ;
+    }
+
+
+    streambuf::int_type
+    SerialStreamBuf::pbackfail(int_type c) 
+    {
+        return mImpl->pbackfail(c) ;
+    }
+
+
+    streamsize
+    SerialStreamBuf::xsputn(const char_type *s, streamsize n) 
+    {
+        return mImpl->xsputn( s, n ) ;
+    }
+
+    streambuf::int_type
+    SerialStreamBuf::overflow(int_type c) 
+    {
+        return mImpl->overflow(c) ;
+    }
+
+    inline
+    SerialStreamBuf::Implementation::Implementation() :
+        mPutbackChar(0),
+        mPutbackAvailable(false),
+        mFileDescriptor(-1)
+    {
+        /* empty */
+    }
+
+    inline
+    int 
+    SerialStreamBuf::Implementation::SetParametersToDefault()
+    {
+        if( -1 == mFileDescriptor ) {
+            return -1 ;
+        }
+        //
+        // Set all values (also the ones, which are not covered by the
+        // parameter-functions of this library).
+        //
+        struct termios tio;
+        if ( -1 == tcgetattr(mFileDescriptor, &tio) ) {
+            return -1 ;
+        }
+        tio.c_iflag = IGNBRK;
+        tio.c_oflag = 0;
+        tio.c_cflag = B19200 | CS8 | CLOCAL | CREAD;
+        tio.c_lflag = 0;
+        //
+        // :TRICKY:
+        // termios.c_line is not a standard element of the termios structure (as 
+        // per the Single Unix Specification 2. This is only present under Linux.
+        //
+#ifdef __linux__
+        tio.c_line = '\0';
+#endif
+        bzero( &tio.c_cc, sizeof(tio.c_cc) );
+        tio.c_cc[VTIME] = 0;
+        tio.c_cc[VMIN]  = 1;
+        if ( -1 == tcsetattr(mFileDescriptor,TCSANOW,&tio) ) {
+            return -1 ;
+        }
+        //
+        // Baud rate
+        //
+        if( BaudRate::BAUD_INVALID == 
+            SetBaudRate(SerialStreamBuf::DEFAULT_BAUD) ) 
+        {
+            return -1 ;
+        } ;
+        //
+        // Character size. 
+        //
+        if( -1 == SetCharSize(DEFAULT_CHAR_SIZE) ) {
+            return -1 ;
+        }
+        //
+        // Number of stop bits. 
+        //
+        if( -1 == SetNumOfStopBits(DEFAULT_NO_OF_STOP_BITS) ) {
+            return -1 ;
+        }
+        //
+        // Parity
+        //
+        if( -1 == SetParity(DEFAULT_PARITY) ) {
+            return -1 ;
+        }
+        //
+        // Flow control
+        //
+        if( -1 == SetFlowControl(DEFAULT_FLOW_CONTROL) ) {
+            return -1 ;
+        }
+        //
+        // VMin
+        //
+        if ( -1 == SetVMin(DEFAULT_VMIN) ) {
+            return -1 ;
+        }
+        //
+        // VTime
+        //
+        if ( -1 == SetVTime(DEFAULT_VTIME) ) {
+            return -1 ;
+        }
+        //
+        // All done. Return a value other than -1. 
+        //
         return 0 ;
     }
-    //
-    // Try to read upto n characters in the array s.
-    //
-    ssize_t retval ; 
-    //
-    // If a putback character is available, then we need to read only
-    // n-1 character.
-    //
-    if( mPutbackAvailable ) {
-        //
-        // Put the mPutbackChar at the beginning of the array,
-        // s. Increment retval to indicate that a character has been
-        // placed in s.
-        // 
-        // (Corrected Bug#2364846 by incrementing retval below)
-        //
-        s[0] = mPutbackChar ; 
-        ++retval ;
-        //
-        // The putback character is no longer available. 
-        //
-        mPutbackAvailable = false ;
-        //
-        // If we need to read more than one character, then call read()
-        // and try to read n-1 more characters and put them at location
-        // starting from &s[1].
-        //
-        if( n > 1 ) {
 
-            retval = read(mFileDescriptor, &s[1], n-1) ;
-
-            //
-            // If read was successful, then we need to increment retval by
-            // one to indicate that the putback character was prepended to
-            // the array, s. If read failed then leave retval at -1. 
-            //
-            if( retval != -1 ) {
-                retval ++ ;
-            }
+    inline
+    int
+    SerialStreamBuf::Implementation::InitializeSerialPort() 
+    {
+        //
+        // If we do not have a valid file descriptor then return with
+        // failure.
+        //
+        if( -1 == this->mFileDescriptor ) {
+            return -1 ;
         }
-    } else {
         //
-        // If no putback character is available then we try to read n
-        // characters.
+        // Use non-blocking mode while configuring the serial port. 
         //
-
-        retval = read(mFileDescriptor, s, n);
-
-    }
-    // 
-    // If retval == -1 then the read call had an error, otherwise, if
-    // retval == 0 then we could not read the characters. In either
-    // case, we return 0 to indicate that no characters could be read
-    // from the serial port.
-    //
-    if( ( -1 == retval ) ||
-        (  0 == retval ) ) {
-        return 0 ;
-    }
-    //
-    // Return the number of characters actually read from the serial
-    // port.
-    //
-    return retval ;
-}
-
-inline
-std::streamsize
-SerialStreamBuf::Implementation::showmanyc() 
-{
-
-    int retval = -1;
-
-    if ( -1 == mFileDescriptor ) {
-        return -1;
-    };
-
-    if ( mPutbackAvailable ) {
-
-        // We still have a character left in the buffer.
-        retval = 1;
-
-    } else {
-        // Switch to non-blocking read.
         int flags = fcntl(this->mFileDescriptor, F_GETFL, 0) ;
         if( -1 == fcntl( this->mFileDescriptor, 
                          F_SETFL, 
                          flags | O_NONBLOCK ) ) {
-            return -1;
+            return -1 ;
         }
-
-        // Try to read a character.
-        retval = read(mFileDescriptor, &mPutbackChar, 1);
-
-        if ( retval == 1 ) {
-            mPutbackAvailable = true;
-        } else
-            retval = 0;
-
-        // Switch back to blocking read.
+        //
+        // Flush out any garbage left behind in the buffers associated
+        // with the port from any previous operations. 
+        //
+        if( -1 == tcflush(this->mFileDescriptor, TCIOFLUSH) ) {
+            return -1 ;
+        }
+        //
+        // Set up the default configuration for the serial port. 
+        //
+        if( -1 == this->SetParametersToDefault() ) {
+            return -1 ;
+        }
+        //
+        // Allow all further communications to happen in blocking 
+        // mode. 
+        //
+        flags = fcntl(this->mFileDescriptor, F_GETFL, 0) ;
         if( -1 == fcntl( this->mFileDescriptor, 
                          F_SETFL, 
-                         flags ) ) {
-            return -1;
+                         flags & ~O_NONBLOCK ) ) {
+            return -1 ;
         }
-    };
-    return retval;    
-}
-
-inline
-streambuf::int_type
-SerialStreamBuf::Implementation::underflow() 
-{
-    //
-    // If we do not have a valid file handler for the serial port, we
-    // cannot do much.
-    //
-    if( -1 == mFileDescriptor ) {
-        return traits_type::eof() ;
+        //
+        // If we get here without problems then we are good; return a value
+        // different from -1.
+        //
+        return 0 ;
     }
-    //
-    // Read the next character from the serial port. 
-    //
-    char next_ch ;
-    ssize_t retval ;
-    //
-    // If a putback character is available then we return that
-    // character. However, we are not supposed to change the value of
-    // gptr() in this routine so we leave mPutbackAvailable set to true.
-    // 
-    if ( mPutbackAvailable ) {
-        next_ch = mPutbackChar ;
-    } else {
-        //
-        // If no putback character is available then we need to read one
-        // character from the serial port.
-        //
 
-        retval = read(mFileDescriptor, &next_ch, 1);
+    inline
+    BaudRate
+    SerialStreamBuf::Implementation::SetBaudRate( const BaudRate baud_rate )
+    {
+        if( -1 == mFileDescriptor ) {
+            return BaudRate::BAUD_INVALID ;
+        }
+        switch (baud_rate) {
+        case BaudRate::BAUD_50:
+        case BaudRate::BAUD_75:   
+        case BaudRate::BAUD_110:  
+        case BaudRate::BAUD_134:  
+        case BaudRate::BAUD_150:  
+        case BaudRate::BAUD_200:  
+        case BaudRate::BAUD_300:  
+        case BaudRate::BAUD_600:  
+        case BaudRate::BAUD_1200: 
+        case BaudRate::BAUD_1800: 
+        case BaudRate::BAUD_2400: 
+        case BaudRate::BAUD_4800: 
+        case BaudRate::BAUD_9600: 
+        case BaudRate::BAUD_19200:
+        case BaudRate::BAUD_38400:
+        case BaudRate::BAUD_57600:
+        case BaudRate::BAUD_115200:
+            //
+            // Get the current terminal settings. 
+            //
+            struct termios term_setting ;
+            if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
+                return BaudRate::BAUD_INVALID ;
+            }
+            //
+            // Modify the baud rate in the term_setting structure.
+            //
+            cfsetispeed( &term_setting, static_cast<speed_t>(baud_rate) ) ;
+            cfsetospeed( &term_setting, static_cast<speed_t>(baud_rate) ) ;
+            //
+            // Apply the modified termios structure to the serial 
+            // port. 
+            //
+            if( -1 == tcsetattr(mFileDescriptor, TCSANOW, &term_setting) ) {
+                return BaudRate::BAUD_INVALID ;
+            }
+            break ;
+        default:
+            //
+            // :TODO: Thu Jul 13 16:30:14 2000 Pagey
+            //
+            // There is obviously a problem if we reach here. The method
+            // must have been called with an invalid value of the baud
+            // rate. We should probably throw an exception here. I will
+            // print something on cerr for the time being but leave the
+            // stream in "good" state. 
+            //
+            return BaudRate::BAUD_INVALID ;
+            break ;
+        } ;
+        //
+        // If we succeeded in setting the baud rate then we need to return
+        // the baud rate. 
+        //
+        return GetBaudRate() ;
+    }
+
+    inline
+    BaudRate
+    SerialStreamBuf::Implementation::GetBaudRate() const 
+    {
+        if( -1 == mFileDescriptor ) {
+            return BaudRate::BAUD_INVALID ;
+        }
+        //
+        // Get the current terminal settings. 
+        //
+        struct termios term_setting ;
+        if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
+            return BaudRate::BAUD_INVALID ;
+        }
+        //
+        // Read the input and output baud rates. 
+        //
+        speed_t input_baud = cfgetispeed( &term_setting ) ;
+        speed_t output_baud = cfgetospeed( &term_setting ) ;
+        //
+        // Make sure that the input and output baud rates are
+        // equal. Otherwise, we do not know which one to return.
+        //
+        if( input_baud != output_baud ) {
+            return BaudRate::BAUD_INVALID ; 
+        }
+        switch( input_baud ) {
+        case B50: 
+            return BaudRate::BAUD_50 ; break ;
+        case B75:
+            return BaudRate::BAUD_75 ; break ;
+        case B110: 
+            return BaudRate::BAUD_110 ; break ;
+        case B134: 
+            return BaudRate::BAUD_134 ; break ;
+        case B150:
+            return BaudRate::BAUD_150 ; break ;
+        case B200: 
+            return BaudRate::BAUD_200 ; break ;
+        case B300:
+            return BaudRate::BAUD_300 ; break ;
+        case B600:
+            return BaudRate::BAUD_600 ; break ;
+        case B1200:
+            return BaudRate::BAUD_1200 ; break ;
+        case B1800:
+            return BaudRate::BAUD_1800 ; break ;
+        case B2400: 
+            return BaudRate::BAUD_2400 ; break ;
+        case B4800:
+            return BaudRate::BAUD_4800 ; break ;
+        case B9600:
+            return BaudRate::BAUD_9600 ; break ;
+        case B19200:
+            return BaudRate::BAUD_19200 ; break ;
+        case B38400:
+            return BaudRate::BAUD_38400 ; break ;
+        case B57600:
+            return BaudRate::BAUD_57600 ; break ;
+        case B115200:
+            return BaudRate::BAUD_115200 ; break ;
+        default:
+            return BaudRate::BAUD_INVALID ; // we return an invalid value in this case. 
+            break ;
+        }
+        //
+        // The code should never reach here due to the fact that the default
+        // section of the above switch statement returns. So we force an
+        // abort here using an assertion which will always fail.
+        //
+        assert( false ) ;
+        return BaudRate::BAUD_INVALID ;
+    }
+
+    inline
+    SerialStreamBuf::CharSizeEnum
+    SerialStreamBuf::Implementation::SetCharSize(const SerialStreamBuf::CharSizeEnum char_size) 
+    {
+        if( -1 == mFileDescriptor ) {
+            return CHAR_SIZE_INVALID ;
+        }
+        switch(char_size) {
+        case CHAR_SIZE_5:
+        case CHAR_SIZE_6:
+        case CHAR_SIZE_7:
+        case CHAR_SIZE_8:
+            //
+            // Get the current terminal settings. 
+            //
+            struct termios term_setting ;
+            if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
+                return CHAR_SIZE_INVALID ;
+            }
+            //
+            // Set the character size to the specified value. If the character
+            // size is not 8 then it is also important to set ISTRIP. Setting
+            // ISTRIP causes all but the 7 low-order bits to be set to
+            // zero. Otherwise they are set to unspecified values and may
+            // cause problems. At the same time, we should clear the ISTRIP
+            // flag when the character size is 8 otherwise the MSB will always
+            // be set to zero (ISTRIP does not check the character size
+            // setting; it just sets every bit above the low 7 bits to zero).
+            //
+            if( char_size == CHAR_SIZE_8 ) {
+                term_setting.c_iflag &= ~ISTRIP ; // clear the ISTRIP flag.
+            } else {
+                term_setting.c_iflag |= ISTRIP ;  // set the ISTRIP flag.
+            }
+            term_setting.c_cflag &= ~CSIZE ;     // clear all the CSIZE bits.
+            term_setting.c_cflag |= char_size ;  // set the character size. 
+            //
+            // Set the new settings for the serial port. 
+            //
+            if( -1 == tcsetattr(mFileDescriptor, TCSANOW, &term_setting) ) {
+                return CHAR_SIZE_INVALID ;
+            } 
+            break ;
+        default:
+            return CHAR_SIZE_INVALID ;
+            break ;
+        }
+        return this->CharSize() ;
+    }
+
+    inline
+    SerialStreamBuf::CharSizeEnum
+    SerialStreamBuf::Implementation::CharSize() const 
+    {
+        if( -1 == mFileDescriptor ) {
+            return CHAR_SIZE_INVALID ;
+        }
+        //
+        // Get the current terminal settings. 
+        //
+        struct termios term_setting ;
+        if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
+            return CHAR_SIZE_INVALID ;
+        }
+        //
+        // Extract the character size from the terminal settings. 
+        //
+        int char_size = (term_setting.c_cflag & CSIZE) ;
+        switch( char_size ) {
+        case CS5:
+            return CHAR_SIZE_5 ; break ;
+        case CS6:
+            return CHAR_SIZE_6 ; break ;
+        case CS7: 
+            return CHAR_SIZE_7 ; break ;
+        case CS8:
+            return CHAR_SIZE_8 ; break ;
+        default:
+            //
+            // If we get an invalid character, we set the badbit for the
+            // stream associated with the serial port.
+            //
+            return CHAR_SIZE_INVALID ;
+            break ;
+        } ;
+        return CHAR_SIZE_INVALID ;
+    }
+
+    inline
+    short
+    SerialStreamBuf::Implementation::SetNumOfStopBits(short stop_bits) 
+    {
+        if( -1 == mFileDescriptor ) {
+            return 0 ;
+        }
+        //
+        // Get the current terminal settings. 
+        //
+        struct termios term_setting ;
+        if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
+            return 0 ;
+        }
+        switch( stop_bits ) {
+        case 1:
+            term_setting.c_cflag &= ~CSTOPB ;
+            break ;
+        case 2:
+            term_setting.c_cflag |= CSTOPB ;
+            break ;
+        default: 
+            return 0 ;
+            break ;
+        }
+        //
+        // Set the new settings for the serial port. 
+        //
+        if( -1 == tcsetattr(mFileDescriptor, TCSANOW, &term_setting) ) {
+            return 0 ;
+        } 
+        return this->NumOfStopBits() ;
+    }
+
+    inline
+    short 
+    SerialStreamBuf::Implementation::NumOfStopBits() const 
+    {
+        if( -1 == mFileDescriptor ) {
+            return 0 ;
+        }
+        //
+        // Get the current terminal settings. 
+        //
+        struct termios term_setting ;
+        if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
+            return 0 ;
+        }
+        //
+        // If CSTOPB is set then the number of stop bits is 2 otherwise it
+        // is 1.
+        //
+        if( term_setting.c_cflag & CSTOPB ) {
+            return 2 ; 
+        } else {
+            return 1 ;
+        }
+    }
+
+    inline
+    SerialStreamBuf::ParityEnum
+    SerialStreamBuf::Implementation::SetParity(const SerialStreamBuf::ParityEnum parity) 
+    {
+        if( -1 == mFileDescriptor ) {
+            return PARITY_INVALID ;
+        }
+        //
+        // Get the current terminal settings. 
+        //
+        struct termios term_setting ;
+        if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
+            return PARITY_INVALID ;
+        }
+        //
+        // Set the parity in the termios structure. 
+        //
+        switch( parity ) {
+        case PARITY_EVEN:
+            term_setting.c_cflag |= PARENB ;
+            term_setting.c_cflag &= ~PARODD ;
+            break ;
+        case PARITY_ODD:
+            term_setting.c_cflag |= PARENB ;
+            term_setting.c_cflag |= PARODD ;
+            break ;
+        case PARITY_NONE:
+            term_setting.c_cflag &= ~PARENB ;
+            break ;
+        default:
+            return PARITY_INVALID ;
+        }
+        //
+        // Write the settings back to the serial port. 
+        //
+        if( -1 == tcsetattr(mFileDescriptor, TCSANOW, &term_setting) ) {
+            return PARITY_INVALID ;
+        } 
+        return Parity() ;
+    }
+
+
+    inline
+    SerialStreamBuf::ParityEnum
+    SerialStreamBuf::Implementation::Parity() const 
+    {
+        if( -1 == mFileDescriptor ) {
+            return PARITY_INVALID ;
+        }
+        //
+        // Get the current terminal settings. 
+        //
+        struct termios term_setting ;
+        if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
+            return PARITY_INVALID ;
+        }
+        //
+        // Get the parity setting from the termios structure. 
+        //
+        if( term_setting.c_cflag & PARENB ) {   // parity is enabled.
+            if( term_setting.c_cflag & PARODD ) { // odd parity
+                return PARITY_ODD ; 
+            } else {                              // even parity
+                return PARITY_EVEN ;
+            }
+        } else {                                // no parity.
+            return PARITY_NONE ;
+        }
+        return PARITY_INVALID ; // execution should never reach here. 
+    }
+
+    inline
+    SerialStreamBuf::FlowControlEnum
+    SerialStreamBuf::Implementation::FlowControl() const 
+    {
+        if( -1 == mFileDescriptor ) {
+            return FLOW_CONTROL_INVALID ;
+        }
+        //
+        // Get the current terminal settings.
+        //
+        struct termios tset ;
+        if( -1 == tcgetattr(mFileDescriptor, &tset) ) {
+            return FLOW_CONTROL_INVALID ;
+        }
+        //
+        // Check if IXON and IXOFF are set in c_iflag. If both are set and
+        // VSTART and VSTOP are set to 0x11 (^Q) and 0x13 (^S) respectively,
+        // then we are using software flow control.
+        //
+        if( (tset.c_iflag & IXON)         &&
+            (tset.c_iflag & IXOFF)        &&
+            (CTRL_Q == tset.c_cc[VSTART]) &&
+            (CTRL_S == tset.c_cc[VSTOP] ) ) {
+            return FLOW_CONTROL_SOFT ;
+        } else if ( ! ( (tset.c_iflag & IXON) ||
+                        (tset.c_iflag & IXOFF) ) ) {
+            if ( tset.c_cflag & CRTSCTS ) {
+                //
+                // If neither IXON or IXOFF is set then we must have hardware flow
+                // control.
+                //
+                return FLOW_CONTROL_HARD ;
+            } else {
+                return FLOW_CONTROL_NONE ;
+            }
+        }
+        //
+        // If none of the above conditions are satisfied then the serial
+        // port is using a flow control setup which we do not support at
+        // present.
+        //
+        return FLOW_CONTROL_INVALID ;
+    }
+
+    inline
+    short 
+    SerialStreamBuf::Implementation::SetVMin( short vmin ) 
+    {
+        if( -1 == mFileDescriptor ) {
+            return -1 ;
+        }
+
+        if ( vmin < 0 || vmin > 255 ) {
+            return -1 ;
+        };
 
         //
-        // Make the next character the putback character. This has the
-        // effect of returning the next character without changing gptr()
-        // as required by the C++ standard.
+        // Get the current terminal settings. 
         //
-        if( retval == 1 ) {
-            mPutbackChar = next_ch ;
-            mPutbackAvailable = true ;
-        } else if( ( -1 == retval ) ||
-                   (  0 == retval ) ) {
+        struct termios term_setting ;
+        if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
+            return -1 ;
+        }
+
+        term_setting.c_cc[VMIN] = (cc_t)vmin;
+        //
+        // Set the new settings for the serial port. 
+        //
+        if( -1 == tcsetattr(mFileDescriptor, TCSANOW, &term_setting) ) {
+            return -1 ;
+        } 
+
+        return vmin;
+    }
+
+    inline
+    short 
+    SerialStreamBuf::Implementation::SetVTime( short vtime ) 
+    {
+        if( -1 == mFileDescriptor ) {
+            return -1 ;
+        }
+
+        if ( vtime < 0 || vtime > 255 ) {
+            return -1 ;
+        };
+
+        //
+        // Get the current terminal settings. 
+        //
+        struct termios term_setting ;
+        if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
+            return -1 ;
+        }
+
+        term_setting.c_cc[VTIME] = (cc_t)vtime;
+        //
+        // Set the new settings for the serial port. 
+        //
+        if( -1 == tcsetattr(mFileDescriptor, TCSANOW, &term_setting) ) {
+            return -1 ;
+        }
+
+        return vtime;
+    }
+
+    inline
+    short 
+    SerialStreamBuf::Implementation::VTime() const 
+    {
+        if( -1 == mFileDescriptor ) {
+            return -1 ;
+        }
+        //
+        // Get the current terminal settings. 
+        //
+        struct termios term_setting ;
+        if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
+            return -1 ;
+        }
+
+        return term_setting.c_cc[VTIME];
+    }
+
+    inline
+    streamsize
+    SerialStreamBuf::Implementation::xsgetn(char_type *s, streamsize n) 
+    {
+        //
+        // If mFileDescriptor is -1 then we do not have a valid serial port
+        // associated with this buffer. Hence, we cannot read any characters
+        // from the serial port. Similarly, if the parameter n is less than
+        // or equal to 0, then we do not need to do anything here.
+        // 
+        if( (-1 == mFileDescriptor) ||
+            (n <= 0) ) {
+            return 0 ;
+        }
+        //
+        // Try to read upto n characters in the array s.
+        //
+        ssize_t retval ; 
+        //
+        // If a putback character is available, then we need to read only
+        // n-1 character.
+        //
+        if( mPutbackAvailable ) {
             //
-            // If we had a problem reading the character, we return
-            // traits::eof().
+            // Put the mPutbackChar at the beginning of the array,
+            // s. Increment retval to indicate that a character has been
+            // placed in s.
+            // 
+            // (Corrected Bug#2364846 by incrementing retval below)
             //
+            s[0] = mPutbackChar ; 
+            ++retval ;
+            //
+            // The putback character is no longer available. 
+            //
+            mPutbackAvailable = false ;
+            //
+            // If we need to read more than one character, then call read()
+            // and try to read n-1 more characters and put them at location
+            // starting from &s[1].
+            //
+            if( n > 1 ) {
+
+                retval = read(mFileDescriptor, &s[1], n-1) ;
+
+                //
+                // If read was successful, then we need to increment retval by
+                // one to indicate that the putback character was prepended to
+                // the array, s. If read failed then leave retval at -1. 
+                //
+                if( retval != -1 ) {
+                    retval ++ ;
+                }
+            }
+        } else {
+            //
+            // If no putback character is available then we try to read n
+            // characters.
+            //
+
+            retval = read(mFileDescriptor, s, n);
+
+        }
+        // 
+        // If retval == -1 then the read call had an error, otherwise, if
+        // retval == 0 then we could not read the characters. In either
+        // case, we return 0 to indicate that no characters could be read
+        // from the serial port.
+        //
+        if( ( -1 == retval ) ||
+            (  0 == retval ) ) {
+            return 0 ;
+        }
+        //
+        // Return the number of characters actually read from the serial
+        // port.
+        //
+        return retval ;
+    }
+
+    inline
+    std::streamsize
+    SerialStreamBuf::Implementation::showmanyc() 
+    {
+
+        int retval = -1;
+
+        if ( -1 == mFileDescriptor ) {
+            return -1;
+        };
+
+        if ( mPutbackAvailable ) {
+
+            // We still have a character left in the buffer.
+            retval = 1;
+
+        } else {
+            // Switch to non-blocking read.
+            int flags = fcntl(this->mFileDescriptor, F_GETFL, 0) ;
+            if( -1 == fcntl( this->mFileDescriptor, 
+                             F_SETFL, 
+                             flags | O_NONBLOCK ) ) {
+                return -1;
+            }
+
+            // Try to read a character.
+            retval = read(mFileDescriptor, &mPutbackChar, 1);
+
+            if ( retval == 1 ) {
+                mPutbackAvailable = true;
+            } else
+                retval = 0;
+
+            // Switch back to blocking read.
+            if( -1 == fcntl( this->mFileDescriptor, 
+                             F_SETFL, 
+                             flags ) ) {
+                return -1;
+            }
+        };
+        return retval;    
+    }
+
+    inline
+    streambuf::int_type
+    SerialStreamBuf::Implementation::underflow() 
+    {
+        //
+        // If we do not have a valid file handler for the serial port, we
+        // cannot do much.
+        //
+        if( -1 == mFileDescriptor ) {
             return traits_type::eof() ;
         }
-    }
-    //
-    // :NOTE: Wed Aug  9 21:26:51 2000 Pagey
-    // The value of mPutbackAvailable is always true when the code
-    // reaches here.
-    //
-    //
-    // Return the character as an int value as required by the C++
-    // standard.
-    //
-    return traits_type::to_int_type(next_ch) ;
-}
+        //
+        // Read the next character from the serial port. 
+        //
+        char next_ch ;
+        ssize_t retval ;
+        //
+        // If a putback character is available then we return that
+        // character. However, we are not supposed to change the value of
+        // gptr() in this routine so we leave mPutbackAvailable set to true.
+        // 
+        if ( mPutbackAvailable ) {
+            next_ch = mPutbackChar ;
+        } else {
+            //
+            // If no putback character is available then we need to read one
+            // character from the serial port.
+            //
 
-inline
-streambuf::int_type
-SerialStreamBuf::Implementation::pbackfail(int_type c) 
-{
-    //
-    // If we do not have a valid file descriptor, then we return eof. 
-    //
-    if( -1 == mFileDescriptor ) {
-        return traits_type::eof() ;
-    }
-    //
-    // If a putback character is already available, then we cannot
-    // do any more putback and hence need to return eof.
-    //
-    if( mPutbackAvailable ) {
-        return traits_type::eof() ;
-    } else if ( traits_type::eq_int_type(c, traits_type::eof()) ) {
-        //
-        // If an eof character is passed in, then we are required to
-        // backup one character. However, we cannot do this for a serial
-        // port. Hence we return eof to signal an error.
-        //
-        return traits_type::eof() ;
-    } else {
-        //
-        // If no putback character is available at present, then make
-        // c the putback character and return it. 
-        //
-        mPutbackChar = traits_type::to_char_type(c) ;
-        mPutbackAvailable = true ;
-        return traits_type::not_eof(c) ;
-    }
-}
+            retval = read(mFileDescriptor, &next_ch, 1);
 
-inline
-streamsize
-SerialStreamBuf::Implementation::xsputn(const char_type *s, streamsize n) 
-{
-    //
-    // If we do not have a valid file descriptor, then we cannot do much
-    // here. Similarly if n is non-positive then we have nothing to do
-    // here.
-    //
-    if( (-1 == mFileDescriptor) ||
-        (n <= 0) ) {
-        return 0 ;
+            //
+            // Make the next character the putback character. This has the
+            // effect of returning the next character without changing gptr()
+            // as required by the C++ standard.
+            //
+            if( retval == 1 ) {
+                mPutbackChar = next_ch ;
+                mPutbackAvailable = true ;
+            } else if( ( -1 == retval ) ||
+                       (  0 == retval ) ) {
+                //
+                // If we had a problem reading the character, we return
+                // traits::eof().
+                //
+                return traits_type::eof() ;
+            }
+        }
+        //
+        // :NOTE: Wed Aug  9 21:26:51 2000 Pagey
+        // The value of mPutbackAvailable is always true when the code
+        // reaches here.
+        //
+        //
+        // Return the character as an int value as required by the C++
+        // standard.
+        //
+        return traits_type::to_int_type(next_ch) ;
     }
-    //
-    // Write the n characters to the serial port. 
-    //
-    ssize_t retval = write(mFileDescriptor, s, n) ;
-    //
-    // If the write failed then return 0. 
-    //
-    if( (-1 == retval) ||
-        ( 0 == retval) ) {
-        return 0 ;
-    }
-    //
-    // Otherwise, return the number of bytes actually written. 
-    //
-    return retval ;
-}
 
-inline
-streambuf::int_type
-SerialStreamBuf::Implementation::overflow(int_type c) 
-{
-    //
-    // If we do not have a valid file descriptor then we cannot do much
-    // here.
-    //
-    if( -1 == mFileDescriptor ) {
-        return traits_type::eof() ;
+    inline
+    streambuf::int_type
+    SerialStreamBuf::Implementation::pbackfail(int_type c) 
+    {
+        //
+        // If we do not have a valid file descriptor, then we return eof. 
+        //
+        if( -1 == mFileDescriptor ) {
+            return traits_type::eof() ;
+        }
+        //
+        // If a putback character is already available, then we cannot
+        // do any more putback and hence need to return eof.
+        //
+        if( mPutbackAvailable ) {
+            return traits_type::eof() ;
+        } else if ( traits_type::eq_int_type(c, traits_type::eof()) ) {
+            //
+            // If an eof character is passed in, then we are required to
+            // backup one character. However, we cannot do this for a serial
+            // port. Hence we return eof to signal an error.
+            //
+            return traits_type::eof() ;
+        } else {
+            //
+            // If no putback character is available at present, then make
+            // c the putback character and return it. 
+            //
+            mPutbackChar = traits_type::to_char_type(c) ;
+            mPutbackAvailable = true ;
+            return traits_type::not_eof(c) ;
+        }
     }
-    //
-    // Try to write the specified character to the serial port. 
-    //
-    if ( traits_type::eq_int_type( c, traits_type::eof()) ) {
+
+    inline
+    streamsize
+    SerialStreamBuf::Implementation::xsputn(const char_type *s, streamsize n) 
+    {
         //
-        // If c is the eof character then we do nothing. 
+        // If we do not have a valid file descriptor, then we cannot do much
+        // here. Similarly if n is non-positive then we have nothing to do
+        // here.
         //
-        return traits_type::eof() ;
-    } else {
+        if( (-1 == mFileDescriptor) ||
+            (n <= 0) ) {
+            return 0 ;
+        }
         //
-        // Otherwise we write the character to the serial port. 
+        // Write the n characters to the serial port. 
         //
-        char out_ch = traits_type::to_char_type(c) ;
-        ssize_t retval = write(mFileDescriptor, &out_ch, 1) ;
+        ssize_t retval = write(mFileDescriptor, s, n) ;
         //
-        // If the write failed then return eof. 
+        // If the write failed then return 0. 
         //
         if( (-1 == retval) ||
             ( 0 == retval) ) {
+            return 0 ;
+        }
+        //
+        // Otherwise, return the number of bytes actually written. 
+        //
+        return retval ;
+    }
+
+    inline
+    streambuf::int_type
+    SerialStreamBuf::Implementation::overflow(int_type c) 
+    {
+        //
+        // If we do not have a valid file descriptor then we cannot do much
+        // here.
+        //
+        if( -1 == mFileDescriptor ) {
             return traits_type::eof() ;
         }
         //
-        // Otherwise, return something other than eof().
+        // Try to write the specified character to the serial port. 
         //
-        return traits_type::not_eof(c) ;
+        if ( traits_type::eq_int_type( c, traits_type::eof()) ) {
+            //
+            // If c is the eof character then we do nothing. 
+            //
+            return traits_type::eof() ;
+        } else {
+            //
+            // Otherwise we write the character to the serial port. 
+            //
+            char out_ch = traits_type::to_char_type(c) ;
+            ssize_t retval = write(mFileDescriptor, &out_ch, 1) ;
+            //
+            // If the write failed then return eof. 
+            //
+            if( (-1 == retval) ||
+                ( 0 == retval) ) {
+                return traits_type::eof() ;
+            }
+            //
+            // Otherwise, return something other than eof().
+            //
+            return traits_type::not_eof(c) ;
+        }
+        assert( 0 == "The code should never reach here." ) ;
     }
-    assert( 0 == "The code should never reach here." ) ;
 }

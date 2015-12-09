@@ -68,7 +68,7 @@ SerialStream::SerialStream( const string       fileName,
 }
 
 SerialStream::SerialStream( const std::string fileName,
-                            const SerialStreamBuf::BaudRateEnum baudRate,
+                            const BaudRate baudRate,
                             const SerialStreamBuf::CharSizeEnum charSize,
                             const SerialStreamBuf::ParityEnum parityType,
                             const short numOfStopBits,
@@ -108,7 +108,7 @@ SerialStream::Open( const std::string       fileName,
 
 void 
 SerialStream::SetBaudRate( 
-    const SerialStreamBuf::BaudRateEnum baudRate ) 
+    const BaudRate baudRate ) 
 {
     SerialStreamBuf* my_buffer = 
         dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
@@ -124,7 +124,7 @@ SerialStream::SetBaudRate(
         // the SerialStreamBuf class returns BAUD_INVALID, then we
         // have a problem and the stream is no longer valid for I/O.
         //
-        if( SerialStreamBuf::BAUD_INVALID == 
+        if( BaudRate::BAUD_INVALID == 
             my_buffer->SetBaudRate(baudRate) ) 
         {
             setstate(badbit) ;
@@ -144,8 +144,8 @@ SerialStream::SetBaudRate(
     return ;
 }
 
-const SerialStreamBuf::BaudRateEnum 
-SerialStream::BaudRate() 
+const BaudRate 
+SerialStream::GetBaudRate() 
 {
     SerialStreamBuf* my_buffer = 
         dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
@@ -161,7 +161,7 @@ SerialStream::BaudRate()
         // SerialStreamBuf class returns BAUD_INVALID, then we have a
         // problem and the stream is no longer valid for I/O.
         //
-        return my_buffer->BaudRate() ;
+        return my_buffer->GetBaudRate() ;
     } 
     else 
     {
@@ -172,7 +172,7 @@ SerialStream::BaudRate()
         // problem and we should stop all I/O using this stream.
         //
         setstate(badbit) ;
-        return SerialStreamBuf::BAUD_INVALID ;
+        return BaudRate::BAUD_INVALID ;
     }
 }
 
