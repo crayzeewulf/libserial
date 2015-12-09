@@ -450,7 +450,7 @@ extern "C++"
 
             */
             virtual std::streambuf* setbuf( char_type*, 
-                                            std::streamsize ) ;
+                                            std::streamsize ) override ;
 
             /** Reads upto n characters from the serial port and returns
                 them through the character array located at s.
@@ -459,7 +459,7 @@ extern "C++"
                 serial port. 
             */
             virtual std::streamsize xsgetn( char_type*      s, 
-                                            std::streamsize n ) ;
+                                            std::streamsize n ) override ;
 
             /** 
              * Check if input is available on the port. If you call \c
@@ -473,7 +473,7 @@ extern "C++"
              * }
              * \endcode 
              */
-            virtual std::streamsize showmanyc();
+            virtual std::streamsize showmanyc() override ;
 
             /** Reads and returns the next character from the associated
                 serial port if one otherwise returns traits::eof(). This
@@ -482,7 +482,7 @@ extern "C++"
 
                 @return The next character from the serial port. 
             */
-            virtual int_type underflow() ;
+            virtual int_type underflow() override ;
 
             /** Reads and returns the next character from the associated
                 serial port if one otherwise returns traits::eof(). This
@@ -492,7 +492,7 @@ extern "C++"
                 @return The next character from the serial port.  
 
             */
-            virtual int_type   uflow() ;
+            virtual int_type uflow() override ;
 
             /** This function is called when a putback of a character
                 fails. This must be implemented for unbuffered I/O as all
@@ -500,7 +500,7 @@ extern "C++"
                 least on character.
 
             */
-            virtual int_type pbackfail(int_type c = traits_type::eof()) ;
+            virtual int_type pbackfail(int_type c = traits_type::eof()) override ;
 
             /** Writes upto n characters from the character sequence at s to
                 the serial port associated with the buffer. 
@@ -509,14 +509,14 @@ extern "C++"
                 written to the serial port. 
             */
             virtual std::streamsize xsputn( const char_type* s, 
-                                            std::streamsize  n ) ;
+                                            std::streamsize  n ) override ;
 
             /** Writes the specified character to the associated
                 serial port. 
 
                 @return The character c. 
             */
-            virtual int_type overflow(int_type c) ;
+            virtual int_type overflow(int_type c) override ;
 
         private:
             /* ------------------------------------------------------------
