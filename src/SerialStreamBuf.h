@@ -8,8 +8,8 @@
 #ifndef _SerialStreamBuf_h_
 #define _SerialStreamBuf_h_
 
-#include <SerialPort.h>
-#include <boost/scoped_ptr.hpp>
+#include "SerialPort.h"
+#include <memory>
 #include <streambuf>
 #include <string>
 
@@ -518,22 +518,20 @@ extern "C++"
             */
             virtual int_type overflow(int_type c) override ;
 
+            //
+            // Copying and moving of instances of this class are prohibited.
+            //
+            SerialStreamBuf(const SerialStreamBuf&) = delete ;
+            SerialStreamBuf(SerialStreamBuf&&) = delete ;
+            SerialStreamBuf& operator=(const SerialStreamBuf&) = delete ;
+            SerialStreamBuf& operator=(SerialStreamBuf&&) = delete ;
         private:
             /* ------------------------------------------------------------
              * Private Data Members
              * ------------------------------------------------------------
              */
-            //
-            // The copy constructor and the assignment operator are
-            // declared private but never defined. This allows the
-            // compiler to catch attempts to copy instances of this
-            // class.
-            //
-            SerialStreamBuf( const SerialStreamBuf& ) ;
-            SerialStreamBuf& operator=( const SerialStreamBuf& ) ;
-
             class Implementation ;
-            boost::scoped_ptr<Implementation> mImpl ;
+            std::unique_ptr<Implementation> mImpl ;
         } ; // class SerialStreamBuf
     } // namespace LibSerial
 } // extern "C++"

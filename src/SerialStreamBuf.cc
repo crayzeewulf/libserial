@@ -132,7 +132,7 @@ public: // Yes. "public"
 } ;
 
 SerialStreamBuf::SerialStreamBuf() :
-    mImpl( new Implementation )
+    mImpl(new Implementation)
 {
     setbuf(0, 0) ;
     return ;
