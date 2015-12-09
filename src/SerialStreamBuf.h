@@ -18,23 +18,18 @@ extern "C++"
     namespace LibSerial 
     {
         /**
-         * This is the streambuf subclass used by SerialStream. This
-         * subclass takes care of opening the serial port file in the
-         * required modes and providing the corresponding file
-         * descriptor to SerialStream so that various parameters
-         * associated with the serial port can be set. Several
-         * features of this streambuf class resemble those of
-         * std::filebuf, however this class it not made a subclass of
-         * filebuf because we need access to the file descriptor
-         * associated with the serial port and the standard filebuf
-         * does not provide access to it.
+         * This is the streambuf subclass used by SerialStream. This subclass
+         * takes care of opening the serial port file in the required modes and
+         * providing the corresponding file descriptor to SerialStream so that
+         * various parameters associated with the serial port can be set.
+         * Several features of this streambuf class resemble those of
+         * std::filebuf, however this class it not made a subclass of filebuf
+         * because we need access to the file descriptor associated with the
+         * serial port and the standard filebuf does not provide access to it.
          *
-         * At present, this class uses unbuffered I/O and all calls
-         * to setbuf() will be ignored.
-         *
-         * @author $Author: crayzeewulf $ <A HREF="pagey@gnudom.org">Manish P. Pagey</A>
-         * @version $Id: SerialStreamBuf.h,v 1.9 2005-10-17 00:19:12 crayzeewulf Exp $
-         * */
+         * At present, this class uses unbuffered I/O and all calls to setbuf()
+         * will be ignored.
+         */
         class SerialStreamBuf : public std::streambuf 
         {
         public:
@@ -44,17 +39,15 @@ extern "C++"
              * -----------------------------------------------------------------
              */
             /**
-             * The baud rates currently supported by the SUS-2 general
-             * terminal interface specification. Note that B0 is not
-             * supported because it is not really a baud rate (it
-             * causes the modem to hang up i.e. drop DTR). Use the
-             * close() method instead.
+             * The baud rates currently supported by the SUS-2 general terminal
+             * interface specification. Note that B0 is not supported because
+             * it is not really a baud rate (it causes the modem to hang up
+             * i.e. drop DTR). Use the close() method instead.
              *
-             * @deprecated This enumeration will be removed in
-             * revision 0.7.x of libserial. It is here for backward
-             * compatibility with 0.5.x releases. Please use the
-             * corresponding enumeration from SerialPort class
-             * instead.
+             * @deprecated This enumeration will be removed in revision 0.7.x
+             * of libserial. It is here for backward compatibility with 0.5.x
+             * releases. Please use the corresponding enumeration from
+             * SerialPort class instead.
              */
             enum BaudRateEnum 
             {
@@ -95,13 +88,12 @@ extern "C++"
             } ;
 
             /**
-             * The allowed values of character sizes that can be used
-             * during the serial communication.
+             * The allowed values of character sizes that can be used during
+             * the serial communication.
              *
-             * @deprecated This enumeration is deprecated. It will be
-             * removed in version 0.7.0. It is here for backward
-             * compatibility with version 0.5.x. Please use
-             * SerialPort::CharacterSize instead.
+             * @deprecated This enumeration is deprecated. It will be removed
+             * in version 0.7.0. It is here for backward compatibility with
+             * version 0.5.x. Please use SerialPort::CharacterSize instead.
              */
             enum CharSizeEnum 
             {
@@ -114,12 +106,11 @@ extern "C++"
             } ;
 
             /**
-             * The allowed values of the parity associated with the
-             * serial port communications.
+             * The allowed values of the parity associated with the serial port
+             * communications.
              *
-             * @deprecated This enumeration is deprecated and will be
-             * removed in version 0.7.0. Please use SerialPort::Parity
-             * instead.
+             * @deprecated This enumeration is deprecated and will be removed
+             * in version 0.7.0. Please use SerialPort::Parity instead.
              */
             enum ParityEnum 
             {
@@ -131,12 +122,11 @@ extern "C++"
             } ;
 
             /**
-             * The values of the flow control settings for a serial
-             * port.
+             * The values of the flow control settings for a serial port.
              *
-             * @deprecated This enumeration has been deprecated and
-             * will be removed in version 0.7.0. Please use
-             * SerialPort::FlowControl instead.
+             * @deprecated This enumeration has been deprecated and will be
+             * removed in version 0.7.0. Please use SerialPort::FlowControl
+             * instead.
              */
             enum FlowControlEnum 
             {
@@ -154,35 +144,31 @@ extern "C++"
             /**
              * The default value of the baud rate of the serial port.
              *
-             * @deprecated Please use SerialPort::BAUD_DEFAULT
-             * instead.
+             * @deprecated Please use SerialPort::BAUD_DEFAULT instead.
              */
-            static const BaudRateEnum DEFAULT_BAUD ;
+            static constexpr BaudRateEnum DEFAULT_BAUD = SerialStreamBuf::BAUD_DEFAULT ;
 
             /** 
-             * The default value of the character size used during the
-             * serial communication.
+             * The default value of the character size used during the serial
+             * communication.
              * 
-             * @deprecated Please use SerialPort::CHAR_SIZE_DEFAULT
-             * instead.
+             * @deprecated Please use SerialPort::CHAR_SIZE_DEFAULT instead.
              */
-            static const CharSizeEnum DEFAULT_CHAR_SIZE ;
+            static constexpr CharSizeEnum DEFAULT_CHAR_SIZE = SerialStreamBuf::CHAR_SIZE_DEFAULT ;
 
             /** 
              * The default number of stop bits used.
              *
-             * @deprecated Please use SerialPort::STOP_BITS_DEFAULT
-             * instead.
+             * @deprecated Please use SerialPort::STOP_BITS_DEFAULT instead.
              */
-            static const short DEFAULT_NO_OF_STOP_BITS ;
+            static constexpr short DEFAULT_NO_OF_STOP_BITS = 1 ;
 
             /** 
              * The default parity setting.
              *
-             * @deprecated Please use SerialPort::PARITY_DEFAULT
-             * instead.
+             * @deprecated Please use SerialPort::PARITY_DEFAULT instead.
              */
-            static const ParityEnum DEFAULT_PARITY ;
+            static constexpr ParityEnum DEFAULT_PARITY = SerialStreamBuf::PARITY_DEFAULT ;
       
             /**
              * The default flow control setting.
@@ -190,17 +176,16 @@ extern "C++"
              * @deprecated Please use SerialPort::FLOW_CONTROL_DEFAULT
              * instead.
              */
-            static const FlowControlEnum DEFAULT_FLOW_CONTROL ;
+            static constexpr FlowControlEnum DEFAULT_FLOW_CONTROL = SerialStreamBuf::FLOW_CONTROL_DEFAULT ;
 
             /**
              * The default character buffer size.
              *
-             * @deprecated VMIN and VTIME will not be supported
-             * starting from version 0.7.0. Methods of SerialPort
-             * class provide better mechanisms for implementing read
-             * and write timeouts.
+             * @deprecated VMIN and VTIME will not be supported starting from
+             * version 0.7.0. Methods of SerialPort class provide better
+             * mechanisms for implementing read and write timeouts.
              */
-            static const short DEFAULT_VMIN ;
+            static constexpr short DEFAULT_VMIN = 1 ;
 
             /**
              * The default character buffer timing.
@@ -210,7 +195,7 @@ extern "C++"
              * class provide better mechanisms for implementing read
              * and write timeouts.
              */
-            static const short DEFAULT_VTIME ;
+            static constexpr short DEFAULT_VTIME = 0 ;
 
             /* -----------------------------------------------------------------
              * Constructors and Destructor
