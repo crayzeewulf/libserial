@@ -321,27 +321,27 @@ extern "C++"
                 on success and BAUD_INVALID on failure. 
 
             */
-            const BaudRateEnum SetBaudRate(const BaudRateEnum baudRate ) ;
+            BaudRateEnum SetBaudRate(const BaudRateEnum baudRate ) ;
 
             /** Return the current baud rate of the serial port. If the baud
                 rate is not set to a valid value then it returns
                 BAUD_INVALID.
 
             */
-            const BaudRateEnum BaudRate() const ;
+            BaudRateEnum BaudRate() const ;
 
             /** Set the character size to be used during serial
                 communication. It returns the character size on success and
                 CHAR_SIZE_INVALID on failure.
 
             */
-            const CharSizeEnum SetCharSize(const CharSizeEnum charSize) ;
+            CharSizeEnum SetCharSize(const CharSizeEnum charSize) ;
 
             /** Return the character size currently being used for serial
                 communication.
 
             */
-            const CharSizeEnum CharSize() const ;
+            CharSizeEnum CharSize() const ;
 
             /** Set the number of stop bits used during serial
                 communication. The only valid values are 1 and 2.
@@ -364,48 +364,48 @@ extern "C++"
             @param parity The parity value. 
 	  
             */
-            const ParityEnum SetParity(const ParityEnum parityType) ;
+            ParityEnum SetParity(const ParityEnum parityType) ;
 
             /** Get the current parity setting for the serial port. 
 	  
             @return The parity setting for the serial port. 
 	  
             */
-            const ParityEnum Parity() const ;
+            ParityEnum Parity() const ;
 
             /** Use the specified flow control. 
 
             */
-            const FlowControlEnum SetFlowControl(const FlowControlEnum flowControlType) ;
+            FlowControlEnum SetFlowControl(const FlowControlEnum flowControlType) ;
 
             /** Return the current flow control setting. 
 
             */
-            const FlowControlEnum FlowControl() const ;
+            FlowControlEnum FlowControl() const ;
 
             /** 
              * Set the minimum number of characters for non-canonical
              * reads. See VMIN in man termios(3).
              */
-            const short SetVMin( short vtime ) ;
+            short SetVMin( short vtime ) ;
 
             /**
              * Get the VMIN value for the device. This represents the
              * minimum number of characters for non-canonical reads.
              */
-            const short VMin() const;
+            short VMin() const;
 
             /** 
              * Set character buffer timeout in 10ths of a second. This
              * applies to non-canonical reads.
              */
-            const short SetVTime( short vtime ) ;
+            short SetVTime( short vtime ) ;
 
             /** 
              * Get the current timeout value for non-canonical reads
              * in deciseconds. 
              */
-            const short VTime() const;
+            short VTime() const;
 
             /* -----------------------------------------------------------------
              * Operators
@@ -461,16 +461,19 @@ extern "C++"
             virtual std::streamsize xsgetn( char_type*      s, 
                                             std::streamsize n ) ;
 
-	    /** Check, wether input is available on the port.
-		If you call \c SerialStream::in_avail, this method will be
-		called to check for available input.
-		\code
-		while( serial_port.rdbuf()->in_avail() > 0  ) {
-  		  serial_port.get(ch);
-		  ...
-		}
-		\endcode */
-	    virtual std::streamsize showmanyc();
+            /** 
+             * Check if input is available on the port. If you call \c
+             * SerialStream::in_avail, this method will be called to check for
+             * available input.
+             *
+             * \code
+             * while( serial_port.rdbuf()->in_avail() > 0  ) {
+             *     serial_port.get(ch);
+             *     ...
+             * }
+             * \endcode 
+             */
+            virtual std::streamsize showmanyc();
 
             /** Reads and returns the next character from the associated
                 serial port if one otherwise returns traits::eof(). This
