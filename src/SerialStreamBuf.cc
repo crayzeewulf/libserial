@@ -287,7 +287,7 @@ SerialStreamBuf::SetParametersToDefault()
 SerialStreamBuf::BaudRateEnum
 SerialStreamBuf::SetBaudRate(const BaudRateEnum baud_rate) 
 {
-    mImpl->SetBaudRate( baud_rate ) ;
+    return mImpl->SetBaudRate( baud_rate ) ;
 }
 
 SerialStreamBuf::BaudRateEnum
