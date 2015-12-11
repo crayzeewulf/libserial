@@ -44,7 +44,7 @@ SerialStream::Close()
     }
 }
 
-const bool
+bool
 SerialStream::IsOpen() const 
 {
     //
@@ -69,7 +69,7 @@ SerialStream::SerialStream( const string       fileName,
 
 SerialStream::SerialStream( const std::string fileName,
                             const BaudRate baudRate,
-                            const SerialStreamBuf::CharSizeEnum charSize,
+                            const CharSize charSize,
                             const SerialStreamBuf::ParityEnum parityType,
                             const short numOfStopBits,
                             const SerialStreamBuf::FlowControlEnum flowControlType ) :
@@ -111,7 +111,7 @@ SerialStream::SetBaudRate(
     const BaudRate baudRate ) 
 {
     SerialStreamBuf* my_buffer = 
-        dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
+    dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //
     // Make sure that we are dealing with a SerialStreamBuf before
     // proceeding. This check also makes sure that we have a non-NULL
@@ -144,11 +144,11 @@ SerialStream::SetBaudRate(
     return ;
 }
 
-const BaudRate 
+BaudRate 
 SerialStream::GetBaudRate() 
 {
     SerialStreamBuf* my_buffer = 
-        dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
+    dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //
     // Make sure that we are dealing with a SerialStreamBuf before
     // proceeding. This check also makes sure that we have a non-NULL
@@ -178,10 +178,10 @@ SerialStream::GetBaudRate()
 
 void
 SerialStream::SetCharSize( 
-    const SerialStreamBuf::CharSizeEnum charSize ) 
+    const CharSize charSize ) 
 {
     SerialStreamBuf* my_buffer = 
-        dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
+    dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //
     // Make sure that we are dealing with a SerialStreamBuf before
     // proceeding. This check also makes sure that we have a non-NULL
@@ -194,8 +194,7 @@ SerialStream::SetCharSize(
         // SerialStreamBuf class returns BAUD_INVALID, then we have a
         // problem and the stream is no longer valid for I/O.
         //
-        if( SerialStreamBuf::CHAR_SIZE_INVALID == 
-            my_buffer->SetCharSize(charSize) ) 
+        if( CharSize::CHAR_SIZE_INVALID == my_buffer->SetCharSize(charSize) ) 
         {
             setstate(badbit) ;
         }
@@ -213,11 +212,11 @@ SerialStream::SetCharSize(
     return ;
 }
 
-const SerialStreamBuf::CharSizeEnum
-SerialStream::CharSize() 
+CharSize
+SerialStream::GetCharSize() 
 {
     SerialStreamBuf* my_buffer = 
-        dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
+    dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //
     // Make sure that we are dealing with a SerialStreamBuf before
     // proceeding. This check also makes sure that we have a non-NULL
@@ -230,7 +229,7 @@ SerialStream::CharSize()
         // SerialStreamBuf class returns BAUD_INVALID, then we have a
         // problem and the stream is no longer valid for I/O.
         //
-        return my_buffer->CharSize() ;
+        return my_buffer->GetCharSize() ;
     } 
     else 
     {
@@ -241,7 +240,7 @@ SerialStream::CharSize()
         // problem and we should stop all I/O using this stream.
         //
         setstate(badbit) ;
-        return SerialStreamBuf::CHAR_SIZE_INVALID ;
+        return CharSize::CHAR_SIZE_INVALID ;
     }
 }
 
@@ -274,7 +273,7 @@ SerialStream::SetNumOfStopBits(short stop_bits) {
     return ;
 }
 
-const short
+short
 SerialStream::NumOfStopBits() {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //
@@ -330,7 +329,7 @@ SerialStream::SetParity(const SerialStreamBuf::ParityEnum parity) {
     return ;
 }
 
-const SerialStreamBuf::ParityEnum
+SerialStreamBuf::ParityEnum
 SerialStream::Parity() {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //
@@ -386,59 +385,59 @@ SerialStream::SetFlowControl(const SerialStreamBuf::FlowControlEnum flow_c) {
     return ;
 }
 
-const short
+short
 SerialStream::SetVMin( short vmin ) {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     if ( my_buffer ) {
-      if ( -1 == my_buffer->SetVMin( vmin ) ) {
+        if ( -1 == my_buffer->SetVMin( vmin ) ) {
+            setstate(badbit) ;
+            return -1;
+        };
+    } else {
         setstate(badbit) ;
         return -1;
-      };
-    } else {
-      setstate(badbit) ;
-      return -1;
     };
     return vmin;
 }
 
-const short
+short
 SerialStream::VMin() {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     if ( my_buffer ) {
-      return my_buffer->VMin();
+        return my_buffer->VMin();
     } else {
-      setstate(badbit) ;
-      return -1;
+        setstate(badbit) ;
+        return -1;
     };
 }
 
-const short
+short
 SerialStream::SetVTime( short vmin ) {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     if ( my_buffer ) {
-      if ( -1 == my_buffer->SetVTime( vmin ) ) {
+        if ( -1 == my_buffer->SetVTime( vmin ) ) {
+            setstate(badbit) ;
+            return -1;
+        };
+    } else {
         setstate(badbit) ;
         return -1;
-      };
-    } else {
-      setstate(badbit) ;
-      return -1;
     };
     return vmin;
 }
 
-const short
+short
 SerialStream::VTime() {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     if ( my_buffer ) {
-      return my_buffer->VTime();
+        return my_buffer->VTime();
     } else {
-      setstate(badbit) ;
-      return -1;
+        setstate(badbit) ;
+        return -1;
     };
 }
 
-const SerialStreamBuf::FlowControlEnum
+SerialStreamBuf::FlowControlEnum
 SerialStream::FlowControl() {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //

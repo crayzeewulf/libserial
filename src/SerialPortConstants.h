@@ -54,6 +54,21 @@ namespace LibSerial
         BAUD_INVALID = std::numeric_limits<speed_t>::max()
     } ;
 
+    /**
+     * The allowed values of character sizes that can be used during
+     * the serial communication.
+     */
+    enum class CharSize : tcflag_t
+    {
+        CHAR_SIZE_5 = CS5,
+        CHAR_SIZE_6 = CS6,
+        CHAR_SIZE_7 = CS7,
+        CHAR_SIZE_8 = CS8,
+        CHAR_SIZE_DEFAULT = CS8,
+        CHAR_SIZE_INVALID = std::numeric_limits<tcflag_t>::max()
+    } ;
+
+
 } /* LibSerial */ 
 
 #endif /* end of include guard: SERIALPORTCONSTANTS_H */

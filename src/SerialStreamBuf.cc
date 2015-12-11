@@ -27,11 +27,11 @@ namespace LibSerial
         BaudRate
         GetBaudRate() const ;
 
-        SerialStreamBuf::CharSizeEnum
-        SetCharSize(const SerialStreamBuf::CharSizeEnum char_size) ;
+        CharSize
+        SetCharSize(const CharSize char_size) ;
 
-        SerialStreamBuf::CharSizeEnum
-        CharSize() const ;
+        CharSize
+        GetCharSize() const ;
 
         short SetNumOfStopBits(short numOfStopBits) ;
         short NumOfStopBits() const ; 
@@ -273,17 +273,17 @@ namespace LibSerial
     }
 
 
-    SerialStreamBuf::CharSizeEnum
-    SerialStreamBuf::SetCharSize(const CharSizeEnum char_size) 
+    CharSize
+    SerialStreamBuf::SetCharSize(const CharSize char_size) 
     {
         return mImpl->SetCharSize( char_size ) ;
     }
 
 
-    SerialStreamBuf::CharSizeEnum
-    SerialStreamBuf::CharSize() const 
+    CharSize
+    SerialStreamBuf::GetCharSize() const 
     {
-        return mImpl->CharSize() ;
+        return mImpl->GetCharSize() ;
     }
 
 
@@ -507,7 +507,7 @@ namespace LibSerial
         //
         // Character size. 
         //
-        if( -1 == SetCharSize(DEFAULT_CHAR_SIZE) ) {
+        if( CharSize::CHAR_SIZE_INVALID == SetCharSize(DEFAULT_CHAR_SIZE) ) {
             return -1 ;
         }
         //
@@ -736,23 +736,23 @@ namespace LibSerial
     }
 
     inline
-    SerialStreamBuf::CharSizeEnum
-    SerialStreamBuf::Implementation::SetCharSize(const SerialStreamBuf::CharSizeEnum char_size) 
+    CharSize
+    SerialStreamBuf::Implementation::SetCharSize(const CharSize char_size) 
     {
         if( -1 == mFileDescriptor ) {
-            return CHAR_SIZE_INVALID ;
+            return CharSize::CHAR_SIZE_INVALID ;
         }
         switch(char_size) {
-        case CHAR_SIZE_5:
-        case CHAR_SIZE_6:
-        case CHAR_SIZE_7:
-        case CHAR_SIZE_8:
+        case CharSize::CHAR_SIZE_5:
+        case CharSize::CHAR_SIZE_6:
+        case CharSize::CHAR_SIZE_7:
+        case CharSize::CHAR_SIZE_8:
             //
             // Get the current terminal settings. 
             //
             struct termios term_setting ;
             if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
-                return CHAR_SIZE_INVALID ;
+                return CharSize::CHAR_SIZE_INVALID ;
             }
             //
             // Set the character size to the specified value. If the character
@@ -764,40 +764,40 @@ namespace LibSerial
             // be set to zero (ISTRIP does not check the character size
             // setting; it just sets every bit above the low 7 bits to zero).
             //
-            if( char_size == CHAR_SIZE_8 ) {
+            if( char_size == CharSize::CHAR_SIZE_8 ) {
                 term_setting.c_iflag &= ~ISTRIP ; // clear the ISTRIP flag.
             } else {
                 term_setting.c_iflag |= ISTRIP ;  // set the ISTRIP flag.
             }
             term_setting.c_cflag &= ~CSIZE ;     // clear all the CSIZE bits.
-            term_setting.c_cflag |= char_size ;  // set the character size. 
+            term_setting.c_cflag |= static_cast<tcflag_t>(char_size) ;  // set the character size. 
             //
             // Set the new settings for the serial port. 
             //
             if( -1 == tcsetattr(mFileDescriptor, TCSANOW, &term_setting) ) {
-                return CHAR_SIZE_INVALID ;
+                return CharSize::CHAR_SIZE_INVALID ;
             } 
             break ;
         default:
-            return CHAR_SIZE_INVALID ;
+            return CharSize::CHAR_SIZE_INVALID ;
             break ;
         }
-        return this->CharSize() ;
+        return this->GetCharSize() ;
     }
 
     inline
-    SerialStreamBuf::CharSizeEnum
-    SerialStreamBuf::Implementation::CharSize() const 
+    CharSize
+    SerialStreamBuf::Implementation::GetCharSize() const 
     {
         if( -1 == mFileDescriptor ) {
-            return CHAR_SIZE_INVALID ;
+            return CharSize::CHAR_SIZE_INVALID ;
         }
         //
         // Get the current terminal settings. 
         //
         struct termios term_setting ;
         if( -1 == tcgetattr(mFileDescriptor, &term_setting) ) {
-            return CHAR_SIZE_INVALID ;
+            return CharSize::CHAR_SIZE_INVALID ;
         }
         //
         // Extract the character size from the terminal settings. 
@@ -805,22 +805,22 @@ namespace LibSerial
         int char_size = (term_setting.c_cflag & CSIZE) ;
         switch( char_size ) {
         case CS5:
-            return CHAR_SIZE_5 ; break ;
+            return CharSize::CHAR_SIZE_5 ; break ;
         case CS6:
-            return CHAR_SIZE_6 ; break ;
+            return CharSize::CHAR_SIZE_6 ; break ;
         case CS7: 
-            return CHAR_SIZE_7 ; break ;
+            return CharSize::CHAR_SIZE_7 ; break ;
         case CS8:
-            return CHAR_SIZE_8 ; break ;
+            return CharSize::CHAR_SIZE_8 ; break ;
         default:
             //
             // If we get an invalid character, we set the badbit for the
             // stream associated with the serial port.
             //
-            return CHAR_SIZE_INVALID ;
+            return CharSize::CHAR_SIZE_INVALID ;
             break ;
         } ;
-        return CHAR_SIZE_INVALID ;
+        return CharSize::CHAR_SIZE_INVALID ;
     }
 
     inline
@@ -1094,7 +1094,7 @@ namespace LibSerial
         //
         // Try to read upto n characters in the array s.
         //
-        ssize_t retval ; 
+        ssize_t retval {0} ; 
         //
         // If a putback character is available, then we need to read only
         // n-1 character.

@@ -28,24 +28,6 @@ namespace LibSerial
     public:
 
         /**
-         * The allowed values of character sizes that can be used during
-         * the serial communication.
-         *
-         * @deprecated This enumeration is deprecated. It will be removed
-         * in version 0.7.0. It is here for backward compatibility with
-         * version 0.5.x. Please use SerialPort::CharacterSize instead.
-         */
-        enum CharSizeEnum 
-        {
-            CHAR_SIZE_5 = SerialPort::CHAR_SIZE_5,
-            CHAR_SIZE_6 = SerialPort::CHAR_SIZE_6,
-            CHAR_SIZE_7 = SerialPort::CHAR_SIZE_7,
-            CHAR_SIZE_8 = SerialPort::CHAR_SIZE_8,
-            CHAR_SIZE_DEFAULT = SerialPort::CHAR_SIZE_DEFAULT,
-            CHAR_SIZE_INVALID
-        } ;
-
-        /**
          * The allowed values of the parity associated with the serial port
          * communications.
          *
@@ -91,7 +73,7 @@ namespace LibSerial
         /// 
         /// @deprecated Please use SerialPort::CHAR_SIZE_DEFAULT instead.
         /// 
-        static constexpr CharSizeEnum DEFAULT_CHAR_SIZE = SerialStreamBuf::CHAR_SIZE_DEFAULT ;
+        static constexpr CharSize DEFAULT_CHAR_SIZE = CharSize::CHAR_SIZE_DEFAULT ;
 
         /** 
          * The default number of stop bits used.
@@ -235,11 +217,11 @@ namespace LibSerial
         /// Set the character size to be used during serial
         /// communication. It returns the character size on success and
         /// CHAR_SIZE_INVALID on failure.
-        CharSizeEnum SetCharSize(const CharSizeEnum charSize) ;
+        CharSize SetCharSize(const CharSize charSize) ;
 
         /// Return the character size currently being used for serial
         /// communication.
-        CharSizeEnum CharSize() const ;
+        CharSize GetCharSize() const ;
 
         /// Set the number of stop bits used during serial
         /// communication. The only valid values are 1 and 2.

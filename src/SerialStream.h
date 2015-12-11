@@ -97,7 +97,7 @@ extern "C++"
              */
             SerialStream( const std::string fileName,
                           const BaudRate baudRate = SerialStreamBuf::DEFAULT_BAUD,
-                          const SerialStreamBuf::CharSizeEnum charSize = SerialStreamBuf::DEFAULT_CHAR_SIZE,
+                          const CharSize charSize = SerialStreamBuf::DEFAULT_CHAR_SIZE,
                           const SerialStreamBuf::ParityEnum parityType = SerialStreamBuf::DEFAULT_PARITY,
                           const short numOfStopBits = SerialStreamBuf::DEFAULT_NO_OF_STOP_BITS,
                           const SerialStreamBuf::FlowControlEnum flowControlType = SerialStreamBuf::DEFAULT_FLOW_CONTROL ) ;
@@ -136,7 +136,7 @@ extern "C++"
             /** Returns true if the Stream is in a good open state,
              * false otherwise
              */
-            const bool IsOpen() const ;
+            bool IsOpen() const ;
 
             /** 
              * Set the baud rate for serial communications. 
@@ -154,19 +154,19 @@ extern "C++"
                 with a non-null buffer.  If the buffer is null, it
                 attempts to set the state of the stream accordingly.
             */
-            const BaudRate GetBaudRate() ;
+            BaudRate GetBaudRate() ;
 
             /** Set the character size associated with the serial port. 
 	  
             @param size The character size will be set to this value. 
             */
-            void SetCharSize(const SerialStreamBuf::CharSizeEnum charSize ) ;
+            void SetCharSize(const CharSize charSize ) ;
 
             /** Get the character size being used for serial communication. 
 	 
             @return The current character size. 
             */
-            const SerialStreamBuf::CharSizeEnum CharSize() ;
+            CharSize GetCharSize() ;
 
             /** Set the number of stop bits used during serial
                 communication. The only valid values are 1 and 2.
@@ -180,7 +180,7 @@ extern "C++"
                 communication.
 	  
                 @return The number of stop bits.  */
-            const short NumOfStopBits() ; 
+            short NumOfStopBits() ; 
 
             /** Set the parity for serial communication.
 	  
@@ -194,7 +194,7 @@ extern "C++"
             @return The parity setting for the serial port. 
 	  
             */
-            const SerialStreamBuf::ParityEnum Parity() ;
+            SerialStreamBuf::ParityEnum Parity() ;
 
             /** Use the specified flow control. 
 
@@ -205,12 +205,12 @@ extern "C++"
             /** Return the current flow control setting. 
 
             */
-            const SerialStreamBuf::FlowControlEnum FlowControl() ;
+            SerialStreamBuf::FlowControlEnum FlowControl() ;
 
             /** Set character buffer size.
                 
             */
-            const short SetVMin( short vtime ) ;
+            short SetVMin( short vtime ) ;
 
 
             /** Get current size of character buffer.
@@ -218,19 +218,19 @@ extern "C++"
                 for more documentation about VTIME and VMIN.
                 
             */
-            const short VMin() ;
+            short VMin() ;
 
             /** Set character buffer timing in 10th of a second.
                 
             */
-            const short SetVTime( short vtime ) ;
+            short SetVTime( short vtime ) ;
 
             /** Get current timing of character buffer in 10th of a second.
                 Look <A HREF="http://www.unixwiz.net/techtips/termios-vmin-vtime.html">here</A>
                 for more documentation about VTIME and VMIN.
                 
             */
-            const short VTime() ;
+            short VTime() ;
 
 
             /* ------------------------------------------------------------

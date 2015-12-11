@@ -43,7 +43,7 @@ main( int    argc,
     //
     // Set the number of data bits.
     //
-    serial_port.SetCharSize( SerialStreamBuf::CHAR_SIZE_8 ) ;
+    serial_port.SetCharSize( CharSize::CHAR_SIZE_8 ) ;
     if ( ! serial_port.good() ) 
     {
         std::cerr << "Error: Could not set the character size." << std::endl ;
