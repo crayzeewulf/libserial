@@ -1,0 +1,296 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Tutorial &mdash; LibSerial 0.6.0rc3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6.0rc3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="LibSerial 0.6.0rc3 documentation" href="index.html" />
+    <link rel="next" title="API Documentation" href="api_documentation.html" />
+    <link rel="prev" title="Install" href="install.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="api_documentation.html" title="API Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Install"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">LibSerial 0.6.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="opening-a-serial-port-i-o-stream">
+<h2>Opening a Serial Port I/O Stream<a class="headerlink" href="#opening-a-serial-port-i-o-stream" title="Permalink to this headline">¶</a></h2>
+<p>A serial port I/O stream, SerialStream, instance can be created and opened by
+providing the name of the serial port device to the constructor:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;SerialStream.h&gt;</span><span class="cp"></span>
+<span class="c1">//</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">LibSerial</span> <span class="p">;</span>
+<span class="c1">//</span>
+<span class="c1">// Create and open the serial port for communication.</span>
+<span class="c1">//</span>
+<span class="n">SerialStream</span> <span class="nf">my_serial_stream</span><span class="p">(</span> <span class="s">&quot;/dev/ttyS0&quot;</span> <span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>In certain applications, the name of the serial port device may not be known
+when the SerialStream instance is created. In such cases, the same effect as
+above can be achieved as follows:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;SerialStream.h&gt;</span><span class="cp"></span>
+<span class="c1">//</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">LibSerial</span> <span class="p">;</span>
+<span class="c1">//</span>
+<span class="c1">// Create a SerialStream instance.</span>
+<span class="c1">//</span>
+<span class="n">SerialStream</span> <span class="n">my_serial_stream</span> <span class="p">;</span>
+<span class="c1">//</span>
+<span class="c1">// Open the serial port for communication.</span>
+<span class="c1">//</span>
+<span class="n">my_serial_stream</span><span class="p">.</span><span class="n">Open</span><span class="p">(</span> <span class="s">&quot;/dev/ttyS0&quot;</span> <span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="setting-the-baud-rate">
+<h2>Setting the Baud Rate<a class="headerlink" href="#setting-the-baud-rate" title="Permalink to this headline">¶</a></h2>
+<p>The baud rate for the SerialStream can be set using the
+SerialStream::SetBaudRate() member function.</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">//</span>
+<span class="c1">// The various available baud rates are defined in SerialStreamBuf class.</span>
+<span class="c1">// This is to be changed soon. All serial port settings will be placed in</span>
+<span class="c1">// in the SerialPort class.</span>
+<span class="c1">//</span>
+<span class="n">my_serial_stream</span><span class="p">.</span><span class="n">SetBaudRate</span><span class="p">(</span> <span class="n">SerialStreamBuf</span><span class="o">::</span><span class="n">BAUD_115200</span> <span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="setting-the-character-size">
+<h2>Setting the Character Size<a class="headerlink" href="#setting-the-character-size" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">//</span>
+<span class="c1">// Use 8 bit wide characters.</span>
+<span class="c1">//</span>
+<span class="n">my_serial_port</span><span class="p">.</span><span class="n">SetCharSize</span><span class="p">(</span> <span class="n">SerialStreamBuf</span><span class="o">::</span><span class="n">CHAR_SIZE_8</span> <span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="setting-the-number-of-stop-bits">
+<h2>Setting the Number of Stop Bits<a class="headerlink" href="#setting-the-number-of-stop-bits" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">//</span>
+<span class="c1">// Use one stop bit.</span>
+<span class="c1">//</span>
+<span class="n">my_serial_port</span><span class="p">.</span><span class="n">SetNumOfStopBits</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="setting-the-parity-type">
+<h2>Setting the Parity Type<a class="headerlink" href="#setting-the-parity-type" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">//</span>
+<span class="c1">// Use odd parity during serial communication.</span>
+<span class="c1">//</span>
+<span class="n">my_serial_port</span><span class="p">.</span><span class="n">SetParity</span><span class="p">(</span> <span class="n">SerialStreamBuf</span><span class="o">::</span><span class="n">PARITY_ODD</span> <span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="setting-the-flow-control-type">
+<h2>Setting the Flow-Control Type<a class="headerlink" href="#setting-the-flow-control-type" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">//</span>
+<span class="c1">// Use hardware flow-control.</span>
+<span class="c1">//</span>
+<span class="n">my_serial_port</span><span class="p">.</span><span class="n">SetFlowControl</span><span class="p">(</span> <span class="n">SerialStreamBuf</span><span class="o">::</span><span class="n">FLOW_CONTROL_HARD</span> <span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="reading-characters">
+<h2>Reading Characters<a class="headerlink" href="#reading-characters" title="Permalink to this headline">¶</a></h2>
+<p>Characters can be read from the serial port using standard iostream &#8220;&gt;&gt;&#8221;
+operator. For example:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">//</span>
+<span class="c1">// Read one character from the serial port.</span>
+<span class="c1">//</span>
+<span class="kt">char</span> <span class="n">next_char</span> <span class="p">;</span>
+<span class="n">my_serial_stream</span> <span class="o">&gt;&gt;</span> <span class="n">next_char</span> <span class="p">;</span>
+<span class="c1">//</span>
+<span class="c1">// You can also read other types of values from the serial port in a similar fashion.</span>
+<span class="c1">//</span>
+<span class="kt">int</span> <span class="n">data_size</span> <span class="p">;</span>
+<span class="n">my_serial_stream</span> <span class="o">&gt;&gt;</span> <span class="n">data_size</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>All other methods of standard C++ iostream objects are available too. For
+example, one can read characters from the serial port using the get() method:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">//</span>
+<span class="c1">// Read one byte from the serial port.</span>
+<span class="c1">//</span>
+<span class="kt">char</span> <span class="n">next_byte</span> <span class="p">;</span>
+<span class="n">my_serial_stream</span><span class="p">.</span><span class="n">get</span><span class="p">(</span> <span class="n">next_byte</span> <span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="writing-characters">
+<h2>Writing Characters<a class="headerlink" href="#writing-characters" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">//</span>
+<span class="c1">// Write a single character to the serial port.</span>
+<span class="c1">//</span>
+<span class="n">my_serial_stream</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;U&#39;</span> <span class="p">;</span>
+<span class="c1">//</span>
+<span class="c1">// You can write a whole string.</span>
+<span class="c1">//</span>
+<span class="n">my_serial_stream</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hello, Serial Port.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span> <span class="p">;</span>
+<span class="c1">//</span>
+<span class="c1">// In fact, you can pretty much write any type of object that</span>
+<span class="c1">// is supported by a &quot;&lt;&lt;&quot; operator.</span>
+<span class="c1">//</span>
+<span class="kt">double</span> <span class="n">radius</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="p">;</span>
+<span class="kt">double</span> <span class="n">area</span> <span class="o">=</span> <span class="n">M_PI</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="p">;</span>
+<span class="n">my_serial_stream</span> <span class="o">&lt;&lt;</span> <span class="n">area</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span> <span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="reading-blocks-of-data">
+<h2>Reading Blocks of Data<a class="headerlink" href="#reading-blocks-of-data" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">//</span>
+<span class="c1">// Read a whole array of data from the serial port.</span>
+<span class="c1">//</span>
+<span class="k">const</span> <span class="kt">int</span> <span class="n">BUFFER_SIZE</span> <span class="o">=</span> <span class="mi">256</span> <span class="p">;</span>
+<span class="kt">char</span> <span class="n">input_buffer</span><span class="p">[</span><span class="n">BUFFER_SIZE</span><span class="p">]</span> <span class="p">;</span>
+<span class="c1">//</span>
+<span class="n">my_serial_stream</span><span class="p">.</span><span class="n">read</span><span class="p">(</span> <span class="n">input_buffer</span><span class="p">,</span>
+                       <span class="n">BUFFER_SIZE</span> <span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="writing-blocks-of-data">
+<h2>Writing Blocks of Data<a class="headerlink" href="#writing-blocks-of-data" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">//</span>
+<span class="c1">// Write an array of data from the serial port.</span>
+<span class="c1">//</span>
+<span class="k">const</span> <span class="kt">int</span> <span class="n">BUFFER_SIZE</span> <span class="o">=</span> <span class="mi">256</span> <span class="p">;</span>
+<span class="kt">char</span> <span class="n">output_buffer</span><span class="p">[</span><span class="n">BUFFER_SIZE</span><span class="p">]</span> <span class="p">;</span>
+<span class="c1">//</span>
+<span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">BUFFER_SIZE</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">output_buffer</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span> <span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//</span>
+<span class="n">my_serial_stream</span><span class="p">.</span><span class="n">write</span><span class="p">(</span> <span class="n">output_buffer</span><span class="p">,</span>
+                        <span class="n">BUFFER_SIZE</span> <span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="closing-the-serial-port">
+<h2>Closing the Serial Port<a class="headerlink" href="#closing-the-serial-port" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">my_serial_port</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span> <span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="complete-example-programs">
+<h2>Complete Example Programs<a class="headerlink" href="#complete-example-programs" title="Permalink to this headline">¶</a></h2>
+<p>Coming soon.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Tutorial</a><ul>
+<li><a class="reference internal" href="#opening-a-serial-port-i-o-stream">Opening a Serial Port I/O Stream</a></li>
+<li><a class="reference internal" href="#setting-the-baud-rate">Setting the Baud Rate</a></li>
+<li><a class="reference internal" href="#setting-the-character-size">Setting the Character Size</a></li>
+<li><a class="reference internal" href="#setting-the-number-of-stop-bits">Setting the Number of Stop Bits</a></li>
+<li><a class="reference internal" href="#setting-the-parity-type">Setting the Parity Type</a></li>
+<li><a class="reference internal" href="#setting-the-flow-control-type">Setting the Flow-Control Type</a></li>
+<li><a class="reference internal" href="#reading-characters">Reading Characters</a></li>
+<li><a class="reference internal" href="#writing-characters">Writing Characters</a></li>
+<li><a class="reference internal" href="#reading-blocks-of-data">Reading Blocks of Data</a></li>
+<li><a class="reference internal" href="#writing-blocks-of-data">Writing Blocks of Data</a></li>
+<li><a class="reference internal" href="#closing-the-serial-port">Closing the Serial Port</a></li>
+<li><a class="reference internal" href="#complete-example-programs">Complete Example Programs</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="install.html"
+                        title="previous chapter">Install</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="api_documentation.html"
+                        title="next chapter">API Documentation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/tutorial.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="api_documentation.html" title="API Documentation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Install"
+             >previous</a> |</li>
+        <li><a href="index.html">LibSerial 0.6.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, CrayzeeWulf.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

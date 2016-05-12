@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Description &mdash; LibSerial 0.6.0rc3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6.0rc3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="LibSerial 0.6.0rc3 documentation" href="index.html" />
+    <link rel="next" title="Download" href="download.html" />
+    <link rel="prev" title="Feature Summary" href="feature_summary.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="download.html" title="Download"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="feature_summary.html" title="Feature Summary"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">LibSerial 0.6.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="description">
+<h1>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h1>
+<p>LibSerial provides a collection of C++ classes that allow one to access serial
+ports on POSIX systems like standard C++ iostream objects. The SerialStream
+class represents the primary class that is expected to be used by developers to
+access serial ports as iostream objects. Additionally a SerialPort class is
+available to provide access to serial ports without using the standard C++
+iostream interface. This is useful for embedded systems where a complete C++
+STL may not be available. Member functions are provided for setting various
+parameters of the serial ports such as the baud rate, character size, flow
+control and others. The idea is to simplify serial port programming on POSIX
+systems. For example, using libserial, you can do the following:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;SerialStream.h&gt;</span><span class="cp"></span>
+<span class="c1">//</span>
+<span class="c1">// Open the serial port.</span>
+<span class="c1">//</span>
+<span class="n">SerialStream</span> <span class="nf">serial_port</span><span class="p">(</span> <span class="s">&quot;/dev/ttyS0&quot;</span> <span class="p">)</span> <span class="p">;</span>
+<span class="c1">//</span>
+<span class="c1">// Set the baud rate of the serial port.</span>
+<span class="c1">//</span>
+<span class="n">serial_port</span><span class="p">.</span><span class="n">SetBaudRate</span><span class="p">(</span> <span class="n">SerialStreamBuf</span><span class="o">::</span><span class="n">BAUD_9600</span> <span class="p">)</span> <span class="p">;</span>
+<span class="c1">//</span>
+<span class="c1">// Read a character from the serial port.</span>
+<span class="c1">//</span>
+<span class="kt">char</span> <span class="n">next_char</span> <span class="p">;</span>
+<span class="n">serial_port</span> <span class="o">&gt;&gt;</span> <span class="n">next_char</span> <span class="p">;</span>
+<span class="c1">//</span>
+<span class="c1">// Write the character back to the serial port.</span>
+<span class="c1">//</span>
+<span class="n">serial_port</span> <span class="o">&lt;&lt;</span> <span class="n">next_char</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>In addition to the C++ programming languge, LibSerial releases after version
+0.6.0 also provide bindings to several scripting languages such as Python,
+Perl, PHP, Java, and Ruby. This provides developers a wide range languages to
+select when writing applications that need access to serial ports on POSIX
+compatible operating systems. LibSerial has received most extensive testing
+under Linux operating system.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="feature_summary.html"
+                        title="previous chapter">Feature Summary</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="download.html"
+                        title="next chapter">Download</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/description.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="download.html" title="Download"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="feature_summary.html" title="Feature Summary"
+             >previous</a> |</li>
+        <li><a href="index.html">LibSerial 0.6.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, CrayzeeWulf.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
