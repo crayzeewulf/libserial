@@ -19,4 +19,4 @@ make
 make install
 ```
 
-Complete documentation is available [here](http://crayzeewulf.github.io/libserial).
+Complete documentation is available [here](http://libserial.readthedocs.io/en/latest/index.html).
