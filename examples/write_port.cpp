@@ -22,9 +22,10 @@ main( int    argc,
     //
     const char* const SERIAL_PORT_DEVICE = "/dev/ttyUSB0" ;
     using namespace LibSerial ;    
-    SerialStream serial_port ;
-    serial_port.Open( SERIAL_PORT_DEVICE ) ;
-    if ( ! serial_port.good() ) 
+    SerialStream serial_stream ;
+    serial_stream.Open( SERIAL_PORT_DEVICE ) ;
+    
+    if ( ! serial_stream.good() ) 
     {
         std::cerr << "Error: Could not open serial port " 
                   << SERIAL_PORT_DEVICE 
@@ -34,8 +35,8 @@ main( int    argc,
     //
     // Set the baud rate of the serial port.
     //
-    serial_port.SetBaudRate( SerialStreamBuf::BAUD_115200 ) ;
-    if ( ! serial_port.good() ) 
+    serial_stream.SetBaudRate( SerialStreamBuf::BAUD_115200 ) ;
+    if ( ! serial_stream.good() ) 
     {
         std::cerr << "Error: Could not set the baud rate." << std::endl ;
         exit(1) ;
@@ -43,8 +44,8 @@ main( int    argc,
     //
     // Set the number of data bits.
     //
-    serial_port.SetCharSize( SerialStreamBuf::CHAR_SIZE_8 ) ;
-    if ( ! serial_port.good() ) 
+    serial_stream.SetCharSize( SerialStreamBuf::CHAR_SIZE_8 ) ;
+    if ( ! serial_stream.good() ) 
     {
         std::cerr << "Error: Could not set the character size." << std::endl ;
         exit(1) ;
@@ -52,8 +53,8 @@ main( int    argc,
     //
     // Disable parity.
     //
-    serial_port.SetParity( SerialStreamBuf::PARITY_NONE ) ;
-    if ( ! serial_port.good() ) 
+    serial_stream.SetParity( SerialStreamBuf::PARITY_NONE ) ;
+    if ( ! serial_stream.good() ) 
     {
         std::cerr << "Error: Could not disable the parity." << std::endl ;
         exit(1) ;
@@ -61,8 +62,8 @@ main( int    argc,
     //
     // Set the number of stop bits.
     //
-    serial_port.SetNumOfStopBits( 1 ) ;
-    if ( ! serial_port.good() ) 
+    serial_stream.SetNumOfStopBits( 1 ) ;
+    if ( ! serial_stream.good() ) 
     {
         std::cerr << "Error: Could not set the number of stop bits."
                   << std::endl ;
@@ -71,8 +72,8 @@ main( int    argc,
     //
     // Turn on hardware flow control.
     //
-    serial_port.SetFlowControl( SerialStreamBuf::FLOW_CONTROL_NONE ) ;
-    if ( ! serial_port.good() ) 
+    serial_stream.SetFlowControl( SerialStreamBuf::FLOW_CONTROL_NONE ) ;
+    if ( ! serial_stream.good() ) 
     {
         std::cerr << "Error: Could not use hardware flow control."
                   << std::endl ;
@@ -82,7 +83,7 @@ main( int    argc,
     // Do not skip whitespace characters while reading from the
     // serial port.
     //
-    // serial_port.unsetf( std::ios_base::skipws ) ;
+    // serial_stream.unsetf( std::ios_base::skipws ) ;
     //
     // Open the input file for reading. 
     //
@@ -102,7 +103,7 @@ main( int    argc,
     {
         char next_byte ;
         input_file.read( &next_byte, 1 ) ;
-        serial_port.write( &next_byte, 1 ) ;
+        serial_stream.write( &next_byte, 1 ) ;
         //
         // Print a '.' for every character read from the input file. 
         //

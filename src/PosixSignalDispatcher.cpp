@@ -94,7 +94,7 @@ namespace
     PosixSignalDispatcherImpl::OriginalSigactionList
     PosixSignalDispatcherImpl::mOriginalSigactionList ;
 
-} ;
+}
 
 PosixSignalDispatcher::PosixSignalDispatcher()
 {
@@ -321,4 +321,4 @@ namespace
         //
         return ;
     }
-} ;
+}

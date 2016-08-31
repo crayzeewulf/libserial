@@ -60,7 +60,7 @@ namespace
     const struct timeval
     operator-( const struct timeval& firstOperand,
                const struct timeval& secondOperand ) ;
-} ;
+}
 
 class SerialPort::SerialPortImpl : public PosixSignalHandler
 {
@@ -1743,5 +1743,4 @@ namespace
         }
         return result ;
     }
-} ;
-
+}

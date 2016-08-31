@@ -45,38 +45,38 @@ public:
 
     ~Implementation() { /* empty */ }
 
-    const SerialStreamBuf::BaudRateEnum
+    SerialStreamBuf::BaudRateEnum
     SetBaudRate(const SerialStreamBuf::BaudRateEnum baud_rate) ;
 
-    const SerialStreamBuf::BaudRateEnum
+    SerialStreamBuf::BaudRateEnum
     BaudRate() const ;
 
-    const SerialStreamBuf::CharSizeEnum
+    SerialStreamBuf::CharSizeEnum
     SetCharSize(const SerialStreamBuf::CharSizeEnum char_size) ;
 
-    const SerialStreamBuf::CharSizeEnum
+    SerialStreamBuf::CharSizeEnum
     CharSize() const ;
 
     short SetNumOfStopBits(short numOfStopBits) ;
     short NumOfStopBits() const ; 
 
-    const SerialStreamBuf::ParityEnum 
+    SerialStreamBuf::ParityEnum 
     SetParity(const SerialStreamBuf::ParityEnum parityType) ;
 
-    const SerialStreamBuf::ParityEnum 
+    SerialStreamBuf::ParityEnum 
     Parity() const ;
 
-    const SerialStreamBuf::FlowControlEnum 
+    SerialStreamBuf::FlowControlEnum 
     SetFlowControl(const SerialStreamBuf::FlowControlEnum flowControlType) ;
     
-    const SerialStreamBuf::FlowControlEnum 
+    SerialStreamBuf::FlowControlEnum 
     FlowControl() const ;
 
-    const short SetVMin( short vtime ) ;
-    const short VMin() const;
+    short SetVMin( short vtime ) ;
+    short VMin() const;
 
-    const short SetVTime( short vtime ) ;
-    const short VTime() const;
+    short SetVTime( short vtime ) ;
+    short VTime() const;
 
     streamsize
     xsgetn(char_type *s, streamsize n) ;
@@ -287,7 +287,7 @@ SerialStreamBuf::SetParametersToDefault()
 SerialStreamBuf::BaudRateEnum
 SerialStreamBuf::SetBaudRate(const BaudRateEnum baud_rate) const
 {
-    mImpl->SetBaudRate( baud_rate ) ;
+    return mImpl->SetBaudRate( baud_rate ) ;
 }
 
 SerialStreamBuf::BaudRateEnum
@@ -343,7 +343,7 @@ SerialStreamBuf::SetFlowControl(const FlowControlEnum flow_c) const
     return mImpl->SetFlowControl( flow_c ) ;
 }
 
-const SerialStreamBuf::FlowControlEnum
+SerialStreamBuf::FlowControlEnum
 SerialStreamBuf::Implementation::SetFlowControl(const SerialStreamBuf::FlowControlEnum flow_c) 
 {
     if( -1 == mFileDescriptor ) 
@@ -411,7 +411,7 @@ SerialStreamBuf::VMin() const
     return mImpl->VMin() ;
 }
 
-const short 
+short 
 SerialStreamBuf::Implementation::VMin() const 
 {
     if( -1 == mFileDescriptor ) {
@@ -621,7 +621,7 @@ SerialStreamBuf::Implementation::InitializeSerialPort()
 }
 
 inline
-const SerialStreamBuf::BaudRateEnum
+SerialStreamBuf::BaudRateEnum
 SerialStreamBuf::Implementation::SetBaudRate( const SerialStreamBuf::BaudRateEnum baud_rate )
 {
     if( -1 == mFileDescriptor ) {
@@ -686,7 +686,7 @@ SerialStreamBuf::Implementation::SetBaudRate( const SerialStreamBuf::BaudRateEnu
 }
 
 inline
-const SerialStreamBuf::BaudRateEnum
+SerialStreamBuf::BaudRateEnum
 SerialStreamBuf::Implementation::BaudRate() const 
 {
     if( -1 == mFileDescriptor ) {
@@ -760,7 +760,7 @@ SerialStreamBuf::Implementation::BaudRate() const
 }
 
 inline
-const SerialStreamBuf::CharSizeEnum
+SerialStreamBuf::CharSizeEnum
 SerialStreamBuf::Implementation::SetCharSize(const SerialStreamBuf::CharSizeEnum char_size) 
 {
     if( -1 == mFileDescriptor ) {
@@ -810,7 +810,7 @@ SerialStreamBuf::Implementation::SetCharSize(const SerialStreamBuf::CharSizeEnum
 }
 
 inline
-const SerialStreamBuf::CharSizeEnum
+SerialStreamBuf::CharSizeEnum
 SerialStreamBuf::Implementation::CharSize() const 
 {
     if( -1 == mFileDescriptor ) {
@@ -907,7 +907,7 @@ SerialStreamBuf::Implementation::NumOfStopBits() const
 }
 
 inline
-const SerialStreamBuf::ParityEnum
+SerialStreamBuf::ParityEnum
 SerialStreamBuf::Implementation::SetParity(const SerialStreamBuf::ParityEnum parity) 
 {
     if( -1 == mFileDescriptor ) {
@@ -949,7 +949,7 @@ SerialStreamBuf::Implementation::SetParity(const SerialStreamBuf::ParityEnum par
 
 
 inline
-const SerialStreamBuf::ParityEnum
+SerialStreamBuf::ParityEnum
 SerialStreamBuf::Implementation::Parity() const 
 {
     if( -1 == mFileDescriptor ) {
@@ -978,7 +978,7 @@ SerialStreamBuf::Implementation::Parity() const
 }
 
 inline
-const SerialStreamBuf::FlowControlEnum
+SerialStreamBuf::FlowControlEnum
 SerialStreamBuf::Implementation::FlowControl() const 
 {
     if( -1 == mFileDescriptor ) {
@@ -1022,7 +1022,7 @@ SerialStreamBuf::Implementation::FlowControl() const
 }
 
 inline
-const short 
+short 
 SerialStreamBuf::Implementation::SetVMin( short vmin ) 
 {
     if( -1 == mFileDescriptor ) {
@@ -1053,7 +1053,7 @@ SerialStreamBuf::Implementation::SetVMin( short vmin )
 }
 
 inline
-const short 
+short 
 SerialStreamBuf::Implementation::SetVTime( short vtime ) 
 {
     if( -1 == mFileDescriptor ) {
@@ -1084,7 +1084,7 @@ SerialStreamBuf::Implementation::SetVTime( short vtime )
 }
 
 inline
-const short 
+short 
 SerialStreamBuf::Implementation::VTime() const 
 {
     if( -1 == mFileDescriptor ) {
@@ -1118,7 +1118,7 @@ SerialStreamBuf::Implementation::xsgetn(char_type *s, streamsize n)
     //
     // Try to read upto n characters in the array s.
     //
-    ssize_t retval ; 
+    ssize_t retval = -1;
     //
     // If a putback character is available, then we need to read only
     // n-1 character.
@@ -1186,7 +1186,7 @@ std::streamsize
 SerialStreamBuf::Implementation::showmanyc() 
 {
 
-    int retval = -1;
+    ssize_t retval = -1;
 
     if ( -1 == mFileDescriptor ) {
         return -1;

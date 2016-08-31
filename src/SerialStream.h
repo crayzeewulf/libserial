@@ -160,7 +160,7 @@ extern "C++"
              * @brief Determines if the Serial Stream is in an open state.
              * @return Returns true iff the Stream is in an open state.
              */
-            const bool IsOpen() const;
+            bool IsOpen() const;
 
             /** 
              * @brief Sets the input and output baud ratesfor the Serial Stream object. 
@@ -178,7 +178,7 @@ extern "C++"
              *
              * @return Returns the current baud rate for the serial port.
              */
-            const SerialStreamBuf::BaudRateEnum BaudRate();
+            SerialStreamBuf::BaudRateEnum BaudRate();
 
             /**
              * @brief Sets the character size associated with the serial port. 
@@ -190,7 +190,7 @@ extern "C++"
              * @brief Gets the character size being used for serial communication.
              * @return Returns the current character size. 
             */
-            const SerialStreamBuf::CharSizeEnum CharSize();
+            SerialStreamBuf::CharSizeEnum CharSize();
 
             /**
              * @brief Sets the number of stop bits used during serial communication.
@@ -203,7 +203,7 @@ extern "C++"
              * @brief Gets the number of stop bits being used during serial communication.
              * @return Returns the number of stop bits.
              */
-            const short NumOfStopBits(); 
+            short NumOfStopBits(); 
 
             /**
              * @brief Sets the parity type for serial communication.
@@ -215,7 +215,7 @@ extern "C++"
              * @brief Get the current parity setting for the serial port. 
              * @return Returns the parity setting for the serial port. 
              */
-            const SerialStreamBuf::ParityEnum Parity();
+            SerialStreamBuf::ParityEnum Parity();
 
             /**
              * @brief Sets the specified flow control type. 
@@ -226,14 +226,14 @@ extern "C++"
              * @brief Returns the current flow control setting.
              * @return Returns the current flow control setting.
              */
-            const SerialStreamBuf::FlowControlEnum FlowControl();
+            SerialStreamBuf::FlowControlEnum FlowControl();
 
             /**
              * @brief Sets character buffer size.
              * @param vMin The size to set the read/write character buffer.
              * @return Returns 
              */
-            const short SetVMin(const short vMin);
+            short SetVMin(const short vMin);
 
 
             /**
@@ -242,14 +242,14 @@ extern "C++"
              *        for more documentation about VTIME and VMIN.
              * @return Returns 
              */
-            const short VMin();
+            short VMin();
 
             /**
              * @brief Sets the character buffer timing in 10ths of a second.
              * @param vTime The character buffer timing value to be set.
              * @return Returns 
              */
-            const short SetVTime(const short vTime);
+            short SetVTime(const short vTime);
 
             /**
              * @brief Get current timing of character buffer in 10th of a second.
@@ -257,7 +257,7 @@ extern "C++"
              *        for more documentation about VTIME and VMIN.
              * @return Returns 
              */
-            const short VTime();
+            short VTime();
 
 
             /**------------------------------------------------------------

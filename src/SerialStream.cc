@@ -44,7 +44,7 @@ SerialStream::Close()
     }
 }
 
-const bool
+bool
 SerialStream::IsOpen() const 
 {
     //
@@ -144,7 +144,7 @@ SerialStream::SetBaudRate(
     return ;
 }
 
-const SerialStreamBuf::BaudRateEnum 
+SerialStreamBuf::BaudRateEnum 
 SerialStream::BaudRate() 
 {
     SerialStreamBuf* my_buffer = 
@@ -213,7 +213,7 @@ SerialStream::SetCharSize(
     return ;
 }
 
-const SerialStreamBuf::CharSizeEnum
+SerialStreamBuf::CharSizeEnum
 SerialStream::CharSize() 
 {
     SerialStreamBuf* my_buffer = 
@@ -274,7 +274,7 @@ SerialStream::SetNumOfStopBits(short stop_bits) {
     return ;
 }
 
-const short
+short
 SerialStream::NumOfStopBits() {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //
@@ -330,7 +330,7 @@ SerialStream::SetParity(const SerialStreamBuf::ParityEnum parity) {
     return ;
 }
 
-const SerialStreamBuf::ParityEnum
+SerialStreamBuf::ParityEnum
 SerialStream::Parity() {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //
@@ -386,7 +386,7 @@ SerialStream::SetFlowControl(const SerialStreamBuf::FlowControlEnum flow_c) {
     return ;
 }
 
-const short
+short
 SerialStream::SetVMin( short vMin ) {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     if ( my_buffer ) {
@@ -401,7 +401,7 @@ SerialStream::SetVMin( short vMin ) {
     return vMin;
 }
 
-const short
+short
 SerialStream::VMin() {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     if ( my_buffer ) {
@@ -412,7 +412,7 @@ SerialStream::VMin() {
     };
 }
 
-const short
+short
 SerialStream::SetVTime( short vTime ) {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     if ( my_buffer ) {
@@ -427,7 +427,7 @@ SerialStream::SetVTime( short vTime ) {
     return vTime;
 }
 
-const short
+short
 SerialStream::VTime() {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     if ( my_buffer ) {
@@ -438,7 +438,7 @@ SerialStream::VTime() {
     };
 }
 
-const SerialStreamBuf::FlowControlEnum
+SerialStreamBuf::FlowControlEnum
 SerialStream::FlowControl() {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //
