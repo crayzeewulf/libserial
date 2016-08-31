@@ -19,15 +19,9 @@
  ***************************************************************************/
 
 #include "SerialStream.h"
-#include <fcntl.h>
-#include <cstdio>
-#include <termios.h>
-#include <fstream>
-#include <cassert>
 
-
-using namespace LibSerial ;
-using namespace std ;
+using namespace std;
+using namespace LibSerial;
 
 SerialStream::SerialStream() : 
     std::iostream(0), mIOBuffer(0) 

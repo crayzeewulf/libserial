@@ -19,19 +19,9 @@
  ***************************************************************************/
 
 #include "SerialStreamBuf.h"
-#include <iostream>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <cassert>
-#include <fstream>
-#include <limits.h>
-#include <strings.h>
 
-
-using namespace std ;
-using namespace LibSerial ;
+using namespace std;
+using namespace LibSerial;
 
 //
 // Set the values of the static members of the SerialStream class.
@@ -43,7 +33,7 @@ const SerialStreamBuf::CharSizeEnum
 SerialStreamBuf::DEFAULT_CHAR_SIZE       = SerialStreamBuf::CHAR_SIZE_DEFAULT ;
 
 const short
-SerialStreamBuf::DEFAULT_NO_OF_STOP_BITS = 1                  ;
+SerialStreamBuf::DEFAULT_NO_OF_STOP_BITS = 1 ;
 
 const SerialStreamBuf::ParityEnum
 SerialStreamBuf::DEFAULT_PARITY          = SerialStreamBuf::PARITY_DEFAULT ;
@@ -52,10 +42,10 @@ const SerialStreamBuf::FlowControlEnum
 SerialStreamBuf::DEFAULT_FLOW_CONTROL    = SerialStreamBuf::FLOW_CONTROL_DEFAULT ;
 
 const short
-SerialStreamBuf::DEFAULT_VMIN            = 1                  ;
+SerialStreamBuf::DEFAULT_VMIN            = 1 ;
 
 const short
-SerialStreamBuf::DEFAULT_VTIME           = 0                  ;
+SerialStreamBuf::DEFAULT_VTIME           = 0 ;
 
 
 class SerialStreamBuf::Implementation

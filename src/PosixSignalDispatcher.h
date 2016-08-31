@@ -20,12 +20,19 @@
 #ifndef _PosixSignalDispatcher_h_
 #define _PosixSignalDispatcher_h_
 
+#include <cstring>
+#include <errno.h>
+#include <map>
+#include <signal.h>
+#include <sstream>
 #include <stdexcept>
+
+#include "PosixSignalHandler.h"
 
 /*
  * Forward declarations.
  */
-class PosixSignalHandler ;
+class PosixSignalHandler;
 
 /**
  * @note The signal dispatcher will not interfere with any signals for which
@@ -63,7 +70,7 @@ public:
     class CannotDetachHandler : public std::runtime_error
     {
     public:
-        CannotDetachHandler( const std::string& whatArg )
+        CannotDetachHandler(const std::string& whatArg)
             : runtime_error(whatArg)
         {
         }
