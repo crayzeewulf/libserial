@@ -29,12 +29,52 @@ protected:
     {
         writeString = "Quidquid latine dictum sit, altum sonatur. (Whatever is said in Latin sounds profound.)";
 
-        serialStreamBaudRate    = SerialStreamBuf::BAUD_230400;
-        serialStreamCharSize    = SerialStreamBuf::CHAR_SIZE_8;
-        serialStreamParity      = SerialStreamBuf::PARITY_NONE;
-        serialStreamFlowControl = SerialStreamBuf::FLOW_CONTROL_NONE;
+        serialStreamBaudRate[0]   =  SerialStreamBuf::BAUD_50;
+        serialStreamBaudRate[1]   =  SerialStreamBuf::BAUD_75;
+        serialStreamBaudRate[2]   =  SerialStreamBuf::BAUD_110;
+        serialStreamBaudRate[3]   =  SerialStreamBuf::BAUD_134;
+        serialStreamBaudRate[4]   =  SerialStreamBuf::BAUD_150;
+        serialStreamBaudRate[5]   =  SerialStreamBuf::BAUD_200;
+        serialStreamBaudRate[6]   =  SerialStreamBuf::BAUD_300;
+        serialStreamBaudRate[7]   =  SerialStreamBuf::BAUD_600;
+        serialStreamBaudRate[8]   =  SerialStreamBuf::BAUD_1200;
+        serialStreamBaudRate[9]   =  SerialStreamBuf::BAUD_1800;
+        serialStreamBaudRate[10]  =  SerialStreamBuf::BAUD_2400;
+        serialStreamBaudRate[11]  =  SerialStreamBuf::BAUD_4800;
+        serialStreamBaudRate[12]  =  SerialStreamBuf::BAUD_9600;
+        serialStreamBaudRate[13]  =  SerialStreamBuf::BAUD_19200;
+        serialStreamBaudRate[14]  =  SerialStreamBuf::BAUD_38400;
+        serialStreamBaudRate[15]  =  SerialStreamBuf::BAUD_57600;
+        serialStreamBaudRate[16]  =  SerialStreamBuf::BAUD_115200;
+        serialStreamBaudRate[17]  =  SerialStreamBuf::BAUD_230400;
+        serialStreamBaudRate[18]  =  SerialStreamBuf::BAUD_460800;
+        serialStreamBaudRate[19]  =  SerialStreamBuf::BAUD_500000;
+        serialStreamBaudRate[20]  =  SerialStreamBuf::BAUD_576000;
+        serialStreamBaudRate[21]  =  SerialStreamBuf::BAUD_921600;
+        serialStreamBaudRate[22]  =  SerialStreamBuf::BAUD_1000000;
+        serialStreamBaudRate[23]  =  SerialStreamBuf::BAUD_1152000;
+        serialStreamBaudRate[24]  =  SerialStreamBuf::BAUD_1500000;
+        serialStreamBaudRate[25]  =  SerialStreamBuf::BAUD_2000000;
+        serialStreamBaudRate[26]  =  SerialStreamBuf::BAUD_2500000;
+        serialStreamBaudRate[27]  =  SerialStreamBuf::BAUD_3000000;
+        serialStreamBaudRate[28]  =  SerialStreamBuf::BAUD_3500000;
+        serialStreamBaudRate[29]  =  SerialStreamBuf::BAUD_4000000;
 
-        serialStreamNumOfStopBits = 2;
+        serialStreamCharSize[0] = SerialStreamBuf::CHAR_SIZE_5;
+        serialStreamCharSize[1] = SerialStreamBuf::CHAR_SIZE_6;
+        serialStreamCharSize[2] = SerialStreamBuf::CHAR_SIZE_7;
+        serialStreamCharSize[3] = SerialStreamBuf::CHAR_SIZE_8;
+
+        serialStreamParity[0] = SerialStreamBuf::PARITY_EVEN;
+        serialStreamParity[1] = SerialStreamBuf::PARITY_ODD;
+        serialStreamParity[2] = SerialStreamBuf::PARITY_NONE;
+
+        serialStreamFlowControl[0] = SerialStreamBuf::FLOW_CONTROL_HARD;
+        serialStreamFlowControl[1] = SerialStreamBuf::FLOW_CONTROL_SOFT;
+        serialStreamFlowControl[2] = SerialStreamBuf::FLOW_CONTROL_NONE;
+
+        serialStreamNumOfStopBits[0] = 1;
+        serialStreamNumOfStopBits[1] = 2;
     }
 
     void testSerialStreamOpenClose()
@@ -136,13 +176,24 @@ protected:
         serialStream.Open(TEST_SERIAL_PORT);
         ASSERT_TRUE(serialStream.IsOpen());
 
-        serialStream.SetBaudRate(serialStreamBaudRate);
+        size_t maxBaudIndex = 15;
+        
+        #ifdef __linux__
+            maxBaudIndex = 26;
+        #if __MAX_BAUD > B2000000
+            maxBaudIndex = 30;
+        #endif
+        #endif
 
-        SerialStreamBuf::BaudRateEnum baudRate = serialStream.BaudRate();
+        std::cout << "MaxBaudRate index = " << maxBaudIndex << std::endl;
 
-        ASSERT_EQ(baudRate, serialStreamBaudRate);
-
-        std::cout << "\tbaudRate = " << baudRate << std::endl;
+        for (size_t i = 0; i < maxBaudIndex; i++)
+        {
+            serialStream.SetBaudRate(serialStreamBaudRate[i]);
+            SerialStreamBuf::BaudRateEnum baudRate = serialStream.BaudRate();
+            ASSERT_EQ(baudRate, serialStreamBaudRate[i]);
+            std::cout << "\tbaudRate = " << baudRate << std::endl;
+        }
 
         serialStream.Close();
         ASSERT_FALSE(serialStream.IsOpen());
@@ -153,13 +204,13 @@ protected:
         serialStream.Open(TEST_SERIAL_PORT);
         ASSERT_TRUE(serialStream.IsOpen());
 
-        serialStream.SetCharSize(serialStreamCharSize);
-
-        SerialStreamBuf::CharSizeEnum charSize = serialStream.CharSize();
-
-        ASSERT_EQ(charSize, serialStreamCharSize);
-
-        std::cout << "\tcharSize = " << charSize << std::endl;
+        for (size_t i = 0; i < 4; i++)
+        {
+            serialStream.SetCharSize(serialStreamCharSize[i]);
+            SerialStreamBuf::CharSizeEnum charSize = serialStream.CharSize();
+            ASSERT_EQ(charSize, serialStreamCharSize[i]);
+            std::cout << "\tcharSize = " << charSize << std::endl;
+        }
 
         serialStream.Close();
         ASSERT_FALSE(serialStream.IsOpen());
@@ -170,13 +221,12 @@ protected:
         serialStream.Open(TEST_SERIAL_PORT);
         ASSERT_TRUE(serialStream.IsOpen());
 
-        serialStream.SetParity(serialStreamParity);
-
-        SerialStreamBuf::ParityEnum parity = serialStream.Parity();
-
-        ASSERT_EQ(parity, serialStreamParity);
-
-        std::cout << "\tparity = " << parity << std::endl;
+        for (size_t i = 0; i < 3; i++)
+        {
+            serialStream.SetParity(serialStreamParity[i]);
+            SerialStreamBuf::ParityEnum parity = serialStream.Parity();
+            ASSERT_EQ(parity, serialStreamParity[i]);
+        }
 
         serialStream.Close();
         ASSERT_FALSE(serialStream.IsOpen());
@@ -187,13 +237,12 @@ protected:
         serialStream.Open(TEST_SERIAL_PORT);
         ASSERT_TRUE(serialStream.IsOpen());
 
-        serialStream.SetFlowControl(serialStreamFlowControl);
-
-        SerialStreamBuf::FlowControlEnum flowControl = serialStream.FlowControl();
-
-        ASSERT_EQ(flowControl, serialStreamFlowControl);
-
-        std::cout << "\tflowControl = " << flowControl << std::endl;
+        for (size_t i = 0; i < 3; i++)
+        {
+            serialStream.SetFlowControl(serialStreamFlowControl[i]);
+            SerialStreamBuf::FlowControlEnum flowControl = serialStream.FlowControl();
+            ASSERT_EQ(flowControl, serialStreamFlowControl[i]);
+        }
 
         serialStream.Close();
         ASSERT_FALSE(serialStream.IsOpen());
@@ -204,13 +253,12 @@ protected:
         serialStream.Open(TEST_SERIAL_PORT);
         ASSERT_TRUE(serialStream.IsOpen());
 
-        serialStream.SetNumOfStopBits(serialStreamNumOfStopBits);
-
-        short numOfStopBits = serialStream.NumOfStopBits();
-
-        ASSERT_EQ(numOfStopBits, serialStreamNumOfStopBits);
-
-        std::cout << "\tnumOfStopBits = " << numOfStopBits << std::endl;
+        for (size_t i = 0; i < 2; i++)
+        {
+            serialStream.SetNumOfStopBits(serialStreamNumOfStopBits[i]);
+            short numOfStopBits = serialStream.NumOfStopBits();
+            ASSERT_EQ(numOfStopBits, serialStreamNumOfStopBits[i]);
+        }
 
         serialStream.Close();
         ASSERT_FALSE(serialStream.IsOpen());
@@ -284,12 +332,12 @@ protected:
         ASSERT_FALSE(serialStream.IsOpen());
     }
 
-    SerialStreamBuf::BaudRateEnum    serialStreamBaudRate;
-    SerialStreamBuf::CharSizeEnum    serialStreamCharSize;
-    SerialStreamBuf::ParityEnum      serialStreamParity;
-    SerialStreamBuf::FlowControlEnum serialStreamFlowControl;
+    SerialStreamBuf::BaudRateEnum    serialStreamBaudRate[30];
+    SerialStreamBuf::CharSizeEnum    serialStreamCharSize[4];
+    SerialStreamBuf::ParityEnum      serialStreamParity[3];
+    SerialStreamBuf::FlowControlEnum serialStreamFlowControl[3];
 
-    short serialStreamNumOfStopBits;
+    short serialStreamNumOfStopBits[2];
 
     // std::string portName = "dev/ttyS0";
     // SerialPort seralPort("/dev/ttyS0");
