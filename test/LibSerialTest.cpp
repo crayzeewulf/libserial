@@ -176,23 +176,20 @@ protected:
         serialStream.Open(TEST_SERIAL_PORT);
         ASSERT_TRUE(serialStream.IsOpen());
 
-        size_t maxBaudIndex = 15;
+        size_t maxBaudIndex = 17;
         
-        #ifdef __linux__
-            maxBaudIndex = 26;
-        #if __MAX_BAUD > B2000000
-            maxBaudIndex = 30;
-        #endif
-        #endif
-
-        std::cout << "MaxBaudRate index = " << maxBaudIndex << std::endl;
+        // #ifdef __linux__
+        //     maxBaudIndex = 26;
+        // #if __MAX_BAUD > B2000000
+        //     maxBaudIndex = 30;
+        // #endif
+        // #endif
 
         for (size_t i = 0; i < maxBaudIndex; i++)
         {
             serialStream.SetBaudRate(serialStreamBaudRate[i]);
             SerialStreamBuf::BaudRateEnum baudRate = serialStream.BaudRate();
             ASSERT_EQ(baudRate, serialStreamBaudRate[i]);
-            std::cout << "\tbaudRate = " << baudRate << std::endl;
         }
 
         serialStream.Close();
