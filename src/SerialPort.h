@@ -253,7 +253,7 @@ public:
      * @brief Gets the current baud rate for the serial port.
      * @throw NotOpen This exception is thrown if this method is called while the serial
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
-     * port is not open.
+     *        port is not open.
      */
     BaudRate GetBaudRate() const
         throw(NotOpen, std::runtime_error);

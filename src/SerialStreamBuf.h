@@ -1,5 +1,5 @@
 /***************************************************************************
- *   @file SerialStreamBuf.h                                          *
+ *   @file SerialStreamBuf.h                                               *
  *   @copyright                                                            *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
