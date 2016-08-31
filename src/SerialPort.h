@@ -380,7 +380,7 @@ public:
      * @return Returns the line read from the serial port ending with the line termination character.
      */
     const std::string ReadLine(const unsigned int msTimeout = 0,
-                         const char lineTerminator = '\n')
+                               const char lineTerminator = '\n')
         throw(NotOpen, ReadTimeout, std::runtime_error);
 
     /**
