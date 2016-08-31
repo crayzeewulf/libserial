@@ -57,7 +57,8 @@ SET(GTEST_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/gtest")
 
 EXTERNALPROJECT_ADD(GTestExternal
   PREFIX             "${GTEST_PREFIX}"
-  URL https://github.com/google/googletest/archive/release-1.7.0.zip
+  URL https://github.com/google/googletest/archive/release-1.7.0.tar.gz
+  URL_HASH SHA1=d7aa4b8536f3a007b480cf016be8a4333dbf4768
   INSTALL_COMMAND ""
 
   #@TODO - Pull from Github rather than prebuilt zip file.
