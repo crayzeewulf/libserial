@@ -284,27 +284,27 @@ SerialStreamBuf::SetParametersToDefault()
 }
 
 
-const SerialStreamBuf::BaudRateEnum
-SerialStreamBuf::SetBaudRate(const BaudRateEnum baud_rate) 
+SerialStreamBuf::BaudRateEnum
+SerialStreamBuf::SetBaudRate(const BaudRateEnum baud_rate) const
 {
     mImpl->SetBaudRate( baud_rate ) ;
 }
 
-const SerialStreamBuf::BaudRateEnum
+SerialStreamBuf::BaudRateEnum
 SerialStreamBuf::BaudRate() const 
 {
     return mImpl->BaudRate() ;
 }
 
 
-const SerialStreamBuf::CharSizeEnum
-SerialStreamBuf::SetCharSize(const CharSizeEnum char_size) 
+SerialStreamBuf::CharSizeEnum
+SerialStreamBuf::SetCharSize(const CharSizeEnum char_size) const
 {
     return mImpl->SetCharSize( char_size ) ;
 }
 
 
-const SerialStreamBuf::CharSizeEnum
+SerialStreamBuf::CharSizeEnum
 SerialStreamBuf::CharSize() const 
 {
     return mImpl->CharSize() ;
@@ -312,7 +312,7 @@ SerialStreamBuf::CharSize() const
 
 
 short
-SerialStreamBuf::SetNumOfStopBits(short stop_bits) 
+SerialStreamBuf::SetNumOfStopBits(short stop_bits) const
 {
     return mImpl->SetNumOfStopBits( stop_bits ) ;
 }
@@ -325,20 +325,20 @@ SerialStreamBuf::NumOfStopBits() const
 }
 
 
-const SerialStreamBuf::ParityEnum
-SerialStreamBuf::SetParity(const ParityEnum parity) 
+SerialStreamBuf::ParityEnum
+SerialStreamBuf::SetParity(const ParityEnum parity) const
 {
     return mImpl->SetParity( parity ) ;
 }
 
-const SerialStreamBuf::ParityEnum
+SerialStreamBuf::ParityEnum
 SerialStreamBuf::Parity() const 
 {
     return mImpl->Parity() ;
 }
 
-const SerialStreamBuf::FlowControlEnum
-SerialStreamBuf::SetFlowControl(const FlowControlEnum flow_c) 
+SerialStreamBuf::FlowControlEnum
+SerialStreamBuf::SetFlowControl(const FlowControlEnum flow_c) const
 {
     return mImpl->SetFlowControl( flow_c ) ;
 }
@@ -391,21 +391,21 @@ SerialStreamBuf::Implementation::SetFlowControl(const SerialStreamBuf::FlowContr
     return FlowControl() ;
 }
 
-const SerialStreamBuf::FlowControlEnum
+SerialStreamBuf::FlowControlEnum
 SerialStreamBuf::FlowControl() const 
 {
     return mImpl->FlowControl() ;
 }
 
 
-const short 
-SerialStreamBuf::SetVMin( short vmin ) 
+short 
+SerialStreamBuf::SetVMin( short vmin ) const
 {
     return mImpl->SetVMin( vmin ) ;
 }
 
 
-const short 
+short 
 SerialStreamBuf::VMin() const 
 {
     return mImpl->VMin() ;
@@ -428,13 +428,13 @@ SerialStreamBuf::Implementation::VMin() const
     return term_setting.c_cc[VMIN];
 }
 
-const short 
-SerialStreamBuf::SetVTime( short vtime ) 
+short 
+SerialStreamBuf::SetVTime( short vtime ) const
 {
     return mImpl->SetVTime( vtime ) ;
 }
 
-const short 
+short 
 SerialStreamBuf::VTime() const 
 {
     return mImpl->VTime() ;

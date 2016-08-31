@@ -387,10 +387,10 @@ SerialStream::SetFlowControl(const SerialStreamBuf::FlowControlEnum flow_c) {
 }
 
 const short
-SerialStream::SetVMin( short vmin ) {
+SerialStream::SetVMin( short vMin ) {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     if ( my_buffer ) {
-      if ( -1 == my_buffer->SetVMin( vmin ) ) {
+      if ( -1 == my_buffer->SetVMin( vMin ) ) {
         setstate(badbit) ;
         return -1;
       };
@@ -398,7 +398,7 @@ SerialStream::SetVMin( short vmin ) {
       setstate(badbit) ;
       return -1;
     };
-    return vmin;
+    return vMin;
 }
 
 const short
@@ -413,10 +413,10 @@ SerialStream::VMin() {
 }
 
 const short
-SerialStream::SetVTime( short vmin ) {
+SerialStream::SetVTime( short vTime ) {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     if ( my_buffer ) {
-      if ( -1 == my_buffer->SetVTime( vmin ) ) {
+      if ( -1 == my_buffer->SetVTime( vTime ) ) {
         setstate(badbit) ;
         return -1;
       };
@@ -424,7 +424,7 @@ SerialStream::SetVTime( short vmin ) {
       setstate(badbit) ;
       return -1;
     };
-    return vmin;
+    return vTime;
 }
 
 const short
