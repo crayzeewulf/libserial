@@ -442,30 +442,12 @@ public:
         throw(NotOpen, std::runtime_error);
 
     /**
-     * @brief Sets the CTS (clear-to-send) line to the specified value.
-     * @param ctsState The CTS line state to set.
-     * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
-     * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
-     */
-    // void SetCts(const bool ctsState = true)
-    //    throw(NotOpen, std::runtime_error);
-
-    /**
      * @brief Gets the status of the CTS (clear-to-send) line.
      * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      */
     bool GetCts() const
         throw(NotOpen, std::runtime_error);
-
-    /**
-     * @brief Sets the DSR (data-set-ready) line to the specified value.
-     * @param dsrState The DSR line state to set.
-     * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
-     * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
-     */
-    //void SetDsr(const bool dsrState = true)
-    //    throw(NotOpen, std::runtime_error);
 
     /**
      * @brief Gets the status of the DSR (data-set-ready) line.

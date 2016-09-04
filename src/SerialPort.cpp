@@ -210,7 +210,6 @@ public:
         throw( SerialPort::NotOpen,
                std::runtime_error ) ;
 
-    
     bool
     GetDsr() const 
         throw( SerialPort::NotOpen,
@@ -562,7 +561,6 @@ SerialPort::GetRts() const
 {
     return mSerialPortImpl->GetRts() ;
 }
-
 
 bool
 SerialPort::GetCts() const 
@@ -1513,7 +1511,6 @@ SerialPort::SerialPortImpl::GetRts() const
     return this->GetModemControlLine( TIOCM_RTS ) ;
 }    
 
-
 inline
 bool
 SerialPort::SerialPortImpl::GetCts() const
@@ -1522,7 +1519,6 @@ SerialPort::SerialPortImpl::GetCts() const
 {
     return this->GetModemControlLine( TIOCM_CTS ) ;
 }    
-
 
 inline
 bool

@@ -19,6 +19,9 @@
 
 using namespace LibSerial;
 
+SerialPort serialPort(TEST_SERIAL_PORT);    // @TODO - Why must SerialPort objects be declared at a global level to compile?
+SerialPort serialPort2(TEST_SERIAL_PORT_2); // @TODO - Why must SerialPort objects be declared at a global level to compile?
+
 class LibSerialTest
     : public ::testing::Test
 {
@@ -30,53 +33,69 @@ protected:
     {
         writeString = "Quidquid latine dictum sit, altum sonatur. (Whatever is said in Latin sounds profound.)";
 
-        serialStreamBaudRate[0]   =  SerialStreamBuf::BAUD_50;
-        serialStreamBaudRate[1]   =  SerialStreamBuf::BAUD_75;
-        serialStreamBaudRate[2]   =  SerialStreamBuf::BAUD_110;
-        serialStreamBaudRate[3]   =  SerialStreamBuf::BAUD_134;
-        serialStreamBaudRate[4]   =  SerialStreamBuf::BAUD_150;
-        serialStreamBaudRate[5]   =  SerialStreamBuf::BAUD_200;
-        serialStreamBaudRate[6]   =  SerialStreamBuf::BAUD_300;
-        serialStreamBaudRate[7]   =  SerialStreamBuf::BAUD_600;
-        serialStreamBaudRate[8]   =  SerialStreamBuf::BAUD_1200;
-        serialStreamBaudRate[9]   =  SerialStreamBuf::BAUD_1800;
-        serialStreamBaudRate[10]  =  SerialStreamBuf::BAUD_2400;
-        serialStreamBaudRate[11]  =  SerialStreamBuf::BAUD_4800;
-        serialStreamBaudRate[12]  =  SerialStreamBuf::BAUD_9600;
-        serialStreamBaudRate[13]  =  SerialStreamBuf::BAUD_19200;
-        serialStreamBaudRate[14]  =  SerialStreamBuf::BAUD_38400;
-        serialStreamBaudRate[15]  =  SerialStreamBuf::BAUD_57600;
-        serialStreamBaudRate[16]  =  SerialStreamBuf::BAUD_115200;
-        serialStreamBaudRate[17]  =  SerialStreamBuf::BAUD_230400;
-        serialStreamBaudRate[18]  =  SerialStreamBuf::BAUD_460800;
-        serialStreamBaudRate[19]  =  SerialStreamBuf::BAUD_500000;
-        serialStreamBaudRate[20]  =  SerialStreamBuf::BAUD_576000;
-        serialStreamBaudRate[21]  =  SerialStreamBuf::BAUD_921600;
-        serialStreamBaudRate[22]  =  SerialStreamBuf::BAUD_1000000;
-        serialStreamBaudRate[23]  =  SerialStreamBuf::BAUD_1152000;
-        serialStreamBaudRate[24]  =  SerialStreamBuf::BAUD_1500000;
-        serialStreamBaudRate[25]  =  SerialStreamBuf::BAUD_2000000;
-        serialStreamBaudRate[26]  =  SerialStreamBuf::BAUD_2500000;
-        serialStreamBaudRate[27]  =  SerialStreamBuf::BAUD_3000000;
-        serialStreamBaudRate[28]  =  SerialStreamBuf::BAUD_3500000;
-        serialStreamBaudRate[29]  =  SerialStreamBuf::BAUD_4000000;
+        serialPortBaudRate[0]   =  SerialPort::BAUD_50;
+        serialPortBaudRate[1]   =  SerialPort::BAUD_75;
+        serialPortBaudRate[2]   =  SerialPort::BAUD_110;
+        serialPortBaudRate[3]   =  SerialPort::BAUD_134;
+        serialPortBaudRate[4]   =  SerialPort::BAUD_150;
+        serialPortBaudRate[5]   =  SerialPort::BAUD_200;
+        serialPortBaudRate[6]   =  SerialPort::BAUD_300;
+        serialPortBaudRate[7]   =  SerialPort::BAUD_600;
+        serialPortBaudRate[8]   =  SerialPort::BAUD_1200;
+        serialPortBaudRate[9]   =  SerialPort::BAUD_1800;
+        serialPortBaudRate[10]  =  SerialPort::BAUD_2400;
+        serialPortBaudRate[11]  =  SerialPort::BAUD_4800;
+        serialPortBaudRate[12]  =  SerialPort::BAUD_9600;
+        serialPortBaudRate[13]  =  SerialPort::BAUD_19200;
+        serialPortBaudRate[14]  =  SerialPort::BAUD_38400;
+        serialPortBaudRate[15]  =  SerialPort::BAUD_57600;
+        serialPortBaudRate[16]  =  SerialPort::BAUD_115200;
+        serialPortBaudRate[17]  =  SerialPort::BAUD_230400;
+        serialPortBaudRate[18]  =  SerialPort::BAUD_460800;
+        serialPortBaudRate[19]  =  SerialPort::BAUD_500000;
+        serialPortBaudRate[20]  =  SerialPort::BAUD_576000;
+        serialPortBaudRate[21]  =  SerialPort::BAUD_921600;
+        serialPortBaudRate[22]  =  SerialPort::BAUD_1000000;
+        serialPortBaudRate[23]  =  SerialPort::BAUD_1152000;
+        serialPortBaudRate[24]  =  SerialPort::BAUD_1500000;
+        serialPortBaudRate[25]  =  SerialPort::BAUD_2000000;
+        serialPortBaudRate[26]  =  SerialPort::BAUD_2500000;
+        serialPortBaudRate[27]  =  SerialPort::BAUD_3000000;
+        serialPortBaudRate[28]  =  SerialPort::BAUD_3500000;
+        serialPortBaudRate[29]  =  SerialPort::BAUD_4000000;
 
-        serialStreamCharSize[0] = SerialStreamBuf::CHAR_SIZE_5;
-        serialStreamCharSize[1] = SerialStreamBuf::CHAR_SIZE_6;
-        serialStreamCharSize[2] = SerialStreamBuf::CHAR_SIZE_7;
-        serialStreamCharSize[3] = SerialStreamBuf::CHAR_SIZE_8;
+        serialPortCharacterSize[0] = SerialPort::CHAR_SIZE_5;
+        serialPortCharacterSize[1] = SerialPort::CHAR_SIZE_6;
+        serialPortCharacterSize[2] = SerialPort::CHAR_SIZE_7;
+        serialPortCharacterSize[3] = SerialPort::CHAR_SIZE_8;
 
-        serialStreamParity[0] = SerialStreamBuf::PARITY_EVEN;
-        serialStreamParity[1] = SerialStreamBuf::PARITY_ODD;
-        serialStreamParity[2] = SerialStreamBuf::PARITY_NONE;
+        serialPortParity[0] = SerialPort::PARITY_EVEN;
+        serialPortParity[1] = SerialPort::PARITY_ODD;
+        serialPortParity[2] = SerialPort::PARITY_NONE;
 
-        serialStreamFlowControl[0] = SerialStreamBuf::FLOW_CONTROL_HARD;
-        serialStreamFlowControl[1] = SerialStreamBuf::FLOW_CONTROL_SOFT;
-        serialStreamFlowControl[2] = SerialStreamBuf::FLOW_CONTROL_NONE;
+        serialPortFlowControl[0] = SerialPort::FLOW_CONTROL_NONE;
+        serialPortFlowControl[1] = SerialPort::FLOW_CONTROL_HARD;
+        serialPortFlowControl[2] = SerialPort::FLOW_CONTROL_SOFT;
+        
+        for (size_t i = 0; i < 30; i++)
+        {
+            serialStreamBaudRate[i] =  SerialStreamBuf::BaudRateEnum(serialPortBaudRate[i]);
+        }
 
-        serialStreamNumOfStopBits[0] = 1;
-        serialStreamNumOfStopBits[1] = 2;
+        for (size_t i = 0; i < 4; i++)
+        {
+            serialStreamCharSize[i] = SerialStreamBuf::CharSizeEnum(serialPortCharacterSize[i]);
+        }
+
+        for (size_t i = 0; i < 3; i++)
+        {
+            serialStreamParity[i] = SerialStreamBuf::ParityEnum(serialPortParity[i]);
+            serialStreamFlowControl[i] = SerialStreamBuf::FlowControlEnum(serialPortFlowControl[i]);
+        }
     }
+
+
+    //---------------------- Serial Stream Unit Tests -----------------------//
 
     void testSerialStreamOpenClose()
     {
@@ -87,7 +106,7 @@ protected:
         ASSERT_FALSE(serialStream.IsOpen());
     }
 
-    void testSerialStreamReadAndWriteTest()
+    void testSerialStreamReadAndWrite()
     {
         serialStream.Open(TEST_SERIAL_PORT);
         serialStream2.Open(TEST_SERIAL_PORT_2);
@@ -95,47 +114,47 @@ protected:
         ASSERT_TRUE(serialStream.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());
 
-        serialStream << writeString;
-        serialStream << "\n";
-
+        serialStream << writeString << std::endl;
         getline(serialStream2, readString);
         ASSERT_EQ(readString, writeString);
-
-        // @TODO - Each of these styles of read/write also need assertion tests created.
-        // read()
-        // get()
-        // getline()
-        // write()
-        // Read(DataBuffer& dataBuffer)
-        // ReadByte(unsigned int msTimeout)
-        // ReadLine(unsigned int msTimeout, char lineTerminator)
-        // Write(DataBuffer& dataBuffer)
-        // Write(std::string& dataString)
-        // WriteByte(unsigned char dataByte)
 
         serialStream.Close();
         serialStream2.Close();
 
         ASSERT_FALSE(serialStream.IsOpen());
         ASSERT_FALSE(serialStream2.IsOpen());
-    }
 
-    void testSerialStreamIsDataAvailableTest()
-    {
+
         serialStream.Open(TEST_SERIAL_PORT);
         serialStream2.Open(TEST_SERIAL_PORT_2);
 
         ASSERT_TRUE(serialStream.IsOpen());
-        ASSERT_TRUE(serialStream2.IsOpen());
+        ASSERT_TRUE(serialStream2.IsOpen());        
 
-        // serialStream << writeString;
+        writeByte = 'a';
+        serialStream.write(&writeByte, 1);
+        serialStream << writeByte << std::endl;
+        serialStream2.read(&readByte, 1);
+        ASSERT_EQ(readByte, writeByte);
 
-        // bool dataAvailable = serialStream2.IsDataAvailable();
-        // ASSERT_TRUE(dataAvailable);
+        serialStream.Close();
+        serialStream2.Close();
 
-        // serialStream2 >> readString;
-        // dataAvailable = serialStream2.IsDataAvailable();
-        // ASSERT_FALSE(dataAvailable);
+        ASSERT_FALSE(serialStream.IsOpen());
+        ASSERT_FALSE(serialStream2.IsOpen());
+
+
+        serialStream.Open(TEST_SERIAL_PORT);
+        serialStream2.Open(TEST_SERIAL_PORT_2);
+
+        ASSERT_TRUE(serialStream.IsOpen());
+        ASSERT_TRUE(serialStream2.IsOpen());        
+
+        writeByte = 'A';
+        serialStream.write(&writeByte, 1);
+        serialStream << writeByte << std::endl;
+        serialStream2.get(readByte);
+        ASSERT_EQ(readByte, writeByte);
 
         serialStream.Close();
         serialStream2.Close();
@@ -176,7 +195,7 @@ protected:
         serialStream.Open(TEST_SERIAL_PORT);
         ASSERT_TRUE(serialStream.IsOpen());
 
-        // @TODO - Why don't the smaller CharSize values work?
+        // @TODO - Why don't the smaller Character Size values work?
         for (size_t i = 2; i < 4; i++)
         {
             serialStream.SetCharSize(serialStreamCharSize[i]);
@@ -222,104 +241,288 @@ protected:
 
     void testSerialStreamSetGetStopBits()
     {
+        short numOfStopBits;
+
         serialStream.Open(TEST_SERIAL_PORT);
         ASSERT_TRUE(serialStream.IsOpen());
 
-        for (size_t i = 0; i < 2; i++)
+        serialStream.SetNumOfStopBits(1);
+        numOfStopBits = serialStream.NumOfStopBits();
+        ASSERT_EQ(numOfStopBits, 1);
+
+        serialStream.SetNumOfStopBits(2);
+        numOfStopBits = serialStream.NumOfStopBits();
+        ASSERT_EQ(numOfStopBits, 2);
+
+        serialStream.Close();
+        ASSERT_FALSE(serialStream.IsOpen());
+    }
+
+
+    //----------------------- Serial Port Unit Tests ------------------------//
+
+    void testSerialPortReadAndWrite()
+    {
+        serialPort.Open();
+        serialPort2.Open();
+        
+        ASSERT_TRUE(serialPort.IsOpen());
+        ASSERT_TRUE(serialPort2.IsOpen());
+
+        SerialPort::DataBuffer readDataBuffer;
+        SerialPort::DataBuffer writeDataBuffer;
+
+        // Test using ASCII characters.
+        for (size_t i = 48; i < 122; i++)
         {
-            serialStream.SetNumOfStopBits(serialStreamNumOfStopBits[i]);
-            short numOfStopBits = serialStream.NumOfStopBits();
-            ASSERT_EQ(numOfStopBits, serialStreamNumOfStopBits[i]);
+            writeDataBuffer.push_back(i);
         }
 
-        serialStream.Close();
-        ASSERT_FALSE(serialStream.IsOpen());
+        serialPort.Write(writeDataBuffer);
+        serialPort2.Read(readDataBuffer, 74, 1);
+        ASSERT_EQ(readDataBuffer, writeDataBuffer);
+
+        serialPort.Close();
+        serialPort2.Close();
+        
+        ASSERT_FALSE(serialPort.IsOpen());
+        ASSERT_FALSE(serialPort2.IsOpen());
+        
+        serialPort.Open();
+        serialPort2.Open();
+        
+        ASSERT_TRUE(serialPort.IsOpen());
+        ASSERT_TRUE(serialPort2.IsOpen());
+
+        serialPort.WriteByte((unsigned char)writeByte);
+        readByte = (char)serialPort2.ReadByte(1);
+        ASSERT_EQ(readByte, writeByte);
+        
+        serialPort.Close();
+        serialPort2.Close();
+        
+        ASSERT_FALSE(serialPort.IsOpen());
+        ASSERT_FALSE(serialPort2.IsOpen());
+        
+        serialPort.Open();
+        serialPort2.Open();
+        
+        ASSERT_TRUE(serialPort.IsOpen());
+        ASSERT_TRUE(serialPort2.IsOpen());
+        
+        // serialPort.Write(writeString);
+        // readString = serialPort2.ReadLine();
+        // ASSERT_EQ(readString, writeString);
+        
+        serialPort.Close();
+        serialPort2.Close();
+        
+        ASSERT_FALSE(serialPort.IsOpen());
+        ASSERT_FALSE(serialPort2.IsOpen());
     }
 
-    void testSerialStreamSetGetDTR()
+    void testSerialPortIsDataAvailableTest()
     {
-        serialStream.Open(TEST_SERIAL_PORT);
-        ASSERT_TRUE(serialStream.IsOpen());
+        serialPort.Open();
+        serialPort2.Open();
 
-        // serialStream.SetDtr(true);
-        // bool dtrLine = serialStream.GetDtr();
-        // ASSERT_TRUE(dtrLine);
+        ASSERT_TRUE(serialPort.IsOpen());
+        ASSERT_TRUE(serialPort2.IsOpen());
 
-        // serialStream.SetDtr(false);
-        // dtrLine = serialStream.GetDtr();
-        // ASSERT_FALSE(dtrLine);
+        ASSERT_FALSE(serialPort.IsDataAvailable());
 
-        serialStream.Close();
-        ASSERT_FALSE(serialStream.IsOpen());
+        serialPort.WriteByte((unsigned char)writeByte);
+        usleep(1); // @TODO - This should be replaced to a call to tcdrain();
+        ASSERT_TRUE(serialPort2.IsDataAvailable());
+
+        readByte = (char)serialPort2.ReadByte(1);
+        ASSERT_FALSE(serialPort2.IsDataAvailable());
+
+        serialPort.Close();
+        serialPort2.Close();
+        
+        ASSERT_FALSE(serialPort.IsOpen());
+        ASSERT_FALSE(serialPort2.IsOpen());
     }
 
-    void testSerialStreamSetGetRTS()
+    void testSerialPortSetGetBaudRate()
     {
-        serialStream.Open(TEST_SERIAL_PORT);
-        ASSERT_TRUE(serialStream.IsOpen());
+        serialPort.Open();
+        ASSERT_TRUE(serialPort.IsOpen());
 
-        // serialStream.SetRts(true);
-        // bool rtsLine = serialStream.GetRts();
-        // ASSERT_TRUE(rtsLine);
+        size_t maxBaudIndex = 17;
+        
+        // @TODO - Why don't higher baud rates work in Linux?
+        // #ifdef __linux__
+        //     maxBaudIndex = 26;
+            
+        //     #if __MAX_BAUD > B2000000
+        //         maxBaudIndex = 30;
+        //     #endif
+        
+        // #endif
 
-        // serialStream.SetRts(false);
-        // rtsLine = serialStream.GetRts();
-        // ASSERT_FALSE(rtsLine);
+        for (size_t i = 0; i < maxBaudIndex; i++)
+        {
+            serialPort.SetBaudRate(serialPortBaudRate[i]);
+            SerialPort::BaudRate baudRate = serialPort.GetBaudRate();
+            ASSERT_EQ(baudRate, serialStreamBaudRate[i]);
+        }
 
-        serialStream.Close();
-        ASSERT_FALSE(serialStream.IsOpen());
+        serialPort.Close();
+        ASSERT_FALSE(serialPort.IsOpen());
     }
 
-    void testSerialStreamGetCTS()
+    void testSerialPortSetGetCharSize()
     {
-        serialStream.Open(TEST_SERIAL_PORT);
-        ASSERT_TRUE(serialStream.IsOpen());
+        serialPort.Open();
+        ASSERT_TRUE(serialPort.IsOpen());
 
-        // serialStream.SetCts(true);
-        // bool ctsLine = serialStream.GetCts();
-        // ASSERT_TRUE(ctsLine);
+        // @TODO - Why don't the smaller CharSize values work in Linux?
+        for (size_t i = 2; i < 4; i++)
+        {
+            serialPort.SetCharSize(serialPortCharacterSize[i]);
+            SerialPort::CharacterSize charSize = serialPort.GetCharSize();
+            ASSERT_EQ(charSize, serialPortCharacterSize[i]);
+        }
 
-        // serialStream.SetCts(false);
-        // ctsLine = serialStream.GetCts();
-        // ASSERT_FALSE(ctsLine);
-
-        serialStream.Close();
-        ASSERT_FALSE(serialStream.IsOpen());
+        serialPort.Close();
+        ASSERT_FALSE(serialPort.IsOpen());
     }
 
-    void testSerialStreamGetDSR()
+    void testSerialPortSetGetParity()
     {
-        serialStream.Open(TEST_SERIAL_PORT);
-        ASSERT_TRUE(serialStream.IsOpen());
+        serialPort.Open();
+        ASSERT_TRUE(serialPort.IsOpen());
 
-        // serialStream.SetDsr(true);
-        // bool dsrLine = serialStream.GetDsr();
-        // ASSERT_TRUE(dsrLine);
+        for (size_t i = 0; i < 3; i++)
+        {
+            serialPort.SetParity(serialPortParity[i]);
+            SerialPort::Parity parity = serialPort.GetParity();
+            ASSERT_EQ(parity, serialPortParity[i]);
+        }
 
-        // serialStream.SetDsr(false);
-        // dsrLine = serialStream.GetDsr();
-        // ASSERT_FALSE(dsrLine);
-
-        serialStream.Close();
-        ASSERT_FALSE(serialStream.IsOpen());
+        serialPort.Close();
+        ASSERT_FALSE(serialPort.IsOpen());
     }
+
+    void testSerialPortSetGetFlowControl()
+    {
+        serialPort.Open();
+        ASSERT_TRUE(serialPort.IsOpen());
+
+        // @TODO - FLOW_CONTROL_SOFT flow control is not valid in Linux.
+        for (size_t i = 0; i < 2; i++)
+        {
+            serialPort.SetFlowControl(serialPortFlowControl[i]);
+            SerialPort::FlowControl flowControl = serialPort.GetFlowControl();
+            ASSERT_EQ(flowControl, serialPortFlowControl[i]);
+        }
+
+        serialPort.Close();
+        ASSERT_FALSE(serialPort.IsOpen());
+    }
+
+    void testSerialPortSetGetStopBits()
+    {
+        short numOfStopBits;
+
+        serialPort.Open();
+        ASSERT_TRUE(serialPort.IsOpen());
+
+        serialPort.SetNumOfStopBits(SerialPort::STOP_BITS_1);
+        numOfStopBits = serialPort.GetNumOfStopBits();
+        ASSERT_EQ(numOfStopBits, SerialPort::STOP_BITS_1);
+
+        serialPort.SetNumOfStopBits(SerialPort::STOP_BITS_2);
+        numOfStopBits = serialPort.GetNumOfStopBits();
+        ASSERT_EQ(numOfStopBits, SerialPort::STOP_BITS_2);
+
+        serialPort.Close();
+        ASSERT_FALSE(serialPort.IsOpen());
+    }
+
+    void testSerialPortSetGetDTR()
+    {
+        serialPort.Open();
+        ASSERT_TRUE(serialPort.IsOpen());
+
+        serialPort.SetDtr(true);
+        bool dtrLine = serialPort.GetDtr();
+        ASSERT_TRUE(dtrLine);
+
+        serialPort.SetDtr(false);
+        dtrLine = serialPort.GetDtr();
+        ASSERT_FALSE(dtrLine);
+
+        serialPort.Close();
+        ASSERT_FALSE(serialPort.IsOpen());
+    }
+
+    void testSerialPortSetGetRTS()
+    {
+        serialPort.Open();
+        ASSERT_TRUE(serialPort.IsOpen());
+
+        serialPort.SetRts(true);
+        bool rtsLine = serialPort.GetRts();
+        ASSERT_TRUE(rtsLine);
+
+        serialPort.SetRts(false);
+        rtsLine = serialPort.GetRts();
+        ASSERT_FALSE(rtsLine);
+
+        serialPort.Close();
+        ASSERT_FALSE(serialPort.IsOpen());
+    }
+
+    void testSerialPortGetCTS()
+    {
+        serialPort.Open();
+        ASSERT_TRUE(serialPort.IsOpen());
+
+        bool ctsLine = serialPort.GetCts();
+        ASSERT_FALSE(ctsLine);
+
+        serialPort.Close();
+        ASSERT_FALSE(serialPort.IsOpen());
+    }
+
+    void testSerialPortGetDSR()
+    {
+        serialPort.Open();
+        ASSERT_TRUE(serialPort.IsOpen());
+
+        bool dsrLine = serialPort.GetDsr();
+        ASSERT_FALSE(dsrLine);
+
+        serialPort.Close();
+        ASSERT_FALSE(serialPort.IsOpen());
+    }
+
+    SerialPort::BaudRate        serialPortBaudRate[30];
+    SerialPort::CharacterSize   serialPortCharacterSize[4];
+    SerialPort::Parity          serialPortParity[3];
+    SerialPort::FlowControl     serialPortFlowControl[3];
 
     SerialStreamBuf::BaudRateEnum    serialStreamBaudRate[30];
     SerialStreamBuf::CharSizeEnum    serialStreamCharSize[4];
     SerialStreamBuf::ParityEnum      serialStreamParity[3];
     SerialStreamBuf::FlowControlEnum serialStreamFlowControl[3];
 
-    short serialStreamNumOfStopBits[2];
-
-    // std::string portName = "dev/ttyS0";
-    // SerialPort seralPort("/dev/ttyS0");
-
     SerialStream serialStream;
     SerialStream serialStream2;
 
     std::string readString;
     std::string writeString;
+
+    char writeByte;
+    char readByte;
 };
+
+
+
+//------------------------ Serial Stream Unit Tests -------------------------//
 
 TEST_F(LibSerialTest, testSerialStreamOpenClose)
 {
@@ -327,16 +530,10 @@ TEST_F(LibSerialTest, testSerialStreamOpenClose)
     testSerialStreamOpenClose();
 }
 
-TEST_F(LibSerialTest, testSerialStreamReadAndWriteTest)
+TEST_F(LibSerialTest, testSerialStreamReadAndWrite)
 {
     SCOPED_TRACE("Serial Stream Read and Write Test");
-    testSerialStreamReadAndWriteTest();
-}
-
-TEST_F(LibSerialTest, testSerialStreamIsDataAvailableTest)
-{
-    SCOPED_TRACE("Serial Stream Is Data Available Test");
-    testSerialStreamIsDataAvailableTest();
+    testSerialStreamReadAndWrite();
 }
 
 TEST_F(LibSerialTest, testSerialStreamSetGetBaudRate)
@@ -369,26 +566,71 @@ TEST_F(LibSerialTest, testSerialStreamSetGetStopBits)
     testSerialStreamSetGetStopBits();
 }
 
-TEST_F(LibSerialTest, testSerialStreamSetGetDTR)
+
+
+//------------------------- Serial Port Unit Tests --------------------------//
+
+TEST_F(LibSerialTest, testSerialPortReadAndWrite)
 {
-    SCOPED_TRACE("Serial Stream Set and Get Test");
-    testSerialStreamSetGetDTR();
+    SCOPED_TRACE("Serial Port Read and Write Test");
+    testSerialPortReadAndWrite();
 }
 
-TEST_F(LibSerialTest, testSerialStreamSetGetRTS)
+TEST_F(LibSerialTest, testSerialPortIsDataAvailableTest)
 {
-    SCOPED_TRACE("Serial Stream Set and Get Test");
-    testSerialStreamSetGetRTS();
+    SCOPED_TRACE("Serial Port Is Data Available Test");
+    testSerialPortIsDataAvailableTest();
 }
 
-TEST_F(LibSerialTest, testSerialStreamGetCTS)
+TEST_F(LibSerialTest, testSerialPortSetGetBaudRate)
 {
-    SCOPED_TRACE("Serial Stream Set and Get CTS Test");
-    testSerialStreamGetCTS();
+    SCOPED_TRACE("Serial Port Set and Get Baud Rate Test");
+    testSerialPortSetGetBaudRate();
 }
 
-TEST_F(LibSerialTest, testSerialStreamGetDSR)
+TEST_F(LibSerialTest, testSerialPortSetGetCharSize)
 {
-    SCOPED_TRACE("Serial Stream Set and Get DSR Test");
-    testSerialStreamGetDSR();
+    SCOPED_TRACE("Serial Port Set and Get Char Size Test");
+    testSerialPortSetGetCharSize();
+}
+
+TEST_F(LibSerialTest, testSerialPortSetGetParity)
+{
+    SCOPED_TRACE("Serial Port Set and Get Parity Type Test");
+    testSerialPortSetGetParity();
+}
+
+TEST_F(LibSerialTest, testSerialPortSetGetFlowControl)
+{
+    SCOPED_TRACE("Serial Port Set and Get Flow Control Test");
+    testSerialPortSetGetFlowControl();
+}
+
+TEST_F(LibSerialTest, testSerialPortSetGetStopBits)
+{
+    SCOPED_TRACE("Serial Port Set and Get Stop Bits Test");
+    testSerialPortSetGetStopBits();
+}
+TEST_F(LibSerialTest, testSerialPortSetGetDTR)
+{
+    SCOPED_TRACE("Serial Port Set and Get DTR Test");
+    testSerialPortSetGetDTR();
+}
+
+TEST_F(LibSerialTest, testSerialPortSetGetRTS)
+{
+    SCOPED_TRACE("Serial Port Set and Get RTS Test");
+    testSerialPortSetGetRTS();
+}
+
+TEST_F(LibSerialTest, testSerialPortGetCTS)
+{
+    SCOPED_TRACE("Serial Port Get CTS Test");
+    testSerialPortGetCTS();
+}
+
+TEST_F(LibSerialTest, testSerialPortGetDSR)
+{
+    SCOPED_TRACE("Serial Port Get DSR Test");
+    testSerialPortGetDSR();
 }
