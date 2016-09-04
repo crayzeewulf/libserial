@@ -44,6 +44,11 @@
 #include "PosixSignalHandler.h"
  
 
+//
+// :TODO: This class will be placed in LibSerial namespace in the next 
+// version. 
+//
+
 /**
  * @note This class attaches a handler to the SIGIO signal to detect
  *       the data arriving at a serial port. However, this signal handler

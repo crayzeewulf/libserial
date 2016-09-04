@@ -541,7 +541,7 @@ SerialStreamBuf::Implementation::SetParametersToDefault()
     //
     // Character size. 
     //
-    if( -1 == SetCharSize(DEFAULT_CHAR_SIZE) ) {
+    if( CHAR_SIZE_INVALID == SetCharSize(DEFAULT_CHAR_SIZE) ) {
         return -1 ;
     }
     //
@@ -553,13 +553,13 @@ SerialStreamBuf::Implementation::SetParametersToDefault()
     //
     // Parity
     //
-    if( -1 == SetParity(DEFAULT_PARITY) ) {
+    if( PARITY_INVALID == SetParity(DEFAULT_PARITY) ) {
         return -1 ;
     }
     //
     // Flow control
     //
-    if( -1 == SetFlowControl(DEFAULT_FLOW_CONTROL) ) {
+    if( FLOW_CONTROL_INVALID == SetFlowControl(DEFAULT_FLOW_CONTROL) ) {
         return -1 ;
     }
     //
