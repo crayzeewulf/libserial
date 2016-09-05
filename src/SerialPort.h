@@ -22,27 +22,11 @@
 #ifndef _SerialPort_h_
 #define _SerialPort_h_
 
-#include <cerrno>
-#include <cassert>
-#include <cstring>
-#include <cstdlib>
-#include <fcntl.h>
-#include <iostream>
-#include <map>
-#include <queue>
-#include <signal.h>
-#include <stdexcept>
 #include <string>
-#include <strings.h>
-#include <sys/ioctl.h>
-#include <sys/time.h>
-#include <termios.h>
-#include <unistd.h>
 #include <vector>
+#include <stdexcept>
+#include <termios.h>
 
-#include "PosixSignalDispatcher.h"
-#include "PosixSignalHandler.h"
- 
 
 //
 // :TODO: This class will be placed in LibSerial namespace in the next 

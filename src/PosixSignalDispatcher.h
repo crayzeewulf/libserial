@@ -20,14 +20,8 @@
 #ifndef _PosixSignalDispatcher_h_
 #define _PosixSignalDispatcher_h_
 
-#include <cstring>
-#include <errno.h>
-#include <map>
-#include <signal.h>
-#include <sstream>
 #include <stdexcept>
 
-#include "PosixSignalHandler.h"
 
 /*
  * Forward declarations.

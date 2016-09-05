@@ -18,7 +18,17 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+
 #include "SerialStreamBuf.h"
+#include <iostream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <cassert>
+#include <fstream>
+#include <limits.h>
+#include <strings.h>
 
 using namespace std;
 using namespace LibSerial;

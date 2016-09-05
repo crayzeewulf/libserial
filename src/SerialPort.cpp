@@ -20,6 +20,22 @@
  ***************************************************************************/
 
 #include "SerialPort.h"
+#include "PosixSignalDispatcher.h"
+#include "PosixSignalHandler.h"
+#include <queue>
+#include <map>
+#include <cerrno>
+#include <cassert>
+#include <termios.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <sys/time.h>
+#include <signal.h>
+#include <strings.h>
+#include <cstring>
+#include <cstdlib>
+#include <iostream>
 
 namespace
 {

@@ -21,20 +21,10 @@
 #ifndef _SerialStreamBuf_h_
 #define _SerialStreamBuf_h_
 
+#include <SerialPort.h>
 #include <boost/scoped_ptr.hpp>
-#include <cassert>
-#include <fcntl.h>
-#include <fstream>
-#include <iostream>
-#include <limits.h>
 #include <streambuf>
 #include <string>
-#include <strings.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-#include <SerialPort.h>
 
 extern "C++" 
 {

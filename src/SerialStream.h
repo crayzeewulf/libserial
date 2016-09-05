@@ -21,14 +21,9 @@
 #ifndef _SerialStream_h_
 #define _SerialStream_h_
 
-#include <cassert>
-#include <cstdio>
-#include <fcntl.h>
-#include <fstream>
-#include <string>
-#include <termios.h>
-
 #include <SerialStreamBuf.h>
+#include <string>
+#include <fstream>
 
 extern "C++" 
 {
