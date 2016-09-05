@@ -19,15 +19,16 @@
 
 using namespace LibSerial;
 
-SerialPort serialPort(TEST_SERIAL_PORT);    // @TODO - Why must SerialPort objects be declared at a global level to compile?
-SerialPort serialPort2(TEST_SERIAL_PORT_2); // @TODO - Why must SerialPort objects be declared at a global level to compile?
-
 class LibSerialTest
     : public ::testing::Test
 {
 public:
+    LibSerialTest() : serialPort(TEST_SERIAL_PORT), serialPort2(TEST_SERIAL_PORT_2) {} 
 
 protected:
+    SerialPort serialPort ;
+    SerialPort serialPort2 ;
+
 
     virtual void SetUp()
     {
