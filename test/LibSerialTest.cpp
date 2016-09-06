@@ -312,7 +312,6 @@ protected:
         ASSERT_TRUE(serialPort2.IsOpen());
         
         serialPort.Write(writeString + '\n');
-        usleep(1);
         readString = serialPort2.ReadLine();
         ASSERT_EQ(readString, writeString + '\n');
         
