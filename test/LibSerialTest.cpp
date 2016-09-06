@@ -313,7 +313,7 @@ protected:
         
         serialPort.Write(writeString + '\n');
         usleep(1);
-        readString = serialPort2.ReadLine(1000, '\n');
+        readString = serialPort2.ReadLine();
         ASSERT_EQ(readString, writeString + '\n');
         
         serialPort.Close();
