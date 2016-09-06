@@ -43,12 +43,12 @@ namespace
     // Various error messages used in this file while throwing
     // exceptions.
     //
-    const std::string ERR_MSG_PORT_NOT_OPEN     = "Serial port not open." ;
-    const std::string ERR_MSG_PORT_ALREADY_OPEN = "Serial port already open." ;
-    const std::string ERR_MSG_UNSUPPORTED_BAUD  = "Unsupported baud rate." ;
-    const std::string ERR_MSG_UNKNOWN_BAUD      = "Unknown baud rate." ;
-    const std::string ERR_MSG_INVALID_PARITY    = "Invalid parity setting." ;
-    const std::string ERR_MSG_INVALID_STOP_BITS = "Invalid number of stop bits." ;
+    const std::string ERR_MSG_PORT_NOT_OPEN        = "Serial port not open." ;
+    const std::string ERR_MSG_PORT_ALREADY_OPEN    = "Serial port already open." ;
+    const std::string ERR_MSG_UNSUPPORTED_BAUD     = "Unsupported baud rate." ;
+    const std::string ERR_MSG_UNKNOWN_BAUD         = "Unknown baud rate." ;
+    const std::string ERR_MSG_INVALID_PARITY       = "Invalid parity setting." ;
+    const std::string ERR_MSG_INVALID_STOP_BITS    = "Invalid number of stop bits." ;
     const std::string ERR_MSG_INVALID_FLOW_CONTROL = "Invalid flow control." ;
 
     /*

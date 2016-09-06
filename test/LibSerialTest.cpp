@@ -311,10 +311,10 @@ protected:
         ASSERT_TRUE(serialPort.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
         
-        serialPort.Write(writeString);
+        serialPort.Write(writeString + '\n');
         usleep(1);
-        readString = serialPort2.ReadLine(10, '\0');
-        ASSERT_EQ(readString, writeString);
+        readString = serialPort2.ReadLine(1000, '\n');
+        ASSERT_EQ(readString, writeString + '\n');
         
         serialPort.Close();
         serialPort2.Close();
