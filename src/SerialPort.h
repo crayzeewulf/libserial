@@ -97,7 +97,7 @@ public:
 #endif
 #endif /* __linux__ */
         BAUD_DEFAULT = BAUD_57600
-    };
+    } ;
 
     /**
      * @brief The allowed set of character sizes.
@@ -109,7 +109,7 @@ public:
         CHAR_SIZE_7 = CS7, //!< 7 bit characters.
         CHAR_SIZE_8 = CS8, //!< 8 bit characters.
         CHAR_SIZE_DEFAULT = CHAR_SIZE_8
-    };
+    } ;
 
     /**
      * @brief The allowed number of stop bits.
@@ -119,7 +119,7 @@ public:
         STOP_BITS_1, //! 1 stop bit.
         STOP_BITS_2, //! 2 stop bits.
         STOP_BITS_DEFAULT = STOP_BITS_1
-    };
+    } ;
 
     /**
      * @brief The allowed parity types.
@@ -130,7 +130,7 @@ public:
         PARITY_ODD,     //!< Odd parity.
         PARITY_NONE,    //!< No parity i.e. parity checking disabled.
         PARITY_DEFAULT = PARITY_NONE
-    };
+    } ;
 
     /**
      * @brief The allowed flow control types.
@@ -141,7 +141,7 @@ public:
         FLOW_CONTROL_SOFT,
         FLOW_CONTROL_NONE,
         FLOW_CONTROL_DEFAULT = FLOW_CONTROL_NONE
-    };
+    } ;
 
     class NotOpen : public std::logic_error
     {
@@ -150,7 +150,7 @@ public:
             : logic_error(whatArg) 
         {
         }
-    };
+    } ;
 
     class OpenFailed : public std::runtime_error
     {
@@ -159,7 +159,7 @@ public:
             : runtime_error(whatArg)
         {
         }
-    };
+    } ;
 
     class AlreadyOpen : public std::logic_error
     {
@@ -168,7 +168,7 @@ public:
             : logic_error(whatArg)
         {
         }
-    };
+    } ;
 
     class UnsupportedBaudRate : public std::runtime_error
     {
@@ -177,7 +177,7 @@ public:
             : runtime_error(whatArg)
         {
         }
-    };
+    } ;
 
     class ReadTimeout : public std::runtime_error
     {
@@ -186,7 +186,7 @@ public:
             : runtime_error("Read timeout")
         {
         }
-    };
+    } ;
 
     /**
      * @brief Default Constructor for a serial port object.
@@ -196,7 +196,7 @@ public:
     /**
      * @brief Default Destructor for a serial port object.
      */
-    virtual ~SerialPort() throw();
+    virtual ~SerialPort() throw() ;
 
     /**
      * @brief Opens the serial port with the specified settings.
@@ -208,18 +208,21 @@ public:
      * @throw std::invalid_argument This exception is thrown if an
      *        invalid parameter value is specified.
      */
-    void Open(const BaudRate baudRate           = BAUD_DEFAULT,
-              const CharacterSize characterSize = CHAR_SIZE_DEFAULT,
-              const Parity parityType           = PARITY_DEFAULT,
-              const StopBits stopBits           = STOP_BITS_DEFAULT,
-              const FlowControl flowControl     = FLOW_CONTROL_DEFAULT)
-        throw(AlreadyOpen, OpenFailed, UnsupportedBaudRate, std::invalid_argument);
+    void Open( const BaudRate baudRate           = BAUD_DEFAULT,
+               const CharacterSize characterSize = CHAR_SIZE_DEFAULT,
+               const Parity parityType           = PARITY_DEFAULT,
+               const StopBits stopBits           = STOP_BITS_DEFAULT,
+               const FlowControl flowControl     = FLOW_CONTROL_DEFAULT )
+        throw( AlreadyOpen,
+               OpenFailed,
+               UnsupportedBaudRate,
+               std::invalid_argument) ;
 
     /**
      * @brief Determines if the serial port is open for I/O.
      * @return Returns true iff the serial port is open.
      */
-    bool IsOpen() const;
+    bool IsOpen() const ;
 
     /**
      * @brief Closes the serial port. All settings of the serial port will be
@@ -227,7 +230,7 @@ public:
      * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
      */
     void Close()
-        throw(NotOpen);
+        throw( NotOpen ) ;
 
     /**
      * @brief Sets the baud rate for the serial port to the specified value
@@ -236,8 +239,10 @@ public:
      * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
      * @throw std::invalid_argument This exception is thrown if an invalid baud rate or other argument is specified.
      */
-    void SetBaudRate(const BaudRate baudRate)
-        throw(UnsupportedBaudRate, NotOpen, std::invalid_argument);
+    void SetBaudRate( const BaudRate baudRate )
+        throw( UnsupportedBaudRate,
+               NotOpen,
+               std::invalid_argument ) ;
 
     /**
      * @brief Gets the current baud rate for the serial port.
@@ -246,7 +251,8 @@ public:
      *        port is not open.
      */
     BaudRate GetBaudRate() const
-        throw(NotOpen, std::runtime_error);
+        throw( NotOpen,
+               std::runtime_error ) ;
 
     /**
      * @brief Sets the character size for the serial port.
@@ -254,15 +260,16 @@ public:
      * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
      * @throw std::invalid_argument This exception is thrown if an invalid character size is specified.
      */
-    void SetCharSize(const CharacterSize characterSize)
-        throw(NotOpen, std::invalid_argument);
+    void SetCharSize( const CharacterSize characterSize )
+        throw( NotOpen,
+               std::invalid_argument ) ;
     
     /**
      * @brief Gets the current character size for the serial port.
      * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
      */
     CharacterSize GetCharSize() const
-        throw(NotOpen);
+        throw( NotOpen ) ;
 
     /**
      * @brief Sets the parity type for the serial port.
@@ -270,14 +277,15 @@ public:
      * @throw std::invalid_argument This exception is thrown if an invalid parity is specified.
      */
     void SetParity(const Parity parityType)
-        throw(NotOpen, std::invalid_argument);
+        throw( NotOpen,
+               std::invalid_argument ) ;
 
     /**
      * @brief Gets the parity type for the serial port.
      * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
      */
     Parity GetParity() const
-        throw(NotOpen);
+        throw( NotOpen ) ;
 
     /**
      * @brief Sets the number of stop bits to be used with the serial port.
@@ -286,14 +294,15 @@ public:
      * @throw std::invalid_argument This exception is thrown if an invalid number of stop bits is specified.
      */
     void SetNumOfStopBits(const StopBits numOfStopBits)
-        throw(NotOpen, std::invalid_argument);
+        throw( NotOpen,
+               std::invalid_argument ) ;
 
     /**
      * @brief Gets the number of stop bits currently being used by the serial port.
      * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
      */
     StopBits GetNumOfStopBits() const
-        throw(NotOpen);
+        throw( NotOpen ) ;
 
     /**
      * @brief Sets flow control for the serial port.
@@ -301,7 +310,8 @@ public:
      * @throw std::invalid_argument This exception is thrown if an invalid flow control is specified.
      */
     void SetFlowControl(const FlowControl flowControl)
-        throw(NotOpen, std::invalid_argument);
+        throw( NotOpen,
+               std::invalid_argument ) ;
 
     /**
      * @brief Get the current flow control setting.
@@ -309,7 +319,7 @@ public:
      * @return Returns the flow control type of the serial port.
      */
     FlowControl GetFlowControl() const
-        throw(NotOpen);
+        throw( NotOpen ) ;
 
     /**
      * @brief Checks if data is available at the input of the serial port.
@@ -317,7 +327,7 @@ public:
      * @return Returns true iff data is available to read.
      */
     bool IsDataAvailable() const
-        throw(NotOpen);
+        throw( NotOpen ) ;
 
     /**
      * @brief Reads the specified number of bytes from the serial port.
@@ -342,7 +352,9 @@ public:
     void Read(DataBuffer& dataBuffer,
               const unsigned int numberOfBytes = 0,
               const unsigned int msTimeout = 0)
-        throw(NotOpen, ReadTimeout, std::runtime_error);
+        throw( NotOpen,
+               ReadTimeout,
+               std::runtime_error ) ;
 
     /**
      * @brief Reads a single byte from the serial port.
@@ -357,7 +369,9 @@ public:
      * @return Returns the byte read.
      */
     unsigned char ReadByte(const unsigned int msTimeout = 0)
-        throw(NotOpen, ReadTimeout, std::runtime_error);
+        throw( NotOpen,
+               ReadTimeout,
+               std::runtime_error ) ;
 
     /**
      * @brief Reads a line of characters from the serial port.
@@ -370,7 +384,9 @@ public:
      */
     const std::string ReadLine(const unsigned int msTimeout = 0,
                                const char lineTerminator = '\n')
-        throw(NotOpen, ReadTimeout, std::runtime_error);
+        throw( NotOpen,
+               ReadTimeout,
+               std::runtime_error ) ;
 
     /**
      * @brief Writes the dataBuffer vector to the serial port.
@@ -378,7 +394,8 @@ public:
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      */
     void Write(const DataBuffer& dataBuffer)
-        throw(NotOpen, std::runtime_error);
+        throw( NotOpen,
+               std::runtime_error ) ;
 
     /**
      * @brief Writes a std::string to the serial port.
@@ -386,7 +403,8 @@ public:
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      */
     void Write(const std::string& dataString)
-        throw(NotOpen, std::runtime_error);
+        throw( NotOpen,
+               std::runtime_error ) ;
 
     /**
      * @brief Writes a single byte to the serial port.
@@ -395,7 +413,8 @@ public:
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      */
     void WriteByte(const unsigned char dataByte)
-        throw(NotOpen, std::runtime_error);
+        throw( NotOpen,
+               std::runtime_error ) ;
 
     /**
      * @brief Sets the DTR line to the specified value.
@@ -403,7 +422,8 @@ public:
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      */
     void SetDtr(const bool dtrState = true)
-        throw(NotOpen, std::runtime_error);
+        throw( NotOpen,
+               std::runtime_error ) ;
 
     /**
      * @brief Gets the status of the DTR line.
@@ -411,7 +431,8 @@ public:
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      */
     bool GetDtr() const
-        throw(NotOpen, std::runtime_error);
+        throw( NotOpen,
+               std::runtime_error ) ;
 
     /**
      * @brief Sets the RTS (ready-to-send) line to the specified value.
@@ -420,7 +441,8 @@ public:
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      */
     void SetRts(const bool rtsState = true)
-        throw(NotOpen, std::runtime_error);
+        throw( NotOpen,
+               std::runtime_error ) ;
 
     /**
      * @brief Gets the status of the RTS (ready-to-send) line.
@@ -428,7 +450,8 @@ public:
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      */
     bool GetRts() const
-        throw(NotOpen, std::runtime_error);
+        throw( NotOpen,
+               std::runtime_error ) ;
 
     /**
      * @brief Gets the status of the CTS (clear-to-send) line.
@@ -436,7 +459,8 @@ public:
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      */
     bool GetCts() const
-        throw(NotOpen, std::runtime_error);
+        throw( NotOpen,
+               std::runtime_error ) ;
 
     /**
      * @brief Gets the status of the DSR (data-set-ready) line.
@@ -444,7 +468,8 @@ public:
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      */
     bool GetDsr() const
-        throw(NotOpen, std::runtime_error);
+        throw( NotOpen,
+               std::runtime_error ) ;
 
 private:
     /**
