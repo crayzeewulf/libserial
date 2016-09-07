@@ -1,13 +1,32 @@
+/***************************************************************************
+ *   @file SerialStream.cc                                                 *
+ *   @copyright                                                            *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
 #include "SerialStream.h"
 #include <fcntl.h>
 #include <cstdio>
 #include <termios.h>
 #include <fstream>
 #include <cassert>
-
-
-using namespace LibSerial ;
-using namespace std ;
+ 
+using namespace std;
+using namespace LibSerial;
 
 SerialStream::SerialStream() : 
     std::iostream(0), mIOBuffer(0) 
@@ -44,7 +63,7 @@ SerialStream::Close()
     }
 }
 
-const bool
+bool
 SerialStream::IsOpen() const 
 {
     //
@@ -144,7 +163,7 @@ SerialStream::SetBaudRate(
     return ;
 }
 
-const SerialStreamBuf::BaudRateEnum 
+SerialStreamBuf::BaudRateEnum 
 SerialStream::BaudRate() 
 {
     SerialStreamBuf* my_buffer = 
@@ -213,7 +232,7 @@ SerialStream::SetCharSize(
     return ;
 }
 
-const SerialStreamBuf::CharSizeEnum
+SerialStreamBuf::CharSizeEnum
 SerialStream::CharSize() 
 {
     SerialStreamBuf* my_buffer = 
@@ -274,7 +293,7 @@ SerialStream::SetNumOfStopBits(short stop_bits) {
     return ;
 }
 
-const short
+short
 SerialStream::NumOfStopBits() {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //
@@ -330,7 +349,7 @@ SerialStream::SetParity(const SerialStreamBuf::ParityEnum parity) {
     return ;
 }
 
-const SerialStreamBuf::ParityEnum
+SerialStreamBuf::ParityEnum
 SerialStream::Parity() {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //
@@ -386,11 +405,11 @@ SerialStream::SetFlowControl(const SerialStreamBuf::FlowControlEnum flow_c) {
     return ;
 }
 
-const short
-SerialStream::SetVMin( short vmin ) {
+short
+SerialStream::SetVMin( short vMin ) {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     if ( my_buffer ) {
-      if ( -1 == my_buffer->SetVMin( vmin ) ) {
+      if ( -1 == my_buffer->SetVMin( vMin ) ) {
         setstate(badbit) ;
         return -1;
       };
@@ -398,10 +417,10 @@ SerialStream::SetVMin( short vmin ) {
       setstate(badbit) ;
       return -1;
     };
-    return vmin;
+    return vMin;
 }
 
-const short
+short
 SerialStream::VMin() {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     if ( my_buffer ) {
@@ -412,11 +431,11 @@ SerialStream::VMin() {
     };
 }
 
-const short
-SerialStream::SetVTime( short vmin ) {
+short
+SerialStream::SetVTime( short vTime ) {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     if ( my_buffer ) {
-      if ( -1 == my_buffer->SetVTime( vmin ) ) {
+      if ( -1 == my_buffer->SetVTime( vTime ) ) {
         setstate(badbit) ;
         return -1;
       };
@@ -424,10 +443,10 @@ SerialStream::SetVTime( short vmin ) {
       setstate(badbit) ;
       return -1;
     };
-    return vmin;
+    return vTime;
 }
 
-const short
+short
 SerialStream::VTime() {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     if ( my_buffer ) {
@@ -438,7 +457,7 @@ SerialStream::VTime() {
     };
 }
 
-const SerialStreamBuf::FlowControlEnum
+SerialStreamBuf::FlowControlEnum
 SerialStream::FlowControl() {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //

@@ -1,6 +1,7 @@
 /***************************************************************************
+ *   @file SerialPort.cpp                                                  *
  *   Copyright (C) 2004 by Manish Pagey                                    *
- *   crayzeewulf@users.sourceforge.net
+ *   crayzeewulf@users.sourceforge.net                                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -42,12 +43,12 @@ namespace
     // Various error messages used in this file while throwing
     // exceptions.
     //
-    const std::string ERR_MSG_PORT_NOT_OPEN     = "Serial port not open." ;
-    const std::string ERR_MSG_PORT_ALREADY_OPEN = "Serial port already open." ;
-    const std::string ERR_MSG_UNSUPPORTED_BAUD  = "Unsupported baud rate." ;
-    const std::string ERR_MSG_UNKNOWN_BAUD      = "Unknown baud rate." ;
-    const std::string ERR_MSG_INVALID_PARITY    = "Invalid parity setting." ;
-    const std::string ERR_MSG_INVALID_STOP_BITS = "Invalid number of stop bits." ;
+    const std::string ERR_MSG_PORT_NOT_OPEN        = "Serial port not open." ;
+    const std::string ERR_MSG_PORT_ALREADY_OPEN    = "Serial port already open." ;
+    const std::string ERR_MSG_UNSUPPORTED_BAUD     = "Unsupported baud rate." ;
+    const std::string ERR_MSG_UNKNOWN_BAUD         = "Unknown baud rate." ;
+    const std::string ERR_MSG_INVALID_PARITY       = "Invalid parity setting." ;
+    const std::string ERR_MSG_INVALID_STOP_BITS    = "Invalid number of stop bits." ;
     const std::string ERR_MSG_INVALID_FLOW_CONTROL = "Invalid flow control." ;
 
     /*
@@ -60,7 +61,7 @@ namespace
     const struct timeval
     operator-( const struct timeval& firstOperand,
                const struct timeval& secondOperand ) ;
-} ;
+}
 
 class SerialPort::SerialPortImpl : public PosixSignalHandler
 {
@@ -225,7 +226,6 @@ public:
         throw( SerialPort::NotOpen,
                std::runtime_error ) ;
 
-    
     bool
     GetDsr() const 
         throw( SerialPort::NotOpen,
@@ -577,7 +577,6 @@ SerialPort::GetRts() const
 {
     return mSerialPortImpl->GetRts() ;
 }
-
 
 bool
 SerialPort::GetCts() const 
@@ -1528,7 +1527,6 @@ SerialPort::SerialPortImpl::GetRts() const
     return this->GetModemControlLine( TIOCM_RTS ) ;
 }    
 
-
 inline
 bool
 SerialPort::SerialPortImpl::GetCts() const
@@ -1537,7 +1535,6 @@ SerialPort::SerialPortImpl::GetCts() const
 {
     return this->GetModemControlLine( TIOCM_CTS ) ;
 }    
-
 
 inline
 bool
@@ -1743,5 +1740,4 @@ namespace
         }
         return result ;
     }
-} ;
-
+}
