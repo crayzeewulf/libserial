@@ -146,8 +146,8 @@ public:
     class NotOpen : public std::logic_error
     {
     public:
-        NotOpen(const std::string& whatArg)
-            : logic_error(whatArg) 
+        NotOpen( const std::string& whatArg )
+            : logic_error( whatArg ) 
         {
         }
     } ;
@@ -155,8 +155,8 @@ public:
     class OpenFailed : public std::runtime_error
     {
     public:
-        OpenFailed(const std::string& whatArg)
-            : runtime_error(whatArg)
+        OpenFailed( const std::string& whatArg )
+            : runtime_error( whatArg )
         {
         }
     } ;
@@ -164,8 +164,8 @@ public:
     class AlreadyOpen : public std::logic_error
     {
     public:
-        AlreadyOpen(const std::string& whatArg)
-            : logic_error(whatArg)
+        AlreadyOpen( const std::string& whatArg )
+            : logic_error( whatArg )
         {
         }
     } ;
@@ -173,8 +173,8 @@ public:
     class UnsupportedBaudRate : public std::runtime_error
     {
     public:
-        UnsupportedBaudRate(const std::string& whatArg)
-            : runtime_error(whatArg)
+        UnsupportedBaudRate( const std::string& whatArg )
+            : runtime_error( whatArg )
         {
         }
     } ;
@@ -191,7 +191,7 @@ public:
     /**
      * @brief Default Constructor for a serial port object.
      */
-    explicit SerialPort(const std::string& serialPortName);
+    explicit SerialPort( const std::string& serialPortName );
 
     /**
      * @brief Default Destructor for a serial port object.
@@ -276,7 +276,7 @@ public:
      * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
      * @throw std::invalid_argument This exception is thrown if an invalid parity is specified.
      */
-    void SetParity(const Parity parityType)
+    void SetParity( const Parity parityType )
         throw( NotOpen,
                std::invalid_argument ) ;
 
@@ -293,7 +293,7 @@ public:
      * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
      * @throw std::invalid_argument This exception is thrown if an invalid number of stop bits is specified.
      */
-    void SetNumOfStopBits(const StopBits numOfStopBits)
+    void SetNumOfStopBits( const StopBits numOfStopBits )
         throw( NotOpen,
                std::invalid_argument ) ;
 
@@ -309,7 +309,7 @@ public:
      * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
      * @throw std::invalid_argument This exception is thrown if an invalid flow control is specified.
      */
-    void SetFlowControl(const FlowControl flowControl)
+    void SetFlowControl( const FlowControl flowControl )
         throw( NotOpen,
                std::invalid_argument ) ;
 
@@ -349,9 +349,9 @@ public:
 
     typedef std::vector<unsigned char> DataBuffer;
 
-    void Read(DataBuffer& dataBuffer,
-              const unsigned int numberOfBytes = 0,
-              const unsigned int msTimeout = 0)
+    void Read( DataBuffer& dataBuffer,
+               const unsigned int numberOfBytes = 0,
+               const unsigned int msTimeout = 0 )
         throw( NotOpen,
                ReadTimeout,
                std::runtime_error ) ;
@@ -368,7 +368,7 @@ public:
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      * @return Returns the byte read.
      */
-    unsigned char ReadByte(const unsigned int msTimeout = 0)
+    unsigned char ReadByte( const unsigned int msTimeout = 0 )
         throw( NotOpen,
                ReadTimeout,
                std::runtime_error ) ;
@@ -382,8 +382,8 @@ public:
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      * @return Returns the line read from the serial port ending with the line termination character.
      */
-    const std::string ReadLine(const unsigned int msTimeout = 0,
-                               const char lineTerminator = '\n')
+    const std::string ReadLine( const unsigned int msTimeout = 0,
+                                const char lineTerminator = '\n' )
         throw( NotOpen,
                ReadTimeout,
                std::runtime_error ) ;
@@ -393,7 +393,7 @@ public:
      * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      */
-    void Write(const DataBuffer& dataBuffer)
+    void Write( const DataBuffer& dataBuffer )
         throw( NotOpen,
                std::runtime_error ) ;
 
@@ -402,7 +402,7 @@ public:
      * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      */
-    void Write(const std::string& dataString)
+    void Write( const std::string& dataString )
         throw( NotOpen,
                std::runtime_error ) ;
 
@@ -412,7 +412,7 @@ public:
      * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      */
-    void WriteByte(const unsigned char dataByte)
+    void WriteByte( const unsigned char dataByte )
         throw( NotOpen,
                std::runtime_error ) ;
 
@@ -421,7 +421,7 @@ public:
      * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      */
-    void SetDtr(const bool dtrState = true)
+    void SetDtr( const bool dtrState = true )
         throw( NotOpen,
                std::runtime_error ) ;
 
@@ -440,7 +440,7 @@ public:
      * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
      * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      */
-    void SetRts(const bool rtsState = true)
+    void SetRts( const bool rtsState = true )
         throw( NotOpen,
                std::runtime_error ) ;
 
@@ -476,13 +476,13 @@ private:
      * @brief Prevents copying of objects of this class by declaring the copy
      *        constructor private. This method is never defined.
      */
-    SerialPort(const SerialPort& otherSerialPort);
+    SerialPort( const SerialPort& otherSerialPort );
 
     /**
      * @brief Prevents copying of objects of this class by declaring the assignment
      *        operator private. This method is never defined.
      */
-    SerialPort& operator=(const SerialPort& otherSerialPort);
+    SerialPort& operator=( const SerialPort& otherSerialPort );
 
     /**
      * @brief Forward declaration of the implementation class folowing the PImpl idiom.
