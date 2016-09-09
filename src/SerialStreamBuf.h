@@ -201,7 +201,7 @@ extern "C++"
             static const FlowControlEnum DEFAULT_FLOW_CONTROL ;
 
             /**
-             * @brief The default character buffer timing.
+             * @brief The default character buffer size.
              *
              * @deprecated VMIN and VTIME will not be supported starting
              *             from version 0.7.0. Methods of SerialPort class
