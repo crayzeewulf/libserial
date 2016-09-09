@@ -370,11 +370,18 @@ public:
                ReadTimeout,
                std::runtime_error ) ;
 
+    
+    /**
+     * @brief A vector of character types to store data bytes read from the
+     *        serial port.
+     */
+    typedef std::vector<unsigned char> DataBuffer ;
+    
     /**
      * @brief Reads the specified number of bytes from the serial port.
      *        The method will timeout if no data is received in the specified
      *        number of milliseconds (msTimeout). If msTimeout is 0, then
-     *        this method will block till all requested bytes are
+     *        this method will block until all requested bytes are
      *        received. If numOfBytes is zero, then this method will keep
      *        reading data till no more data is available at the serial port.
      *        In all cases, all read data is available in dataBuffer on
@@ -389,7 +396,6 @@ public:
      * @throw std::runtime_error This exception is thrown if any standard
      *        runtime error is encountered.
      */
-    typedef std::vector<unsigned char> DataBuffer ;
     void
     Read( DataBuffer&        dataBuffer,
           const unsigned int numOfBytes = 0,
@@ -400,6 +406,12 @@ public:
 
     /**
      * @brief Reads a line of characters from the serial port.
+     *        The method will timeout if no data is received in the specified
+     *        number of milliseconds (msTimeout). If msTimeout is 0, then
+     *        this method will block until a line terminator is received.
+     *        If a line terminator is read, a string will be returned,
+     *        however, if the timeout is reached, an exception will be thrown
+     *        and all previously read data will be lost.
      * @param msTimeout The timeout value to return if a line termination
      *        character is not read.
      * @param lineTerminator The line termination character to specify the
@@ -411,7 +423,7 @@ public:
      * @throw std::runtime_error This exception is thrown if any standard
      *        runtime error is encountered.
      * @return Returns the line read from the serial port ending with the line
-     *         termination character.
+     *         termination character iff sucessful.
      */
     const std::string
     ReadLine( const unsigned int msTimeout = 0,
