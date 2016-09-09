@@ -1,22 +1,24 @@
-/***************************************************************************
- *   Copyright (C) 2004 by Manish Pagey                                    *
- *   crayzeewulf@users.sourceforge.net
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/******************************************************************************
+ *   @file SerialPort.h                                                       *
+ *   @copyright (C) 2004 by Manish Pagey                                      *
+ *   crayzeewulf@users.sourceforge.net                                        *
+ *                                                                            *
+ *   This program is free software; you can redistribute it and/or modify     *
+ *   it under the terms of the GNU General Public License as published by     *
+ *   the Free Software Foundation; either version 2 of the License, or        *
+ *   (at your option) any later version.                                      *
+ *                                                                            *
+ *   This program is distributed in the hope that it will be useful,          *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of           *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
+ *   GNU General Public License for more details.                             *
+ *                                                                            *
+ *   You should have received a copy of the GNU General Public License        *
+ *   along with this program; if not, write to the                            *
+ *   Free Software Foundation, Inc.,                                          *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
+ *****************************************************************************/
+
 #ifndef _SerialPort_h_
 #define _SerialPort_h_
 
@@ -28,7 +30,7 @@
 
 
 //
-// :TODO: This class will be placed in LibSerial namespace in the next 
+// @todo - This class will be placed in LibSerial namespace in the next 
 // version. 
 //
 
@@ -43,7 +45,7 @@
  * Otherwise, it may not be possible to receive any data through
  * the serial port using this class.
  *
- * :FIXME: Provide examples of the above potential problem.
+ * @FIXME: Provide examples of the above potential problem.
  *
  * @todo The current implementation does not check if another process
  * has locked the serial port device and does not lock the serial port
@@ -56,7 +58,7 @@ class SerialPort
 {
 public:
     /**
-     * The allowed set of baud rates.
+     * @brief The allowed set of baud rates.
      */
     enum BaudRate {
         BAUD_50      = B50,
@@ -77,10 +79,9 @@ public:
         BAUD_57600   = B57600,
         BAUD_115200  = B115200,
         BAUD_230400  = B230400,
-        //
-        // Bug#1318912: B460800 is defined on Linux but not on Mac OS
-        // X. What about other operating systems ?
-        //
+
+        // @TODO: Bug#1318912: B460800 is defined on Linux but not on Mac OS X.
+        // What about other operating systems ?
 #ifdef __linux__
         BAUD_460800 = B460800,
         BAUD_500000 = B500000,
@@ -100,6 +101,9 @@ public:
         BAUD_DEFAULT = BAUD_57600
     } ;
 
+    /**
+     * @brief The allowed set of character sizes.
+     */
     enum CharacterSize {
         CHAR_SIZE_5  = CS5, //!< 5 bit characters.
         CHAR_SIZE_6  = CS6, //!< 6 bit characters.
@@ -108,12 +112,18 @@ public:
         CHAR_SIZE_DEFAULT = CHAR_SIZE_8
     } ;
 
+    /**
+     * @brief The allowed number of stop bits.
+     */
     enum StopBits {
         STOP_BITS_1,   //! 1 stop bit.
         STOP_BITS_2,   //! 2 stop bits.
         STOP_BITS_DEFAULT = STOP_BITS_1
     } ;
 
+    /**
+     * @brief The allowed parity types.
+     */
     enum Parity {
         PARITY_EVEN,     //!< Even parity.
         PARITY_ODD,      //!< Odd parity.
@@ -121,9 +131,12 @@ public:
         PARITY_DEFAULT = PARITY_NONE
     } ;
 
+    /**
+     * @brief The allowed flow control types.
+     */
     enum FlowControl {
         FLOW_CONTROL_HARD,
-        FLOW_CONTROL_SOFT,
+        FLOW_CONTROL_SOFT, // @todo - is this type allowable in linux?
         FLOW_CONTROL_NONE,
         FLOW_CONTROL_DEFAULT = FLOW_CONTROL_NONE
     } ;
@@ -163,27 +176,24 @@ public:
     } ;
 
     /**
-     * Constructor for a serial port.
+     * @brief Default Constructor for a serial port object.
      */
     explicit SerialPort( const std::string& serialPortName ) ;
 
     /**
-     * Destructor.
+     * @brief Default Destructor for a serial port object.
      */
     virtual ~SerialPort() throw() ;
 
     /**
-     * Open the serial port with the specified settings. A serial port
-     * cannot be used till it is open.
-     *
+     * @brief Opens the serial port with the specified settings.
+     *        A serial port cannot be used until it has been opened.
      * @throw AlreadyOpen This exception is thrown if the serial port
-     * is already open.
-     *
+     *        is already open.
      * @throw OpenFailed This exception is thrown if the serial port
-     * could not be opened.
-     *
+     *        could not be opened.
      * @throw std::invalid_argument This exception is thrown if an
-     * invalid parameter value is specified.
+     *        invalid parameter value is specified.
      */
     void
     Open( const BaudRate      baudRate    = BAUD_DEFAULT,
@@ -197,32 +207,31 @@ public:
                std::invalid_argument ) ;
 
     /**
-     * Check if the serial port is open for I/O.
+     * @brief Determines if the serial port is open for I/O.
+     * @return Returns true iff the serial port is open.
      */
     bool
     IsOpen() const ;
 
     /**
-     * Close the serial port. All settings of the serial port will be
-     * lost and no more I/O can be performed on the serial port.
-     *
-     * @throw NotOpen Thrown if this method is called while the serial
-     * port is not open.
-     *
+     * @brief Closes the serial port. All settings of the serial port will be
+     *        lost and no more I/O can be performed on the serial port.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
      */
     void
     Close()
         throw(NotOpen) ;
 
     /**
-     * Set the baud rate for the serial port to the specified value
-     * (baudRate).
-     *
-     * @throw NotOpen Thrown if this method is called while the serial
-     * port is not open.
-     *
-     * @throw std::invalid_argument Thrown if an invalid baud rate is
-     * specified.
+     * @brief Sets the baud rate for the serial port to the specified value
+     * @param baudRate The baud rate to be set for the serial port.
+     * @throw UnsupportedBaudRate Thrown if an unsupported baud rate is
+     *        specified.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw std::invalid_argument This exception is thrown if an invalid
+     *        baud rate or other argument is specified.
      */
     void
     SetBaudRate( const BaudRate baudRate )
@@ -231,10 +240,11 @@ public:
                std::invalid_argument ) ;
 
     /**
-     * Get the current baud rate for the serial port.
-     *
-     * @throw NotOpen Thrown if this method is called while the serial
-     * port is not open.
+     * @brief Gets the current baud rate for the serial port.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial the port is not open
+     * @throw std::runtime_error This exception is thrown if any standard
+     *        runtime error is encountered.
      */
     BaudRate
     GetBaudRate() const
@@ -242,37 +252,33 @@ public:
                std::runtime_error ) ;
 
     /**
-     * Set the character size for the serial port.
-     *
-     * @throw NotOpen Thrown if this method is called while the serial
-     * port is not open.
-     *
-     * @throw std::invalid_argument Thrown if an invalid character
-     * size is specified.
+     * @brief Sets the character size for the serial port.
+     * @param characterSize the number of bytes each character is represented
+     *        within.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw std::invalid_argument This exception is thrown if an invalid
+     *        character size is specified.
      */
     void
     SetCharSize( const CharacterSize charSize )
         throw( NotOpen,
                std::invalid_argument ) ;
     /**
-     * Get the current character size for the serial port.
-     *
-     * @throw NotOpen Thrown if this method is called while the serial
-     * port is not open.
-     *
+     * @brief Gets the current character size for the serial port.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
      */
     CharacterSize
     GetCharSize() const
         throw(NotOpen) ;
 
     /**
-     * Set the parity type for the serial port.
-     *
-     * @throw NotOpen Thrown if this method is called while the serial
-     * port is not open.
-     *
-     * @throw std::invalid_argument Thrown if an invalid parity is
-     * specified.
+     * @brief Sets the parity type for the serial port.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw std::invalid_argument This exception is thrown if an invalid
+     *        parity is specified.
      */
     void
     SetParity( const Parity parityType )
@@ -280,24 +286,21 @@ public:
                std::invalid_argument ) ;
 
     /**
-     * Get the parity type for the serial port.
-     *
-     * @throw NotOpen Thrown if this method is called while the serial
-     * port is not open.
-     *
+     * @brief Gets the parity type for the serial port.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
      */
     Parity
     GetParity() const
         throw(NotOpen) ;
 
     /**
-     * Set the number of stop bits to be used with the serial port.
-     *
-     * @throw NotOpen Thrown if this method is called while the serial
-     * port is not open.
-     *
-     * @throw std::invalid_argument Thrown if an invalid number of
-     * stop bits is specified.
+     * @brief Sets the number of stop bits to be used with the serial port.
+     * @brief numOfStopBits The number of stop bits to set.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw std::invalid_argument This exception is thrown if an invalid
+     *        number of stop bits is specified.
      */
     void
     SetNumOfStopBits( const StopBits numOfStopBits )
@@ -305,25 +308,21 @@ public:
                std::invalid_argument ) ;
 
     /**
-     * Get the number of stop bits currently being used by the serial
-     * port.
-     *
-     * @throw NotOpen Thrown if this method is called while the serial
-     * port is not open.
-     *
+     * @brief Gets the number of stop bits currently being used by the serial
+     *        port.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
      */
     StopBits
     GetNumOfStopBits() const
         throw(NotOpen) ;
 
-    /**
-     * Set flow control.
-     *
-     * @throw NotOpen Thrown if this method is called while the serial
-     * port is not open.
-     *
-     * @throw std::invalid_argument Thrown if an invalid flow control
-     * is specified.
+     /**
+     * @brief Sets flow control for the serial port.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw std::invalid_argument This exception is thrown if an invalid
+     *        flow control is specified.
      */
     void
     SetFlowControl( const FlowControl   flowControl )
@@ -331,32 +330,39 @@ public:
                std::invalid_argument ) ;
 
     /**
-     * Get the current flow control setting.
-     *
-     * @throw NotOpen Thrown if this method is called while the serial
-     * port is not open.
-     *
+     * @brief Get the current flow control setting.
+     * @throw NotOpen This exception is thrown if the method is called while
+     *        the serial port is not open.
+     * @return Returns the flow control type of the serial port.
      */
     FlowControl
     GetFlowControl() const
         throw( NotOpen ) ;
 
     /**
-     * Check if data is available at the input of the serial port.
-     *
-     * @throw NotOpen Thrown if this method is called while the serial
-     * port is not open.
-     *
+     * @brief Checks if data is available at the input of the serial port.
+     * @throw NotOpen This exception is thrown if the method is called while
+     *        the serial port is not open.
+     * @return Returns true iff data is available to read.
      */
     bool
     IsDataAvailable() const
         throw(NotOpen) ;
 
     /**
-     * Read a single byte from the serial port. If no data is
-     * available in the specified number of milliseconds (msTimeout),
-     * then this method will throw ReadTimeout exception. If msTimeout
-     * is 0, then this method will block till data is available.
+     * @brief Reads a single byte from the serial port.
+     *        If no data is available within the specified number
+     *        of milliseconds (msTimeout), then this method will
+     *        throw a ReadTimeout exception. If msTimeout is 0,
+     *        then this method will block until data is available.
+     * @param msTimeout The timeout period in milliseconds.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw ReadTimeout This exception is thrown if the timeout value is
+     *        reached before a line termination character is received.
+     * @throw std::runtime_error This exception is thrown if any standard
+     *        runtime error is encountered.
+     * @return Returns the byte read.
      */
     unsigned char
     ReadByte( const unsigned int msTimeout = 0 )
@@ -365,14 +371,23 @@ public:
                std::runtime_error ) ;
 
     /**
-     * Read the specified number of bytes from the serial port. The
-     * method will timeout if no data is received in the specified
-     * number of milliseconds (msTimeout). If msTimeout is 0, then
-     * this method will block till all requested bytes are
-     * received. If numOfBytes is zero, then this method will keep
-     * reading data till no more data is available at the serial
-     * port. In all cases, all read data is available in dataBuffer on
-     * return from this method.
+     * @brief Reads the specified number of bytes from the serial port.
+     *        The method will timeout if no data is received in the specified
+     *        number of milliseconds (msTimeout). If msTimeout is 0, then
+     *        this method will block till all requested bytes are
+     *        received. If numOfBytes is zero, then this method will keep
+     *        reading data till no more data is available at the serial port.
+     *        In all cases, all read data is available in dataBuffer on
+     *        return from this method.
+     * @param dataBuffer The data buffer to place serial data into.
+     * @param numOfBytes The number of bytes to read before returning.
+     * @param msTimeout The timeout period in milliseconds.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw ReadTimeout This exception is thrown if the timeout value is
+     *        reached before a line termination character is received.
+     * @throw std::runtime_error This exception is thrown if any standard
+     *        runtime error is encountered.
      */
     typedef std::vector<unsigned char> DataBuffer ;
     void
@@ -383,9 +398,20 @@ public:
                ReadTimeout,
                std::runtime_error ) ;
 
-
     /**
-     * Read a line of characters from the serial port.
+     * @brief Reads a line of characters from the serial port.
+     * @param msTimeout The timeout value to return if a line termination
+     *        character is not read.
+     * @param lineTerminator The line termination character to specify the
+     *        end of a line.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw ReadTimeout This exception is thrown if the timeout value is
+     *        reached before a line termination character is received.
+     * @throw std::runtime_error This exception is thrown if any standard
+     *        runtime error is encountered.
+     * @return Returns the line read from the serial port ending with the line
+     *         termination character.
      */
     const std::string
     ReadLine( const unsigned int msTimeout = 0,
@@ -395,10 +421,12 @@ public:
                std::runtime_error ) ;
 
     /**
-     * Send a single byte to the serial port.
-     *
-     * @throw NotOpen Thrown if this method is called while the serial
-     * port is not open.
+     * @brief Writes a single byte to the serial port.
+     * @param dataByte The byte to be written to the serial port.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw std::runtime_error This exception is thrown if any standard
+     *        runtime error is encountered.
      */
     void
     WriteByte(const unsigned char dataByte)
@@ -406,7 +434,13 @@ public:
                std::runtime_error ) ;
 
     /**
-     * Write the data from the specified vector to the serial port.
+     * @brief Writes a DataBuffer vector to the serial port.
+     * @param dataBuffer The DataBuffer vector to be written to the serial
+     *        port.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw std::runtime_error This exception is thrown if any standard
+     *        runtime error is encountered.
      */
     void
     Write(const DataBuffer& dataBuffer)
@@ -414,7 +448,10 @@ public:
                std::runtime_error ) ;
 
     /**
-     * Write a string to the serial port.
+     * @brief Writes a std::string to the serial port.
+     * @param dataString The data string to be written to the serial port.
+     * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
+     * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
      */
     void
     Write(const std::string& dataString)
@@ -422,15 +459,25 @@ public:
                std::runtime_error ) ;
 
     /**
-     * Set the DTR line to the specified value.
+     * @brief Sets the DTR line to the specified value.
+     * @param dtrState The line voltage state to be set,
+     *        (true = high, false = low).
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw std::runtime_error This exception is thrown if any standard
+     *        runtime error is encountered.
      */
     void
     SetDtr( const bool dtrState = true )
         throw( NotOpen,
                std::runtime_error ) ;
 
-    /**
-     * Get the status of the DTR line.
+     /**
+     * @brief Gets the status of the DTR line.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw std::runtime_error This exception is thrown if any standard
+     *        runtime error is encountered.
      */
     bool
     GetDtr() const
@@ -438,7 +485,13 @@ public:
                std::runtime_error ) ;
 
     /**
-     * Set the RTS line to the specified value.
+     * @brief Sets the RTS (ready-to-send) line to the specified value.
+     * @param rtsState The line voltage state to be set,
+     *        (true = high, false = low).
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw std::runtime_error This exception is thrown if any standard
+     *        runtime error is encountered.
      */
     void
     SetRts( const bool rtsState = true )
@@ -446,53 +499,61 @@ public:
                std::runtime_error ) ;
 
     /**
-     * Get the status of the RTS line.
+     * @brief Gets the status of the RTS (ready-to-send) line.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw std::runtime_error This exception is thrown if any standard
+     *        runtime error is encountered.
      */
     bool
     GetRts() const
         throw( NotOpen,
                std::runtime_error ) ;
-
-    //void
-    //SetCts( const bool ctsState = true )
-    //    throw( NotOpen,
-    //           std::runtime_error ) ;
-
+        
+    /**
+     * @brief Gets the status of the CTS (clear-to-send) line.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw std::runtime_error This exception is thrown if any standard
+     *        runtime error is encountered.
+     */
     bool
     GetCts() const
         throw( NotOpen,
                std::runtime_error ) ;
 
-    //void
-    //SetDsr( const bool dsrState = true )
-    //    throw( NotOpen,
-    //           std::runtime_error ) ;
-
+    /**
+     * @brief Gets the status of the DSR (data-set-ready) line.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw std::runtime_error This exception is thrown if any standard
+     *        runtime error is encountered.
+     */
     bool
     GetDsr() const
         throw( NotOpen,
                std::runtime_error ) ;
 private:
     /**
-     * Prevent copying of objects of this class by declaring the copy
-     * constructor private. This method is never defined.
+     * @brief Prevents copying of objects of this class by declaring the copy
+     *        constructor private. This method is never defined.
      */
     SerialPort( const SerialPort& otherSerialPort ) ;
 
     /**
-     * Prevent copying of objects of this class by declaring the assignment
-     * operator private. This method is never defined.
+     * @brief Prevents copying of objects of this class by declaring the
+     *        assignment operator private. This method is never defined.
      */
     SerialPort& operator=(const SerialPort& otherSerialPort ) ;
 
-    /*
-     * Forward declaration of the implementation class folowing the
-     * PImpl idiom.
+    /**
+     * @brief Forward declaration of the implementation class folowing
+     *        the PImpl idiom.
      */
     class SerialPortImpl ;
 
     /**
-     * Pointer to implementation class instance.
+     * @brief Pointer to implementation class instance.
      */
     SerialPortImpl* mSerialPortImpl ;
 } ;
