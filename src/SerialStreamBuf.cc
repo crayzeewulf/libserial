@@ -1,3 +1,23 @@
+/******************************************************************************
+ *   @file SerialStreamBuf.cc                                                 *
+ *   @copyright                                                               *
+ *                                                                            *
+ *   This program is free software; you can redistribute it and/or modify     *
+ *   it under the terms of the GNU General Public License as published by     *
+ *   the Free Software Foundation; either version 2 of the License, or        *
+ *   (at your option) any later version.                                      *
+ *                                                                            *
+ *   This program is distributed in the hope that it will be useful,          *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of           *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
+ *   GNU General Public License for more details.                             *
+ *                                                                            *
+ *   You should have received a copy of the GNU General Public License        *
+ *   along with this program; if not, write to the                            *
+ *   Free Software Foundation, Inc.,                                          *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
+ *****************************************************************************/
+
 #include "SerialStreamBuf.h"
 #include <iostream>
 #include <sys/types.h>
@@ -1023,13 +1043,13 @@ SerialStreamBuf::Implementation::FlowControl() const
 
 inline
 const short 
-SerialStreamBuf::Implementation::SetVMin( short vmin ) 
+SerialStreamBuf::Implementation::SetVMin( short vMin ) 
 {
     if( -1 == mFileDescriptor ) {
         return -1 ;
     }
 
-    if ( vmin < 0 || vmin > 255 ) {
+    if ( vMin < 0 || vMin > 255 ) {
         return -1 ;
     };
 
@@ -1041,7 +1061,7 @@ SerialStreamBuf::Implementation::SetVMin( short vmin )
         return -1 ;
     }
 
-    term_setting.c_cc[VMIN] = (cc_t)vmin;
+    term_setting.c_cc[VMIN] = (cc_t)vMin;
     //
     // Set the new settings for the serial port. 
     //
@@ -1049,18 +1069,18 @@ SerialStreamBuf::Implementation::SetVMin( short vmin )
         return -1 ;
     } 
 
-    return vmin;
+    return vMin;
 }
 
 inline
 const short 
-SerialStreamBuf::Implementation::SetVTime( short vtime ) 
+SerialStreamBuf::Implementation::SetVTime( short vTime ) 
 {
     if( -1 == mFileDescriptor ) {
         return -1 ;
     }
 
-    if ( vtime < 0 || vtime > 255 ) {
+    if ( vTime < 0 || vTime > 255 ) {
         return -1 ;
     };
 
@@ -1072,7 +1092,7 @@ SerialStreamBuf::Implementation::SetVTime( short vtime )
         return -1 ;
     }
 
-    term_setting.c_cc[VTIME] = (cc_t)vtime;
+    term_setting.c_cc[VTIME] = (cc_t)vTime;
     //
     // Set the new settings for the serial port. 
     //
@@ -1080,7 +1100,7 @@ SerialStreamBuf::Implementation::SetVTime( short vtime )
         return -1 ;
     }
 
-    return vtime;
+    return vTime;
 }
 
 inline
@@ -1118,7 +1138,7 @@ SerialStreamBuf::Implementation::xsgetn(char_type *s, streamsize n)
     //
     // Try to read upto n characters in the array s.
     //
-    ssize_t retval ; 
+    ssize_t retval = -1;
     //
     // If a putback character is available, then we need to read only
     // n-1 character.
@@ -1185,8 +1205,7 @@ inline
 std::streamsize
 SerialStreamBuf::Implementation::showmanyc() 
 {
-
-    int retval = -1;
+    ssize_t retval = -1;
 
     if ( -1 == mFileDescriptor ) {
         return -1;
@@ -1239,7 +1258,7 @@ SerialStreamBuf::Implementation::underflow()
     // Read the next character from the serial port. 
     //
     char next_ch ;
-    ssize_t retval ;
+    ssize_t retval = -1;
     //
     // If a putback character is available then we return that
     // character. However, we are not supposed to change the value of
