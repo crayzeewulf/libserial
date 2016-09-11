@@ -1,4 +1,8 @@
-SUBDIRS=src doc examples 
+SUBDIRS=src doc examples
+
+if PYTHON
+SUBDIRS += sip
+endif
 
 ACLOCAL_AMFLAGS=-I m4
 

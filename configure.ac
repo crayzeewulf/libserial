@@ -38,6 +38,11 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_INLINE
 
+AC_ARG_WITH([python],
+	AS_HELP_STRING([--without-python], [Disable Python bindings]),
+	[], [with_python=yes])
+AM_CONDITIONAL([PYTHON], [test "${with_python}" != "no"])
+
 AC_OUTPUT([Makefile
 doxygen.conf
 libserial.spec

@@ -252,13 +252,11 @@ namespace LibSerial
         return this;
     }
 
-
     int
     SerialStreamBuf::SetParametersToDefault() 
     {
         return mImpl->SetParametersToDefault() ;
     }
-
 
     BaudRate
     SerialStreamBuf::SetBaudRate(const BaudRate baud_rate) 
@@ -440,7 +438,6 @@ namespace LibSerial
     {
         return mImpl->pbackfail(c) ;
     }
-
 
     streamsize
     SerialStreamBuf::xsputn(const char_type *s, streamsize n) 
