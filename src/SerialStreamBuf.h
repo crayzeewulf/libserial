@@ -332,14 +332,14 @@ extern "C++"
              * @return Returns the baud rate on success and BAUD_INVALID on
              *         failure.
              */
-            const BaudRateEnum SetBaudRate(const BaudRateEnum baudRate ) ;
+            BaudRateEnum SetBaudRate(const BaudRateEnum baudRate ) ;
 
             /**
              * @return Returns the current baud rate of the serial port.
              *         If the baud rate is not set to a valid value then it
              *         returns BAUD_INVALID.
              */
-            const BaudRateEnum BaudRate() const ;
+            BaudRateEnum BaudRate() const ;
 
             /**
              * @brief Sets the character size to be used during serial
@@ -348,7 +348,7 @@ extern "C++"
              * @return Returns the character size on success and
              *         CHAR_SIZE_INVALID on failure.
              */
-            const CharSizeEnum SetCharSize(const CharSizeEnum charSize) ;
+            CharSizeEnum SetCharSize(const CharSizeEnum charSize) ;
 
             /**
              * @brief Gets the character size currently being used during
@@ -356,7 +356,7 @@ extern "C++"
              * @return Returns the character size currently being used during
              *         serial communication.
              */
-            const CharSizeEnum CharSize() const ;
+            CharSizeEnum CharSize() const ;
 
             /**
              * @brief Sets the number of stop bits used during serial
@@ -378,26 +378,26 @@ extern "C++"
              * @param parityType The parity type value to be set. 
              * @return Returns the parity type set.
              */
-            const ParityEnum SetParity(const ParityEnum parityType) ;
+            ParityEnum SetParity(const ParityEnum parityType) ;
 
             /**
              * @brief Gets the current parity setting for the serial port.
              * @return Returns the parity setting for the serial port.
              */
-            const ParityEnum Parity() const ;
+            ParityEnum Parity() const ;
 
             /**
              * @brief Sets the specified flow control.
              * @param flowControlType The flow control type to be set.
              * @return Returns the flow control type set.
              */
-            const FlowControlEnum SetFlowControl(const FlowControlEnum flowControlType) ;
+            FlowControlEnum SetFlowControl(const FlowControlEnum flowControlType) ;
 
             /**
              * @brief Gets the current flow control setting.
              * @return Returns the current flow control setting.
              */
-            const FlowControlEnum FlowControl() const ;
+            FlowControlEnum FlowControl() const ;
 
             /**
              * @brief Sets the minimum number of characters for non-canonical
@@ -406,7 +406,7 @@ extern "C++"
              * @param vMin the number of minimum characters to be set.
              * @return Returns the minimum number of charcters set.
              */
-            const short SetVMin( short vMin ) ;
+            short SetVMin( short vMin ) ;
 
             /**
              * @brief Gets the VMIN value for the device, which represents the
@@ -414,16 +414,16 @@ extern "C++"
              * @return Returns the minimum number of characters for
              *         non-canonical reads.
              */
-            const short VMin() const;
+            short VMin() const;
 
             /** 
              * @brief Sets character buffer timeout for non-canonical reads in
              *        deciseconds.
-             * @param vTime The timeout value (in deciseconds) to be set.
+             * @param vtime The timeout value (in deciseconds) to be set.
              * @return Returns the character buffer timeout for non-canonical
              *         reads in deciseconds.
              */
-            const short SetVTime( short vTime ) ;
+            short SetVTime( short vtime ) ;
 
             /** 
              * @brief Gets the current timeout value for non-canonical reads in
@@ -431,7 +431,7 @@ extern "C++"
              * @return Returns the character buffer timeout for non-canonical
              *         reads in deciseconds. 
              */
-            const short VTime() const;
+            short VTime() const;
 
             /**----------------------------------------------------------------
              * Operators

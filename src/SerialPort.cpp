@@ -609,7 +609,8 @@ SerialPort::SerialPortImpl::SerialPortImpl( const std::string& serialPortName ) 
     mIsQueueDataAvailable(false)
 {
 	//Initializing the mutex
-	if(pthread_mutex_init(&mQueueMutex, NULL) != 0) {
+	if (pthread_mutex_init(&mQueueMutex, NULL) != 0)
+    {
 		std::cerr << "SerialPort.cpp: Could not initialize mutex!" << std::endl;
 	}
 }
@@ -1294,7 +1295,8 @@ SerialPort::SerialPortImpl::ReadByte(const unsigned int msTimeout)
 
 
     //Updating flag if queue is empty by now
-    if( mInputBuffer.size() == 0) {
+    if ( mInputBuffer.size() == 0)
+    {
     	mIsQueueDataAvailable = false;
     }
     pthread_mutex_unlock(&mQueueMutex);
