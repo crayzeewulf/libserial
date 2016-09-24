@@ -107,7 +107,7 @@ protected:
         ASSERT_FALSE(serialStream.IsOpen());
     }
 
-    void testSerialStreamReadAndWrite()
+    void testSerialStreamReadWrite()
     {
         serialStream.Open(TEST_SERIAL_PORT);
         serialStream2.Open(TEST_SERIAL_PORT_2);
@@ -171,6 +171,7 @@ protected:
 
         size_t maxBaudIndex = 17;
         
+        // @TODO - Why does setting higher baud rates fail?
         // #ifdef __linux__
         //     maxBaudIndex = 26;
             
@@ -262,7 +263,16 @@ protected:
 
     //----------------------- Serial Port Unit Tests ------------------------//
 
-    void testSerialPortReadAndWrite()
+    void testSerialPortOpenClose()
+    {
+        serialPort.Open();
+        ASSERT_TRUE(serialPort.IsOpen());
+
+        serialPort.Close();
+        ASSERT_FALSE(serialPort.IsOpen());
+    }
+
+    void testSerialPortReadWrite()
     {
         serialPort.Open();
         serialPort2.Open();
@@ -280,7 +290,7 @@ protected:
         }
 
         serialPort.Write(writeDataBuffer);
-        serialPort2.Read(readDataBuffer, 74, 1);
+        serialPort2.Read(readDataBuffer, 74, 5);
         ASSERT_EQ(readDataBuffer, writeDataBuffer);
 
         serialPort.Close();
@@ -296,7 +306,7 @@ protected:
         ASSERT_TRUE(serialPort2.IsOpen());
 
         serialPort.WriteByte((unsigned char)writeByte);
-        readByte = (char)serialPort2.ReadByte(1);
+        readByte = (char)serialPort2.ReadByte(5);
         ASSERT_EQ(readByte, writeByte);
         
         serialPort.Close();
@@ -312,7 +322,7 @@ protected:
         ASSERT_TRUE(serialPort2.IsOpen());
         
         serialPort.Write(writeString + '\n');
-        readString = serialPort2.ReadLine(1);
+        readString = serialPort2.ReadLine(5);
         ASSERT_EQ(readString, writeString + '\n');
         
         serialPort.Close();
@@ -353,15 +363,15 @@ protected:
 
         size_t maxBaudIndex = 17;
         
-        // @TODO - Why don't higher baud rates work in Linux?
-        // #ifdef __linux__
-        //     maxBaudIndex = 26;
+        #ifdef __linux__
+            maxBaudIndex = 26;
             
-        //     #if __MAX_BAUD > B2000000
-        //         maxBaudIndex = 30;
-        //     #endif
+            // @TODO - Why does setting the highest baud rates fail?
+            // #if __MAX_BAUD > B2000000
+            //     maxBaudIndex = 30;
+            // #endif
         
-        // #endif
+        #endif
 
         for (size_t i = 0; i < maxBaudIndex; i++)
         {
@@ -379,7 +389,7 @@ protected:
         serialPort.Open();
         ASSERT_TRUE(serialPort.IsOpen());
 
-        // @TODO - Why don't the smaller CharSize values work in Linux?
+        // @TODO - Why don't the smaller CharSize values work?
         for (size_t i = 2; i < 4; i++)
         {
             serialPort.SetCharSize(serialPortCharacterSize[i]);
@@ -412,7 +422,7 @@ protected:
         serialPort.Open();
         ASSERT_TRUE(serialPort.IsOpen());
 
-        // @TODO - FLOW_CONTROL_SOFT flow control is not valid in Linux.
+        // @TODO - FLOW_CONTROL_SOFT flow control is not valid.
         for (size_t i = 0; i < 2; i++)
         {
             serialPort.SetFlowControl(serialPortFlowControl[i]);
@@ -531,10 +541,14 @@ TEST_F(LibSerialTest, testSerialStreamOpenClose)
     testSerialStreamOpenClose();
 }
 
-TEST_F(LibSerialTest, testSerialStreamReadAndWrite)
+TEST_F(LibSerialTest, testSerialStreamReadWrite)
 {
     SCOPED_TRACE("Serial Stream Read and Write Test");
-    testSerialStreamReadAndWrite();
+
+    for (size_t i = 0; i < 1000; i++)
+    {
+        testSerialStreamReadWrite();
+    }
 }
 
 TEST_F(LibSerialTest, testSerialStreamSetGetBaudRate)
@@ -571,10 +585,20 @@ TEST_F(LibSerialTest, testSerialStreamSetGetStopBits)
 
 //------------------------- Serial Port Unit Tests --------------------------//
 
-TEST_F(LibSerialTest, testSerialPortReadAndWrite)
+TEST_F(LibSerialTest, testSerialPortOpenClose)
+{
+    SCOPED_TRACE("Serial Stream Open and Close Test");
+    testSerialStreamOpenClose();
+}
+
+TEST_F(LibSerialTest, testSerialPortReadWrite)
 {
     SCOPED_TRACE("Serial Port Read and Write Test");
-    testSerialPortReadAndWrite();
+    
+    for (size_t i = 0; i < 1000; i++)
+    {
+        testSerialPortReadWrite();
+    }
 }
 
 TEST_F(LibSerialTest, testSerialPortIsDataAvailableTest)

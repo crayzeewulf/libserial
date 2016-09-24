@@ -23,18 +23,18 @@
 #include "PosixSignalDispatcher.h"
 #include "PosixSignalHandler.h"
 #include <queue>
-#include <map>
-#include <cerrno>
-#include <cassert>
-#include <termios.h>
+// #include <map>
+// #include <cerrno>
+// #include <cassert>
+// #include <termios.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <signal.h>
-#include <strings.h>
+// #include <strings.h>
 #include <cstring>
-#include <cstdlib>
+// #include <cstdlib>
 #include <iostream>
 
 namespace
@@ -43,12 +43,12 @@ namespace
     // Various error messages used in this file while throwing
     // exceptions.
     //
-    const std::string ERR_MSG_PORT_NOT_OPEN     = "Serial port not open." ;
-    const std::string ERR_MSG_PORT_ALREADY_OPEN = "Serial port already open." ;
-    const std::string ERR_MSG_UNSUPPORTED_BAUD  = "Unsupported baud rate." ;
-    const std::string ERR_MSG_UNKNOWN_BAUD      = "Unknown baud rate." ;
-    const std::string ERR_MSG_INVALID_PARITY    = "Invalid parity setting." ;
-    const std::string ERR_MSG_INVALID_STOP_BITS = "Invalid number of stop bits." ;
+    const std::string ERR_MSG_PORT_NOT_OPEN        = "Serial port not open." ;
+    const std::string ERR_MSG_PORT_ALREADY_OPEN    = "Serial port already open." ;
+    const std::string ERR_MSG_UNSUPPORTED_BAUD     = "Unsupported baud rate." ;
+    const std::string ERR_MSG_UNKNOWN_BAUD         = "Unknown baud rate." ;
+    const std::string ERR_MSG_INVALID_PARITY       = "Invalid parity setting." ;
+    const std::string ERR_MSG_INVALID_STOP_BITS    = "Invalid number of stop bits." ;
     const std::string ERR_MSG_INVALID_FLOW_CONTROL = "Invalid flow control." ;
 
     /*
@@ -1293,14 +1293,12 @@ SerialPort::SerialPortImpl::ReadByte(const unsigned int msTimeout)
     unsigned char next_char = mInputBuffer.front() ;
     mInputBuffer.pop() ;
 
-
     //Updating flag if queue is empty by now
     if ( mInputBuffer.size() == 0)
     {
     	mIsQueueDataAvailable = false;
     }
     pthread_mutex_unlock(&mQueueMutex);
-
 
     return next_char ;
 }
@@ -1578,7 +1576,8 @@ SerialPort::SerialPortImpl::HandlePosixSignal( int signalNumber )
     }
 
     //Try to get the mutex
-    if (pthread_mutex_trylock(&mQueueMutex) == 0){
+    if (pthread_mutex_trylock(&mQueueMutex) == 0)
+    {
     	// First of all, any pending data within the mShadowInputBuffer
     	// must be transfered into the regular buffer.
     	while(!mShadowInputBuffer.empty())

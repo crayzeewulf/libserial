@@ -259,7 +259,8 @@ SerialStreamBuf::open( const string filename,
     {
         return 0 ;
     }
-    /* switch( mode ) {
+    /* switch( mode )
+       {
        case ios_base::in:
        flags = O_RDONLY ;
        break ;
@@ -896,7 +897,8 @@ SerialStreamBuf::Implementation::CharSize() const
     // Extract the character size from the terminal settings. 
     //
     int char_size = (term_setting.c_cflag & CSIZE) ;
-    switch( char_size ) {
+    switch( char_size )
+    {
     case CS5:
         return CHAR_SIZE_5 ; break ;
     case CS6:
@@ -906,10 +908,8 @@ SerialStreamBuf::Implementation::CharSize() const
     case CS8:
         return CHAR_SIZE_8 ; break ;
     default:
-        //
         // If we get an invalid character, we set the badbit for the
         // stream associated with the serial port.
-        //
         return CHAR_SIZE_INVALID ;
         break ;
     } ;
