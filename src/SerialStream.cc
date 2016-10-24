@@ -45,7 +45,8 @@ SerialStream::~SerialStream()
     // If a SerialStreamBuf is associated with this SerialStream
     // then we need to destroy it here.
     //
-    if( mIOBuffer ) {
+    if ( mIOBuffer )
+    {
         delete mIOBuffer ;
     }
 }
@@ -58,13 +59,14 @@ SerialStream::Close()
     // If a SerialStreamBuf is associated with the SerialStream then
     // destroy it.
     //
-    if( mIOBuffer ) {
+    if ( mIOBuffer )
+    {
         delete mIOBuffer ;
         mIOBuffer = 0 ;
     }
 }
 
-const bool
+bool
 SerialStream::IsOpen() const 
 {
     //
@@ -72,7 +74,8 @@ SerialStream::IsOpen() const
     // calls the is_open() function on this streams SerialStreamBuf,
     // mIOBuffer
     //
-    if ( ! mIOBuffer ) {
+    if ( ! mIOBuffer )
+    {
         return false ;
     }
     return mIOBuffer->is_open() ;
@@ -112,7 +115,8 @@ SerialStream::Open( const std::string       fileName,
     //
     // Create a new SerialStreamBuf if one does not exist. 
     //
-    if( ! mIOBuffer ) {
+    if ( ! mIOBuffer )
+    {
         mIOBuffer = new SerialStreamBuf ;
         assert( 0 != mIOBuffer ) ;
         this->rdbuf( mIOBuffer ) ;
@@ -120,7 +124,8 @@ SerialStream::Open( const std::string       fileName,
     //
     // Open the serial port. 
     //
-    if( 0 == mIOBuffer->open(fileName, openMode) ) {
+    if ( 0 == mIOBuffer->open(fileName, openMode) )
+    {
         setstate(badbit) ;    
     }
     return ;
@@ -137,14 +142,14 @@ SerialStream::SetBaudRate(
     // proceeding. This check also makes sure that we have a non-NULL
     // buffer associated with this stream.
     //
-    if( my_buffer ) 
+    if ( my_buffer ) 
     {
         //
         // Try to set the baud rate. If the corresponding function of
         // the SerialStreamBuf class returns BAUD_INVALID, then we
         // have a problem and the stream is no longer valid for I/O.
         //
-        if( SerialStreamBuf::BAUD_INVALID == 
+        if ( SerialStreamBuf::BAUD_INVALID == 
             my_buffer->SetBaudRate(baudRate) ) 
         {
             setstate(badbit) ;
@@ -164,7 +169,7 @@ SerialStream::SetBaudRate(
     return ;
 }
 
-const SerialStreamBuf::BaudRateEnum 
+SerialStreamBuf::BaudRateEnum 
 SerialStream::BaudRate() 
 {
     SerialStreamBuf* my_buffer = 
@@ -174,7 +179,7 @@ SerialStream::BaudRate()
     // proceeding. This check also makes sure that we have a non-NULL
     // buffer associated with this stream.
     //
-    if( my_buffer ) 
+    if ( my_buffer ) 
     {
         //
         // Try to set the baud rate. If the corresponding function of the
@@ -207,15 +212,15 @@ SerialStream::SetCharSize(
     // proceeding. This check also makes sure that we have a non-NULL
     // buffer associated with this stream.
     //
-    if( my_buffer ) 
+    if ( my_buffer ) 
     {
         //
         // Try to set the baud rate. If the corresponding function of the
         // SerialStreamBuf class returns BAUD_INVALID, then we have a
         // problem and the stream is no longer valid for I/O.
         //
-        if( SerialStreamBuf::CHAR_SIZE_INVALID == 
-            my_buffer->SetCharSize(charSize) ) 
+        if ( SerialStreamBuf::CHAR_SIZE_INVALID == 
+             my_buffer->SetCharSize(charSize) ) 
         {
             setstate(badbit) ;
         }
@@ -233,7 +238,7 @@ SerialStream::SetCharSize(
     return ;
 }
 
-const SerialStreamBuf::CharSizeEnum
+SerialStreamBuf::CharSizeEnum
 SerialStream::CharSize() 
 {
     SerialStreamBuf* my_buffer = 
@@ -243,7 +248,7 @@ SerialStream::CharSize()
     // proceeding. This check also makes sure that we have a non-NULL
     // buffer associated with this stream.
     //
-    if( my_buffer ) 
+    if ( my_buffer ) 
     {
         //
         // Try to set the baud rate. If the corresponding function of the
@@ -266,23 +271,28 @@ SerialStream::CharSize()
 }
 
 void
-SerialStream::SetNumOfStopBits(short stop_bits) {
+SerialStream::SetNumOfStopBits(short stop_bits)
+{
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //
     // Make sure that we are dealing with a SerialStreamBuf before
     // proceeding. This check also makes sure that we have a non-NULL
     // buffer associated with this stream.
     //
-    if( my_buffer ) {
+    if ( my_buffer )
+    {
         //
         // Try to set the baud rate. If the corresponding function of the
         // SerialStreamBuf class returns BAUD_INVALID, then we have a
         // problem and the stream is no longer valid for I/O.
         //
-        if( -1 == my_buffer->SetNumOfStopBits(stop_bits) ) {
+        if ( -1 == my_buffer->SetNumOfStopBits(stop_bits) )
+        {
             setstate(badbit) ;
         }
-    } else {
+    }
+    else
+    {
         //
         // If the dynamic_cast above failed then we either have a NULL
         // streambuf associated with this stream or we have a buffer of
@@ -294,22 +304,26 @@ SerialStream::SetNumOfStopBits(short stop_bits) {
     return ;
 }
 
-const short
-SerialStream::NumOfStopBits() {
+short
+SerialStream::NumOfStopBits()
+{
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //
     // Make sure that we are dealing with a SerialStreamBuf before
     // proceeding. This check also makes sure that we have a non-NULL
     // buffer associated with this stream.
     //
-    if( my_buffer ) {
+    if ( my_buffer )
+    {
         //
         // Try to set the baud rate. If the corresponding function of the
         // SerialStreamBuf class returns BAUD_INVALID, then we have a
         // problem and the stream is no longer valid for I/O.
         //
         return my_buffer->NumOfStopBits() ;
-    } else {
+    }
+    else
+    {
         //
         // If the dynamic_cast above failed then we either have a NULL
         // streambuf associated with this stream or we have a buffer of
@@ -322,23 +336,28 @@ SerialStream::NumOfStopBits() {
 }
 
 void 
-SerialStream::SetParity(const SerialStreamBuf::ParityEnum parity) {
+SerialStream::SetParity(const SerialStreamBuf::ParityEnum parity)
+{
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //
     // Make sure that we are dealing with a SerialStreamBuf before
     // proceeding. This check also makes sure that we have a non-NULL
     // buffer associated with this stream.
     //
-    if( my_buffer ) {
+    if ( my_buffer )
+    {
         //
         // Try to set the baud rate. If the corresponding function of the
         // SerialStreamBuf class returns BAUD_INVALID, then we have a
         // problem and the stream is no longer valid for I/O.
         //
-        if( SerialStreamBuf::PARITY_INVALID == my_buffer->SetParity(parity) ) {
+        if ( SerialStreamBuf::PARITY_INVALID == my_buffer->SetParity(parity) )
+        {
             setstate(badbit) ;
         }
-    } else {
+    }
+    else
+    {
         //
         // If the dynamic_cast above failed then we either have a NULL
         // streambuf associated with this stream or we have a buffer of
@@ -350,22 +369,26 @@ SerialStream::SetParity(const SerialStreamBuf::ParityEnum parity) {
     return ;
 }
 
-const SerialStreamBuf::ParityEnum
-SerialStream::Parity() {
+SerialStreamBuf::ParityEnum
+SerialStream::Parity()
+{
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //
     // Make sure that we are dealing with a SerialStreamBuf before
     // proceeding. This check also makes sure that we have a non-NULL
     // buffer associated with this stream.
     //
-    if( my_buffer ) {
+    if ( my_buffer )
+    {
         //
         // Try to set the baud rate. If the corresponding function of the
         // SerialStreamBuf class returns BAUD_INVALID, then we have a
         // problem and the stream is no longer valid for I/O.
         //
         return my_buffer->Parity() ;
-    } else {
+    }
+    else
+    {
         //
         // If the dynamic_cast above failed then we either have a NULL
         // streambuf associated with this stream or we have a buffer of
@@ -378,23 +401,28 @@ SerialStream::Parity() {
 }
 
 void 
-SerialStream::SetFlowControl(const SerialStreamBuf::FlowControlEnum flow_c) {
+SerialStream::SetFlowControl(const SerialStreamBuf::FlowControlEnum flow_c)
+{
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //
     // Make sure that we are dealing with a SerialStreamBuf before
     // proceeding. This check also makes sure that we have a non-NULL
     // buffer associated with this stream.
     //
-    if( my_buffer ) {
+    if ( my_buffer )
+    {
         //
         // Try to set the baud rate. If the corresponding function of the
         // SerialStreamBuf class returns BAUD_INVALID, then we have a
         // problem and the stream is no longer valid for I/O.
         //
-        if( SerialStreamBuf::FLOW_CONTROL_INVALID == my_buffer->SetFlowControl(flow_c) ) {
+        if ( SerialStreamBuf::FLOW_CONTROL_INVALID == my_buffer->SetFlowControl(flow_c) )
+        {
             setstate(badbit) ;
         }
-    } else {
+    }
+    else
+    {
         //
         // If the dynamic_cast above failed then we either have a NULL
         // streambuf associated with this stream or we have a buffer of
@@ -406,74 +434,97 @@ SerialStream::SetFlowControl(const SerialStreamBuf::FlowControlEnum flow_c) {
     return ;
 }
 
-const short
-SerialStream::SetVMin( short vMin ) {
+short
+SerialStream::SetVMin( short vmin )
+{
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
-    if ( my_buffer ) {
-      if ( -1 == my_buffer->SetVMin( vMin ) ) {
+    if ( my_buffer )
+    {
+        if ( -1 == my_buffer->SetVMin( vmin ) )
+        {
+            setstate(badbit) ;
+            return -1;
+        }
+    }
+    else
+    {
         setstate(badbit) ;
-        return -1;
-      };
-    } else {
-      setstate(badbit) ;
-      return -1;
-    };
-    return vMin;
+        return -1 ;
+    }
+    return vmin;
 }
 
-const short
-SerialStream::VMin() {
+short
+SerialStream::VMin()
+{
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
-    if ( my_buffer ) {
-      return my_buffer->VMin();
-    } else {
-      setstate(badbit) ;
-      return -1;
-    };
-}
-
-const short
-SerialStream::SetVTime( short vTime ) {
-    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
-    if ( my_buffer ) {
-      if ( -1 == my_buffer->SetVTime( vTime ) ) {
+    if ( my_buffer )
+    {
+        return my_buffer->VMin() ;
+    }
+    else
+    {
         setstate(badbit) ;
-        return -1;
-      };
-    } else {
-      setstate(badbit) ;
-      return -1;
-    };
-    return vTime;
+        return -1 ;
+    }
 }
 
-const short
-SerialStream::VTime() {
+short
+SerialStream::SetVTime( short vtime )
+{
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
-    if ( my_buffer ) {
-      return my_buffer->VTime();
-    } else {
-      setstate(badbit) ;
-      return -1;
-    };
+    if ( my_buffer )
+    {
+        if ( -1 == my_buffer->SetVTime( vtime ) )
+        {
+            setstate(badbit) ;
+            return -1 ;
+        }
+    }
+    else
+    {
+        setstate(badbit) ;
+        return -1 ;
+    }
+
+    return vtime ;
 }
 
-const SerialStreamBuf::FlowControlEnum
-SerialStream::FlowControl() {
+short
+SerialStream::VTime()
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
+    if ( my_buffer )
+    {
+        return my_buffer->VTime() ;
+    }
+    else
+    {
+        setstate(badbit) ;
+        return -1 ;
+    }
+}
+
+SerialStreamBuf::FlowControlEnum
+SerialStream::FlowControl()
+{
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf()) ;
     //
     // Make sure that we are dealing with a SerialStreamBuf before
     // proceeding. This check also makes sure that we have a non-NULL
     // buffer associated with this stream.
     //
-    if( my_buffer ) {
+    if ( my_buffer )
+    {
         //
         // Try to set the baud rate. If the corresponding function of the
         // SerialStreamBuf class returns BAUD_INVALID, then we have a
         // problem and the stream is no longer valid for I/O.
         //
         return my_buffer->FlowControl() ;
-    } else {
+    }
+    else
+    {
         //
         // If the dynamic_cast above failed then we either have a NULL
         // streambuf associated with this stream or we have a buffer of
@@ -484,4 +535,3 @@ SerialStream::FlowControl() {
         return SerialStreamBuf::FLOW_CONTROL_INVALID ;
     }
 }
-
