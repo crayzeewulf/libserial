@@ -144,13 +144,11 @@ namespace LibSerial
         return (-1 != mImpl->mFileDescriptor);
     }
 
-
     std::streambuf* 
     SerialStreamBuf::setbuf(char_type *, std::streamsize) 
     {
         return std::streambuf::setbuf(0, 0);
     }
-
 
     SerialStreamBuf*
     SerialStreamBuf::close() 

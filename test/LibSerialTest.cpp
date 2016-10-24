@@ -135,7 +135,7 @@ protected:
         ASSERT_FALSE(serialStream.IsOpen());
     }
 
-    void testSerialStreamReadAndWrite()
+    void testSerialStreamReadWrite()
     {
         serialStream.Open(TEST_SERIAL_PORT);
         serialStream2.Open(TEST_SERIAL_PORT_2);
@@ -198,8 +198,8 @@ protected:
         ASSERT_TRUE(serialStream.IsOpen());
 
         size_t maxBaudIndex = 17;
-        
-        // // @TODO - Why don't the higher baud rates work?
+
+        // @TODO - Why does setting higher baud rates fail?
         // #ifdef __linux__
         //     maxBaudIndex = 26;
             
@@ -300,7 +300,7 @@ protected:
         ASSERT_FALSE(serialPort.IsOpen());
     }
 
-    void testSerialPortReadAndWrite()
+    void testSerialPortReadWrite()
     {
         serialPort.Open();
         serialPort2.Open();
@@ -318,7 +318,7 @@ protected:
         }
 
         serialPort.Write(writeDataBuffer);
-        serialPort2.Read(readDataBuffer, 74, 1);
+        serialPort2.Read(readDataBuffer, 74, 5);
         ASSERT_EQ(readDataBuffer, writeDataBuffer);
 
         serialPort.Close();
@@ -334,7 +334,7 @@ protected:
         ASSERT_TRUE(serialPort2.IsOpen());
 
         serialPort.WriteByte((unsigned char)writeByte);
-        readByte = (char)serialPort2.ReadByte(1);
+        readByte = (char)serialPort2.ReadByte(5);
         ASSERT_EQ(readByte, writeByte);
         
         serialPort.Close();
@@ -350,7 +350,7 @@ protected:
         ASSERT_TRUE(serialPort2.IsOpen());
         
         serialPort.Write(writeString + '\n');
-        readString = serialPort2.ReadLine(1);
+        readString = serialPort2.ReadLine(5);
         ASSERT_EQ(readString, writeString + '\n');
         
         serialPort.Close();
@@ -369,11 +369,17 @@ protected:
         ASSERT_TRUE(serialPort2.IsOpen());
 
         ASSERT_FALSE(serialPort.IsDataAvailable());
+        ASSERT_FALSE(serialPort2.IsDataAvailable());
 
         serialPort.WriteByte((unsigned char)writeByte);
-        usleep(1); // @TODO - This should be replaced to a call to tcdrain();
+        serialPort2.WriteByte((unsigned char)writeByte);
+        usleep(250); // @TODO - This should be replaced to a call to tcdrain();
+        ASSERT_TRUE(serialPort.IsDataAvailable());
         ASSERT_TRUE(serialPort2.IsDataAvailable());
 
+        readByte = (char)serialPort.ReadByte(1);
+        ASSERT_FALSE(serialPort.IsDataAvailable());
+        
         readByte = (char)serialPort2.ReadByte(1);
         ASSERT_FALSE(serialPort2.IsDataAvailable());
 
@@ -393,8 +399,8 @@ protected:
         
         #ifdef __linux__
             maxBaudIndex = 26;
-            
-            // // @TODO - Why don't higher baud rates work?
+
+            // @TODO - Why does setting the highest baud rates fail?
             // #if __MAX_BAUD > B2000000
             //     maxBaudIndex = 30;
             // #endif
@@ -450,7 +456,7 @@ protected:
         serialPort.Open();
         ASSERT_TRUE(serialPort.IsOpen());
 
-        // @TODO - FLOW_CONTROL_SOFT flow control aparrently is not valid.
+        // @TODO - FLOW_CONTROL_SOFT flow control is not valid.
         for (size_t i = 0; i < 2; i++)
         {
             serialPort.SetFlowControl(serialPortFlowControl[i]);
@@ -574,9 +580,9 @@ TEST_F(LibSerialTest, testSerialStreamReadWrite)
 {
     SCOPED_TRACE("Serial Stream Read and Write Test");
 
-    for (size_t i = 0; i < 100; i++)
+    for (size_t i = 0; i < 1000; i++)
     {
-        testSerialStreamReadAndWrite();
+        testSerialStreamReadWrite();
     }
 }
 
@@ -627,7 +633,11 @@ TEST_F(LibSerialTest, testSerialPortOpenClose)
 TEST_F(LibSerialTest, testSerialPortReadWrite)
 {
     SCOPED_TRACE("Serial Port Read and Write Test");
-    testSerialPortReadAndWrite();
+    
+    for (size_t i = 0; i < 1000; i++)
+    {
+        testSerialPortReadWrite();
+    }
 }
 
 TEST_F(LibSerialTest, testSerialPortIsDataAvailableTest)

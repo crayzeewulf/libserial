@@ -23,19 +23,20 @@
 #include "PosixSignalDispatcher.h"
 #include "PosixSignalHandler.h"
 #include <queue>
-#include <map>
-#include <cerrno>
-#include <cassert>
-#include <termios.h>
+// #include <map>
+// #include <cerrno>
+// #include <cassert>
+// #include <termios.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <signal.h>
-#include <strings.h>
+// #include <strings.h>
 #include <cstring>
 #include <cstdlib>
 #include <sstream>
+#include <iostream>
 
 namespace
 {
@@ -43,12 +44,12 @@ namespace
     // Various error messages used in this file while throwing
     // exceptions.
     //
-    const std::string ERR_MSG_PORT_NOT_OPEN     = "Serial port not open." ;
-    const std::string ERR_MSG_PORT_ALREADY_OPEN = "Serial port already open." ;
-    const std::string ERR_MSG_UNSUPPORTED_BAUD  = "Unsupported baud rate." ;
-    const std::string ERR_MSG_UNKNOWN_BAUD      = "Unknown baud rate." ;
-    const std::string ERR_MSG_INVALID_PARITY    = "Invalid parity setting." ;
-    const std::string ERR_MSG_INVALID_STOP_BITS = "Invalid number of stop bits." ;
+    const std::string ERR_MSG_PORT_NOT_OPEN        = "Serial port not open." ;
+    const std::string ERR_MSG_PORT_ALREADY_OPEN    = "Serial port already open." ;
+    const std::string ERR_MSG_UNSUPPORTED_BAUD     = "Unsupported baud rate." ;
+    const std::string ERR_MSG_UNKNOWN_BAUD         = "Unknown baud rate." ;
+    const std::string ERR_MSG_INVALID_PARITY       = "Invalid parity setting." ;
+    const std::string ERR_MSG_INVALID_STOP_BITS    = "Invalid number of stop bits." ;
     const std::string ERR_MSG_INVALID_FLOW_CONTROL = "Invalid flow control." ;
 
     /*
@@ -1334,13 +1335,12 @@ namespace LibSerial
         return this->GetModemControlLine( TIOCM_RTS ) ;
     }    
 
-
     inline
     bool
     SerialPort::Implementation::GetCts() const
     {
         return this->GetModemControlLine( TIOCM_CTS ) ;
-    }    
+    }  
 
 
     inline
