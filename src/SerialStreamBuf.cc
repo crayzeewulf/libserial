@@ -31,9 +31,14 @@ namespace LibSerial
     class SerialStreamBuf::Implementation
     {
     public:
-
+        /**
+         * @brief Default Constructor.
+         */
         Implementation();
 
+        /**
+         * @brief Destructor.
+         */
         ~Implementation()
         {
             /* empty */
@@ -119,7 +124,7 @@ namespace LibSerial
          * @brief Sets the number of stop bits to be used with the serial port.
          * @param numberOfStopBits The number of stop bits to set.
          */
-        void SetNumberOfStopBits(const StopBits& numOfStopBits);
+        void SetNumberOfStopBits(const StopBits& numberOfStopBits);
 
         /**
          * @brief Gets the number of stop bits currently being used by the serial
@@ -247,6 +252,12 @@ namespace LibSerial
     SerialStreamBuf::setbuf(char_type *, std::streamsize) 
     {
         return std::streambuf::setbuf(0, 0);
+    }
+
+    int
+    SerialStreamBuf::InitializeSerialPort()
+    {
+        return mImpl->InitializeSerialPort();
     }
 
     void
@@ -386,6 +397,8 @@ namespace LibSerial
         return mImpl->showmanyc();
     }
 
+
+    /** ------------------------------------------------------------ */
     inline
     SerialStreamBuf::Implementation::Implementation()
         : mFileDescriptor(-1)
@@ -400,42 +413,41 @@ namespace LibSerial
     SerialStreamBuf::Implementation::Open(const string& filename,
                                           ios_base::openmode mode) 
     {
-        // If the buffer is alreay open then we should not allow a call to another open().
-        if (IsOpen() != false) 
+        // Throw an exception if the port is already open.
+        if (this->IsOpen())
         {
-            return 0;
+            throw AlreadyOpen(ERR_MSG_PORT_ALREADY_OPEN);
         }
 
         // We only allow three different combinations of ios_base::openmode so we can
         // use a switch here to construct the flags to be used with the open() system call.
+        // Since we are dealing with the serial port we need to use the O_NOCTTY option.
         int flags;
         
         if (mode == (ios_base::in | ios_base::out))
         {
-            flags = O_RDWR;
+            flags = (O_RDWR | O_NOCTTY);
         } 
         else if (mode == ios_base::in)
         {
-            flags = O_RDONLY;
+            flags = (O_RDONLY | O_NOCTTY);
         } 
         else if (mode == ios_base::out)
         {
-            flags = O_WRONLY;
+            flags = (O_WRONLY | O_NOCTTY);
         } 
         else 
         {
             return 0;
         }
 
-        // Since we are dealing with the serial port we need to use the O_NOCTTY option.
-        flags |= O_NOCTTY;
-
         // Try to open the serial port. 
         mFileDescriptor = open(filename.c_str(), flags);
         
-        if (-1 == mFileDescriptor) 
+        if (mFileDescriptor < 0)
         {
-            return 0;
+            close(mFileDescriptor);
+            throw OpenFailed(strerror(errno));
         }
 
         // Save the current settings of the serial port so they can be
@@ -446,10 +458,41 @@ namespace LibSerial
             throw OpenFailed(strerror(errno));
         }
 
-        // Initialize the serial port. 
+        // Assemble the new port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+
+        // Enable the receiver (CREAD) and ignore modem control lines (CLOCAL).
+        port_settings.c_cflag |= CREAD | CLOCAL;
+
+        // Set the VMIN and VTIME parameters to zero by default. VMIN is
+        // the minimum number of characters for non-canonical read and
+        // VTIME is the timeout in deciseconds for non-canonical
+        // read. Setting both of these parameters to zero implies that a
+        // read will return immediately only giving the currently
+        // available characters.
+        port_settings.c_cc[VMIN] = 0;
+        port_settings.c_cc[VTIME] = 0;
+
+        // Apply the modified settings.
+        if (tcsetattr(mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw OpenFailed(strerror(errno));
+        }
+
+        // Flush the input and output buffers associated with the port.
+        if (tcflush(mFileDescriptor,
+                    TCIOFLUSH) < 0)
+        {
+            throw OpenFailed(strerror(errno));
+        }
+
+        // Initialize the serial port.
         if (-1 == InitializeSerialPort())
         {
-            return 0;
+            throw std::runtime_error(strerror(errno));
         }
 
         return (SerialStreamBuf*)this;
@@ -480,29 +523,27 @@ namespace LibSerial
             // If the close failed then return a null pointer. 
             return NULL;
         } 
-        else
-        {
-            // Set the file descriptor to an invalid value, -1. 
-            mFileDescriptor = -1;
-            
-            // On success, return "this" as required by the C++ standard.
-            return (SerialStreamBuf*)this;
-        }
+
+        // Set the file descriptor to an invalid value, -1. 
+        mFileDescriptor = -1;
+        
+        // On success, return "this" as required by the C++ standard.
+        return (SerialStreamBuf*)this;
     }
 
     inline
     bool
     SerialStreamBuf::Implementation::IsOpen()
     {
-        return (-1 != mFileDescriptor);
+        return (-1 != this->mFileDescriptor);
     }
 
     inline
     int
     SerialStreamBuf::Implementation::InitializeSerialPort()
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -545,8 +586,8 @@ namespace LibSerial
     void 
     SerialStreamBuf::Implementation::SetParametersToDefault()
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -603,67 +644,38 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetBaudRate(const BaudRate& baud_rate)
+    SerialStreamBuf::Implementation::SetBaudRate(const BaudRate& baudRate)
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        switch (baud_rate)
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(mFileDescriptor,
+                      &port_settings) < 0)
         {
-        case BaudRate::BAUD_50:
-        case BaudRate::BAUD_75:
-        case BaudRate::BAUD_110:
-        case BaudRate::BAUD_134:
-        case BaudRate::BAUD_150:
-        case BaudRate::BAUD_200:
-        case BaudRate::BAUD_300:
-        case BaudRate::BAUD_600:
-        case BaudRate::BAUD_1200:
-        case BaudRate::BAUD_1800:
-        case BaudRate::BAUD_2400:
-        case BaudRate::BAUD_4800:
-        case BaudRate::BAUD_9600:
-        case BaudRate::BAUD_19200:
-        case BaudRate::BAUD_38400:
-        case BaudRate::BAUD_57600:
-        case BaudRate::BAUD_115200:
-        case BaudRate::BAUD_230400:
-        case BaudRate::BAUD_460800:
-        case BaudRate::BAUD_921600:
-        case BaudRate::BAUD_1000000:
-        case BaudRate::BAUD_1500000:
-        case BaudRate::BAUD_2000000:
-        case BaudRate::BAUD_2500000:
-        case BaudRate::BAUD_3000000:
-            
-            // Get the current serial port settings.
-            termios port_settings;
-            memset(&port_settings, 0, sizeof(port_settings));
-            
-            if (tcgetattr(mFileDescriptor,
-                          &port_settings) < 0)
-            {
-                throw std::runtime_error(strerror(errno));
-            }
+            throw std::runtime_error(strerror(errno));
+        }
 
-            // Modify the baud rate in the port_settings structure.
-            cfsetispeed(&port_settings, static_cast<speed_t>(baud_rate));
-            cfsetospeed(&port_settings, static_cast<speed_t>(baud_rate));
+        // Set the baud rate for both input and output.
+        if (cfsetspeed(&port_settings, (speed_t)baudRate) < 0 ||
+            cfsetospeed(&port_settings, (speed_t)baudRate) < 0 )
+        {
+            // If applying the baud rate settings fail, throw an exception.
+            throw UnsupportedBaudRate(ERR_MSG_UNSUPPORTED_BAUD_RATE);
+        }
 
-            // Apply the modified settings.
-            if (tcsetattr(mFileDescriptor,
-                          TCSANOW,
-                          &port_settings) < 0)
-            {
-                throw UnsupportedBaudRate(strerror(errno));
-            }
-            break;
-        default:
+        // Apply the modified settings.
+        if (tcsetattr(mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
             throw UnsupportedBaudRate(strerror(errno));
-            break;
         }
 
         return;
@@ -673,8 +685,8 @@ namespace LibSerial
     BaudRate
     SerialStreamBuf::Implementation::GetBaudRate()
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -701,162 +713,16 @@ namespace LibSerial
             return BaudRate::BAUD_INVALID;
         }
 
-        BaudRate baudRate;
-
-        switch(input_baud)
-        {
-        case B50:
-            baudRate = BaudRate::BAUD_50;
-            break;
-        case B75:
-            baudRate = BaudRate::BAUD_75;
-            break;
-        case B110:
-            baudRate = BaudRate::BAUD_110;
-            break;
-        case B134:
-            baudRate = BaudRate::BAUD_134;
-            break;
-        case B150:
-            baudRate = BaudRate::BAUD_150;
-            break;
-        case B200:
-            baudRate = BaudRate::BAUD_200;
-            break;
-        case B300:
-            baudRate = BaudRate::BAUD_300;
-            break;
-        case B600:
-            baudRate = BaudRate::BAUD_600;
-            break;
-        case B1200:
-            baudRate = BaudRate::BAUD_1200;
-            break;
-        case B1800:
-            baudRate = BaudRate::BAUD_1800;
-            break;
-        case B2400:
-            baudRate = BaudRate::BAUD_2400;
-            break;
-        case B4800:
-            baudRate = BaudRate::BAUD_4800;
-            break;
-        case B9600:
-            baudRate = BaudRate::BAUD_9600;
-            break;
-        case B19200:
-            baudRate = BaudRate::BAUD_19200;
-            break;
-        case B38400:
-            baudRate = BaudRate::BAUD_38400;
-            break;
-        case B57600:
-            baudRate = BaudRate::BAUD_57600;
-            break;
-        case B115200:
-            baudRate = BaudRate::BAUD_115200;
-            break;
-        case B230400:
-            baudRate = BaudRate::BAUD_230400;
-            break;
-        case B460800:
-            baudRate = BaudRate::BAUD_460800;
-            break;
-        case B921600:
-            baudRate = BaudRate::BAUD_921600;
-            break;
-        case B1000000:
-            baudRate = BaudRate::BAUD_1000000;
-            break;
-        case B1500000:
-            baudRate = BaudRate::BAUD_1500000;
-            break;
-        case B2000000:
-            baudRate = BaudRate::BAUD_2000000;
-            break;
-        case B2500000:
-            baudRate = BaudRate::BAUD_2500000;
-            break;
-        case B3000000:
-            baudRate = BaudRate::BAUD_3000000;
-            break;
-        default:
-            throw UnsupportedBaudRate(strerror(errno));
-            break;
-        }
-
-        return baudRate;
+        // Obtain the input baud rate from the current settings.
+        return BaudRate(input_baud);
     }
 
     inline
     void
     SerialStreamBuf::Implementation::SetCharacterSize(const CharacterSize& characterSize)
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        switch(characterSize)
-        {
-        case CharacterSize::CHAR_SIZE_5:
-        case CharacterSize::CHAR_SIZE_6:
-        case CharacterSize::CHAR_SIZE_7:
-        case CharacterSize::CHAR_SIZE_8:
-
-            // Get the current serial port settings.
-            termios port_settings;
-            memset(&port_settings, 0, sizeof(port_settings));
-            
-            if (tcgetattr(mFileDescriptor,
-                          &port_settings) < 0)
-            {
-                throw std::runtime_error(strerror(errno));
-            }
-
-            // Set the character size to the specified value. If the character
-            // size is not 8 then it is also important to set ISTRIP. Setting
-            // ISTRIP causes all but the 7 low-order bits to be set to
-            // zero. Otherwise they are set to unspecified values and may
-            // cause problems. At the same time, we should clear the ISTRIP
-            // flag when the character size is 8 otherwise the MSB will always
-            // be set to zero (ISTRIP does not check the character size
-            // setting; it just sets every bit above the low 7 bits to zero).
-            if (characterSize == CharacterSize::CHAR_SIZE_8)
-            {
-                port_settings.c_iflag &= ~ISTRIP; // Clear the ISTRIP flag.
-            }
-            else
-            {
-                port_settings.c_iflag |= ISTRIP;  // Set the ISTRIP flag.
-            }
-
-            port_settings.c_cflag &= ~CSIZE;                               // Clear all CSIZE bits.
-            port_settings.c_cflag |= static_cast<tcflag_t>(characterSize); // Set the character size. 
-
-            // Apply the modified settings.
-            if (tcsetattr(mFileDescriptor,
-                          TCSANOW,
-                          &port_settings) < 0)
-            {
-                throw std::invalid_argument(strerror(errno));
-            }
-            break;
-        default:
-            throw std::invalid_argument(strerror(errno));
-            break;
-        }
-
-        return;
-    }
-
-    inline
-    CharacterSize
-    SerialStreamBuf::Implementation::GetCharacterSize()
-    {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -871,34 +737,67 @@ namespace LibSerial
             throw std::runtime_error(strerror(errno));
         }
 
-        // Extract the character size from the terminal settings.
-        int characterSize = (port_settings.c_cflag & CSIZE);
-        switch(characterSize)
+        // Set the character size to the specified value. If the character
+        // size is not 8 then it is also important to set ISTRIP. Setting
+        // ISTRIP causes all but the 7 low-order bits to be set to
+        // zero. Otherwise they are set to unspecified values and may
+        // cause problems. At the same time, we should clear the ISTRIP
+        // flag when the character size is 8 otherwise the MSB will always
+        // be set to zero (ISTRIP does not check the character size
+        // setting; it just sets every bit above the low 7 bits to zero).
+        if (characterSize == CharacterSize::CHAR_SIZE_8)
         {
-        case CS5:
-            return CharacterSize::CHAR_SIZE_5; break;
-        case CS6:
-            return CharacterSize::CHAR_SIZE_6; break;
-        case CS7: 
-            return CharacterSize::CHAR_SIZE_7; break;
-        case CS8:
-            return CharacterSize::CHAR_SIZE_8; break;
-        default:
-            // If we get an invalid character, we set the badbit for the
-            // stream associated with the serial port.
-            return CharacterSize::CHAR_SIZE_INVALID;
-            break;
+            port_settings.c_iflag &= ~ISTRIP; // Clear the ISTRIP flag.
+        }
+        else
+        {
+            port_settings.c_iflag |= ISTRIP;  // Set the ISTRIP flag.
         }
 
-        return CharacterSize::CHAR_SIZE_INVALID;
+        port_settings.c_cflag &= ~CSIZE;                               // Clear all CSIZE bits.
+        port_settings.c_cflag |= static_cast<tcflag_t>(characterSize); // Set the character size. 
+
+        // Apply the modified settings.
+        if (tcsetattr(mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw std::invalid_argument(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    CharacterSize
+    SerialStreamBuf::Implementation::GetCharacterSize()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // Read the character size from the setttings.
+        return CharacterSize(port_settings.c_cflag & CSIZE);
     }
 
     inline
     void
     SerialStreamBuf::Implementation::SetFlowControl(const FlowControl& flowControlType)
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -923,24 +822,27 @@ namespace LibSerial
         // Set the flow control. Hardware flow control uses the RTS (Ready
         // To Send) and CTS (clear to Send) lines. Software flow control
         // uses IXON|IXOFF
-        if (FlowControl::FLOW_CONTROL_HARD == flowControlType)
+        switch(flowControlType)
         {
+        case FlowControl::FLOW_CONTROL_HARDWARE:
             port_settings.c_iflag &= ~ (IXON|IXOFF);
             port_settings.c_cflag |= CRTSCTS;
             port_settings.c_cc[VSTART] = _POSIX_VDISABLE;
             port_settings.c_cc[VSTOP] = _POSIX_VDISABLE;
-        }
-        else if (FlowControl::FLOW_CONTROL_SOFT == flowControlType)
-        {
+            break;
+        case FlowControl::FLOW_CONTROL_SOFTWARE:
             port_settings.c_iflag |= IXON|IXOFF;
             port_settings.c_cflag &= ~CRTSCTS;
             port_settings.c_cc[VSTART] = CTRL_Q; // 0x11 (021) ^q
             port_settings.c_cc[VSTOP]  = CTRL_S; // 0x13 (023) ^s
-        }
-        else
-        {
+            break;
+        case FlowControl::FLOW_CONTROL_NONE:
             port_settings.c_iflag &= ~(IXON|IXOFF);
             port_settings.c_cflag &= ~CRTSCTS;
+            break;
+        default:
+            throw std::invalid_argument(ERR_MSG_INVALID_FLOW_CONTROL);
+            break;
         }
         
         // Apply the modified settings.
@@ -958,8 +860,8 @@ namespace LibSerial
     FlowControl
     SerialStreamBuf::Implementation::GetFlowControl() 
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -982,7 +884,7 @@ namespace LibSerial
             CTRL_Q == port_settings.c_cc[VSTART] &&
             CTRL_S == port_settings.c_cc[VSTOP])
         {
-            return FlowControl::FLOW_CONTROL_SOFT;
+            return FlowControl::FLOW_CONTROL_SOFTWARE;
         }
         else if (!(port_settings.c_iflag & IXON ||
                    port_settings.c_iflag & IXOFF))
@@ -991,7 +893,7 @@ namespace LibSerial
             {
                 // If neither IXON or IXOFF is set then we must have hardware flow
                 // control.
-                return FlowControl::FLOW_CONTROL_HARD;
+                return FlowControl::FLOW_CONTROL_HARDWARE;
             }
             else
             {
@@ -1008,8 +910,8 @@ namespace LibSerial
     void
     SerialStreamBuf::Implementation::SetParity(const Parity& parityType) 
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1024,19 +926,22 @@ namespace LibSerial
             throw std::runtime_error(strerror(errno));
         }
 
-        // Set the parity type in the termios structure. 
+        // Set the parity type
         switch(parityType)
         {
         case Parity::PARITY_EVEN:
             port_settings.c_cflag |= PARENB;
             port_settings.c_cflag &= ~PARODD;
+            port_settings.c_iflag |= INPCK;
             break;
         case Parity::PARITY_ODD:
             port_settings.c_cflag |= PARENB;
             port_settings.c_cflag |= PARODD;
+            port_settings.c_iflag |= INPCK;
             break;
         case Parity::PARITY_NONE:
             port_settings.c_cflag &= ~PARENB;
+            port_settings.c_iflag |= IGNPAR;
             break;
         default:
             throw std::invalid_argument(ERR_MSG_INVALID_PARITY);
@@ -1058,8 +963,8 @@ namespace LibSerial
     Parity
     SerialStreamBuf::Implementation::GetParity() 
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1097,10 +1002,10 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetNumberOfStopBits(const StopBits& stop_bits)
+    SerialStreamBuf::Implementation::SetNumberOfStopBits(const StopBits& numberOfStopBits)
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1115,7 +1020,8 @@ namespace LibSerial
             throw std::runtime_error(strerror(errno));
         }
 
-        switch(stop_bits)
+        // Set the number of stop bits.
+        switch(numberOfStopBits)
         {
         case StopBits::STOP_BITS_1:
             port_settings.c_cflag &= ~CSTOPB;
@@ -1143,8 +1049,8 @@ namespace LibSerial
     StopBits 
     SerialStreamBuf::Implementation::GetNumberOfStopBits()
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1159,7 +1065,8 @@ namespace LibSerial
             throw std::runtime_error(strerror(errno));
         }
 
-        // If CSTOPB is set then the number of stop bits is 2 otherwise it is 1.
+        // If CSTOPB is set then we are using two stop bits, otherwise we
+        // are using 1 stop bit.
         if (port_settings.c_cflag & CSTOPB)
         {
             return StopBits::STOP_BITS_2;
@@ -1174,8 +1081,8 @@ namespace LibSerial
     void
     SerialStreamBuf::Implementation::SetVMin(const short& vmin)
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1212,8 +1119,8 @@ namespace LibSerial
     short 
     SerialStreamBuf::Implementation::GetVMin()
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1273,8 +1180,8 @@ namespace LibSerial
     short 
     SerialStreamBuf::Implementation::GetVTime() 
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1327,8 +1234,8 @@ namespace LibSerial
     streamsize
     SerialStreamBuf::Implementation::xsgetn(char_type *s, streamsize n) 
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1401,8 +1308,8 @@ namespace LibSerial
     streambuf::int_type
     SerialStreamBuf::Implementation::overflow(int_type character) 
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1435,8 +1342,8 @@ namespace LibSerial
     streambuf::int_type
     SerialStreamBuf::Implementation::underflow() 
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1488,8 +1395,8 @@ namespace LibSerial
     streambuf::int_type
     SerialStreamBuf::Implementation::pbackfail(const int_type character) 
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1521,8 +1428,8 @@ namespace LibSerial
     std::streamsize
     SerialStreamBuf::Implementation::showmanyc()
     {
-        // If we do not have a valid file descriptor then throw an exception.
-        if (-1 == this->mFileDescriptor)
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }

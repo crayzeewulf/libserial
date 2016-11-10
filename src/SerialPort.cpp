@@ -79,6 +79,19 @@ namespace LibSerial
          */
         bool IsOpen();
 
+        /** 
+         * @brief This routine is called by open() in order to
+         *        initialize some parameters of the serial port and
+         *        setting its parameters to default values.
+         * @return -1 on failure and some other value on success. 
+         */
+        int InitializeSerialPort();
+
+        /**
+         * @brief Sets all serial port paramters to their default values.
+         */
+        void SetParametersToDefault();
+
         /**
          * @brief Sets the baud rate for the serial port to the specified value
          * @param baudRate The baud rate to be set for the serial port.
@@ -281,21 +294,17 @@ namespace LibSerial
          */
         void HandlePosixSignal(const int& signalNumber) override;
     private:
-        /**
-         * @brief Name of the serial port. On POSIX systems this is the name of
-         *        the device file.
-         */
-        std::string mSerialPortName {};
-
-        /**
-         * @brief Flag that indicates whether the serial port is currently open.
-         */
-        bool mIsOpen {false};
 
         /**
          * @brief The file descriptor corresponding to the serial port.
          */
         int mFileDescriptor {-1};
+
+        /**
+         * @brief Name of the serial port. On POSIX systems this is the name of
+         *        the device file.
+         */
+        std::string mSerialPortName {};
 
         /**
          * @brief Serial port settings are saved into this variable immediately
@@ -400,6 +409,19 @@ namespace LibSerial
     SerialPort::IsOpen()
     {
         return mImpl->IsOpen();
+    }
+
+    int
+    SerialPort::InitializeSerialPort()
+    {
+        return mImpl->InitializeSerialPort();
+    }
+
+    void
+    SerialPort::SetParametersToDefault()
+    {
+        mImpl->SetParametersToDefault();
+        return;
     }
 
     void
@@ -595,10 +617,12 @@ namespace LibSerial
         return mImpl->GetFileDescriptor();
     }
 
+
     /** ------------------------------------------------------------ */
     inline
     SerialPort::Implementation::Implementation(const std::string& serialPortName)
-        : mSerialPortName(serialPortName)
+        : mFileDescriptor(-1)
+        , mSerialPortName(serialPortName)
     {
         //Initializing the mutex
         if (pthread_mutex_init(&mQueueMutex, NULL) != 0)
@@ -632,13 +656,12 @@ namespace LibSerial
         // Try to open the serial port and throw an exception if we are
         // not able to open it.
 
-        // :FIXME: Exception thrown by this method after opening the
-        // serial port might leave the port open even though mIsOpen
-        // is false. We need to close the port before throwing an
-        // exception or close it next time this method is called before
-        // calling open() again.
+        int flags;
+        flags = (O_RDWR | O_NOCTTY | O_NONBLOCK);
+        
+        // Try to open the serial port. 
         mFileDescriptor = open(mSerialPortName.c_str(),
-                               O_RDWR | O_NOCTTY | O_NONBLOCK);
+                               flags);
         
         if (mFileDescriptor < 0)
         {
@@ -674,7 +697,7 @@ namespace LibSerial
             throw OpenFailed(strerror(errno));
         }
 
-        // Start assembling the new port settings.
+        // Assemble the new port settings.
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
 
@@ -705,8 +728,11 @@ namespace LibSerial
             throw OpenFailed(strerror(errno));
         }
 
-        // Set the serial port open flag.
-        mIsOpen = true;
+        // Initialize the serial port. 
+        if (-1 == InitializeSerialPort())
+        {
+            throw std::runtime_error(strerror(errno));
+        }
 
         return;
     }
@@ -736,8 +762,8 @@ namespace LibSerial
         // Close the serial port file descriptor.
         close(mFileDescriptor);
 
-        // Set the serial port open flag.
-        mIsOpen = false;
+        // Set the file descriptor to an invalid value, -1. 
+        mFileDescriptor = -1;
 
         return;
     }
@@ -746,7 +772,111 @@ namespace LibSerial
     bool
     SerialPort::Implementation::IsOpen()
     {
-        return mIsOpen;
+        return (-1 != this->mFileDescriptor);
+    }
+
+    inline
+    int
+    SerialPort::Implementation::InitializeSerialPort()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Use non-blocking mode while configuring the serial port. 
+        int flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
+        
+        if ( -1 == fcntl( this->mFileDescriptor, 
+                         F_SETFL, 
+                         flags | O_NONBLOCK ) )
+        {
+            return -1;
+        }
+
+        // Flush out any garbage left behind in the buffers associated
+        // with the port from any previous operations. 
+        if ( -1 == tcflush(this->mFileDescriptor, TCIOFLUSH) )
+        {
+            return -1;
+        }
+
+        // Set up the default configuration for the serial port.
+        this->SetParametersToDefault();
+
+        // Allow all further communications to happen in blocking mode.
+        flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
+        
+        if ( -1 == fcntl( this->mFileDescriptor, 
+                         F_SETFL, 
+                         flags & ~O_NONBLOCK ) )
+        {
+            return -1;
+        }
+
+        // Initialization was successful.
+        return 0;
+    }
+
+    inline
+    void 
+    SerialPort::Implementation::SetParametersToDefault()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        port_settings.c_iflag = IGNBRK;
+        port_settings.c_oflag = 0;
+        port_settings.c_cflag = B19200 | CS8 | CLOCAL | CREAD;
+        port_settings.c_lflag = 0;
+
+        // :TRICKY:
+        // termios.c_line is not a standard element of the termios structure (as 
+        // per the Single Unix Specification 2. This is only present under Linux.
+    #ifdef __linux__
+        port_settings.c_line = '\0';
+    #endif
+
+        // Set the VMIN and VTIME parameters to zero by default. VMIN is
+        // the minimum number of characters for non-canonical read and
+        // VTIME is the timeout in deciseconds for non-canonical
+        // read. Setting both of these parameters to zero implies that a
+        // read will return immediately only giving the currently
+        // available characters.
+        port_settings.c_cc[VMIN] = 0;
+        port_settings.c_cc[VTIME] = 0;
+
+        // Apply the modified settings.
+        if (tcsetattr(mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw OpenFailed(strerror(errno));
+        }
+
+        SetBaudRate(BaudRate::BAUD_DEFAULT);
+        SetCharacterSize(CharacterSize::CHAR_SIZE_DEFAULT);
+        SetFlowControl(FlowControl::FLOW_CONTROL_DEFAULT);
+        SetParity(Parity::PARITY_DEFAULT);
+        SetNumberOfStopBits(StopBits::STOP_BITS_DEFAULT);
+        SetVMin(VMIN_DEFAULT);
+        SetVTime(VTIME_DEFAULT);
+        
+        return;
     }
 
     inline
@@ -770,11 +900,11 @@ namespace LibSerial
         }
 
         // Set the baud rate for both input and output.
-        if (cfsetispeed(&port_settings, (speed_t)baudRate) < 0 ||
+        if (cfsetspeed(&port_settings, (speed_t)baudRate) < 0 ||
             cfsetospeed(&port_settings, (speed_t)baudRate) < 0 )
         {
-            // If any of the settings fail, we abandon this method.
-            throw UnsupportedBaudRate(ERR_MSG_UNSUPPORTED_BAUD);
+            // If applying the baud rate settings fail, throw an exception.
+            throw UnsupportedBaudRate(ERR_MSG_UNSUPPORTED_BAUD_RATE);
         }
 
         // Apply the modified settings.
@@ -808,6 +938,18 @@ namespace LibSerial
             throw std::runtime_error(strerror(errno));
         }
 
+        // Read the input and output baud rates.
+        speed_t input_baud = cfgetispeed(&port_settings);
+        speed_t output_baud = cfgetospeed(&port_settings);
+
+        // Make sure that the input and output baud rates are
+        // equal. Otherwise, we do not know which one to return.
+        if (input_baud != output_baud)
+        {
+            throw std::runtime_error(strerror(errno));
+            return BaudRate::BAUD_INVALID;
+        }
+
         // Obtain the input baud rate from the current settings.
         return BaudRate(cfgetispeed(&port_settings));
     }
@@ -830,6 +972,23 @@ namespace LibSerial
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
+        }
+
+        // Set the character size to the specified value. If the character
+        // size is not 8 then it is also important to set ISTRIP. Setting
+        // ISTRIP causes all but the 7 low-order bits to be set to
+        // zero. Otherwise they are set to unspecified values and may
+        // cause problems. At the same time, we should clear the ISTRIP
+        // flag when the character size is 8 otherwise the MSB will always
+        // be set to zero (ISTRIP does not check the character size
+        // setting; it just sets every bit above the low 7 bits to zero).
+        if (characterSize == CharacterSize::CHAR_SIZE_8)
+        {
+            port_settings.c_iflag &= ~ISTRIP; // Clear the ISTRIP flag.
+        }
+        else
+        {
+            port_settings.c_iflag |= ISTRIP;  // Set the ISTRIP flag.
         }
 
         // Set the character size.
@@ -873,12 +1032,19 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::SetFlowControl(const FlowControl& flowControl)
+    SerialPort::Implementation::SetFlowControl(const FlowControl& flowControlType)
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Flush the input and output buffers associated with the port.
+        if (tcflush(mFileDescriptor,
+                    TCIOFLUSH) < 0)
+        {
+            throw OpenFailed(strerror(errno));
         }
 
         // Get the current serial port settings.
@@ -891,20 +1057,32 @@ namespace LibSerial
             throw std::runtime_error(strerror(errno));
         }
 
-        // Set the flow control.
-        switch(flowControl)
+        // Set the flow control. Hardware flow control uses the RTS (Ready
+        // To Send) and CTS (clear to Send) lines. Software flow control
+        // uses IXON|IXOFF
+        switch(flowControlType)
         {
-        case FlowControl::FLOW_CONTROL_HARD:
+        case FlowControl::FLOW_CONTROL_HARDWARE:
+            port_settings.c_iflag &= ~ (IXON|IXOFF);
             port_settings.c_cflag |= CRTSCTS;
+            port_settings.c_cc[VSTART] = _POSIX_VDISABLE;
+            port_settings.c_cc[VSTOP] = _POSIX_VDISABLE;
+            break;
+        case FlowControl::FLOW_CONTROL_SOFTWARE:
+            port_settings.c_iflag |= IXON|IXOFF;
+            port_settings.c_cflag &= ~CRTSCTS;
+            port_settings.c_cc[VSTART] = CTRL_Q; // 0x11 (021) ^q
+            port_settings.c_cc[VSTOP]  = CTRL_S; // 0x13 (023) ^s
             break;
         case FlowControl::FLOW_CONTROL_NONE:
-            port_settings.c_cflag &= ~(CRTSCTS);
+            port_settings.c_iflag &= ~(IXON|IXOFF);
+            port_settings.c_cflag &= ~CRTSCTS;
             break;
         default:
             throw std::invalid_argument(ERR_MSG_INVALID_FLOW_CONTROL);
             break;
         }
-
+        
         // Apply the modified settings.
         if (tcsetattr(mFileDescriptor,
                       TCSANOW,
@@ -936,14 +1114,34 @@ namespace LibSerial
             throw std::runtime_error(strerror(errno));
         }
 
-        // If CRTSCTS is set then we are using hardware flow
-        // control. Otherwise, we are not using any flow control.
-        if (port_settings.c_cflag & CRTSCTS)
+        // Check if IXON and IXOFF are set in c_iflag. If both are set and
+        // VSTART and VSTOP are set to 0x11 (^Q) and 0x13 (^S) respectively,
+        // then we are using software flow control.
+        if (port_settings.c_iflag & IXON &&
+            port_settings.c_iflag & IXOFF &&
+            CTRL_Q == port_settings.c_cc[VSTART] &&
+            CTRL_S == port_settings.c_cc[VSTOP])
         {
-            return FlowControl::FLOW_CONTROL_HARD;
+            return FlowControl::FLOW_CONTROL_SOFTWARE;
+        }
+        else if (!(port_settings.c_iflag & IXON ||
+                   port_settings.c_iflag & IXOFF))
+        {
+            if (port_settings.c_cflag & CRTSCTS)
+            {
+                // If neither IXON or IXOFF is set then we must have hardware flow
+                // control.
+                return FlowControl::FLOW_CONTROL_HARDWARE;
+            }
+            else
+            {
+                return FlowControl::FLOW_CONTROL_NONE;
+            }
         }
 
-        return FlowControl::FLOW_CONTROL_NONE;
+        // If none of the above conditions are satisfied then the serial port
+        // is using a flow control setup which we do not support at present.
+        return FlowControl::FLOW_CONTROL_INVALID;
     }
 
     inline
@@ -966,7 +1164,7 @@ namespace LibSerial
             throw std::runtime_error(strerror(errno));
         }
 
-        // Set the parity type depending on the specified parameter.
+        // Set the parity type
         switch(parityType)
         {
         case Parity::PARITY_EVEN:
@@ -975,11 +1173,12 @@ namespace LibSerial
             port_settings.c_iflag |= INPCK;
             break;
         case Parity::PARITY_ODD:
-            port_settings.c_cflag |= (PARENB | PARODD);
+            port_settings.c_cflag |= PARENB;
+            port_settings.c_cflag |= PARODD;
             port_settings.c_iflag |= INPCK;
             break;
         case Parity::PARITY_NONE:
-            port_settings.c_cflag &= ~(PARENB);
+            port_settings.c_cflag &= ~PARENB;
             port_settings.c_iflag |= IGNPAR;
             break;
         default:
@@ -1018,22 +1217,25 @@ namespace LibSerial
             throw std::runtime_error(strerror(errno));
         }
 
-        // Get the parity type from the current settings.
+        // Get the parity setting from the termios structure. 
         if (port_settings.c_cflag & PARENB)
         {
-            // Parity is enabled. Lets check if it is odd or even.
+            // parity is enabled.
             if (port_settings.c_cflag & PARODD)
             {
-                return Parity::PARITY_ODD;
+                return Parity::PARITY_ODD; // odd parity
             }
             else
             {
-                return Parity::PARITY_EVEN;
+                return Parity::PARITY_EVEN; // even parity
             }
         }
+        else
+        {
+            return Parity::PARITY_NONE; // no parity.
+        }
 
-        // Parity is disabled.
-        return Parity::PARITY_NONE;
+        return Parity::PARITY_INVALID; // execution should never reach here. 
     }
 
     inline
@@ -1060,12 +1262,12 @@ namespace LibSerial
         switch(numberOfStopBits)
         {
         case StopBits::STOP_BITS_1:
-            port_settings.c_cflag &= ~(CSTOPB);
+            port_settings.c_cflag &= ~CSTOPB;
             break;
         case StopBits::STOP_BITS_2:
             port_settings.c_cflag |= CSTOPB;
             break;
-        default:
+        default: 
             throw std::invalid_argument(ERR_MSG_INVALID_STOP_BITS);
             break;
         }
@@ -1107,8 +1309,10 @@ namespace LibSerial
         {
             return StopBits::STOP_BITS_2;
         }
-
-        return StopBits::STOP_BITS_1;
+        else
+        {
+            return StopBits::STOP_BITS_1;
+        }
     }
 
     inline

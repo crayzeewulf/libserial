@@ -50,12 +50,12 @@ namespace LibSerial
         /**
          * @brief Default Constructor.
          */
-        SerialStreamBuf();
+        explicit SerialStreamBuf();
 
         /**
          *  @brief Default Destructor.  
          */
-        ~SerialStreamBuf();
+        virtual ~SerialStreamBuf();
 
         /**
          * @brief If IsOpen() != <tt>false</tt>, returns a null
@@ -137,6 +137,14 @@ namespace LibSerial
          */
         bool IsOpen();
 
+        /** 
+         * @brief This routine is called by open() in order to
+         *        initialize some parameters of the serial port and
+         *        setting its parameters to default values.
+         * @return -1 on failure and some other value on success. 
+         */
+        int InitializeSerialPort();
+
         /**
          * @brief Initializes the serial communication parameters to their
          *        default values.
@@ -169,9 +177,9 @@ namespace LibSerial
 
         /**
          * @brief Sets flow control for the serial port.
-         * @param flowControlType The flow control type to be set.
+         * @param flowControl The flow control type to be set.
          */
-        void SetFlowControl(const FlowControl& flowControlType);
+        void SetFlowControl(const FlowControl& flowControl);
 
         /**
          * @brief Get the current flow control setting.
@@ -231,18 +239,6 @@ namespace LibSerial
 
 
     protected:
-        /**
-         * @brief Character used to signal that I/O can start while using
-         *        software flow control with the serial port.
-         */
-        static const char CTRL_Q = 0x11;
-  
-        /**
-         * @brief Character used to signal that I/O should stop while using
-         *        software flow control with the serial port.
-         */
-        static const char CTRL_S = 0x13;
-
         /**
          * @brief Performs an operation that is defined separately for each
          *        class derived from streambuf. The default behavior is to

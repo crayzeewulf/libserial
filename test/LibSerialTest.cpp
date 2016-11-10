@@ -66,8 +66,8 @@ protected:
         characterSizes[3] = CharacterSize::CHAR_SIZE_8;
 
         flowControlTypes[0] = FlowControl::FLOW_CONTROL_NONE;
-        flowControlTypes[1] = FlowControl::FLOW_CONTROL_HARD;
-        flowControlTypes[2] = FlowControl::FLOW_CONTROL_SOFT;
+        flowControlTypes[1] = FlowControl::FLOW_CONTROL_HARDWARE;
+        flowControlTypes[2] = FlowControl::FLOW_CONTROL_SOFTWARE;
 
         parityTypes[0] = Parity::PARITY_EVEN;
         parityTypes[1] = Parity::PARITY_ODD;
@@ -182,7 +182,7 @@ protected:
         ASSERT_FALSE(serialStream.IsOpen());
     }
 
-    void testSerialStreamSetGetCharSize()
+    void testSerialStreamSetGetCharacterSize()
     {
         serialStream.Open(TEST_SERIAL_PORT);
         ASSERT_TRUE(serialStream.IsOpen());
@@ -437,7 +437,7 @@ protected:
         ASSERT_FALSE(serialPort.IsOpen());
     }
 
-    void testSerialPortSetGetCharSize()
+    void testSerialPortSetGetCharacterSize()
     {
         serialPort.Open();
         ASSERT_TRUE(serialPort.IsOpen());
@@ -648,13 +648,13 @@ TEST_F(LibSerialTest, testSerialStreamSetGetBaudRate)
     }
 }
 
-TEST_F(LibSerialTest, testSerialStreamSetGetCharSize)
+TEST_F(LibSerialTest, testSerialStreamSetGetCharacterSize)
 {
-    SCOPED_TRACE("Serial Stream Set and Get Char Size Test");
+    SCOPED_TRACE("Serial Stream Set and Get Character Size Test");
     
     for (size_t i = 0; i < 100; i++)
     {
-        testSerialStreamSetGetCharSize();
+        testSerialStreamSetGetCharacterSize();
     }
 }
 
@@ -753,13 +753,13 @@ TEST_F(LibSerialTest, testSerialPortSetGetBaudRate)
     }
 }
 
-TEST_F(LibSerialTest, testSerialPortSetGetCharSize)
+TEST_F(LibSerialTest, testSerialPortSetGetCharacterSize)
 {
-    SCOPED_TRACE("Serial Port Set and Get Char Size Test");
+    SCOPED_TRACE("Serial Port Set and Get Character Size Test");
     
     for (size_t i = 0; i < 100; i++)
     {
-        testSerialPortSetGetCharSize();
+        testSerialPortSetGetCharacterSize();
     }
 }
 

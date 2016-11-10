@@ -31,13 +31,13 @@ namespace LibSerial
     /**
      * Error messages utilized when throwing exceptions.
      */
-    const std::string ERR_MSG_PTHREAD_MUTEX_ERROR  = "Could not initialize mutex!";
-    const std::string ERR_MSG_PORT_NOT_OPEN        = "Serial port not open.";
-    const std::string ERR_MSG_PORT_ALREADY_OPEN    = "Serial port already open.";
-    const std::string ERR_MSG_UNSUPPORTED_BAUD     = "Unsupported baud rate.";
-    const std::string ERR_MSG_INVALID_FLOW_CONTROL = "Invalid flow control.";
-    const std::string ERR_MSG_INVALID_PARITY       = "Invalid parity setting.";
-    const std::string ERR_MSG_INVALID_STOP_BITS    = "Invalid number of stop bits.";
+    const std::string ERR_MSG_INVALID_FLOW_CONTROL  = "Invalid flow control.";
+    const std::string ERR_MSG_INVALID_PARITY        = "Invalid parity setting.";
+    const std::string ERR_MSG_INVALID_STOP_BITS     = "Invalid number of stop bits.";
+    const std::string ERR_MSG_PORT_ALREADY_OPEN     = "Serial port already open.";
+    const std::string ERR_MSG_PORT_NOT_OPEN         = "Serial port not open.";
+    const std::string ERR_MSG_PTHREAD_MUTEX_ERROR   = "Could not initialize mutex!";
+    const std::string ERR_MSG_UNSUPPORTED_BAUD_RATE = "Unsupported baud rate.";
 
     const int MICROSECONDS_PER_MS  =    1000;
     const int MILLISECONDS_PER_SEC =    1000;
@@ -60,6 +60,18 @@ namespace LibSerial
      *             and write timeouts.
      */
     static constexpr short VTIME_DEFAULT = 0;
+    
+    /**
+     * @brief Character used to signal that I/O can start while using
+     *        software flow control with the serial port.
+     */
+    static constexpr char CTRL_Q = 0x11;
+
+    /**
+     * @brief Character used to signal that I/O should stop while using
+     *        software flow control with the serial port.
+     */
+    static constexpr char CTRL_S = 0x13;
 
     class NotOpen : public std::logic_error
     {
@@ -172,8 +184,8 @@ namespace LibSerial
      */
     enum class FlowControl : tcflag_t
     {
-        FLOW_CONTROL_HARD,
-        FLOW_CONTROL_SOFT,
+        FLOW_CONTROL_HARDWARE,
+        FLOW_CONTROL_SOFTWARE,
         FLOW_CONTROL_NONE,
         FLOW_CONTROL_DEFAULT = FLOW_CONTROL_NONE,
         FLOW_CONTROL_INVALID = std::numeric_limits<tcflag_t>::max()
