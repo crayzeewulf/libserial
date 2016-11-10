@@ -22,46 +22,28 @@
 #include "SerialPort.h"
 #include "PosixSignalDispatcher.h"
 #include "PosixSignalHandler.h"
-#include <queue>
-// #include <map>
-// #include <cerrno>
-// #include <cassert>
-// #include <termios.h>
+
+#include <cstring>
 #include <fcntl.h>
-#include <unistd.h>
+#include <queue>
+#include <signal.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
-#include <signal.h>
-// #include <strings.h>
-#include <cstring>
-#include <cstdlib>
-#include <sstream>
-#include <iostream>
+#include <unistd.h>
+
 
 namespace
 {
-    //
-    // Various error messages used in this file while throwing
-    // exceptions.
-    //
-    const std::string ERR_MSG_PORT_NOT_OPEN        = "Serial port not open." ;
-    const std::string ERR_MSG_PORT_ALREADY_OPEN    = "Serial port already open." ;
-    const std::string ERR_MSG_UNSUPPORTED_BAUD     = "Unsupported baud rate." ;
-    const std::string ERR_MSG_UNKNOWN_BAUD         = "Unknown baud rate." ;
-    const std::string ERR_MSG_INVALID_PARITY       = "Invalid parity setting." ;
-    const std::string ERR_MSG_INVALID_STOP_BITS    = "Invalid number of stop bits." ;
-    const std::string ERR_MSG_INVALID_FLOW_CONTROL = "Invalid flow control." ;
-
-    /*
+    /**
      * Return the difference between the two specified timeval values.
      * This method subtracts secondOperand from firstOperand and returns
      * the result as a timeval. The time represented by firstOperand must
      * be later than the time represented by secondOperand. Otherwise,
      * the result of this operator may be undefined.
      */
-    const struct timeval
-    operator-( const struct timeval& firstOperand,
-               const struct timeval& secondOperand ) ;
+    const timeval
+    operator-(const timeval& firstOperand,
+              const timeval& secondOperand);
 }
 
 namespace LibSerial 
@@ -70,1045 +52,1342 @@ namespace LibSerial
     {
     public:
         /**
-         * Constructor.
+         * @brief Default Constructor.
+         * @param serialPortName The serial port name to be opened.
          */
-        Implementation( const std::string& serialPortName ) ;
+        Implementation(const std::string& serialPortName);
 
         /**
-         * Destructor.
+         * @brief Destructor.
          */
-        ~Implementation() ;
+        ~Implementation();
 
         /**
-         * Open the serial port.
+         * @brief Opens the serial port.
          */
-        void Open() ;
+        void Open();
 
         /**
-         * Check if the serial port is currently open.
+         * @brief Closes the serial port. All settings of the serial port will be
+         *        lost and no more I/O can be performed on the serial port.
          */
-        bool IsOpen() const ;
+        void Close();
 
         /**
-         * Close the serial port.
+         * @brief Determines if the serial port is open for I/O.
+         * @return Returns true iff the serial port is open.
          */
-        void Close() ;
+        bool IsOpen();
 
         /**
-         * Set the baud rate of the serial port.
+         * @brief Sets the baud rate for the serial port to the specified value
+         * @param baudRate The baud rate to be set for the serial port.
          */
-        void
-        SetBaudRate(SerialPort::BaudRate baudRate) ;
+        void SetBaudRate(const BaudRate& baudRate);
 
         /**
-         * Get the current baud rate.
+         * @brief Gets the current baud rate for the serial port.
+         * @return Returns the baud rate.
          */
-        SerialPort::BaudRate GetBaudRate() const ;
+        BaudRate GetBaudRate();
 
         /**
-         * Set the character size.
+         * @brief Sets the character size for the serial port.
+         * @param characterSize The character size to be set.
          */
-        void SetCharSize(SerialPort::CharacterSize charSize) ;
+        void SetCharacterSize(const CharacterSize& characterSize);
 
         /**
-         * Get the current character size.
+         * @brief Gets the character size being used for serial communication.
+         * @return Returns the current character size. 
          */
-        SerialPort::CharacterSize GetCharSize() const ;
+        CharacterSize GetCharacterSize();
 
-        void SetParity(const SerialPort::Parity parityType) ;
+        /**
+         * @brief Sets flow control for the serial port.
+         * @param flowControlType The flow control type to be set.
+         */
+        void SetFlowControl(const FlowControl& flowControl);
 
-        SerialPort::Parity GetParity() const ;
+        /**
+         * @brief Get the current flow control setting.
+         * @return Returns the flow control type of the serial port.
+         */
+        FlowControl GetFlowControl();
 
-        void SetNumOfStopBits(SerialPort::StopBits numOfStopBits) ;
+        /**
+         * @brief Sets the parity type for the serial port.
+         * @param parityType The parity type to be set.
+         */
+        void SetParity(const Parity& parityType);
 
-        SerialPort::StopBits GetNumOfStopBits() const ;
+        /**
+         * @brief Gets the parity type for the serial port.
+         * @return Returns the parity type.
+         */
+        Parity GetParity();
 
-        void SetFlowControl(SerialPort::FlowControl flowControl) ;
+        /**
+         * @brief Sets the number of stop bits to be used with the serial port.
+         * @param numberOfStopBits The number of stop bits to set.
+         */
+        void SetNumberOfStopBits(const StopBits& numberOfStopBits);
 
-        SerialPort::FlowControl GetFlowControl() const ;
+        /**
+         * @brief Gets the number of stop bits currently being used by the serial
+         * @return Returns the number of stop bits.
+         */
+        StopBits GetNumberOfStopBits();
 
-        bool IsDataAvailable() const ;
+        /**
+         * @brief Sets the minimum number of characters for non-canonical reads.
+         * @param vmin the number of minimum characters to be set.
+         */
+        void SetVMin(const short& vmin);
 
-        unsigned char ReadByte(const unsigned int msTimeout = 0) ;
+        /**
+         * @brief Gets the VMIN value for the device, which represents the
+         *        minimum number of characters for non-canonical reads.
+         * @return Returns the minimum number of characters for non-canonical reads.
+         */
+        short GetVMin();
 
-        void Read( SerialPort::DataBuffer& dataBuffer,
-                   unsigned int numOfBytes,
-                   unsigned int msTimeout ) ;
+        /** 
+         * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
+         * @param vtime The timeout value in deciseconds to be set.
+         */
+        void SetVTime(const short& vtime);
 
-        const std::string ReadLine(unsigned int msTimeout = 0,
-                                   char         lineTerminator = '\n') ;
+        /** 
+         * @brief Gets the current timeout value for non-canonical reads in deciseconds.
+         * @return Returns the character buffer timeout for non-canonical reads in deciseconds. 
+         */
+        short GetVTime();
 
-        void WriteByte(unsigned char dataByte) ;
+        /**
+         * @brief Determines if data is available at the serial port.
+         */
+        bool IsDataAvailable();
 
-        void Write(const SerialPort::DataBuffer& dataBuffer) ;
+        /**
+         * @brief Reads the specified number of bytes from the serial port.
+         *        The method will timeout if no data is received in the specified
+         *        number of milliseconds (msTimeout). If msTimeout is 0, then
+         *        this method will block until all requested bytes are
+         *        received. If numOfBytes is zero, then this method will keep
+         *        reading data till no more data is available at the serial port.
+         *        In all cases, all read data is available in dataBuffer on
+         *        return from this method.
+         * @param dataBuffer The data buffer to place serial data into.
+         * @param numOfBytes The number of bytes to read before returning.
+         * @param msTimeout The timeout period in milliseconds.
+         * @return Returns the number of bytes read.
+         */
+        int Read(SerialPort::DataBuffer& dataBuffer,
+                 const unsigned int&     numOfBytes,
+                 const unsigned int&     msTimeout);
 
+        /**
+         * @brief Reads a single byte from the serial port.
+         *        If no data is available within the specified number
+         *        of milliseconds (msTimeout), then this method will
+         *        throw a ReadTimeout exception. If msTimeout is 0,
+         *        then this method will block until data is available.
+         * @param msTimeout The timeout period in milliseconds.
+         * @return Returns the number of bytes read.
+         */
+        int ReadByte(unsigned char&      charBuffer, 
+                     const unsigned int& msTimeout = 0);
+
+        /**
+         * @brief Reads a line of characters from the serial port.
+         *        The method will timeout if no data is received in the specified
+         *        number of milliseconds (msTimeout). If msTimeout is 0, then
+         *        this method will block until a line terminator is received.
+         *        If a line terminator is read, a string will be returned,
+         *        however, if the timeout is reached, an exception will be thrown
+         *        and all previously read data will be lost.
+         * @param dataString The data string read from the serial port.
+         * @param lineTerminator The line termination character to specify the
+         *        end of a line.
+         * @param msTimeout The timeout value to return if a line termination
+         *        character is not read.
+         * @return Returns the number of bytes read.
+         */
+        int ReadLine(std::string&        dataString,
+                     const char&         lineTerminator = '\n',
+                     const unsigned int& msTimeout = 0);
+
+        /**
+         * @brief Writes a single byte to the serial port.
+         * @param dataByte The byte to be written to the serial port.
+         */
+        void WriteByte(const unsigned char& dataByte);
+
+        /**
+         * @brief Writes a DataBuffer vector to the serial port.
+         * @param dataBuffer The DataBuffer vector to be written to the serial port.
+         */
+        void Write(const SerialPort::DataBuffer& dataBuffer);
+
+        /**
+         * @brief Writes a DataBuffer vector to the serial port.
+         * @param dataBuffer The DataBuffer vector to be written to the serial port.
+         * @param bufferSize The number of bytes to be written to the serial port.
+         */
         void Write(const unsigned char* dataBuffer,
-                   const unsigned int   bufferSize ) ;
+                   const unsigned int&   bufferSize);
 
-        void SetDtr(const bool dtrState) ;
+        /**
+         * @brief Sets the serial port DTR line status.
+         * @param dtrState The state to set the DTR line
+         */
+        void SetDtr(const bool& dtrState);
 
-        bool GetDtr() const ;
+        /**
+         * @brief Gets the serial port DTR line status.
+         */
+        bool GetDtr();
 
-        void SetRts( const bool rtsState ) ;
+        /**
+         * @brief Sets the serial port RTS line status.
+         * @param dtrState The state to set the RTS line
+         */
+        void SetRts(const bool& rtsState);
 
-        bool GetRts() const ;
+        /**
+         * @brief Gets the serial port RTS line status.
+         */
+        bool GetRts();
 
-        bool GetCts() const ;
+        /**
+         * @brief Gets the serial port CTS line status.
+         */
+        bool GetCts();
 
-        bool GetDsr() const ;
+        /**
+         * @brief Gets the serial port DSR line status.
+         */
+        bool GetDsr();
+
+        /**
+         * @brief Gets the serial port file descriptor.
+         */
+        int GetFileDescriptor();
 
         /*
-         * This method must be defined by all subclasses of
-         * PosixSignalHandler.
+         * @brief This method must be defined by all subclasses of
+         *        PosixSignalHandler.
          */
-        void HandlePosixSignal(int signalNumber) override ;
+        void HandlePosixSignal(const int& signalNumber) override;
     private:
         /**
-         * Name of the serial port. On POSIX systems this is the name of
-         * the device file.
+         * @brief Name of the serial port. On POSIX systems this is the name of
+         *        the device file.
          */
-        std::string mSerialPortName {} ;
+        std::string mSerialPortName {};
 
         /**
-         * Flag that indicates whether the serial port is currently open.
+         * @brief Flag that indicates whether the serial port is currently open.
          */
-        bool mIsOpen {false} ;
+        bool mIsOpen {false};
 
         /**
-         * The file descriptor corresponding to the serial port.
+         * @brief The file descriptor corresponding to the serial port.
          */
-        int mFileDescriptor {-1} ;
+        int mFileDescriptor {-1};
 
         /**
-         * Serial port settings are saved into this variable immediately
-         * after the port is opened. These settings are restored when the
-         * serial port is closed.
+         * @brief Serial port settings are saved into this variable immediately
+         *        after the port is opened. These settings are restored when the
+         *        serial port is closed.
          */
-        termios mOldPortSettings {} ;
+        termios mOldPortSettings {};
 
         /**
-         * Circular buffer used to store the received data. This is done
-         * asynchronously and helps prevent overflow of the corresponding 
-         * tty's input buffer.
+         * @brief Circular buffer used to store the received data. This is done
+         *        asynchronously and helps prevent overflow of the corresponding 
+         *        tty's input buffer.
          * 
-         * :TODO: The size of this buffer is allowed to increase indefinitely. If 
-         * data keeps arriving at the serial port and is never read then this 
-         * buffer will continue occupying more and more memory. We need to put a 
-         * cap on the size of this buffer. It might even be worth providing a 
-         * method to set the size of this buffer.  
+         * @TODO: The size of this buffer is allowed to increase indefinitely. If 
+         *        data keeps arriving at the serial port and is never read then this 
+         *        buffer will continue occupying more and more memory. We need to put a 
+         *        cap on the size of this buffer. It might even be worth providing a 
+         *        method to set the size of this buffer.  
          */
-        std::queue<unsigned char> mInputBuffer {} ;
-
-        /*
-         * In order to be thread save, a second queue is implemented to store
-         * byte which are received while the queue is locked by the
-         * ReadByte method. The content must be transfered to mInputBuffer
-         * before further bytes are stored into it.
-         */
-        std::queue<unsigned char> mShadowInputBuffer {} ;
-
-        /*
-         * Mutex to control threaded access to mInputBuffer
-         */
-        pthread_mutex_t mQueueMutex {} ;
-
-        /*
-         * Indicates if unread bytes are available within the queue
-         */
-        volatile bool mIsQueueDataAvailable {false} ;
+        std::queue<unsigned char> mInputBuffer {};
 
         /**
-         * Set the specified modem control line to the specified value. 
-         *
+         * @brief In order to be thread safe, a second queue is implemented to store
+         *        bytes which are received while the queue is locked by the
+         *        ReadByte method. The content must be transfered to mInputBuffer
+         *        before further bytes are stored into it.
+         */
+        std::queue<unsigned char> mShadowInputBuffer {};
+
+        /**
+         * @brief Mutex to control threaded access to mInputBuffer
+         */
+        pthread_mutex_t mQueueMutex {};
+
+        /**
+         * @brief Set the specified modem control line to the specified value. 
          * @param modemLine One of the following four values: TIOCM_DTR,
-         * TIOCM_RTS, TIOCM_CTS, or TIOCM_DSR.
-         *
+         *        TIOCM_RTS, TIOCM_CTS, or TIOCM_DSR.
          * @param lineState State of the modem line after successful
-         * call to this method.
+         *        call to this method.
          */
         void
-        SetModemControlLine( const int modemLine,
-                             const bool lineState ) ;
+        SetModemControlLine(const int& modemLine,
+                            const bool& lineState);
 
         /**
-         * Get the current state of the specified modem control line.
-         * 
+         * @brief Get the current state of the specified modem control line.
          * @param modemLine One of the following four values: TIOCM_DTR,
-         * TIOCM_RTS, TIOCM_CTS, or TIOCM_DSR.
-         *
+         *        TIOCM_RTS, TIOCM_CTS, or TIOCM_DSR.
          * @return True if the specified line is currently set and false
-         * otherwise.
+         *         otherwise.
          */
         bool
-        GetModemControlLine( const int modemLine ) const ;
-    } ;
+        GetModemControlLine(const int& modemLine);
+    };
 
-    SerialPort::SerialPort( const std::string& serialPortName ) :
-        mImpl(new Implementation(serialPortName))
+    SerialPort::SerialPort(const std::string& serialPortName)
+        : mImpl(new Implementation(serialPortName))
     {
-        /* empty */
+        // Empty
     }
 
     SerialPort::~SerialPort()
     throw()
     {
-        /*
-         * Close the serial port if it is open.
-         */
-        if ( this->IsOpen() )
+        // Close the serial port if it is open.
+        if (this->IsOpen())
         {
-            this->Close() ;
+            this->Close();
         }
-        return ;
+
+        return;
     }
 
     void
-    SerialPort::Open( const BaudRate      baudRate,
-                      const CharacterSize charSize,
-                      const Parity        parityType,
-                      const StopBits      stopBits,
-                      const FlowControl   flowControl )
+    SerialPort::Open(const BaudRate&      baudRate,
+                     const CharacterSize& characterSize,
+                     const FlowControl&   flowControlType,
+                     const Parity&        parityType,
+                     const StopBits&      stopBits)
     {
-        //
         // Open the serial port.
-        mImpl->Open() ;
-        //
+        mImpl->Open();
+
         // Set the various parameters of the serial port if it is open.
-        //
-        this->SetBaudRate(baudRate) ;
-        this->SetCharSize(charSize) ;
-        this->SetParity(parityType) ;
-        this->SetNumOfStopBits(stopBits) ;
-        this->SetFlowControl(flowControl) ;
+        this->SetBaudRate(baudRate);
+        this->SetCharacterSize(characterSize);
+        this->SetFlowControl(flowControlType);
+        this->SetParity(parityType);
+        this->SetNumberOfStopBits(stopBits);
+        return;
+    }
 
-        //
-        // All done.
-        //
-        return ;
+    void
+    SerialPort::Close()
+    {
+        mImpl->Close();
+        return;
     }
 
     bool
-    SerialPort::IsOpen() const
+    SerialPort::IsOpen()
     {
-        return mImpl->IsOpen() ;
-    }
-
-    void SerialPort::Close()
-    {
-        mImpl->Close() ;
-        return ;
+        return mImpl->IsOpen();
     }
 
     void
-    SerialPort::SetBaudRate( const BaudRate baudRate )
+    SerialPort::SetBaudRate(const BaudRate& baudRate)
     {
-        mImpl->SetBaudRate( baudRate ) ;
-        return ;
+        mImpl->SetBaudRate(baudRate);
+        return;
     }
 
-    SerialPort::BaudRate
-    SerialPort::GetBaudRate() const
+    BaudRate
+    SerialPort::GetBaudRate()
     {
-        return mImpl->GetBaudRate() ;
+        return mImpl->GetBaudRate();
     }
 
 
     void
-    SerialPort::SetCharSize( const CharacterSize charSize )
+    SerialPort::SetCharacterSize(const CharacterSize& characterSize)
     {
-        mImpl->SetCharSize(charSize) ;
+        mImpl->SetCharacterSize(characterSize);
+        return;
     }
 
-    SerialPort::CharacterSize
-    SerialPort::GetCharSize() const
+    CharacterSize
+    SerialPort::GetCharacterSize()
     {
-        return mImpl->GetCharSize() ;
-    }
-
-    void
-    SerialPort::SetParity( const Parity parityType )
-    {
-        mImpl->SetParity( parityType ) ;
-        return ;
-    }
-
-    SerialPort::Parity
-    SerialPort::GetParity() const
-    {
-        return mImpl->GetParity() ;
+        return mImpl->GetCharacterSize();
     }
 
     void
-    SerialPort::SetNumOfStopBits( const StopBits numOfStopBits )
+    SerialPort::SetFlowControl(const FlowControl& flowControl)
     {
-        mImpl->SetNumOfStopBits(numOfStopBits) ;
-        return ;
+        mImpl->SetFlowControl(flowControl);
+        return;
     }
 
-    SerialPort::StopBits
-    SerialPort::GetNumOfStopBits() const
+    FlowControl
+    SerialPort::GetFlowControl()
     {
-        return mImpl->GetNumOfStopBits() ;
+        return mImpl->GetFlowControl();
     }
-
 
     void
-    SerialPort::SetFlowControl( const FlowControl   flowControl )
+    SerialPort::SetParity(const Parity& parityType)
     {
-        mImpl->SetFlowControl( flowControl ) ;
-        return ;
+        mImpl->SetParity( parityType );
+        return;
     }
 
-    SerialPort::FlowControl
-    SerialPort::GetFlowControl() const
+    Parity
+    SerialPort::GetParity()
     {
-        return mImpl->GetFlowControl() ;
+        return mImpl->GetParity();
+    }
+
+    void
+    SerialPort::SetNumberOfStopBits(const StopBits& numberOfStopBits)
+    {
+        mImpl->SetNumberOfStopBits(numberOfStopBits);
+        return;
+    }
+
+    StopBits
+    SerialPort::GetNumberOfStopBits()
+    {
+        return mImpl->GetNumberOfStopBits();
+    }
+
+    void
+    SerialPort::SetVMin(const short& vmin)
+    {
+        mImpl->SetVMin(vmin);
+        return;
+    }
+
+    short
+    SerialPort::GetVMin()
+    {
+        return mImpl->GetVMin();
+    }
+
+    void
+    SerialPort::SetVTime(const short& vtime)
+    {
+        mImpl->SetVTime(vtime);
+        return;
+    }
+
+    short
+    SerialPort::GetVTime()
+    {
+        return mImpl->GetVTime();
     }
 
     bool
-    SerialPort::IsDataAvailable() const
+    SerialPort::IsDataAvailable()
     {
-        return mImpl->IsDataAvailable() ;
+        return mImpl->IsDataAvailable();
     }
 
-    unsigned char
-    SerialPort::ReadByte( const unsigned int msTimeout )
+    int
+    SerialPort::Read(SerialPort::DataBuffer&  dataBuffer,
+                     const unsigned int&      numOfBytes,
+                     const unsigned int&      msTimeout)
     {
-        return mImpl->ReadByte(msTimeout) ;
+        return mImpl->Read(dataBuffer,
+                           numOfBytes,
+                           msTimeout);
+    }
+
+    int
+    SerialPort::ReadByte(unsigned char&      charBuffer,
+                         const unsigned int& msTimeout)
+    {
+        return mImpl->ReadByte(charBuffer,
+                               msTimeout);
+    }
+
+    int
+    SerialPort::ReadLine(std::string&        dataString,
+                         const char&         lineTerminator,
+                         const unsigned int& msTimeout)
+    {
+        return mImpl->ReadLine(dataString,
+                               lineTerminator,
+                               msTimeout);
     }
 
     void
-    SerialPort::Read( SerialPort::DataBuffer& dataBuffer,
-                      const unsigned int      numOfBytes,
-                      const unsigned int      msTimeout )
+    SerialPort::WriteByte(const unsigned char& dataByte)
     {
-        return mImpl->Read( dataBuffer,
-                                      numOfBytes,
-                                      msTimeout ) ;
-    }
-
-
-    std::string
-    SerialPort::ReadLine( const unsigned int msTimeout,
-                          const char         lineTerminator )
-    {
-        return mImpl->ReadLine( msTimeout,
-                                          lineTerminator ) ;
-    }
-
-
-    void
-    SerialPort::WriteByte( const unsigned char dataByte )
-    {
-        mImpl->WriteByte( dataByte ) ;
-        return ;
+        mImpl->WriteByte(dataByte);
+        return;
     }
 
     void
     SerialPort::Write(const DataBuffer& dataBuffer)
     {
-        mImpl->Write( dataBuffer ) ;
-        return ;
+        mImpl->Write(dataBuffer);
+        return;
     }
 
     void
     SerialPort::Write(const std::string& dataString)
     {
-        mImpl->Write( reinterpret_cast<const unsigned char*>(dataString.c_str()),
-                                dataString.length() ) ;
-        return ;
+        mImpl->Write(reinterpret_cast<const unsigned char*>(dataString.c_str()),
+                     dataString.length());
+        return;
     }
 
     void
-    SerialPort::SetDtr( const bool dtrState )
+    SerialPort::SetDtr(const bool& dtrState)
     {
-        mImpl->SetDtr( dtrState ) ;
-        return ;
+        mImpl->SetDtr(dtrState);
+        return;
     }
 
     bool
-    SerialPort::GetDtr() const 
+    SerialPort::GetDtr() 
     {
-        return mImpl->GetDtr() ;
+        return mImpl->GetDtr();
     }
 
     void
-    SerialPort::SetRts( const bool rtsState )
+    SerialPort::SetRts(const bool& rtsState)
     {
-        mImpl->SetRts( rtsState ) ;
-        return ;
+        mImpl->SetRts(rtsState);
+        return;
     }
 
     bool
-    SerialPort::GetRts() const 
+    SerialPort::GetRts() 
     {
-        return mImpl->GetRts() ;
+        return mImpl->GetRts();
     }
 
 
     bool
-    SerialPort::GetCts() const 
+    SerialPort::GetCts() 
     {
-        return mImpl->GetCts() ;
+        return mImpl->GetCts();
     }
 
     bool
-    SerialPort::GetDsr() const 
+    SerialPort::GetDsr() 
     {
-        return mImpl->GetDsr() ;
+        return mImpl->GetDsr();
     }
 
-    /* ------------------------------------------------------------ */
+    int
+    SerialPort::GetFileDescriptor()
+    {
+        return mImpl->GetFileDescriptor();
+    }
+
+    /** ------------------------------------------------------------ */
     inline
-    SerialPort::Implementation::Implementation(const std::string& serialPortName) :
-        mSerialPortName(serialPortName)
+    SerialPort::Implementation::Implementation(const std::string& serialPortName)
+        : mSerialPortName(serialPortName)
     {
         //Initializing the mutex
-        if (pthread_mutex_init(&mQueueMutex, NULL) != 0) {
-            std::ostringstream err_msg ; 
-            err_msg << "SerialPort.cpp: Could not initialize mutex!" ;
-            throw std::runtime_error(err_msg.str()) ;
+        if (pthread_mutex_init(&mQueueMutex, NULL) != 0)
+        {
+            throw std::runtime_error(ERR_MSG_PTHREAD_MUTEX_ERROR);
         }
     }
 
     inline
     SerialPort::Implementation::~Implementation()
     {
-        //
         // Close the serial port if it is open.
-        //
-        if ( this->IsOpen() )
+        if (this->IsOpen())
         {
-            this->Close() ;
+            this->Close();
         }
-        return ;
+
+        return;
     }
 
     inline
     void
     SerialPort::Implementation::Open()
     {
-        /*
-         * Throw an exception if the port is already open.
-         */
-        if ( this->IsOpen() )
+        // Throw an exception if the port is already open.
+        if (this->IsOpen())
         {
-            throw SerialPort::AlreadyOpen( ERR_MSG_PORT_ALREADY_OPEN ) ;
-        }
-        /*
-         * Try to open the serial port and throw an exception if we are
-         * not able to open it.
-         *
-         * :FIXME: Exception thrown by this method after opening the
-         * serial port might leave the port open even though mIsOpen
-         * is false. We need to close the port before throwing an
-         * exception or close it next time this method is called before
-         * calling open() again.
-         */
-        mFileDescriptor = open( mSerialPortName.c_str(),
-                                O_RDWR | O_NOCTTY | O_NONBLOCK ) ;
-        if ( mFileDescriptor < 0 )
-        {
-            throw SerialPort::OpenFailed( strerror(errno) )  ;
+            throw AlreadyOpen(ERR_MSG_PORT_ALREADY_OPEN);
         }
 
+        // Try to open the serial port and throw an exception if we are
+        // not able to open it.
 
-        PosixSignalDispatcher& signal_dispatcher = PosixSignalDispatcher::Instance() ;
-        signal_dispatcher.AttachHandler( SIGIO,
-                                         *this ) ;
-
-        /*
-         * Direct all SIGIO and SIGURG signals for the port to the current
-         * process.
-         */
-        if ( fcntl( mFileDescriptor,
-                    F_SETOWN,
-                    getpid() ) < 0 )
+        // :FIXME: Exception thrown by this method after opening the
+        // serial port might leave the port open even though mIsOpen
+        // is false. We need to close the port before throwing an
+        // exception or close it next time this method is called before
+        // calling open() again.
+        mFileDescriptor = open(mSerialPortName.c_str(),
+                               O_RDWR | O_NOCTTY | O_NONBLOCK);
+        
+        if (mFileDescriptor < 0)
         {
-            throw SerialPort::OpenFailed( strerror(errno) ) ;
+            close(mFileDescriptor);
+            throw OpenFailed(strerror(errno));
         }
 
-        /*
-         * Enable asynchronous I/O with the serial port.
-         */
-        if ( fcntl( mFileDescriptor,
-                    F_SETFL,
-                    FASYNC ) < 0 )
+        PosixSignalDispatcher& signal_dispatcher = PosixSignalDispatcher::Instance();
+        signal_dispatcher.AttachHandler(SIGIO,
+                                        *this);
+
+        // Direct all SIGIO and SIGURG signals for the port to the current process.
+        if (fcntl(mFileDescriptor,
+                  F_SETOWN,
+                  getpid()) < 0)
         {
-            throw SerialPort::OpenFailed( strerror(errno) ) ;
+            throw OpenFailed(strerror(errno));
         }
 
-        /*
-         * Save the current settings of the serial port so they can be
-         * restored when the serial port is closed.
-         */
-        if ( tcgetattr( mFileDescriptor,
-                        &mOldPortSettings ) < 0 )
+        // Enable asynchronous I/O with the serial port.
+        if (fcntl(mFileDescriptor,
+                  F_SETFL,
+                  FASYNC) < 0)
         {
-            throw SerialPort::OpenFailed( strerror(errno) ) ;
+            throw OpenFailed(strerror(errno));
         }
 
-        //
+        // Save the current settings of the serial port so they can be
+        // restored when the serial port is closed.
+        if (tcgetattr(mFileDescriptor,
+                      &mOldPortSettings) < 0)
+        {
+            throw OpenFailed(strerror(errno));
+        }
+
         // Start assembling the new port settings.
-        //
-        termios port_settings ;
-        bzero( &port_settings,
-               sizeof( port_settings ) ) ;
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
 
-        //
-        // Enable the receiver (CREAD) and ignore modem control lines
-        // (CLOCAL).
-        //
-        port_settings.c_cflag |= CREAD | CLOCAL ;
+        // Enable the receiver (CREAD) and ignore modem control lines (CLOCAL).
+        port_settings.c_cflag |= CREAD | CLOCAL;
 
-        //
         // Set the VMIN and VTIME parameters to zero by default. VMIN is
         // the minimum number of characters for non-canonical read and
         // VTIME is the timeout in deciseconds for non-canonical
         // read. Setting both of these parameters to zero implies that a
         // read will return immediately only giving the currently
         // available characters.
-        //
-        port_settings.c_cc[ VMIN  ] = 0 ;
-        port_settings.c_cc[ VTIME ] = 0 ;
-        /*
-         * Flush the input buffer associated with the port.
-         */
-        if ( tcflush( mFileDescriptor,
-                      TCIFLUSH ) < 0 )
+        port_settings.c_cc[VMIN] = 0;
+        port_settings.c_cc[VTIME] = 0;
+
+        // Apply the modified settings.
+        if (tcsetattr(mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
         {
-            throw SerialPort::OpenFailed( strerror(errno) ) ;
-        }
-        /*
-         * Write the new settings to the port.
-         */
-        if ( tcsetattr( mFileDescriptor,
-                        TCSANOW,
-                        &port_settings ) < 0 )
-        {
-            throw SerialPort::OpenFailed( strerror(errno) ) ;
+            throw OpenFailed(strerror(errno));
         }
 
-        /*
-         * The serial port is open at this point.
-         */
-        mIsOpen = true ;
+        // Flush the input and output buffers associated with the port.
+        if (tcflush(mFileDescriptor,
+                    TCIOFLUSH) < 0)
+        {
+            throw OpenFailed(strerror(errno));
+        }
 
-        //Reset flag
-        mIsQueueDataAvailable = false;
+        // Set the serial port open flag.
+        mIsOpen = true;
 
-        return ;
-    }
-
-    inline
-    bool
-    SerialPort::Implementation::IsOpen() const
-    {
-        return mIsOpen ;
+        return;
     }
 
     inline
     void
     SerialPort::Implementation::Close()
     {
-        //
         // Throw an exception if the serial port is not open.
-        //
-        if ( ! this->IsOpen() )
+        if (!this->IsOpen())
         {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
-        //
-        PosixSignalDispatcher& signal_dispatcher = PosixSignalDispatcher::Instance() ;
-        signal_dispatcher.DetachHandler( SIGIO,
-                                         *this ) ;
-        //
+
+        PosixSignalDispatcher& signal_dispatcher = PosixSignalDispatcher::Instance();
+        signal_dispatcher.DetachHandler(SIGIO,
+                                        *this);
+
         // Restore the old settings of the port.
-        //
-        tcsetattr( mFileDescriptor,
-                   TCSANOW,
-                   &mOldPortSettings ) ;
-        //
+        if (tcsetattr(mFileDescriptor,
+                      TCSANOW,
+                      &mOldPortSettings) < 0)
+        {
+            throw std::invalid_argument(strerror(errno));
+        }
+
         // Close the serial port file descriptor.
-        //
-        close(mFileDescriptor) ;
-        //
-        // The port is not open anymore.
-        //
-        mIsOpen = false ;
-        //
-        return ;
-    }
+        close(mFileDescriptor);
 
-    inline
-    void
-    SerialPort::Implementation::SetBaudRate( const SerialPort::BaudRate baudRate )
-    {
-        //
-        // Throw an exception if the serial port is not open.
-        //
-        if ( ! this->IsOpen() )
-        {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
-        }
-        //
-        // Get the current settings of the serial port.
-        //
-        termios port_settings ;
-        if ( tcgetattr( mFileDescriptor,
-                        &port_settings ) < 0 )
-        {
-            throw std::runtime_error( strerror(errno) ) ;
-        }
-        //
-        // Set the baud rate for both input and output.
-        //
-        if ( ( cfsetispeed( &port_settings,
-                            baudRate ) < 0 ) ||
-             ( cfsetospeed( &port_settings,
-                            baudRate ) < 0 ) )
-        {
-            //
-            // If any of the settings fail, we abandon this method.
-            //
-            throw SerialPort::UnsupportedBaudRate( ERR_MSG_UNSUPPORTED_BAUD ) ;
-        }
-        //
-        // Set the new attributes of the serial port.
-        //
-        if ( tcsetattr( mFileDescriptor,
-                        TCSANOW,
-                        &port_settings ) < 0 )
-        {
-            throw SerialPort::UnsupportedBaudRate( strerror(errno) ) ;
-        }
-        return ;
-    }
+        // Set the serial port open flag.
+        mIsOpen = false;
 
-    inline
-    SerialPort::BaudRate
-    SerialPort::Implementation::GetBaudRate() const
-    {
-        //
-        // Make sure that the serial port is open.
-        //
-        if ( ! this->IsOpen() )
-        {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
-        }
-        //
-        // Read the current serial port settings.
-        //
-        termios port_settings ;
-        if ( tcgetattr( mFileDescriptor,
-                        &port_settings ) < 0 )
-        {
-            throw std::runtime_error( strerror(errno) ) ;
-        }
-        //
-        // Obtain the input baud rate from the current settings.
-        //
-        return SerialPort::BaudRate(cfgetispeed( &port_settings )) ;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::SetCharSize( const SerialPort::CharacterSize charSize )
-    {
-        //
-        // Make sure that the serial port is open.
-        //
-        if ( ! this->IsOpen() )
-        {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
-        }
-        //
-        // Get the current settings of the serial port.
-        //
-        termios port_settings ;
-        if ( tcgetattr( mFileDescriptor,
-                        &port_settings ) < 0 )
-        {
-            throw std::runtime_error( strerror(errno) ) ;
-        }
-        //
-        // Set the character size.
-        //
-        port_settings.c_cflag &= ~CSIZE ;
-        port_settings.c_cflag |= charSize ;
-        //
-        // Apply the modified settings.
-        //
-        if ( tcsetattr( mFileDescriptor,
-                        TCSANOW,
-                        &port_settings ) < 0 )
-        {
-            throw std::invalid_argument( strerror(errno) ) ;
-        }
-        return ;
-    }
-
-    inline
-    SerialPort::CharacterSize
-    SerialPort::Implementation::GetCharSize() const
-    {
-        //
-        // Make sure that the serial port is open.
-        //
-        if ( ! this->IsOpen() )
-        {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
-        }
-        //
-        // Get the current port settings.
-        //
-        termios port_settings ;
-        if ( tcgetattr( mFileDescriptor,
-                        &port_settings ) < 0 )
-        {
-            throw std::runtime_error( strerror(errno) ) ;
-        }
-        //
-        // Read the character size from the setttings.
-        //
-        return SerialPort::CharacterSize( port_settings.c_cflag & CSIZE ) ;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::SetParity( const SerialPort::Parity parityType )
-    {
-        //
-        // Make sure that the serial port is open.
-        //
-        if ( ! this->IsOpen() )
-        {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
-        }
-        //
-        // Get the current port settings.
-        //
-        termios port_settings ;
-        if ( tcgetattr( mFileDescriptor,
-                        &port_settings ) < 0 )
-        {
-            throw std::runtime_error( strerror(errno) ) ;
-        }
-        //
-        // Set the parity type depending on the specified parameter.
-        //
-        switch( parityType )
-        {
-        case SerialPort::PARITY_EVEN:
-            port_settings.c_cflag |= PARENB ;
-            port_settings.c_cflag &= ~PARODD ;
-            port_settings.c_iflag |= INPCK ;
-            break ;
-        case SerialPort::PARITY_ODD:
-            port_settings.c_cflag |= ( PARENB | PARODD ) ;
-            port_settings.c_iflag |= INPCK ;
-            break ;
-        case SerialPort::PARITY_NONE:
-            port_settings.c_cflag &= ~(PARENB) ;
-            port_settings.c_iflag |= IGNPAR ;
-            break ;
-        default:
-            throw std::invalid_argument( ERR_MSG_INVALID_PARITY ) ;
-            break ;
-        }
-        //
-        // Apply the modified port settings.
-        //
-        if ( tcsetattr( mFileDescriptor,
-                        TCSANOW,
-                        &port_settings ) < 0 )
-        {
-            throw std::invalid_argument( strerror(errno) ) ;
-        }
-        return ;
-    }
-
-    inline
-    SerialPort::Parity
-    SerialPort::Implementation::GetParity() const
-    {
-        //
-        // Make sure that the serial port is open.
-        //
-        if ( ! this->IsOpen() )
-        {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
-        }
-        //
-        // Get the current port settings.
-        //
-        termios port_settings ;
-        if ( tcgetattr( mFileDescriptor,
-                        &port_settings ) < 0 )
-        {
-            throw std::runtime_error( strerror(errno) ) ;
-        }
-        //
-        // Get the parity type from the current settings.
-        //
-        if ( port_settings.c_cflag & PARENB )
-        {
-            //
-            // Parity is enabled. Lets check if it is odd or even.
-            //
-            if ( port_settings.c_cflag & PARODD )
-            {
-                return SerialPort::PARITY_ODD ;
-            }
-            else
-            {
-                return SerialPort::PARITY_EVEN ;
-            }
-        }
-        //
-        // Parity is disabled.
-        //
-        return SerialPort::PARITY_NONE ;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::SetNumOfStopBits( const SerialPort::StopBits numOfStopBits )
-    {
-        //
-        // Make sure that the serial port is open.
-        //
-        if ( ! this->IsOpen() )
-        {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
-        }
-        //
-        // Get the current port settings.
-        //
-        termios port_settings ;
-        if ( tcgetattr( mFileDescriptor,
-                        &port_settings ) < 0 )
-        {
-            throw std::runtime_error( strerror(errno) ) ;
-        }
-        //
-        // Set the number of stop bits.
-        //
-        switch( numOfStopBits )
-        {
-        case SerialPort::STOP_BITS_1:
-            port_settings.c_cflag &= ~(CSTOPB) ;
-            break ;
-        case SerialPort::STOP_BITS_2:
-            port_settings.c_cflag |= CSTOPB ;
-            break ;
-        default:
-            throw std::invalid_argument( ERR_MSG_INVALID_STOP_BITS ) ;
-            break ;
-        }
-        //
-        // Apply the modified settings.
-        //
-        if ( tcsetattr( mFileDescriptor,
-                        TCSANOW,
-                        &port_settings ) < 0 )
-        {
-            throw std::invalid_argument( strerror(errno) ) ;
-        }
-        return ;
-    }
-
-    inline
-    SerialPort::StopBits
-    SerialPort::Implementation::GetNumOfStopBits() const
-    {
-        //
-        // Make sure that the serial port is open.
-        //
-        if ( ! this->IsOpen() )
-        {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
-        }
-        //
-        // Get the current port settings.
-        //
-        termios port_settings ;
-        if ( tcgetattr( mFileDescriptor,
-                        &port_settings ) < 0 )
-        {
-            throw std::runtime_error( strerror(errno) ) ;
-        }
-        //
-        // If CSTOPB is set then we are using two stop bits, otherwise we
-        // are using 1 stop bit.
-        //
-        if ( port_settings.c_cflag & CSTOPB )
-        {
-            return SerialPort::STOP_BITS_2 ;
-        }
-        return SerialPort::STOP_BITS_1 ;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::SetFlowControl( const SerialPort::FlowControl   flowControl )
-    {
-        //
-        // Make sure that the serial port is open.
-        //
-        if ( ! this->IsOpen() )
-        {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
-        }
-        //
-        // Get the current port settings.
-        //
-        termios port_settings ;
-        if ( tcgetattr( mFileDescriptor,
-                        &port_settings ) < 0 )
-        {
-            throw std::runtime_error( strerror(errno) ) ;
-        }
-        //
-        // Set the flow control.
-        //
-        switch( flowControl )
-        {
-        case SerialPort::FLOW_CONTROL_HARD:
-            port_settings.c_cflag |= CRTSCTS ;
-            break ;
-        case SerialPort::FLOW_CONTROL_NONE:
-            port_settings.c_cflag &= ~(CRTSCTS) ;
-            break ;
-        default:
-            throw std::invalid_argument( ERR_MSG_INVALID_FLOW_CONTROL ) ;
-            break ;
-        }
-        //
-        // Apply the modified settings.
-        //
-        if ( tcsetattr( mFileDescriptor,
-                        TCSANOW,
-                        &port_settings ) < 0 )
-        {
-            throw std::invalid_argument( strerror(errno) ) ;
-        }
-        return ;
-    }
-
-    inline
-    SerialPort::FlowControl
-    SerialPort::Implementation::GetFlowControl() const
-    {
-        //
-        // Make sure that the serial port is open.
-        //
-        if ( ! this->IsOpen() )
-        {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
-        }
-        //
-        // Get the current port settings.
-        //
-        termios port_settings ;
-        if ( tcgetattr( mFileDescriptor,
-                        &port_settings ) < 0 )
-        {
-            throw std::runtime_error( strerror(errno) ) ;
-        }
-        //
-        // If CRTSCTS is set then we are using hardware flow
-        // control. Otherwise, we are not using any flow control.
-        //
-        if ( port_settings.c_cflag & CRTSCTS )
-        {
-            return SerialPort::FLOW_CONTROL_HARD ;
-        }
-        return SerialPort::FLOW_CONTROL_NONE ;
+        return;
     }
 
     inline
     bool
-    SerialPort::Implementation::IsDataAvailable() const
+    SerialPort::Implementation::IsOpen()
     {
-        //
-        // Make sure that the serial port is open.
-        //
-        if ( ! this->IsOpen() )
-        {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
-        }
-        //
-        // Check if any data is available in the input buffer.
-        //
-        //return ( mInputBuffer.size() > 0 ? true : false ) ;
-        //Here comes an (almost) thread safe alternative
-        return mIsQueueDataAvailable;
+        return mIsOpen;
     }
 
     inline
-    unsigned char
-    SerialPort::Implementation::ReadByte(const unsigned int msTimeout)
+    void
+    SerialPort::Implementation::SetBaudRate(const BaudRate& baudRate)
     {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+        
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // Set the baud rate for both input and output.
+        if (cfsetispeed(&port_settings, (speed_t)baudRate) < 0 ||
+            cfsetospeed(&port_settings, (speed_t)baudRate) < 0 )
+        {
+            // If any of the settings fail, we abandon this method.
+            throw UnsupportedBaudRate(ERR_MSG_UNSUPPORTED_BAUD);
+        }
+
+        // Apply the modified settings.
+        if (tcsetattr(mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw UnsupportedBaudRate(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    BaudRate
+    SerialPort::Implementation::GetBaudRate()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // Obtain the input baud rate from the current settings.
+        return BaudRate(cfgetispeed(&port_settings));
+    }
+
+    inline
+    void
+    SerialPort::Implementation::SetCharacterSize(const CharacterSize& characterSize)
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // Set the character size.
+        port_settings.c_cflag &= ~CSIZE;
+        port_settings.c_cflag |= (tcflag_t)characterSize;
+
+        // Apply the modified settings.
+        if (tcsetattr(mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw std::invalid_argument(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    CharacterSize
+    SerialPort::Implementation::GetCharacterSize()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // Read the character size from the setttings.
+        return CharacterSize(port_settings.c_cflag & CSIZE);
+    }
+
+    inline
+    void
+    SerialPort::Implementation::SetFlowControl(const FlowControl& flowControl)
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // Set the flow control.
+        switch(flowControl)
+        {
+        case FlowControl::FLOW_CONTROL_HARD:
+            port_settings.c_cflag |= CRTSCTS;
+            break;
+        case FlowControl::FLOW_CONTROL_NONE:
+            port_settings.c_cflag &= ~(CRTSCTS);
+            break;
+        default:
+            throw std::invalid_argument(ERR_MSG_INVALID_FLOW_CONTROL);
+            break;
+        }
+
+        // Apply the modified settings.
+        if (tcsetattr(mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw std::invalid_argument(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    FlowControl
+    SerialPort::Implementation::GetFlowControl()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // If CRTSCTS is set then we are using hardware flow
+        // control. Otherwise, we are not using any flow control.
+        if (port_settings.c_cflag & CRTSCTS)
+        {
+            return FlowControl::FLOW_CONTROL_HARD;
+        }
+
+        return FlowControl::FLOW_CONTROL_NONE;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::SetParity(const Parity& parityType)
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // Set the parity type depending on the specified parameter.
+        switch(parityType)
+        {
+        case Parity::PARITY_EVEN:
+            port_settings.c_cflag |= PARENB;
+            port_settings.c_cflag &= ~PARODD;
+            port_settings.c_iflag |= INPCK;
+            break;
+        case Parity::PARITY_ODD:
+            port_settings.c_cflag |= (PARENB | PARODD);
+            port_settings.c_iflag |= INPCK;
+            break;
+        case Parity::PARITY_NONE:
+            port_settings.c_cflag &= ~(PARENB);
+            port_settings.c_iflag |= IGNPAR;
+            break;
+        default:
+            throw std::invalid_argument(ERR_MSG_INVALID_PARITY);
+            break;
+        }
+
+        // Apply the modified port settings.
+        if (tcsetattr(mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw std::invalid_argument(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    Parity
+    SerialPort::Implementation::GetParity()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // Get the parity type from the current settings.
+        if (port_settings.c_cflag & PARENB)
+        {
+            // Parity is enabled. Lets check if it is odd or even.
+            if (port_settings.c_cflag & PARODD)
+            {
+                return Parity::PARITY_ODD;
+            }
+            else
+            {
+                return Parity::PARITY_EVEN;
+            }
+        }
+
+        // Parity is disabled.
+        return Parity::PARITY_NONE;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::SetNumberOfStopBits(const StopBits& numberOfStopBits)
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // Set the number of stop bits.
+        switch(numberOfStopBits)
+        {
+        case StopBits::STOP_BITS_1:
+            port_settings.c_cflag &= ~(CSTOPB);
+            break;
+        case StopBits::STOP_BITS_2:
+            port_settings.c_cflag |= CSTOPB;
+            break;
+        default:
+            throw std::invalid_argument(ERR_MSG_INVALID_STOP_BITS);
+            break;
+        }
+
+        // Apply the modified settings.
+        if (tcsetattr(mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw std::invalid_argument(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    StopBits
+    SerialPort::Implementation::GetNumberOfStopBits()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // If CSTOPB is set then we are using two stop bits, otherwise we
+        // are using 1 stop bit.
+        if (port_settings.c_cflag & CSTOPB)
+        {
+            return StopBits::STOP_BITS_2;
+        }
+
+        return StopBits::STOP_BITS_1;
+    }
+
+    inline
+    void 
+    SerialPort::Implementation::SetVMin(const short& vmin)
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        if (vmin < 0 || vmin > 255)
+        {
+            throw std::invalid_argument(strerror(errno));
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        port_settings.c_cc[VMIN] = (cc_t)vmin;
+
+        // Apply the modified settings.
+        if (tcsetattr(mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw std::invalid_argument(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    short 
+    SerialPort::Implementation::GetVMin()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        return port_settings.c_cc[VMIN];
+    }
+
+    inline
+    void 
+    SerialPort::Implementation::SetVTime(const short& vtime)
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        if (vtime < 0 || vtime > 255)
+        {
+            throw std::invalid_argument(strerror(errno));
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        port_settings.c_cc[VTIME] = (cc_t)vtime;
+
+        // Apply the modified settings.
+        if (tcsetattr(mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw std::invalid_argument(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    short 
+    SerialPort::Implementation::GetVTime() 
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        return port_settings.c_cc[VTIME];
+    }
+
+    inline
+    bool
+    SerialPort::Implementation::IsDataAvailable()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        pthread_mutex_lock(&mQueueMutex);
+        bool dataAvailableStatus = !mInputBuffer.empty();
+        pthread_mutex_unlock(&mQueueMutex);
+
+        return dataAvailableStatus;
+    }
+
+    inline
+    int
+    SerialPort::Implementation::Read(SerialPort::DataBuffer& dataBuffer,
+                                     const unsigned int&     numOfBytes,
+                                     const unsigned int&     msTimeout)
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        unsigned int elapsed_ms;
+        unsigned int remaining_ms;
+
+        timeval entry_time;
+        timeval current_time;
+        timeval elapsed_time;
+
+        // Throw an exception if we are unable to read the current time.  
+        if (gettimeofday(&entry_time,
+                         NULL) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+        
+        // Empty the data buffer.
+        dataBuffer.resize(0);
+        unsigned char nextChar = 0;
+        size_t bytesRead = 0;
+
+        if (0 == numOfBytes)
+        {
+            // Read all available data if numOfBytes is zero.
+            while(this->IsDataAvailable())
+            {
+                bytesRead += ReadByte(nextChar,
+                                      msTimeout);
+                dataBuffer.push_back(nextChar);
+            }
+        }
+        else
+        {
+            // Reserve enough space in the buffer to store the incoming data.
+            dataBuffer.reserve(numOfBytes);
+
+            for (unsigned int i=0; i<numOfBytes; ++i)
+            {
+                // Throw an exception if we are unable to read the current time.            
+                if (gettimeofday(&current_time,
+                                 NULL) < 0)
+                {
+                    throw std::runtime_error(strerror(errno));
+                }
+
+                // Obtain the elapsed time.
+                elapsed_time = current_time - entry_time;
+
+                // Calculate the elapsed number of milliseconds.
+                elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
+                              elapsed_time.tv_usec / MICROSECONDS_PER_MS);
+
+                // If more than msTimeout milliseconds have elapsed while
+                // waiting for data, then we throw a ReadTimeout exception.
+                if (msTimeout > 0 &&
+                    elapsed_ms > msTimeout)
+                {
+                    throw ReadTimeout();
+                }
+                
+                remaining_ms = msTimeout - elapsed_ms;
+
+                bytesRead += ReadByte(nextChar,
+                                      remaining_ms);
+
+                dataBuffer.push_back(nextChar);
+            }
+        }
+        
+        return dataBuffer.size();
+    }
+
+    inline
+    int
+    SerialPort::Implementation::ReadByte(unsigned char&      charBuffer,
+                                         const unsigned int& msTimeout)
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        unsigned int elapsed_ms;
+
+        timeval entry_time;
+        timeval current_time;
+        timeval elapsed_time;
+        
+        // Throw an exception if we are unable to read the current time.  
+        if (gettimeofday(&entry_time,
+                         NULL) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
         pthread_mutex_lock(&mQueueMutex);
         int queueSize = mInputBuffer.size();
         pthread_mutex_unlock(&mQueueMutex);
-        //
-        // Make sure that the serial port is open.
-        //
-        if ( ! this->IsOpen() )
-        {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
-        }
-        //
-        // Get the current time. Throw an exception if we are unable
-        // to read the current time.
-        //
-        struct timeval entry_time ;
-        if ( gettimeofday( &entry_time,
-                           NULL ) < 0 )
-        {
-            throw std::runtime_error( strerror(errno) ) ;
-        }
-        //
-        // Wait for data to be available.
-        //
-        const int MICROSECONDS_PER_MS  = 1000 ;
-        const int MILLISECONDS_PER_SEC = 1000 ;
 
-        while(queueSize == 0 )
+        // Wait for data to be available.
+        while (queueSize == 0)
         {
-            //
-            // Read the current time.
-            //
-            struct timeval curr_time ;
-            if ( gettimeofday( &curr_time,
-                               NULL ) < 0 )
+            // Throw an exception if we are unable to read the current time.  
+            if (gettimeofday(&current_time,
+                             NULL) < 0)
             {
-                throw std::runtime_error( strerror(errno) ) ;
+                throw std::runtime_error(strerror(errno));
             }
-            //
-            // Obtain the elapsed time.
-            //
-            struct timeval elapsed_time = curr_time - entry_time ;
-            //
-            // Increase the elapsed number of milliseconds.
-            //
-            int elapsed_ms = ( elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
-                               elapsed_time.tv_usec / MICROSECONDS_PER_MS ) ;
-            //
-            // If more than msTimeout milliseconds have elapsed while
-            // waiting for data, then we throw a ReadTimeout exception.
-            //
-            if ( ( msTimeout > 0 ) &&
-                 ( elapsed_ms > (int)msTimeout ) )
+
+            // Obtain the total elapsed time.
+            elapsed_time = current_time - entry_time;
+
+            // Calculate the elapsed number of milliseconds.
+            elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
+                          elapsed_time.tv_usec / MICROSECONDS_PER_MS);
+
+            // Throw a ReadTimeout exception if more than msTimeout milliseconds
+            // have elapsed while waiting for data.
+            if (msTimeout > 0 &&
+                elapsed_ms > msTimeout)
             {
-                throw SerialPort::ReadTimeout() ;
+                throw ReadTimeout();
             }
-            //
-            // Wait for 1ms (1000us) for data to arrive.
-            //
-            usleep( MICROSECONDS_PER_MS ) ;
+
+            // Sleep for 1ms (1000us) for data to arrive.
+            usleep(MICROSECONDS_PER_MS);
+
             pthread_mutex_lock(&mQueueMutex);
             queueSize = mInputBuffer.size();
             pthread_mutex_unlock(&mQueueMutex);
@@ -1116,430 +1395,413 @@ namespace LibSerial
 
         // Return the first byte and remove it from the queue.
         pthread_mutex_lock(&mQueueMutex);
-        unsigned char next_char = mInputBuffer.front() ;
-        mInputBuffer.pop() ;
-
-        //Updating flag if queue is empty by now
-        if ( mInputBuffer.size() == 0)
-        {
-            mIsQueueDataAvailable = false;
-        }
+        charBuffer = mInputBuffer.front();
+        mInputBuffer.pop();
+        queueSize = mInputBuffer.size();
         pthread_mutex_unlock(&mQueueMutex);
 
-        return next_char ;
+        return 1;
     }
 
     inline
-    void
-    SerialPort::Implementation::Read( SerialPort::DataBuffer& dataBuffer,
-                                      const unsigned int      numOfBytes,
-                                      const unsigned int      msTimeout )
+    int
+    SerialPort::Implementation::ReadLine(std::string&        dataString,
+                                         const char&         lineTerminator,
+                                         const unsigned int& msTimeout)
     {
-        //
-        // Make sure that the serial port is open.
-        //
-        if ( ! this->IsOpen() )
-        {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
-        }
-        //
-        // Empty the data buffer.
-        //
-        dataBuffer.resize(0) ;
-        //
-        if ( 0 == numOfBytes )
-        {
-            //
-            // Read all available data if numOfBytes is zero.
-            //
-            while( this->IsDataAvailable() )
-            {
-                dataBuffer.push_back( ReadByte(msTimeout) ) ;
-            }
-        }
-        else
-        {
-            //
-            // Reserve enough space in the buffer to store the incoming
-            // data.
-            //
-            dataBuffer.reserve( numOfBytes ) ;
-            //
-            for(unsigned int i=0; i<numOfBytes; ++i)
-            {
-                dataBuffer.push_back( ReadByte(msTimeout) ) ;
-            }
-        }
-        return ;
-    }
+        // Clear the data string.
+        dataString.clear();
 
-    inline
-    const std::string
-    SerialPort::Implementation::ReadLine( const unsigned int msTimeout,
-                                          const char         lineTerminator )
-    {
-        std::string result ;
-        char next_char = 0 ;
+        unsigned char nextChar = 0;
+        size_t bytesRead = 0;
+
+        unsigned int elapsed_ms;
+        unsigned int remaining_ms;
+
+        timeval entry_time;
+        timeval current_time;
+        timeval elapsed_time;
+        
+        // Throw an exception if we are unable to read the current time.
+        if (gettimeofday(&entry_time,
+                         NULL) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        const int MICROSECONDS_PER_MS  = 1000;
+        const int MILLISECONDS_PER_SEC = 1000;
+
         do
         {
-            next_char = this->ReadByte( msTimeout ) ;
-            result += next_char ;
-        }
-        while( next_char != lineTerminator ) ;
-        return result ;
+            // Throw an exception if we are unable to read the current time.            
+            if (gettimeofday(&current_time,
+                             NULL) < 0)
+            {
+                throw std::runtime_error(strerror(errno));
+            }
+
+            // Obtain the elapsed time.
+            elapsed_time = current_time - entry_time;
+
+            // Calculate the elapsed number of milliseconds.
+            elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
+                          elapsed_time.tv_usec / MICROSECONDS_PER_MS);
+
+            // If more than msTimeout milliseconds have elapsed while
+            // waiting for data, then we throw a ReadTimeout exception.
+            if (msTimeout > 0 &&
+                elapsed_ms > msTimeout)
+            {
+                throw ReadTimeout();
+            }
+
+            remaining_ms = msTimeout - elapsed_ms;
+
+            bytesRead += this->ReadByte(nextChar,
+                                        remaining_ms);
+            dataString += nextChar;
+        } while (nextChar != lineTerminator);
+        
+        return bytesRead;
     }
 
     inline
     void
-    SerialPort::Implementation::WriteByte( const unsigned char dataByte )
+    SerialPort::Implementation::WriteByte(const unsigned char& dataByte)
     {
-        //
         // Make sure that the serial port is open.
-        //
-        if ( ! this->IsOpen() )
+        if (!this->IsOpen())
         {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
-        //
+
         // Write the byte to the serial port.
-        //
-        this->Write( &dataByte,
-                     1 ) ;
-        return ;
+        this->Write(&dataByte,
+                    1);
+        return;
     }
 
     inline
     void
     SerialPort::Implementation::Write(const SerialPort::DataBuffer& dataBuffer)
     {
-        //
         // Make sure that the serial port is open.
-        //
-        if ( ! this->IsOpen() )
+        if (!this->IsOpen())
         {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
-        //
+
         // Nothing needs to be done if there is no data in the buffer.
-        //
-        if ( 0 == dataBuffer.size() )
+        if (0 == dataBuffer.size())
         {
-            return ;
+            return;
         }
-        //
+
         // Allocate memory for storing the contents of the
         // dataBuffer. This allows us to write all the data using a single
         // call to write() instead of writing one byte at a time.
-        //
-        unsigned char* local_buffer = new unsigned char[dataBuffer.size()] ;
-        if ( 0 == local_buffer )
+        unsigned char* local_buffer = new unsigned char[dataBuffer.size()];
+        
+        if (0 == local_buffer)
         {
-            throw std::runtime_error( std::string(__FUNCTION__) +
-                                      ": Cannot allocate memory while writing"
-                                      "data to the serial port." ) ;
+            throw std::runtime_error(std::string(__FUNCTION__) +
+                ": Cannot allocate memory while writing data to the serial port.");
         }
-        //
+
         // Copy the data into local_buffer.
-        //
-        std::copy( dataBuffer.begin(),
-                   dataBuffer.end(),
-                   local_buffer ) ;
-        //
+        std::copy(dataBuffer.begin(),
+                  dataBuffer.end(),
+                  local_buffer);
+
         // Write data to the serial port.
-        //
         try
         {
-            this->Write( local_buffer,
-                         dataBuffer.size() ) ;
+            this->Write(local_buffer,
+                        dataBuffer.size());
         }
         catch( ... )
         {
-            //
             // Free the allocated memory.
-            //
-            delete [] local_buffer ;
-            throw ;
+            delete [] local_buffer;
+            throw;
         }
-        //
+
         // Free the allocated memory.
-        //
-        delete [] local_buffer ;
-        return ;
+        delete [] local_buffer;
+        return;
     }
 
     inline
     void
-    SerialPort::Implementation::Write( const unsigned char* dataBuffer,
-                                       const unsigned int   bufferSize )
+    SerialPort::Implementation::Write(const unsigned char* dataBuffer,
+                                      const unsigned int&  bufferSize)
     {
-        //
         // Make sure that the serial port is open.
-        //
-        if ( ! this->IsOpen() )
+        if (!this->IsOpen())
         {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
-        //
+
         // Write the data to the serial port. Keep retrying if EAGAIN
-        // error is received.
-        //
-        int num_of_bytes_written = -1 ;
+        // error is received and EWOULDBLOCK is not received.
+        int num_of_bytes_written = -1;
+        
         do
         {
-            num_of_bytes_written = write( mFileDescriptor,
-                                          dataBuffer,
-                                          bufferSize ) ;
+            num_of_bytes_written = write(mFileDescriptor,
+                                         dataBuffer,
+                                         bufferSize);
         }
-        while ( ( num_of_bytes_written < 0 ) &&
-                ( EAGAIN == errno ) ) ;
-        //
-        if ( num_of_bytes_written < 0 )
+        while (num_of_bytes_written < 0 &&
+               errno == EAGAIN &&
+               errno != EWOULDBLOCK);
+
+        if (num_of_bytes_written < 0 ||
+            num_of_bytes_written < (int)bufferSize)
         {
-            throw std::runtime_error( strerror(errno) ) ;
+            throw std::runtime_error(strerror(errno));
         }
-        //
-        // :FIXME: What happens if num_of_bytes_written < bufferSize ?
-        //
-        return ;
+
+        return;
     }
 
     inline
     void
-    SerialPort::Implementation::SetDtr( const bool dtrState )
+    SerialPort::Implementation::SetDtr(const bool& dtrState)
     {
-        this->SetModemControlLine( TIOCM_DTR, 
-                                   dtrState ) ;
-        return ;
+        this->SetModemControlLine(TIOCM_DTR, 
+                                   dtrState);
+        return;
     }
 
     inline
     bool
-    SerialPort::Implementation::GetDtr() const
+    SerialPort::Implementation::GetDtr()
     {
-        return this->GetModemControlLine( TIOCM_DTR ) ;
+        return this->GetModemControlLine(TIOCM_DTR);
     }    
 
     inline
     void
-    SerialPort::Implementation::SetRts( const bool rtsState )
+    SerialPort::Implementation::SetRts(const bool& rtsState)
     {
-        this->SetModemControlLine( TIOCM_RTS, 
-                                   rtsState ) ;
-        return ;
+        this->SetModemControlLine(TIOCM_RTS, 
+                                  rtsState);
+        return;
     }
 
     inline
     bool
-    SerialPort::Implementation::GetRts() const
+    SerialPort::Implementation::GetRts()
     {
-        return this->GetModemControlLine( TIOCM_RTS ) ;
+        return this->GetModemControlLine(TIOCM_RTS);
     }    
 
     inline
     bool
-    SerialPort::Implementation::GetCts() const
+    SerialPort::Implementation::GetCts()
     {
-        return this->GetModemControlLine( TIOCM_CTS ) ;
-    }  
-
+        return this->GetModemControlLine(TIOCM_CTS);
+    }    
 
     inline
     bool
-    SerialPort::Implementation::GetDsr() const
+    SerialPort::Implementation::GetDsr()
     {
-        return this->GetModemControlLine( TIOCM_DSR ) ;
+        return this->GetModemControlLine(TIOCM_DSR);
     }    
+
+    inline
+    int
+    SerialPort::Implementation::GetFileDescriptor()
+    {
+        return mFileDescriptor;
+    }
 
     inline
     void
-    SerialPort::Implementation::HandlePosixSignal( int signalNumber )
+    SerialPort::Implementation::HandlePosixSignal(const int& signalNumber)
     {
-        //
         // We only want to deal with SIGIO signals here.
-        //
-        if ( SIGIO != signalNumber )
+        if (SIGIO != signalNumber)
         {
-            return ;
-        }
-        //
-        // Check if any data is available at the specified file
-        // descriptor.
-        //
-        int num_of_bytes_available = 0 ;
-        if ( ioctl( mFileDescriptor,
-                    FIONREAD,
-                    &num_of_bytes_available ) < 0 )
-        {
-            /*
-             * Ignore any errors and return immediately.
-             */
-            return ;
+            return;
         }
 
-        //Try to get the mutex
-        if (pthread_mutex_trylock(&mQueueMutex) == 0){
-            // First of all, any pending data within the mShadowInputBuffer
-            // must be transfered into the regular buffer.
+        // Check if any data is available at the specified file descriptor.
+        int num_of_bytes_available = 0;
+        
+        if (ioctl(mFileDescriptor,
+                  FIONREAD,
+                  &num_of_bytes_available) < 0)
+        {
+            // Ignore any errors and return immediately.
+            return;
+        }
+
+        // Try to get the mutex
+        if (pthread_mutex_trylock(&mQueueMutex) == 0)
+        {
+            // Transfer any pending data from the mShadowInputBuffer
+            // into the mInputBuffer.
             while(!mShadowInputBuffer.empty())
             {
-                //Transfering to actual input buffer
                 mInputBuffer.push(mShadowInputBuffer.front());
-                //Removing from shadow buffer
                 mShadowInputBuffer.pop();
             }
 
-            //
-            // If data is available, read all available data and shove
-            // it into the corresponding input buffer.
-            //
+            // If data is available, read all available data and store
+            // it in the corresponding input buffer.
             for(int i=0; i<num_of_bytes_available; ++i)
             {
-                unsigned char next_byte ;
-                if ( read( mFileDescriptor,
-                           &next_byte,
-                           1 ) > 0 )
+                unsigned char next_byte;
+                
+                if (read(mFileDescriptor,
+                         &next_byte,
+                         1) > 0)
                 {
-                    mInputBuffer.push( next_byte );
+                    mInputBuffer.push(next_byte);
                 }
                 else
                 {
-                    //Updating flag
                     pthread_mutex_unlock(&mQueueMutex);
-                    break ;
+                    break;
                 }
             }
 
-            //Updating flag
-            mIsQueueDataAvailable = true;
-
-            //Release the mutex
+            // Release the mutex
             pthread_mutex_unlock(&mQueueMutex);
-        } else {
-            //Mutex is locked - using shadowQueue to avoid a deadlock!
-            //
-            // If data is available, read all available data and shove
-            // it temporarily into the shadow buffer.
-            //
-            for(int i=0; i<num_of_bytes_available; ++i)
+        }
+        else
+        {
+            // The Mutex was already locked, so all available data will be read
+            // from the serial port and stored in the mShadowInputBuffer.
+            for (int i=0; i<num_of_bytes_available; ++i)
             {
-                unsigned char next_byte ;
-                if ( read( mFileDescriptor,
-                           &next_byte,
-                           1 ) > 0 )
+                unsigned char next_byte;
+                
+                if (read(mFileDescriptor,
+                         &next_byte,
+                         1) > 0)
                 {
-                    mShadowInputBuffer.push( next_byte );
+                    mShadowInputBuffer.push(next_byte);
                 }
                 else
                 {
-                    break ;
+                    break;
                 }
             }
         }
-        return ;
+
+        return;
     }
 
     inline
     void
-    SerialPort::Implementation::SetModemControlLine( const int  modemLine,
-                                                     const bool lineState )
+    SerialPort::Implementation::SetModemControlLine(const int&  modemLine,
+                                                    const bool& lineState)
     {
-        //
         // Make sure that the serial port is open.
-        //
-        if ( ! this->IsOpen() )
+        if (!this->IsOpen())
         {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
-        //
-        // :TODO: Check to make sure that modemLine is a valid value.
-        // 
-        // Set or unset the specified bit according to the value of
-        // lineState.
-        //
-        int ioctl_result = -1 ;
-        if ( true == lineState )
+
+        if (modemLine != TIOCM_LE  &&
+            modemLine != TIOCM_DTR &&
+            modemLine != TIOCM_RTS &&
+            modemLine != TIOCM_ST  &&
+            modemLine != TIOCM_SR  &&
+            modemLine != TIOCM_CTS &&
+            modemLine != TIOCM_CAR &&
+            modemLine != TIOCM_CD  &&
+            modemLine != TIOCM_RNG &&
+            modemLine != TIOCM_RI  &&
+            modemLine != TIOCM_DSR)
         {
-            int set_line_mask = modemLine ;
-            ioctl_result = ioctl( mFileDescriptor, 
-                                  TIOCMBIS,
-                                  &set_line_mask ) ;
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // Set or unset the specified bit according to the value of lineState.
+        int ioctl_result = -1;
+        
+        if (true == lineState)
+        {
+            int set_line_mask = modemLine;
+            ioctl_result = ioctl(mFileDescriptor, 
+                                 TIOCMBIS,
+                                 &set_line_mask);
         }
         else
         {
-            int reset_line_mask = modemLine ;
-            ioctl_result = ioctl( mFileDescriptor, 
-                                  TIOCMBIC,
-                                  &reset_line_mask ) ;
+            int reset_line_mask = modemLine;
+            ioctl_result = ioctl(mFileDescriptor, 
+                                 TIOCMBIC,
+                                 &reset_line_mask);
         }
-        //
-        // Check for errors. 
-        //
-        if ( -1 == ioctl_result )
+
+        // Check for errors.
+        if (-1 == ioctl_result)
         {
-            throw std::runtime_error( strerror(errno) ) ;
+            throw std::runtime_error(strerror(errno));
         }
-        return ;
+
+        return;
     }
 
     inline
     bool
-    SerialPort::Implementation::GetModemControlLine( const int modemLine ) const
+    SerialPort::Implementation::GetModemControlLine(const int& modemLine)
     {
-        //
         // Make sure that the serial port is open.
-        //
-        if ( ! this->IsOpen() )
+        if (!this->IsOpen())
         {
-            throw SerialPort::NotOpen( ERR_MSG_PORT_NOT_OPEN ) ;
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
-        //
+
         // Use an ioctl() call to get the state of the line.
-        //
-        int serial_port_state = 0 ;
-        if ( -1 == ioctl( mFileDescriptor,
-                          TIOCMGET,
-                          &serial_port_state ) )
+        int serial_port_state = 0;
+        
+        if (-1 == ioctl(mFileDescriptor,
+                        TIOCMGET,
+                        &serial_port_state))
         {
-            throw std::runtime_error( strerror(errno) ) ;
+            throw std::runtime_error(strerror(errno));
         }
-        //
+
         // :TODO: Verify that modemLine is a valid value.
-        //
-        return ( serial_port_state & modemLine ) ;
+        return (serial_port_state & modemLine);
     }
 }
 
 namespace
 {
-    const struct timeval
-    operator-( const struct timeval& firstOperand,
-               const struct timeval& secondOperand )
+    const timeval
+    operator-(const timeval& firstOperand,
+              const timeval& secondOperand)
     {
-        /*
-         * This implementation may result in undefined behavior if the
-         * platform uses unsigned values for storing tv_sec and tv_usec
-         * members of struct timeval.
+        /**
+         * @NOTE: This implementation may result in undefined behavior if the
+         *        platform uses unsigned values for storing tv_sec and tv_usec
+         *        members of struct timeval.
          */
-        //
-        // Number of microseconds in a second.
-        //
-        const int MICROSECONDS_PER_SECOND = 1000000 ;
-        struct timeval result ;
-        //
+
+        timeval result;
+
         // Take the difference of individual members of the two operands.
-        //
-        result.tv_sec  = firstOperand.tv_sec - secondOperand.tv_sec ;
-        result.tv_usec = firstOperand.tv_usec - secondOperand.tv_usec ;
-        //
+        result.tv_sec  = firstOperand.tv_sec - secondOperand.tv_sec;
+        result.tv_usec = firstOperand.tv_usec - secondOperand.tv_usec;
+
         // If abs(result.tv_usec) is larger than MICROSECONDS_PER_SECOND,
         // then increment/decrement result.tv_sec accordingly.
-        //
-        if ( std::abs( result.tv_usec ) > MICROSECONDS_PER_SECOND )
+        if (std::abs(result.tv_usec) > LibSerial::MICROSECONDS_PER_SEC)
         {
-            int num_of_seconds = (result.tv_usec / MICROSECONDS_PER_SECOND ) ;
-            result.tv_sec  += num_of_seconds ;
-            result.tv_usec -= ( MICROSECONDS_PER_SECOND * num_of_seconds ) ;
+            int num_of_seconds = (result.tv_usec / LibSerial::MICROSECONDS_PER_SEC);
+            result.tv_sec  += num_of_seconds;
+            result.tv_usec -= (LibSerial::MICROSECONDS_PER_SEC * num_of_seconds);
         }
-        return result ;
+        
+        return result;
     }
 }
