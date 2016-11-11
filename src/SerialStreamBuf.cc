@@ -137,7 +137,7 @@ namespace LibSerial
          * @param vmin the number of minimum characters to be set.
          */
         void
-        SetVMin(const short& vmin);
+        SetVMin(const short vmin);
 
         /**
          * @brief Gets the VMIN value for the device, which represents the
@@ -152,7 +152,7 @@ namespace LibSerial
          * @param vtime The timeout value in deciseconds to be set.
          */
         void
-        SetVTime(const short& vtime);
+        SetVTime(const short vtime);
 
         /** 
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
@@ -168,13 +168,13 @@ namespace LibSerial
         xsgetn(char_type *s, streamsize n);
 
         streambuf::int_type
-        overflow(int_type c);
+        overflow(const int_type c);
 
         streambuf::int_type
         underflow();
 
         streambuf::int_type
-        pbackfail(int_type c);
+        pbackfail(const int_type c);
 
         streamsize 
         showmanyc();
@@ -334,7 +334,7 @@ namespace LibSerial
     }
 
     void 
-    SerialStreamBuf::SetVMin(const short& vmin)
+    SerialStreamBuf::SetVMin(const short vmin)
     {
         mImpl->SetVMin(vmin);
         return;
@@ -348,7 +348,7 @@ namespace LibSerial
     }
 
     void 
-    SerialStreamBuf::SetVTime(const short& vtime)
+    SerialStreamBuf::SetVTime(const short vtime)
     {
         mImpl->SetVTime(vtime);
         return;
@@ -373,7 +373,7 @@ namespace LibSerial
     }
 
     streambuf::int_type
-    SerialStreamBuf::overflow(int_type character)
+    SerialStreamBuf::overflow(const int_type character)
     {
         return mImpl->overflow(character);
     }
@@ -386,7 +386,7 @@ namespace LibSerial
 
 
     streambuf::int_type
-    SerialStreamBuf::pbackfail(int_type character)
+    SerialStreamBuf::pbackfail(const int_type character)
     {
         return mImpl->pbackfail(character);
     }
@@ -1079,7 +1079,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetVMin(const short& vmin)
+    SerialStreamBuf::Implementation::SetVMin(const short vmin)
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())
@@ -1140,7 +1140,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetVTime(const short& vtime)
+    SerialStreamBuf::Implementation::SetVTime(const short vtime)
     {
         // If we do not have a valid file descriptor then throw an exception.
         if (-1 == this->mFileDescriptor)
@@ -1306,7 +1306,7 @@ namespace LibSerial
 
     inline
     streambuf::int_type
-    SerialStreamBuf::Implementation::overflow(int_type character) 
+    SerialStreamBuf::Implementation::overflow(const int_type character) 
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())

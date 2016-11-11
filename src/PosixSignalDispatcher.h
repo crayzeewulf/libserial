@@ -95,7 +95,7 @@ public:
      * @throw CannotDetachHandler This exception is thrown if the method cannot
      *        detach the handler.
      */
-    void AttachHandler(const int&          posixSignalNumber,
+    void AttachHandler(const int           posixSignalNumber,
                        PosixSignalHandler& signalHandler)
         throw(CannotAttachHandler);
 
@@ -113,7 +113,7 @@ public:
      * @throw std::logic_error This exception is thrown if any standard logic
      *        error is encountered.
      */
-    void DetachHandler(const int&                posixSignalNumber,
+    void DetachHandler(const int                 posixSignalNumber,
                        const PosixSignalHandler& signalHandler)
         throw(CannotDetachHandler,
               std::logic_error);
@@ -137,14 +137,16 @@ private:
      *        We enforce this by making the copy constructor and the
      *        assignment operator private members.
      */
-    PosixSignalDispatcher(const PosixSignalDispatcher& otherInstance);
+    PosixSignalDispatcher(const PosixSignalDispatcher& otherInstance) = delete;
+    PosixSignalDispatcher(PosixSignalDispatcher&&) = delete;
 
     /**
      * @brief Copying of an instance of this class is not allowed.
      *        We enforce this by making the copy constructor and the
      *        assignment operator private members.
      */
-    const PosixSignalDispatcher& operator=(const PosixSignalDispatcher& otherInstance);
+    PosixSignalDispatcher& operator=(const PosixSignalDispatcher& otherInstance) = delete;
+    PosixSignalDispatcher& operator=(PosixSignalDispatcher&& otherInstance) = delete;
 };
 
 #endif

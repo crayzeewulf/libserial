@@ -215,7 +215,7 @@ namespace LibSerial
          * @brief Sets the minimum number of characters for non-canonical reads.
          * @param vMin the number of minimum characters to be set.
          */
-        void SetVMin(const short& vmin);
+        void SetVMin(const short vmin);
 
         /**
          * @brief Gets the VMIN value for the device, which represents the
@@ -229,7 +229,7 @@ namespace LibSerial
          * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
          * @param vtime The timeout value in deciseconds to be set.
          */
-        void SetVTime(const short& vtime);
+        void SetVTime(const short vtime);
 
         /** 
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
@@ -280,7 +280,7 @@ namespace LibSerial
          * @param character The character to be written to the serial port.
          * @return Returns the character. 
          */
-        virtual int_type overflow(int_type character) override;
+        virtual int_type overflow(const int_type character) override;
 
         /**
          * @brief Reads and returns the next character from the associated

@@ -23,6 +23,7 @@
 #include <cstring>
 #include <map>
 #include <signal.h>
+#include <sstream>
 
 
 namespace
@@ -46,7 +47,7 @@ namespace
          * @brief Implementation of PosixSignalDispatcher::AttachHandler()
          */
         void
-        AttachHandler(const int&          posixSignalNumber,
+        AttachHandler(const int           posixSignalNumber,
                       PosixSignalHandler& signalHandler)
             throw(PosixSignalDispatcher::CannotAttachHandler);
 
@@ -54,7 +55,7 @@ namespace
          * @brief Implementation of PosixSignalDispatcher::DetachHandler()
          */
         void
-        DetachHandler(const int&                posixSignalNumber,
+        DetachHandler(const int                 posixSignalNumber,
                       const PosixSignalHandler& signalHandler)
             throw(PosixSignalDispatcher::CannotDetachHandler,
                   std::logic_error);
@@ -63,14 +64,14 @@ namespace
          * @brief List of signal handlers that are currently associated
          *        with the dispatcher.
          */
-        typedef std::multimap<int, PosixSignalHandler*> SignalHandlerList;
+        using SignalHandlerList = std::multimap<int, PosixSignalHandler*>;
         static SignalHandlerList mSignalHandlerList;
 
         /**
          * @brief List of signal handlers that were originally attached
          *        to the corresponding signals.
          */
-        typedef std::map<int, struct sigaction> OriginalSigactionList;
+        using OriginalSigactionList = std::map<int, struct sigaction>;
         static OriginalSigactionList mOriginalSigactionList;
 
         /**
@@ -119,7 +120,7 @@ PosixSignalDispatcher::Instance()
 }
 
 void
-PosixSignalDispatcher::AttachHandler(const int&          posixSignalNumber,
+PosixSignalDispatcher::AttachHandler(const int           posixSignalNumber,
                                      PosixSignalHandler& signalHandler)
     throw(CannotAttachHandler)
 {
@@ -129,7 +130,7 @@ PosixSignalDispatcher::AttachHandler(const int&          posixSignalNumber,
 }
 
 void
-PosixSignalDispatcher::DetachHandler(const int&                posixSignalNumber,
+PosixSignalDispatcher::DetachHandler(const int                 posixSignalNumber,
                                      const PosixSignalHandler& signalHandler)
     throw(CannotDetachHandler,
           std::logic_error)
@@ -162,7 +163,7 @@ namespace
 
     inline
     void
-    PosixSignalDispatcherImpl::AttachHandler(const int&          posixSignalNumber,
+    PosixSignalDispatcherImpl::AttachHandler(const int           posixSignalNumber,
                                              PosixSignalHandler& signalHandler)
     throw (PosixSignalDispatcher::CannotAttachHandler)
     {
@@ -198,7 +199,7 @@ namespace
 
     inline
     void
-    PosixSignalDispatcherImpl::DetachHandler(const int&                posixSignalNumber,
+    PosixSignalDispatcherImpl::DetachHandler(const int                 posixSignalNumber,
                                              const PosixSignalHandler& signalHandler)
     throw(PosixSignalDispatcher::CannotDetachHandler,
           std::logic_error)
@@ -255,14 +256,17 @@ namespace
     void
     PosixSignalDispatcherImpl::SigactionHandler(int signalNumber)
     {
-        // If we got a signal other than SIGIO here then throw an exception. 
+        /**
+         * If we got a signal other than SIGIO here then throw an exception. 
+         * This was suggested by Oliver Schwaneberg via the patch at:
+         * https://sourceforge.net/p/libserial/patches/3/
+         */
         if (signalNumber != SIGIO)
         {
-            std::string error_msg; 
-            error_msg += "Invalid or unexpected signal: ";
-            error_msg += signalNumber;
-            throw std::runtime_error(error_msg);
-        }
+            std::stringstream error_msg ; 
+            error_msg << "Invalid or unexpected signal: " << signalNumber;
+            throw std::runtime_error(error_msg.str());
+}
 
         // Get a list of handlers associated with signalNumber.
         std::pair<SignalHandlerList::iterator, SignalHandlerList::iterator>

@@ -3,11 +3,13 @@
  * @copyright LibSerial
  */
 
+#include <chrono>
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
 #include <string>
 #include <unistd.h>
+
 
 #include <gtest/gtest.h>
 #include <SerialPort.h>
@@ -23,11 +25,45 @@ class LibSerialTest
     : public ::testing::Test
 {
 public:
-    LibSerialTest() : serialPort(TEST_SERIAL_PORT), serialPort2(TEST_SERIAL_PORT_2) {} 
+    LibSerialTest() : serialPort1(TEST_SERIAL_PORT), serialPort2(TEST_SERIAL_PORT_2) {}
+
+    /** @brief Locks the pthread_mutex_t for the communications thread. */
+    void communicationsDataLock();
+    
+    /** @brief Unlocks the pthread_mutex_t for the communications thread. */
+    void communicationsDataUnlock();
+    
+    /**
+     * @brief Gets the current time (since the epoch) in microseconds.
+     * @return The current time since epoch in microseconds.
+     */
+    long unsigned int getTimeInMicroSeconds();
+
+    /** @brief Engages a serial communications thread. */
+    void engageSerialCommunicationsThread();
+
+    /**
+     * @brief Receives available serial comms and writes data to the serial port.
+     * @param serialPort The serial port to read/write data to/from.
+     */
+    void serialCommunicationsThreadLoop(SerialPort serialPort);
+
+    /**
+     * @brief Public member to call from static thread engage entry point.
+     * @param serialPort The serial port to read/write data to/from.
+     */
+    void startSerialPortCommunicationsThread(SerialPort serialPort);
+
 
 protected:
-    SerialPort serialPort;
+    SerialPort serialPort1;
     SerialPort serialPort2;
+
+    /** @brief The pthread mutex lock to lock data and avoid race conditions. */
+    pthread_mutex_t serialCommunicationsThreadMutex;
+
+    /** @brief The pthread ID for the communicationsThread. */
+    pthread_t serialCommunicationsThreadID;
 
 
     virtual void SetUp()
@@ -82,54 +118,54 @@ protected:
 
     void testSerialStreamOpenClose()
     {
-        serialStream.Open(TEST_SERIAL_PORT);
-        ASSERT_TRUE(serialStream.IsOpen());
+        serialStream1.Open(TEST_SERIAL_PORT);
+        ASSERT_TRUE(serialStream1.IsOpen());
 
-        serialStream.Close();
-        ASSERT_FALSE(serialStream.IsOpen());
+        serialStream1.Close();
+        ASSERT_FALSE(serialStream1.IsOpen());
     }
 
     void testSerialStreamReadWrite()
     {
-        serialStream.Open(TEST_SERIAL_PORT);
+        serialStream1.Open(TEST_SERIAL_PORT);
         serialStream2.Open(TEST_SERIAL_PORT_2);
 
-        ASSERT_TRUE(serialStream.IsOpen());
+        ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());
 
-        serialStream.SetBaudRate(baudRates[16]);
+        serialStream1.SetBaudRate(baudRates[16]);
         serialStream2.SetBaudRate(baudRates[16]);
         
-        BaudRate baudRate = serialStream.GetBaudRate();
+        BaudRate baudRate1 = serialStream1.GetBaudRate();
         BaudRate baudRate2 = serialStream2.GetBaudRate();
         
-        ASSERT_EQ(baudRate, baudRates[16]);
+        ASSERT_EQ(baudRate1, baudRates[16]);
         ASSERT_EQ(baudRate2, baudRates[16]);
 
-        serialStream << writeString << std::endl;
+        serialStream1 << writeString << std::endl;
         getline(serialStream2, readString);
         ASSERT_EQ(readString, writeString);
 
-        serialStream.Close();
+        serialStream1.Close();
         serialStream2.Close();
 
-        ASSERT_FALSE(serialStream.IsOpen());
+        ASSERT_FALSE(serialStream1.IsOpen());
         ASSERT_FALSE(serialStream2.IsOpen());
 
-        serialStream.Open(TEST_SERIAL_PORT);
+        serialStream1.Open(TEST_SERIAL_PORT);
         serialStream2.Open(TEST_SERIAL_PORT_2);
 
-        ASSERT_TRUE(serialStream.IsOpen());
+        ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());        
 
         serialStream2 << writeString << std::endl;
-        getline(serialStream, readString);
+        getline(serialStream1, readString);
         ASSERT_EQ(readString, writeString);
 
         writeByte = 'a';
         
-        serialStream.write(&writeByte, 1);
-        serialStream << writeByte << std::endl;
+        serialStream1.write(&writeByte, 1);
+        serialStream1 << writeByte << std::endl;
 
         serialStream2.read(&readByte, 1);
         ASSERT_EQ(readByte, writeByte);
@@ -137,25 +173,25 @@ protected:
         serialStream2.write(&writeByte, 1);
         serialStream2 << writeByte << std::endl;
         
-        serialStream.read(&readByte, 1);
+        serialStream1.read(&readByte, 1);
         ASSERT_EQ(readByte, writeByte);
 
-        serialStream.Close();
+        serialStream1.Close();
         serialStream2.Close();
 
-        ASSERT_FALSE(serialStream.IsOpen());
+        ASSERT_FALSE(serialStream1.IsOpen());
         ASSERT_FALSE(serialStream2.IsOpen());
 
-        serialStream.Open(TEST_SERIAL_PORT);
+        serialStream1.Open(TEST_SERIAL_PORT);
         serialStream2.Open(TEST_SERIAL_PORT_2);
 
-        ASSERT_TRUE(serialStream.IsOpen());
+        ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());        
 
         writeByte = 'A';
         
-        serialStream.write(&writeByte, 1);
-        serialStream << writeByte << std::endl;
+        serialStream1.write(&writeByte, 1);
+        serialStream1 << writeByte << std::endl;
         
         serialStream2.get(readByte);
         ASSERT_EQ(readByte, writeByte);
@@ -163,135 +199,135 @@ protected:
         serialStream2.write(&writeByte, 1);
         serialStream2 << writeByte << std::endl;
         
-        serialStream.get(readByte);
+        serialStream1.get(readByte);
         ASSERT_EQ(readByte, writeByte);
 
-        serialStream.Close();
+        serialStream1.Close();
         serialStream2.Close();
 
-        ASSERT_FALSE(serialStream.IsOpen());
+        ASSERT_FALSE(serialStream1.IsOpen());
         ASSERT_FALSE(serialStream2.IsOpen());
     }
 
     void testSerialStreamSetGetBaudRate()
     {
-        serialStream.Open(TEST_SERIAL_PORT);
-        ASSERT_TRUE(serialStream.IsOpen());
+        serialStream1.Open(TEST_SERIAL_PORT);
+        ASSERT_TRUE(serialStream1.IsOpen());
 
         size_t maxBaudIndex = 25;
 
         for (size_t i = 0; i < maxBaudIndex; i++)
         {
-            serialStream.SetBaudRate(baudRates[i]);
-            BaudRate baudRate = serialStream.GetBaudRate();
+            serialStream1.SetBaudRate(baudRates[i]);
+            BaudRate baudRate = serialStream1.GetBaudRate();
             ASSERT_EQ(baudRate, baudRates[i]);
         }
 
-        serialStream.Close();
-        ASSERT_FALSE(serialStream.IsOpen());
+        serialStream1.Close();
+        ASSERT_FALSE(serialStream1.IsOpen());
     }
 
     void testSerialStreamSetGetCharacterSize()
     {
-        serialStream.Open(TEST_SERIAL_PORT);
-        ASSERT_TRUE(serialStream.IsOpen());
+        serialStream1.Open(TEST_SERIAL_PORT);
+        ASSERT_TRUE(serialStream1.IsOpen());
 
         // @TODO - Why don't the smaller Character Size values work?
         for (size_t i = 2; i < 4; i++)
         {
-            serialStream.SetCharacterSize(characterSizes[i]);
-            CharacterSize characterSize = serialStream.GetCharacterSize();
+            serialStream1.SetCharacterSize(characterSizes[i]);
+            CharacterSize characterSize = serialStream1.GetCharacterSize();
             ASSERT_EQ(characterSize, characterSizes[i]);
             usleep(10);
         }
 
-        serialStream.Close();
-        ASSERT_FALSE(serialStream.IsOpen());
+        serialStream1.Close();
+        ASSERT_FALSE(serialStream1.IsOpen());
     }
 
     void testSerialStreamSetGetFlowControl()
     {
-        serialStream.Open(TEST_SERIAL_PORT);
-        ASSERT_TRUE(serialStream.IsOpen());
+        serialStream1.Open(TEST_SERIAL_PORT);
+        ASSERT_TRUE(serialStream1.IsOpen());
 
         for (size_t i = 0; i < 3; i++)
         {
-            serialStream.SetFlowControl(flowControlTypes[i]);
-            FlowControl flowControl = serialStream.GetFlowControl();
+            serialStream1.SetFlowControl(flowControlTypes[i]);
+            FlowControl flowControl = serialStream1.GetFlowControl();
             ASSERT_EQ(flowControl, flowControlTypes[i]);
             usleep(10);
         }
 
-        serialStream.Close();
-        ASSERT_FALSE(serialStream.IsOpen());
+        serialStream1.Close();
+        ASSERT_FALSE(serialStream1.IsOpen());
     }
 
     void testSerialStreamSetGetParity()
     {
-        serialStream.Open(TEST_SERIAL_PORT);
-        ASSERT_TRUE(serialStream.IsOpen());
+        serialStream1.Open(TEST_SERIAL_PORT);
+        ASSERT_TRUE(serialStream1.IsOpen());
 
         for (size_t i = 0; i < 3; i++)
         {
-            serialStream.SetParity(parityTypes[i]);
-            Parity parity = serialStream.GetParity();
+            serialStream1.SetParity(parityTypes[i]);
+            Parity parity = serialStream1.GetParity();
             ASSERT_EQ(parity, parityTypes[i]);
             usleep(10);
         }
 
-        serialStream.Close();
-        ASSERT_FALSE(serialStream.IsOpen());
+        serialStream1.Close();
+        ASSERT_FALSE(serialStream1.IsOpen());
     }
 
     void testSerialStreamSetGetStopBits()
     {
         StopBits numberOfStopBits;
 
-        serialStream.Open(TEST_SERIAL_PORT);
-        ASSERT_TRUE(serialStream.IsOpen());
+        serialStream1.Open(TEST_SERIAL_PORT);
+        ASSERT_TRUE(serialStream1.IsOpen());
 
-        serialStream.SetNumberOfStopBits(stopBits[0]);
-        numberOfStopBits = serialStream.GetNumberOfStopBits();
+        serialStream1.SetNumberOfStopBits(stopBits[0]);
+        numberOfStopBits = serialStream1.GetNumberOfStopBits();
         ASSERT_EQ(numberOfStopBits, stopBits[0]);
 
-        serialStream.SetNumberOfStopBits(stopBits[1]);
-        numberOfStopBits = serialStream.GetNumberOfStopBits();
+        serialStream1.SetNumberOfStopBits(stopBits[1]);
+        numberOfStopBits = serialStream1.GetNumberOfStopBits();
         ASSERT_EQ(numberOfStopBits, stopBits[1]);
 
-        serialStream.Close();
-        ASSERT_FALSE(serialStream.IsOpen());
+        serialStream1.Close();
+        ASSERT_FALSE(serialStream1.IsOpen());
     }
 
     void testSerialStreamSetGetVMin()
     {
-        serialStream.Open(TEST_SERIAL_PORT);
-        ASSERT_TRUE(serialStream.IsOpen());
+        serialStream1.Open(TEST_SERIAL_PORT);
+        ASSERT_TRUE(serialStream1.IsOpen());
 
         for (short i = 0; i < 5; i++)
         {
-            serialStream.SetVMin(i);
-            short vMin = serialStream.GetVMin();
+            serialStream1.SetVMin(i);
+            short vMin = serialStream1.GetVMin();
             ASSERT_EQ(vMin, i);
         }
 
-        serialStream.Close();
-        ASSERT_FALSE(serialStream.IsOpen());
+        serialStream1.Close();
+        ASSERT_FALSE(serialStream1.IsOpen());
     }
 
     void testSerialStreamSetGetVTime()
     {
-        serialStream.Open(TEST_SERIAL_PORT);
-        ASSERT_TRUE(serialStream.IsOpen());
+        serialStream1.Open(TEST_SERIAL_PORT);
+        ASSERT_TRUE(serialStream1.IsOpen());
 
         for (short i = 0; i < 5; i++)
         {
-            serialStream.SetVTime(i);
-            short vTime = serialStream.GetVTime();
+            serialStream1.SetVTime(i);
+            short vTime = serialStream1.GetVTime();
             ASSERT_EQ(vTime, i);
         }
 
-        serialStream.Close();
-        ASSERT_FALSE(serialStream.IsOpen());
+        serialStream1.Close();
+        ASSERT_FALSE(serialStream1.IsOpen());
     }
 
 
@@ -299,28 +335,28 @@ protected:
 
     void testSerialPortOpenClose()
     {
-        serialPort.Open();
-        ASSERT_TRUE(serialPort.IsOpen());
+        serialPort1.Open();
+        ASSERT_TRUE(serialPort1.IsOpen());
 
-        serialPort.Close();
-        ASSERT_FALSE(serialPort.IsOpen());
+        serialPort1.Close();
+        ASSERT_FALSE(serialPort1.IsOpen());
     }
 
     void testSerialPortReadWrite(const int timeOutMilliseconds)
     {
-        serialPort.Open();
+        serialPort1.Open();
         serialPort2.Open();
         
-        ASSERT_TRUE(serialPort.IsOpen());
+        ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
-        serialPort.SetBaudRate(baudRates[16]);
+        serialPort1.SetBaudRate(baudRates[16]);
         serialPort2.SetBaudRate(baudRates[16]);
         
-        BaudRate baudRate = serialPort.GetBaudRate();
+        BaudRate baudRate1 = serialPort1.GetBaudRate();
         BaudRate baudRate2 = serialPort2.GetBaudRate();
         
-        ASSERT_EQ(baudRate, baudRates[16]);
+        ASSERT_EQ(baudRate1, baudRates[16]);
         ASSERT_EQ(baudRate2, baudRates[16]);
 
         SerialPort::DataBuffer readDataBuffer;
@@ -332,8 +368,8 @@ protected:
             writeDataBuffer.push_back(i);
         }
 
-        serialPort.Write(writeDataBuffer);
-        tcdrain(serialPort.GetFileDescriptor());
+        serialPort1.Write(writeDataBuffer);
+        tcdrain(serialPort1.GetFileDescriptor());
         
         bytesRead = serialPort2.Read(readDataBuffer, 74, timeOutMilliseconds);
 
@@ -343,13 +379,13 @@ protected:
         unsigned char writeByte;
         unsigned char readByte;
         
-        serialPort.WriteByte(writeByte);
-        tcdrain(serialPort.GetFileDescriptor());
+        serialPort1.WriteByte(writeByte);
+        tcdrain(serialPort1.GetFileDescriptor());
 
         serialPort2.WriteByte(writeByte);
         tcdrain(serialPort2.GetFileDescriptor());
         
-        bytesRead = serialPort.ReadByte(readByte, timeOutMilliseconds);
+        bytesRead = serialPort1.ReadByte(readByte, timeOutMilliseconds);
         ASSERT_EQ(readByte, writeByte);
         ASSERT_EQ(bytesRead, 1);
 
@@ -357,36 +393,39 @@ protected:
         ASSERT_EQ(readByte, writeByte);
         ASSERT_EQ(bytesRead, 1);
 
-        serialPort.Write(writeString + '\n');
-        tcdrain(serialPort.GetFileDescriptor());
+        for (size_t i = 0; i < 10000; i++)
+        {
+            serialPort1.Write(writeString + '\n');
+            tcdrain(serialPort1.GetFileDescriptor());
 
-        serialPort2.Write(writeString + '\n');
-        tcdrain(serialPort2.GetFileDescriptor());
+            serialPort2.Write(writeString + '\n');
+            tcdrain(serialPort2.GetFileDescriptor());
 
-        bytesRead = serialPort.ReadLine(readString, '\n', timeOutMilliseconds);
-        ASSERT_EQ(readString, writeString + '\n');
-        ASSERT_EQ(bytesRead, writeString.size() + 1);
+            bytesRead = serialPort1.ReadLine(readString, '\n', timeOutMilliseconds);
+            ASSERT_EQ(readString, writeString + '\n');
+            ASSERT_EQ(bytesRead, writeString.size() + 1);
+            
+            bytesRead = serialPort2.ReadLine(readString, '\n', timeOutMilliseconds);
+            ASSERT_EQ(readString, writeString + '\n');
+            ASSERT_EQ(bytesRead, writeString.size() + 1);
+        }
         
-        bytesRead = serialPort2.ReadLine(readString, '\n', timeOutMilliseconds);
-        ASSERT_EQ(readString, writeString + '\n');
-        ASSERT_EQ(bytesRead, writeString.size() + 1);
-        
-        serialPort.Close();
+        serialPort1.Close();
         serialPort2.Close();
         
-        ASSERT_FALSE(serialPort.IsOpen());
+        ASSERT_FALSE(serialPort1.IsOpen());
         ASSERT_FALSE(serialPort2.IsOpen());
     }
 
     void testSerialPortIsDataAvailableTest()
     {
-        serialPort.Open();
+        serialPort1.Open();
         serialPort2.Open();
 
-        ASSERT_TRUE(serialPort.IsOpen());
+        ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
-        ASSERT_FALSE(serialPort.IsDataAvailable());
+        ASSERT_FALSE(serialPort1.IsDataAvailable());
         ASSERT_FALSE(serialPort2.IsDataAvailable());
 
         unsigned char writeByte;
@@ -394,8 +433,8 @@ protected:
 
         writeByte = 'A';
 
-        serialPort.WriteByte(writeByte);
-        tcdrain(serialPort.GetFileDescriptor());
+        serialPort1.WriteByte(writeByte);
+        tcdrain(serialPort1.GetFileDescriptor());
         
         usleep(2000);
 
@@ -409,230 +448,230 @@ protected:
                 
         usleep(2000);
 
-        ASSERT_TRUE(serialPort.IsDataAvailable());
+        ASSERT_TRUE(serialPort1.IsDataAvailable());
         
-        bytesRead = serialPort.ReadByte(readByte, 1);
+        bytesRead = serialPort1.ReadByte(readByte, 1);
         ASSERT_TRUE(bytesRead == 1);
 
-        ASSERT_FALSE(serialPort.IsDataAvailable());
+        ASSERT_FALSE(serialPort1.IsDataAvailable());
         ASSERT_FALSE(serialPort2.IsDataAvailable());
 
-        serialPort.Close();
+        serialPort1.Close();
         serialPort2.Close();
         
-        ASSERT_FALSE(serialPort.IsOpen());
+        ASSERT_FALSE(serialPort1.IsOpen());
         ASSERT_FALSE(serialPort2.IsOpen());
     }
 
     void testSerialPortSetGetBaudRate()
     {
-        serialPort.Open();
-        ASSERT_TRUE(serialPort.IsOpen());
+        serialPort1.Open();
+        ASSERT_TRUE(serialPort1.IsOpen());
 
         size_t maxBaudIndex = 25;
 
         for (size_t i = 0; i < maxBaudIndex; i++)
         {
-            serialPort.SetBaudRate(baudRates[i]);
-            BaudRate baudRate = serialPort.GetBaudRate();
+            serialPort1.SetBaudRate(baudRates[i]);
+            BaudRate baudRate = serialPort1.GetBaudRate();
             ASSERT_EQ(baudRate, baudRates[i]);
         }
 
-        serialPort.Close();
-        ASSERT_FALSE(serialPort.IsOpen());
+        serialPort1.Close();
+        ASSERT_FALSE(serialPort1.IsOpen());
     }
 
     void testSerialPortSetGetCharacterSize()
     {
-        serialPort.Open();
-        ASSERT_TRUE(serialPort.IsOpen());
+        serialPort1.Open();
+        ASSERT_TRUE(serialPort1.IsOpen());
 
         // @TODO - Why don't the smaller CharSize values work?
         for (size_t i = 2; i < 4; i++)
         {
-            serialPort.SetCharacterSize(characterSizes[i]);
-            CharacterSize characterSize = serialPort.GetCharacterSize();
+            serialPort1.SetCharacterSize(characterSizes[i]);
+            CharacterSize characterSize = serialPort1.GetCharacterSize();
             ASSERT_EQ(characterSize, characterSizes[i]);
         }
 
-        serialPort.Close();
-        ASSERT_FALSE(serialPort.IsOpen());
+        serialPort1.Close();
+        ASSERT_FALSE(serialPort1.IsOpen());
     }
 
     void testSerialPortSetGetFlowControl()
     {
-        serialPort.Open();
-        ASSERT_TRUE(serialPort.IsOpen());
+        serialPort1.Open();
+        ASSERT_TRUE(serialPort1.IsOpen());
 
         // @TODO - FLOW_CONTROL_SOFT flow control is not valid.
         for (size_t i = 0; i < 2; i++)
         {
-            serialPort.SetFlowControl(flowControlTypes[i]);
-            FlowControl flowControl = serialPort.GetFlowControl();
+            serialPort1.SetFlowControl(flowControlTypes[i]);
+            FlowControl flowControl = serialPort1.GetFlowControl();
             ASSERT_EQ(flowControl, flowControlTypes[i]);
         }
 
-        serialPort.Close();
-        ASSERT_FALSE(serialPort.IsOpen());
+        serialPort1.Close();
+        ASSERT_FALSE(serialPort1.IsOpen());
     }
 
     void testSerialPortSetGetParity()
     {
-        serialPort.Open();
-        ASSERT_TRUE(serialPort.IsOpen());
+        serialPort1.Open();
+        ASSERT_TRUE(serialPort1.IsOpen());
 
         for (size_t i = 0; i < 3; i++)
         {
-            serialPort.SetParity(parityTypes[i]);
-            Parity parity = serialPort.GetParity();
+            serialPort1.SetParity(parityTypes[i]);
+            Parity parity = serialPort1.GetParity();
             ASSERT_EQ(parity, parityTypes[i]);
         }
 
-        serialPort.Close();
-        ASSERT_FALSE(serialPort.IsOpen());
+        serialPort1.Close();
+        ASSERT_FALSE(serialPort1.IsOpen());
     }
 
     void testSerialPortSetGetStopBits()
     {
         StopBits numberOfStopBits;
 
-        serialPort.Open();
-        ASSERT_TRUE(serialPort.IsOpen());
+        serialPort1.Open();
+        ASSERT_TRUE(serialPort1.IsOpen());
 
-        serialPort.SetNumberOfStopBits(stopBits[0]);
-        numberOfStopBits = serialPort.GetNumberOfStopBits();
+        serialPort1.SetNumberOfStopBits(stopBits[0]);
+        numberOfStopBits = serialPort1.GetNumberOfStopBits();
         ASSERT_EQ(numberOfStopBits, stopBits[0]);
 
-        serialPort.SetNumberOfStopBits(stopBits[1]);
-        numberOfStopBits = serialPort.GetNumberOfStopBits();
+        serialPort1.SetNumberOfStopBits(stopBits[1]);
+        numberOfStopBits = serialPort1.GetNumberOfStopBits();
         ASSERT_EQ(numberOfStopBits, stopBits[1]);
 
-        serialPort.Close();
-        ASSERT_FALSE(serialPort.IsOpen());
+        serialPort1.Close();
+        ASSERT_FALSE(serialPort1.IsOpen());
     }
 
     void testSerialPortSetGetDTR()
     {
-        serialPort.Open();
-        ASSERT_TRUE(serialPort.IsOpen());
+        serialPort1.Open();
+        ASSERT_TRUE(serialPort1.IsOpen());
 
-        serialPort.SetDtr(true);
-        bool dtrLine = serialPort.GetDtr();
+        serialPort1.SetDtr(true);
+        bool dtrLine = serialPort1.GetDtr();
         ASSERT_TRUE(dtrLine);
 
-        serialPort.SetDtr(false);
-        dtrLine = serialPort.GetDtr();
+        serialPort1.SetDtr(false);
+        dtrLine = serialPort1.GetDtr();
         ASSERT_FALSE(dtrLine);
 
-        serialPort.Close();
-        ASSERT_FALSE(serialPort.IsOpen());
+        serialPort1.Close();
+        ASSERT_FALSE(serialPort1.IsOpen());
     }
 
     void testSerialPortSetGetRTS()
     {
-        serialPort.Open();
-        ASSERT_TRUE(serialPort.IsOpen());
+        serialPort1.Open();
+        ASSERT_TRUE(serialPort1.IsOpen());
 
-        serialPort.SetRts(true);
-        bool rtsLine = serialPort.GetRts();
+        serialPort1.SetRts(true);
+        bool rtsLine = serialPort1.GetRts();
         ASSERT_TRUE(rtsLine);
 
-        serialPort.SetRts(false);
-        rtsLine = serialPort.GetRts();
+        serialPort1.SetRts(false);
+        rtsLine = serialPort1.GetRts();
         ASSERT_FALSE(rtsLine);
 
-        serialPort.Close();
-        ASSERT_FALSE(serialPort.IsOpen());
+        serialPort1.Close();
+        ASSERT_FALSE(serialPort1.IsOpen());
     }
 
     void testSerialPortGetCTS()
     {
-        serialPort.Open();
-        ASSERT_TRUE(serialPort.IsOpen());
+        serialPort1.Open();
+        ASSERT_TRUE(serialPort1.IsOpen());
 
-        bool ctsLine = serialPort.GetCts();
+        bool ctsLine = serialPort1.GetCts();
         ASSERT_FALSE(ctsLine);
 
-        serialPort.Close();
-        ASSERT_FALSE(serialPort.IsOpen());
+        serialPort1.Close();
+        ASSERT_FALSE(serialPort1.IsOpen());
     }
 
     void testSerialPortGetDSR()
     {
-        serialPort.Open();
-        ASSERT_TRUE(serialPort.IsOpen());
+        serialPort1.Open();
+        ASSERT_TRUE(serialPort1.IsOpen());
 
-        bool dsrLine = serialPort.GetDsr();
+        bool dsrLine = serialPort1.GetDsr();
         ASSERT_FALSE(dsrLine);
 
-        serialPort.Close();
-        ASSERT_FALSE(serialPort.IsOpen());
+        serialPort1.Close();
+        ASSERT_FALSE(serialPort1.IsOpen());
     }
 
     void testSerialPortSetGetVMin()
     {
-        serialPort.Open();
-        ASSERT_TRUE(serialPort.IsOpen());
+        serialPort1.Open();
+        ASSERT_TRUE(serialPort1.IsOpen());
 
         for (short i = 0; i < 5; i++)
         {
-            serialPort.SetVMin(i);
-            short vMin = serialPort.GetVMin();
+            serialPort1.SetVMin(i);
+            short vMin = serialPort1.GetVMin();
             ASSERT_EQ(vMin, i);
         }
 
-        serialPort.Close();
-        ASSERT_FALSE(serialPort.IsOpen());
+        serialPort1.Close();
+        ASSERT_FALSE(serialPort1.IsOpen());
     }
 
     void testSerialPortSetGetVTime()
     {
-        serialPort.Open();
-        ASSERT_TRUE(serialPort.IsOpen());
+        serialPort1.Open();
+        ASSERT_TRUE(serialPort1.IsOpen());
 
         for (short i = 0; i < 5; i++)
         {
-            serialPort.SetVTime(i);
-            short vTime = serialPort.GetVTime();
+            serialPort1.SetVTime(i);
+            short vTime = serialPort1.GetVTime();
             ASSERT_EQ(vTime, i);
         }
 
-        serialPort.Close();
-        ASSERT_FALSE(serialPort.IsOpen());
+        serialPort1.Close();
+        ASSERT_FALSE(serialPort1.IsOpen());
     }
 
     void testSerialStreamToSerialPortReadWrite(const int timeOutMilliseconds)
     {
-        serialPort.Open();
-        ASSERT_TRUE(serialPort.IsOpen());
+        serialPort1.Open();
+        ASSERT_TRUE(serialPort1.IsOpen());
 
-        serialStream.Open(TEST_SERIAL_PORT_2);
-        ASSERT_TRUE(serialStream.IsOpen());
+        serialStream1.Open(TEST_SERIAL_PORT_2);
+        ASSERT_TRUE(serialStream1.IsOpen());
 
-        serialPort.SetBaudRate(baudRates[16]);
-        serialStream.SetBaudRate(baudRates[16]);
+        serialPort1.SetBaudRate(baudRates[16]);
+        serialStream1.SetBaudRate(baudRates[16]);
         
-        BaudRate baudRate = serialPort.GetBaudRate();
-        BaudRate baudRate2 = serialStream.GetBaudRate();
+        BaudRate baudRate1 = serialPort1.GetBaudRate();
+        BaudRate baudRate2 = serialStream1.GetBaudRate();
         
-        ASSERT_EQ(baudRate, baudRates[16]);
+        ASSERT_EQ(baudRate1, baudRates[16]);
         ASSERT_EQ(baudRate2, baudRates[16]);
 
-        serialStream << writeString << std::endl;
-        bytesRead = serialPort.ReadLine(readString, '\n', timeOutMilliseconds);
+        serialStream1 << writeString << std::endl;
+        bytesRead = serialPort1.ReadLine(readString, '\n', timeOutMilliseconds);
         ASSERT_EQ(readString, writeString + '\n');
         ASSERT_EQ(bytesRead, writeString.size() + 1);
        
-        serialPort.Write(writeString + '\n');
-        tcdrain(serialPort.GetFileDescriptor());
-        getline(serialStream, readString);
+        serialPort1.Write(writeString + '\n');
+        tcdrain(serialPort1.GetFileDescriptor());
+        getline(serialStream1, readString);
         ASSERT_EQ(readString, writeString);
 
-        serialPort.Close();
-        serialStream.Close();
+        serialPort1.Close();
+        serialStream1.Close();
         
-        ASSERT_FALSE(serialPort.IsOpen());
-        ASSERT_FALSE(serialStream.IsOpen());
+        ASSERT_FALSE(serialPort1.IsOpen());
+        ASSERT_FALSE(serialStream1.IsOpen());
     }
 
 
@@ -642,7 +681,7 @@ protected:
     Parity          parityTypes[3];
     StopBits        stopBits[2];
 
-    SerialStream serialStream;
+    SerialStream serialStream1;
     SerialStream serialStream2;
 
     std::string readString;
@@ -763,7 +802,7 @@ TEST_F(LibSerialTest, testSerialPortOpenClose)
 
 TEST_F(LibSerialTest, testSerialPortReadWrite)
 {
-    int timeOutMilliseconds = 25;
+    int timeOutMilliseconds = 30;
 
     SCOPED_TRACE("Serial Port Read and Write Test");
 
@@ -893,7 +932,7 @@ TEST_F(LibSerialTest, testSerialPortSetGetVTime)
 }
 
 
-//----------------- Serial Stream to Serial Port Unit Tests -----------------//
+//----------------- Serial Stream to Serial Port Unit Test ------------------//
 
 TEST_F(LibSerialTest, testSerialStreamToSerialPortReadWrite)
 {
@@ -906,3 +945,93 @@ TEST_F(LibSerialTest, testSerialStreamToSerialPortReadWrite)
         testSerialStreamToSerialPortReadWrite(timeOutMilliseconds);
     }
 }
+
+
+//----------------------- Multiple Thread Unit Test -------------------------//
+
+
+// TEST_F(LibSerialTest, testMultipleThreadSerialPortReadWrite)
+// {
+//     SCOPED_TRACE("Test Multiple Threaded Serial Communications.");
+//     startSerialPortCommunicationsThread();
+// }
+
+
+
+// void LibSerialTest::communicationsDataLock()
+// {
+//     pthread_mutex_lock(&serialCommunicationsThreadMutex);
+// }
+
+// void LibSerialTest::communicationsDataUnlock()
+// {
+//     pthread_mutex_unlock(&serialCommunicationsThreadMutex);
+// }
+
+// long unsigned int LibSerialTest::getTimeInMicroSeconds()
+// {
+//     std::chrono::high_resolution_clock::duration timeNow = 
+//         std::chrono::high_resolution_clock::now().time_since_epoch();
+
+//     return std::chrono::duration_cast<std::chrono::microseconds>(timeNow).count();
+// }
+
+// void LibSerialTest::startSerialPortCommunicationsThread(SerialPort serialPort)
+// {
+//     serialCommunicationsThreadLoop(serialPort);
+//     return;
+// }
+
+// void LibSerialTest::serialCommunicationsThreadLoop(SerialPort serialPort)
+// {
+//     serialPort.Open();
+//     serialPort.SetBaudRate(BaudRate::BAUD_115200);
+
+//     long unsigned int loopStartTimeMicroseconds = 0;
+//     long unsigned int timeElapsedMicroSeconds = 0;
+//     long unsigned int timeRemainingMicroSeconds = 0;
+//     long unsigned int timeOutMilliseconds = 25;
+
+//     while (timeElapsedMicroSeconds < 250000000)
+//     {
+//         loopStartTimeMicroseconds = LibSerialTest::getTimeInMicroSeconds();
+
+//         serialPort.Write(writeString + '\n');
+//         tcdrain(serialPort.GetFileDescriptor());
+
+//         bytesRead = serialPort.ReadLine(readString, '\n', timeOutMilliseconds);
+//         ASSERT_EQ(readString, writeString + '\n');
+//         ASSERT_EQ(bytesRead, writeString.size() + 1);
+
+//         timeRemainingMicroSeconds = LibSerialTest::getTimeInMicroSeconds() - loopStartTimeMicroseconds;
+
+//         usleep(timeRemainingMicroSeconds);
+
+//         timeElapsedMicroSeconds = LibSerialTest::getTimeInMicroSeconds() - loopStartTimeMicroseconds;
+//     }
+
+//     serialPort.Close();
+// }
+
+// void LibSerialTest::engageSerialCommunicationsThread()
+// {
+//     pthread_mutex_init(&serialCommunicationsThreadMutex, NULL);
+//     pthread_create(&serialCommunicationsThreadID, NULL, &startSerialPortCommunicationsThread, this);
+// }
+
+// /**
+//  * @brief Static callback entry point for the Serial Communications Thread
+//  * @param args Callback object pointer.
+//  */
+// void* startSerialPortCommunicationsThread(void* args);
+
+// void* startSerialPortCommunicationsThread(void *args)
+// {
+//     LibSerialTest* libSerialTest  = (LibSerialTest*) args;
+//     LibSerialTest* libSerialTest2 = (LibSerialTest*) args;
+
+//     libSerialTest->startSerialPortCommunicationsThread(serialPort1);
+//     libSerialTest2->startSerialPortCommunicationsThread(serialPort2);
+
+//     return NULL;
+// }

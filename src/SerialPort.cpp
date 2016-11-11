@@ -156,7 +156,7 @@ namespace LibSerial
          * @brief Sets the minimum number of characters for non-canonical reads.
          * @param vmin the number of minimum characters to be set.
          */
-        void SetVMin(const short& vmin);
+        void SetVMin(const short vmin);
 
         /**
          * @brief Gets the VMIN value for the device, which represents the
@@ -169,7 +169,7 @@ namespace LibSerial
          * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
          * @param vtime The timeout value in deciseconds to be set.
          */
-        void SetVTime(const short& vtime);
+        void SetVTime(const short vtime);
 
         /** 
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
@@ -197,8 +197,8 @@ namespace LibSerial
          * @return Returns the number of bytes read.
          */
         int Read(SerialPort::DataBuffer& dataBuffer,
-                 const unsigned int&     numOfBytes,
-                 const unsigned int&     msTimeout);
+                 const unsigned int      numOfBytes,
+                 const unsigned int      msTimeout);
 
         /**
          * @brief Reads a single byte from the serial port.
@@ -209,8 +209,8 @@ namespace LibSerial
          * @param msTimeout The timeout period in milliseconds.
          * @return Returns the number of bytes read.
          */
-        int ReadByte(unsigned char&      charBuffer, 
-                     const unsigned int& msTimeout = 0);
+        int ReadByte(unsigned char&     charBuffer, 
+                     const unsigned int msTimeout = 0);
 
         /**
          * @brief Reads a line of characters from the serial port.
@@ -227,15 +227,15 @@ namespace LibSerial
          *        character is not read.
          * @return Returns the number of bytes read.
          */
-        int ReadLine(std::string&        dataString,
-                     const char&         lineTerminator = '\n',
-                     const unsigned int& msTimeout = 0);
+        int ReadLine(std::string&       dataString,
+                     const char         lineTerminator = '\n',
+                     const unsigned int msTimeout = 0);
 
         /**
          * @brief Writes a single byte to the serial port.
          * @param dataByte The byte to be written to the serial port.
          */
-        void WriteByte(const unsigned char& dataByte);
+        void WriteByte(const unsigned char dataByte);
 
         /**
          * @brief Writes a DataBuffer vector to the serial port.
@@ -249,13 +249,13 @@ namespace LibSerial
          * @param bufferSize The number of bytes to be written to the serial port.
          */
         void Write(const unsigned char* dataBuffer,
-                   const unsigned int&   bufferSize);
+                   const unsigned int   bufferSize);
 
         /**
          * @brief Sets the serial port DTR line status.
          * @param dtrState The state to set the DTR line
          */
-        void SetDtr(const bool& dtrState);
+        void SetDtr(const bool dtrState);
 
         /**
          * @brief Gets the serial port DTR line status.
@@ -266,7 +266,7 @@ namespace LibSerial
          * @brief Sets the serial port RTS line status.
          * @param dtrState The state to set the RTS line
          */
-        void SetRts(const bool& rtsState);
+        void SetRts(const bool rtsState);
 
         /**
          * @brief Gets the serial port RTS line status.
@@ -292,7 +292,7 @@ namespace LibSerial
          * @brief This method must be defined by all subclasses of
          *        PosixSignalHandler.
          */
-        void HandlePosixSignal(const int& signalNumber) override;
+        void HandlePosixSignal(const int signalNumber) override;
     private:
 
         /**
@@ -347,8 +347,8 @@ namespace LibSerial
          *        call to this method.
          */
         void
-        SetModemControlLine(const int& modemLine,
-                            const bool& lineState);
+        SetModemControlLine(const int modemLine,
+                            const bool lineState);
 
         /**
          * @brief Get the current state of the specified modem control line.
@@ -358,7 +358,7 @@ namespace LibSerial
          *         otherwise.
          */
         bool
-        GetModemControlLine(const int& modemLine);
+        GetModemControlLine(const int modemLine);
     };
 
     SerialPort::SerialPort(const std::string& serialPortName)
@@ -467,7 +467,7 @@ namespace LibSerial
     void
     SerialPort::SetParity(const Parity& parityType)
     {
-        mImpl->SetParity( parityType );
+        mImpl->SetParity(parityType);
         return;
     }
 
@@ -491,7 +491,7 @@ namespace LibSerial
     }
 
     void
-    SerialPort::SetVMin(const short& vmin)
+    SerialPort::SetVMin(const short vmin)
     {
         mImpl->SetVMin(vmin);
         return;
@@ -504,7 +504,7 @@ namespace LibSerial
     }
 
     void
-    SerialPort::SetVTime(const short& vtime)
+    SerialPort::SetVTime(const short vtime)
     {
         mImpl->SetVTime(vtime);
         return;
@@ -523,9 +523,9 @@ namespace LibSerial
     }
 
     int
-    SerialPort::Read(SerialPort::DataBuffer&  dataBuffer,
-                     const unsigned int&      numOfBytes,
-                     const unsigned int&      msTimeout)
+    SerialPort::Read(SerialPort::DataBuffer& dataBuffer,
+                     const unsigned int      numOfBytes,
+                     const unsigned int      msTimeout)
     {
         return mImpl->Read(dataBuffer,
                            numOfBytes,
@@ -533,17 +533,17 @@ namespace LibSerial
     }
 
     int
-    SerialPort::ReadByte(unsigned char&      charBuffer,
-                         const unsigned int& msTimeout)
+    SerialPort::ReadByte(unsigned char&     charBuffer,
+                         const unsigned int msTimeout)
     {
         return mImpl->ReadByte(charBuffer,
                                msTimeout);
     }
 
     int
-    SerialPort::ReadLine(std::string&        dataString,
-                         const char&         lineTerminator,
-                         const unsigned int& msTimeout)
+    SerialPort::ReadLine(std::string&       dataString,
+                         const char         lineTerminator,
+                         const unsigned int msTimeout)
     {
         return mImpl->ReadLine(dataString,
                                lineTerminator,
@@ -551,7 +551,7 @@ namespace LibSerial
     }
 
     void
-    SerialPort::WriteByte(const unsigned char& dataByte)
+    SerialPort::WriteByte(const unsigned char dataByte)
     {
         mImpl->WriteByte(dataByte);
         return;
@@ -573,7 +573,7 @@ namespace LibSerial
     }
 
     void
-    SerialPort::SetDtr(const bool& dtrState)
+    SerialPort::SetDtr(const bool dtrState)
     {
         mImpl->SetDtr(dtrState);
         return;
@@ -586,7 +586,7 @@ namespace LibSerial
     }
 
     void
-    SerialPort::SetRts(const bool& rtsState)
+    SerialPort::SetRts(const bool rtsState)
     {
         mImpl->SetRts(rtsState);
         return;
@@ -1317,7 +1317,7 @@ namespace LibSerial
 
     inline
     void 
-    SerialPort::Implementation::SetVMin(const short& vmin)
+    SerialPort::Implementation::SetVMin(const short vmin)
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())
@@ -1378,7 +1378,7 @@ namespace LibSerial
 
     inline
     void 
-    SerialPort::Implementation::SetVTime(const short& vtime)
+    SerialPort::Implementation::SetVTime(const short vtime)
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())
@@ -1457,8 +1457,8 @@ namespace LibSerial
     inline
     int
     SerialPort::Implementation::Read(SerialPort::DataBuffer& dataBuffer,
-                                     const unsigned int&     numOfBytes,
-                                     const unsigned int&     msTimeout)
+                                     const unsigned int      numOfBytes,
+                                     const unsigned int      msTimeout)
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())
@@ -1538,8 +1538,8 @@ namespace LibSerial
 
     inline
     int
-    SerialPort::Implementation::ReadByte(unsigned char&      charBuffer,
-                                         const unsigned int& msTimeout)
+    SerialPort::Implementation::ReadByte(unsigned char&     charBuffer,
+                                         const unsigned int msTimeout)
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())
@@ -1609,9 +1609,9 @@ namespace LibSerial
 
     inline
     int
-    SerialPort::Implementation::ReadLine(std::string&        dataString,
-                                         const char&         lineTerminator,
-                                         const unsigned int& msTimeout)
+    SerialPort::Implementation::ReadLine(std::string&       dataString,
+                                         const char         lineTerminator,
+                                         const unsigned int msTimeout)
     {
         // Clear the data string.
         dataString.clear();
@@ -1672,7 +1672,7 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::WriteByte(const unsigned char& dataByte)
+    SerialPort::Implementation::WriteByte(const unsigned char dataByte)
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())
@@ -1739,7 +1739,7 @@ namespace LibSerial
     inline
     void
     SerialPort::Implementation::Write(const unsigned char* dataBuffer,
-                                      const unsigned int&  bufferSize)
+                                      const unsigned int   bufferSize)
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())
@@ -1772,7 +1772,7 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::SetDtr(const bool& dtrState)
+    SerialPort::Implementation::SetDtr(const bool dtrState)
     {
         this->SetModemControlLine(TIOCM_DTR, 
                                    dtrState);
@@ -1788,7 +1788,7 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::SetRts(const bool& rtsState)
+    SerialPort::Implementation::SetRts(const bool rtsState)
     {
         this->SetModemControlLine(TIOCM_RTS, 
                                   rtsState);
@@ -1825,7 +1825,7 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::HandlePosixSignal(const int& signalNumber)
+    SerialPort::Implementation::HandlePosixSignal(const int signalNumber)
     {
         // We only want to deal with SIGIO signals here.
         if (SIGIO != signalNumber)
@@ -1903,8 +1903,8 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::SetModemControlLine(const int&  modemLine,
-                                                    const bool& lineState)
+    SerialPort::Implementation::SetModemControlLine(const int  modemLine,
+                                                    const bool lineState)
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())
@@ -1956,7 +1956,7 @@ namespace LibSerial
 
     inline
     bool
-    SerialPort::Implementation::GetModemControlLine(const int& modemLine)
+    SerialPort::Implementation::GetModemControlLine(const int modemLine)
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())

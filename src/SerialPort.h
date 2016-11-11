@@ -174,7 +174,7 @@ namespace LibSerial
          * @param vMin the number of minimum characters to be set.
          * @return Returns the minimum number of charcters set.
          */
-        void SetVMin(const short& vmin);
+        void SetVMin(const short vmin);
 
         /**
          * @brief Gets the VMIN value for the device, which represents the
@@ -189,7 +189,7 @@ namespace LibSerial
          * @param vtime The timeout value in deciseconds to be set.
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
          */
-        void SetVTime(const short& vtime);
+        void SetVTime(const short vtime);
 
         /** 
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
@@ -217,9 +217,9 @@ namespace LibSerial
          * @param msTimeout The timeout period in milliseconds.
          * @return Returns the number of bytes read.
          */
-        int Read(DataBuffer&         dataBuffer,
-                 const unsigned int& numOfBytes = 0,
-                 const unsigned int& msTimeout  = 0);
+        int Read(DataBuffer&        dataBuffer,
+                 const unsigned int numOfBytes = 0,
+                 const unsigned int msTimeout  = 0);
 
         /**
          * @brief Reads a single byte from the serial port.
@@ -230,8 +230,8 @@ namespace LibSerial
          * @param msTimeout The timeout period in milliseconds.
          * @return Returns the number of bytes read.
          */
-        int ReadByte(unsigned char&      charBuffer,
-                     const unsigned int& msTimeout = 0);
+        int ReadByte(unsigned char&     charBuffer,
+                     const unsigned int msTimeout = 0);
 
         /**
          * @brief Reads a line of characters from the serial port.
@@ -248,15 +248,15 @@ namespace LibSerial
          *        character is not read.
          * @return Returns the number of bytes read.
          */
-        int ReadLine(std::string&        dataString,
-                     const char&         lineTerminator = '\n',
-                     const unsigned int& msTimeout = 0);
+        int ReadLine(std::string&       dataString,
+                     const char         lineTerminator = '\n',
+                     const unsigned int msTimeout = 0);
 
         /**
          * @brief Writes a single byte to the serial port.
          * @param dataByte The byte to be written to the serial port.
          */
-        void WriteByte(const unsigned char& dataByte);
+        void WriteByte(const unsigned char dataByte);
 
         /**
          * @brief Writes a DataBuffer vector to the serial port.
@@ -278,7 +278,7 @@ namespace LibSerial
          * @param dtrState The line voltage state to be set,
          *        (true = high, false = low).
          */
-        void SetDtr(const bool& dtrState = true);
+        void SetDtr(const bool dtrState = true);
 
         /**
          * @brief Gets the status of the DTR line.
@@ -291,7 +291,7 @@ namespace LibSerial
          * @param rtsState The line voltage state to be set,
          *        (true = high, false = low).
          */
-        void SetRts(const bool& rtsState = true);
+        void SetRts(const bool rtsState = true);
 
         /**
          * @brief Get the status of the RTS line.
@@ -332,12 +332,12 @@ namespace LibSerial
          * @brief Prevents copying of objects of this class by declaring the
          *        assignment operator private. This method is never defined.
          */
-        SerialPort& operator=(const SerialPort& otherSerialPort ) = delete;
+        SerialPort& operator=(const SerialPort& otherSerialPort) = delete;
 
         /**
          * @brief Move assignment is not allowed.
          */
-        SerialPort& operator=(const SerialPort&& otherSerialPort ) = delete;
+        SerialPort& operator=(const SerialPort&& otherSerialPort) = delete;
 
         /**
          * @brief Forward declaration of the implementation class folowing
