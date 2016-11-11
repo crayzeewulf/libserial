@@ -97,6 +97,15 @@ protected:
         ASSERT_TRUE(serialStream.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());
 
+        serialStream.SetBaudRate(baudRates[16]);
+        serialStream2.SetBaudRate(baudRates[16]);
+        
+        BaudRate baudRate = serialStream.GetBaudRate();
+        BaudRate baudRate2 = serialStream2.GetBaudRate();
+        
+        ASSERT_EQ(baudRate, baudRates[16]);
+        ASSERT_EQ(baudRate2, baudRates[16]);
+
         serialStream << writeString << std::endl;
         getline(serialStream2, readString);
         ASSERT_EQ(readString, writeString);
@@ -305,6 +314,15 @@ protected:
         ASSERT_TRUE(serialPort.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
+        serialPort.SetBaudRate(baudRates[16]);
+        serialPort2.SetBaudRate(baudRates[16]);
+        
+        BaudRate baudRate = serialPort.GetBaudRate();
+        BaudRate baudRate2 = serialPort2.GetBaudRate();
+        
+        ASSERT_EQ(baudRate, baudRates[16]);
+        ASSERT_EQ(baudRate2, baudRates[16]);
+
         SerialPort::DataBuffer readDataBuffer;
         SerialPort::DataBuffer writeDataBuffer;
 
@@ -321,19 +339,6 @@ protected:
 
         ASSERT_EQ(readDataBuffer, writeDataBuffer);
         ASSERT_EQ(bytesRead, writeDataBuffer.size());
-        usleep(10);
-
-        serialPort.Close();
-        serialPort2.Close();
-        
-        ASSERT_FALSE(serialPort.IsOpen());
-        ASSERT_FALSE(serialPort2.IsOpen());
-        
-        serialPort.Open();
-        serialPort2.Open();
-        
-        ASSERT_TRUE(serialPort.IsOpen());
-        ASSERT_TRUE(serialPort2.IsOpen());
 
         unsigned char writeByte;
         unsigned char readByte;
@@ -596,6 +601,41 @@ protected:
         ASSERT_FALSE(serialPort.IsOpen());
     }
 
+    void testSerialStreamToSerialPortReadWrite(const int timeOutMilliseconds)
+    {
+        serialPort.Open();
+        ASSERT_TRUE(serialPort.IsOpen());
+
+        serialStream.Open(TEST_SERIAL_PORT_2);
+        ASSERT_TRUE(serialStream.IsOpen());
+
+        serialPort.SetBaudRate(baudRates[16]);
+        serialStream.SetBaudRate(baudRates[16]);
+        
+        BaudRate baudRate = serialPort.GetBaudRate();
+        BaudRate baudRate2 = serialStream.GetBaudRate();
+        
+        ASSERT_EQ(baudRate, baudRates[16]);
+        ASSERT_EQ(baudRate2, baudRates[16]);
+
+        serialStream << writeString << std::endl;
+        bytesRead = serialPort.ReadLine(readString, '\n', timeOutMilliseconds);
+        ASSERT_EQ(readString, writeString + '\n');
+        ASSERT_EQ(bytesRead, writeString.size() + 1);
+       
+        serialPort.Write(writeString + '\n');
+        tcdrain(serialPort.GetFileDescriptor());
+        getline(serialStream, readString);
+        ASSERT_EQ(readString, writeString);
+
+        serialPort.Close();
+        serialStream.Close();
+        
+        ASSERT_FALSE(serialPort.IsOpen());
+        ASSERT_FALSE(serialStream.IsOpen());
+    }
+
+
     BaudRate        baudRates[25];
     CharacterSize   characterSizes[4];
     FlowControl     flowControlTypes[3];
@@ -723,7 +763,7 @@ TEST_F(LibSerialTest, testSerialPortOpenClose)
 
 TEST_F(LibSerialTest, testSerialPortReadWrite)
 {
-    int timeOutMilliseconds = 20;
+    int timeOutMilliseconds = 25;
 
     SCOPED_TRACE("Serial Port Read and Write Test");
 
@@ -849,5 +889,20 @@ TEST_F(LibSerialTest, testSerialPortSetGetVTime)
     for (size_t i = 0; i < 100; i++)
     {
         testSerialPortSetGetVTime();
+    }
+}
+
+
+//----------------- Serial Stream to Serial Port Unit Tests -----------------//
+
+TEST_F(LibSerialTest, testSerialStreamToSerialPortReadWrite)
+{
+    int timeOutMilliseconds = 25;
+
+    SCOPED_TRACE("Serial Stream To Serial Port Read and Write Test");
+
+    for (size_t i = 0; i < 100; i++)
+    {
+        testSerialStreamToSerialPortReadWrite(timeOutMilliseconds);
     }
 }

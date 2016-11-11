@@ -1521,7 +1521,7 @@ namespace LibSerial
                 if (msTimeout > 0 &&
                     elapsed_ms > msTimeout)
                 {
-                    throw ReadTimeout();
+                    throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
                 }
                 
                 remaining_ms = msTimeout - elapsed_ms;
@@ -1586,7 +1586,7 @@ namespace LibSerial
             if (msTimeout > 0 &&
                 elapsed_ms > msTimeout)
             {
-                throw ReadTimeout();
+                throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
             }
 
             // Sleep for 1ms (1000us) for data to arrive.
@@ -1657,7 +1657,7 @@ namespace LibSerial
             if (msTimeout > 0 &&
                 elapsed_ms > msTimeout)
             {
-                throw ReadTimeout();
+                throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
             }
 
             remaining_ms = msTimeout - elapsed_ms;

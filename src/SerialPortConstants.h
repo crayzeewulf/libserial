@@ -34,6 +34,7 @@ namespace LibSerial
     const std::string ERR_MSG_INVALID_FLOW_CONTROL  = "Invalid flow control.";
     const std::string ERR_MSG_INVALID_PARITY        = "Invalid parity setting.";
     const std::string ERR_MSG_INVALID_STOP_BITS     = "Invalid number of stop bits.";
+    const std::string ERR_MSG_READ_TIMEOUT          = "Read timeout";
     const std::string ERR_MSG_PORT_ALREADY_OPEN     = "Serial port already open.";
     const std::string ERR_MSG_PORT_NOT_OPEN         = "Serial port not open.";
     const std::string ERR_MSG_PTHREAD_MUTEX_ERROR   = "Could not initialize mutex!";
@@ -112,8 +113,8 @@ namespace LibSerial
     class ReadTimeout : public std::runtime_error
     {
     public:
-        ReadTimeout()
-            : runtime_error("Read timeout")
+        ReadTimeout(const std::string& whatArg)
+            : runtime_error(whatArg)
         {
         }
     };
@@ -161,7 +162,7 @@ namespace LibSerial
         BAUD_3500000 = B3500000,
         BAUD_4000000 = B4000000,
 #endif
-        BAUD_DEFAULT = BAUD_57600,
+        BAUD_DEFAULT = BAUD_115200,
         BAUD_INVALID = std::numeric_limits<speed_t>::max()
     };
 
