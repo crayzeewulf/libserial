@@ -393,22 +393,19 @@ protected:
         ASSERT_EQ(readByte, writeByte);
         ASSERT_EQ(bytesRead, 1);
 
-        for (size_t i = 0; i < 10000; i++)
-        {
-            serialPort1.Write(writeString + '\n');
-            tcdrain(serialPort1.GetFileDescriptor());
+        serialPort1.Write(writeString + '\n');
+        tcdrain(serialPort1.GetFileDescriptor());
 
-            serialPort2.Write(writeString + '\n');
-            tcdrain(serialPort2.GetFileDescriptor());
+        serialPort2.Write(writeString + '\n');
+        tcdrain(serialPort2.GetFileDescriptor());
 
-            bytesRead = serialPort1.ReadLine(readString, '\n', timeOutMilliseconds);
-            ASSERT_EQ(readString, writeString + '\n');
-            ASSERT_EQ(bytesRead, writeString.size() + 1);
-            
-            bytesRead = serialPort2.ReadLine(readString, '\n', timeOutMilliseconds);
-            ASSERT_EQ(readString, writeString + '\n');
-            ASSERT_EQ(bytesRead, writeString.size() + 1);
-        }
+        bytesRead = serialPort1.ReadLine(readString, '\n', timeOutMilliseconds);
+        ASSERT_EQ(readString, writeString + '\n');
+        ASSERT_EQ(bytesRead, writeString.size() + 1);
+        
+        bytesRead = serialPort2.ReadLine(readString, '\n', timeOutMilliseconds);
+        ASSERT_EQ(readString, writeString + '\n');
+        ASSERT_EQ(bytesRead, writeString.size() + 1);
         
         serialPort1.Close();
         serialPort2.Close();
