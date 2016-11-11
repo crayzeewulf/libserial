@@ -841,7 +841,7 @@ namespace LibSerial
 
         port_settings.c_iflag = IGNBRK;
         port_settings.c_oflag = 0;
-        port_settings.c_cflag = B19200 | CS8 | CLOCAL | CREAD;
+        port_settings.c_cflag = B115200 | CS8 | CLOCAL | CREAD;
         port_settings.c_lflag = 0;
 
         // :TRICKY:
