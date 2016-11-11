@@ -96,8 +96,7 @@ public:
      *        detach the handler.
      */
     void AttachHandler(const int           posixSignalNumber,
-                       PosixSignalHandler& signalHandler)
-        throw(CannotAttachHandler);
+                       PosixSignalHandler& signalHandler);
 
     /**
      * @brief Detach the specified signal handler from the signal dispatcher.
@@ -114,9 +113,7 @@ public:
      *        error is encountered.
      */
     void DetachHandler(const int                 posixSignalNumber,
-                       const PosixSignalHandler& signalHandler)
-        throw(CannotDetachHandler,
-              std::logic_error);
+                       const PosixSignalHandler& signalHandler);
 private:
     /**
      * @brief This is a singleton class and the only instances of this class

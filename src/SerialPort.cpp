@@ -368,7 +368,6 @@ namespace LibSerial
     }
 
     SerialPort::~SerialPort()
-    throw()
     {
         // Close the serial port if it is open.
         if (this->IsOpen())

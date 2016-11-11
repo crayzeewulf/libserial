@@ -48,17 +48,15 @@ namespace
          */
         void
         AttachHandler(const int           posixSignalNumber,
-                      PosixSignalHandler& signalHandler)
-            throw(PosixSignalDispatcher::CannotAttachHandler);
+                      PosixSignalHandler& signalHandler);
 
         /**
          * @brief Implementation of PosixSignalDispatcher::DetachHandler()
          */
         void
         DetachHandler(const int                 posixSignalNumber,
-                      const PosixSignalHandler& signalHandler)
-            throw(PosixSignalDispatcher::CannotDetachHandler,
-                  std::logic_error);
+                      const PosixSignalHandler& signalHandler);
+        
     private:
         /**
          * @brief List of signal handlers that are currently associated
@@ -122,7 +120,6 @@ PosixSignalDispatcher::Instance()
 void
 PosixSignalDispatcher::AttachHandler(const int           posixSignalNumber,
                                      PosixSignalHandler& signalHandler)
-    throw(CannotAttachHandler)
 {
     PosixSignalDispatcherImpl::Instance().AttachHandler(posixSignalNumber,
                                                         signalHandler);
@@ -132,8 +129,6 @@ PosixSignalDispatcher::AttachHandler(const int           posixSignalNumber,
 void
 PosixSignalDispatcher::DetachHandler(const int                 posixSignalNumber,
                                      const PosixSignalHandler& signalHandler)
-    throw(CannotDetachHandler,
-          std::logic_error)
 {
     PosixSignalDispatcherImpl::Instance().DetachHandler(posixSignalNumber,
                                                         signalHandler);
@@ -165,7 +160,6 @@ namespace
     void
     PosixSignalDispatcherImpl::AttachHandler(const int           posixSignalNumber,
                                              PosixSignalHandler& signalHandler)
-    throw (PosixSignalDispatcher::CannotAttachHandler)
     {
         // Attach this instance of PosixSignalDispatcher to the specified signal.
         struct sigaction sigaction_info;
@@ -201,8 +195,6 @@ namespace
     void
     PosixSignalDispatcherImpl::DetachHandler(const int                 posixSignalNumber,
                                              const PosixSignalHandler& signalHandler)
-    throw(PosixSignalDispatcher::CannotDetachHandler,
-          std::logic_error)
     {
         // Get the range of values in the SignalHandlerList corresponding
         // to the specified signal number.

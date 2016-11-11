@@ -22,7 +22,6 @@
 #define _SerialStreamBuf_h_
 
 #include "SerialPortConstants.h"
-
 #include <memory>
 
 
@@ -43,7 +42,7 @@ namespace LibSerial
      *        At present, this class uses unbuffered I/O and all calls
      *        to setbuf() will be ignored.
      */
-    class SerialStreamBuf : public std::streambuf 
+    class SerialStreamBuf : public std::streambuf
     {
     public:
 
