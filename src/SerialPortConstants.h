@@ -1,5 +1,5 @@
 /******************************************************************************
- *   @file SerialPortConstants.h                                                  *
+ *   @file SerialPortConstants.h                                              *
  *   @copyright                                                               *
  *                                                                            *
  *   This program is free software; you can redistribute it and/or modify     *
