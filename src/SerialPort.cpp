@@ -194,11 +194,10 @@ namespace LibSerial
          * @param dataBuffer The data buffer to place serial data into.
          * @param numOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
-         * @return Returns the number of bytes read.
          */
-        int Read(SerialPort::DataBuffer& dataBuffer,
-                 const unsigned int      numOfBytes,
-                 const unsigned int      msTimeout);
+        void Read(SerialPort::DataBuffer& dataBuffer,
+                  const unsigned int      numOfBytes,
+                  const unsigned int      msTimeout);
 
         /**
          * @brief Reads a single byte from the serial port.
@@ -207,10 +206,9 @@ namespace LibSerial
          *        throw a ReadTimeout exception. If msTimeout is 0,
          *        then this method will block until data is available.
          * @param msTimeout The timeout period in milliseconds.
-         * @return Returns the number of bytes read.
          */
-        int ReadByte(unsigned char&     charBuffer, 
-                     const unsigned int msTimeout = 0);
+        void ReadByte(unsigned char&     charBuffer, 
+                      const unsigned int msTimeout = 0);
 
         /**
          * @brief Reads a line of characters from the serial port.
@@ -225,11 +223,10 @@ namespace LibSerial
          *        end of a line.
          * @param msTimeout The timeout value to return if a line termination
          *        character is not read.
-         * @return Returns the number of bytes read.
          */
-        int ReadLine(std::string&       dataString,
-                     const char         lineTerminator = '\n',
-                     const unsigned int msTimeout = 0);
+        void ReadLine(std::string&       dataString,
+                      const char         lineTerminator = '\n',
+                      const unsigned int msTimeout = 0);
 
         /**
          * @brief Writes a single byte to the serial port.
@@ -521,32 +518,35 @@ namespace LibSerial
         return mImpl->IsDataAvailable();
     }
 
-    int
+    void
     SerialPort::Read(SerialPort::DataBuffer& dataBuffer,
                      const unsigned int      numOfBytes,
                      const unsigned int      msTimeout)
     {
-        return mImpl->Read(dataBuffer,
-                           numOfBytes,
-                           msTimeout);
+        mImpl->Read(dataBuffer,
+                    numOfBytes,
+                    msTimeout);
+        return;
     }
 
-    int
+    void
     SerialPort::ReadByte(unsigned char&     charBuffer,
                          const unsigned int msTimeout)
     {
-        return mImpl->ReadByte(charBuffer,
-                               msTimeout);
+        mImpl->ReadByte(charBuffer,
+                        msTimeout);
+        return;
     }
 
-    int
+    void
     SerialPort::ReadLine(std::string&       dataString,
                          const char         lineTerminator,
                          const unsigned int msTimeout)
     {
-        return mImpl->ReadLine(dataString,
-                               lineTerminator,
-                               msTimeout);
+        mImpl->ReadLine(dataString,
+                        lineTerminator,
+                        msTimeout);
+        return;
     }
 
     void
@@ -1454,7 +1454,7 @@ namespace LibSerial
     }
 
     inline
-    int
+    void
     SerialPort::Implementation::Read(SerialPort::DataBuffer& dataBuffer,
                                      const unsigned int      numOfBytes,
                                      const unsigned int      msTimeout)
@@ -1482,15 +1482,15 @@ namespace LibSerial
         // Empty the data buffer.
         dataBuffer.resize(0);
         unsigned char nextChar = 0;
-        size_t bytesRead = 0;
 
         if (0 == numOfBytes)
         {
             // Read all available data if numOfBytes is zero.
             while(this->IsDataAvailable())
             {
-                bytesRead += ReadByte(nextChar,
-                                      msTimeout);
+                this->ReadByte(nextChar,
+                               msTimeout);
+
                 dataBuffer.push_back(nextChar);
             }
         }
@@ -1525,18 +1525,18 @@ namespace LibSerial
                 
                 remaining_ms = msTimeout - elapsed_ms;
 
-                bytesRead += ReadByte(nextChar,
-                                      remaining_ms);
+                this->ReadByte(nextChar,
+                               remaining_ms);
 
                 dataBuffer.push_back(nextChar);
             }
         }
         
-        return dataBuffer.size();
+        return;
     }
 
     inline
-    int
+    void
     SerialPort::Implementation::ReadByte(unsigned char&     charBuffer,
                                          const unsigned int msTimeout)
     {
@@ -1560,7 +1560,7 @@ namespace LibSerial
         }
 
         pthread_mutex_lock(&mQueueMutex);
-        int queueSize = mInputBuffer.size();
+        int queueSize = this->mInputBuffer.size();
         pthread_mutex_unlock(&mQueueMutex);
 
         // Wait for data to be available.
@@ -1592,22 +1592,22 @@ namespace LibSerial
             usleep(MICROSECONDS_PER_MS);
 
             pthread_mutex_lock(&mQueueMutex);
-            queueSize = mInputBuffer.size();
+            queueSize = this->mInputBuffer.size();
             pthread_mutex_unlock(&mQueueMutex);
         }
 
         // Return the first byte and remove it from the queue.
         pthread_mutex_lock(&mQueueMutex);
-        charBuffer = mInputBuffer.front();
-        mInputBuffer.pop();
-        queueSize = mInputBuffer.size();
+        charBuffer = this->mInputBuffer.front();
+        this->mInputBuffer.pop();
+        queueSize = this->mInputBuffer.size();
         pthread_mutex_unlock(&mQueueMutex);
 
-        return 1;
+        return;
     }
 
     inline
-    int
+    void
     SerialPort::Implementation::ReadLine(std::string&       dataString,
                                          const char         lineTerminator,
                                          const unsigned int msTimeout)
@@ -1616,7 +1616,6 @@ namespace LibSerial
         dataString.clear();
 
         unsigned char nextChar = 0;
-        size_t bytesRead = 0;
 
         unsigned int elapsed_ms;
         unsigned int remaining_ms;
@@ -1661,12 +1660,12 @@ namespace LibSerial
 
             remaining_ms = msTimeout - elapsed_ms;
 
-            bytesRead += this->ReadByte(nextChar,
-                                        remaining_ms);
+            this->ReadByte(nextChar,
+                           remaining_ms);
             dataString += nextChar;
         } while (nextChar != lineTerminator);
         
-        return bytesRead;
+        return;
     }
 
     inline
@@ -1723,7 +1722,7 @@ namespace LibSerial
             this->Write(local_buffer,
                         dataBuffer.size());
         }
-        catch( ... )
+        catch (...)
         {
             // Free the allocated memory.
             delete [] local_buffer;
@@ -1819,7 +1818,7 @@ namespace LibSerial
     int
     SerialPort::Implementation::GetFileDescriptor()
     {
-        return mFileDescriptor;
+        return this->mFileDescriptor;
     }
 
     inline
@@ -1923,7 +1922,7 @@ namespace LibSerial
             modemLine != TIOCM_RI  &&
             modemLine != TIOCM_DSR)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::invalid_argument(strerror(errno));
         }
 
         // Set or unset the specified bit according to the value of lineState.
@@ -1963,6 +1962,21 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
+        if (modemLine != TIOCM_LE  &&
+            modemLine != TIOCM_DTR &&
+            modemLine != TIOCM_RTS &&
+            modemLine != TIOCM_ST  &&
+            modemLine != TIOCM_SR  &&
+            modemLine != TIOCM_CTS &&
+            modemLine != TIOCM_CAR &&
+            modemLine != TIOCM_CD  &&
+            modemLine != TIOCM_RNG &&
+            modemLine != TIOCM_RI  &&
+            modemLine != TIOCM_DSR)
+        {
+            throw std::invalid_argument(strerror(errno));
+        }
+        
         // Use an ioctl() call to get the state of the line.
         int serial_port_state = 0;
         
@@ -1973,7 +1987,6 @@ namespace LibSerial
             throw std::runtime_error(strerror(errno));
         }
 
-        // :TODO: Verify that modemLine is a valid value.
         return (serial_port_state & modemLine);
     }
 }

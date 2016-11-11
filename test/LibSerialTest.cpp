@@ -371,10 +371,10 @@ protected:
         serialPort1.Write(writeDataBuffer);
         tcdrain(serialPort1.GetFileDescriptor());
         
-        bytesRead = serialPort2.Read(readDataBuffer, 74, timeOutMilliseconds);
+        serialPort2.Read(readDataBuffer, 74, timeOutMilliseconds);
 
         ASSERT_EQ(readDataBuffer, writeDataBuffer);
-        ASSERT_EQ(bytesRead, writeDataBuffer.size());
+        ASSERT_EQ(readDataBuffer.size(), writeDataBuffer.size());
 
         unsigned char writeByte;
         unsigned char readByte;
@@ -385,13 +385,11 @@ protected:
         serialPort2.WriteByte(writeByte);
         tcdrain(serialPort2.GetFileDescriptor());
         
-        bytesRead = serialPort1.ReadByte(readByte, timeOutMilliseconds);
+        serialPort1.ReadByte(readByte, timeOutMilliseconds);
         ASSERT_EQ(readByte, writeByte);
-        ASSERT_EQ(bytesRead, 1);
 
-        bytesRead = serialPort2.ReadByte(readByte, timeOutMilliseconds);
+        serialPort2.ReadByte(readByte, timeOutMilliseconds);
         ASSERT_EQ(readByte, writeByte);
-        ASSERT_EQ(bytesRead, 1);
 
         serialPort1.Write(writeString + '\n');
         tcdrain(serialPort1.GetFileDescriptor());
@@ -399,13 +397,13 @@ protected:
         serialPort2.Write(writeString + '\n');
         tcdrain(serialPort2.GetFileDescriptor());
 
-        bytesRead = serialPort1.ReadLine(readString, '\n', timeOutMilliseconds);
+        serialPort1.ReadLine(readString, '\n', timeOutMilliseconds);
         ASSERT_EQ(readString, writeString + '\n');
-        ASSERT_EQ(bytesRead, writeString.size() + 1);
+        ASSERT_EQ(readString.size(), writeString.size() + 1);
         
-        bytesRead = serialPort2.ReadLine(readString, '\n', timeOutMilliseconds);
+        serialPort2.ReadLine(readString, '\n', timeOutMilliseconds);
         ASSERT_EQ(readString, writeString + '\n');
-        ASSERT_EQ(bytesRead, writeString.size() + 1);
+        ASSERT_EQ(readString.size(), writeString.size() + 1);
         
         serialPort1.Close();
         serialPort2.Close();
@@ -437,8 +435,8 @@ protected:
 
         ASSERT_TRUE(serialPort2.IsDataAvailable());
 
-        bytesRead = serialPort2.ReadByte(readByte, 1);
-        ASSERT_TRUE(bytesRead == 1);
+        serialPort2.ReadByte(readByte, 1);
+        ASSERT_EQ(readByte, writeByte);
 
         serialPort2.WriteByte(writeByte);
         tcdrain(serialPort2.GetFileDescriptor());
@@ -447,8 +445,8 @@ protected:
 
         ASSERT_TRUE(serialPort1.IsDataAvailable());
         
-        bytesRead = serialPort1.ReadByte(readByte, 1);
-        ASSERT_TRUE(bytesRead == 1);
+        serialPort1.ReadByte(readByte, 1);
+        ASSERT_EQ(readByte, writeByte);
 
         ASSERT_FALSE(serialPort1.IsDataAvailable());
         ASSERT_FALSE(serialPort2.IsDataAvailable());
@@ -655,9 +653,9 @@ protected:
         ASSERT_EQ(baudRate2, baudRates[16]);
 
         serialStream1 << writeString << std::endl;
-        bytesRead = serialPort1.ReadLine(readString, '\n', timeOutMilliseconds);
+        serialPort1.ReadLine(readString, '\n', timeOutMilliseconds);
         ASSERT_EQ(readString, writeString + '\n');
-        ASSERT_EQ(bytesRead, writeString.size() + 1);
+        ASSERT_EQ(readString.size(), writeString.size() + 1);
        
         serialPort1.Write(writeString + '\n');
         tcdrain(serialPort1.GetFileDescriptor());
@@ -669,6 +667,11 @@ protected:
         
         ASSERT_FALSE(serialPort1.IsOpen());
         ASSERT_FALSE(serialStream1.IsOpen());
+    }
+
+    void startSerialPortCommunicationsThread()
+    {
+
     }
 
 
@@ -686,8 +689,6 @@ protected:
 
     char writeByte;
     char readByte;
-
-    int bytesRead = 0;
 };
 
 
@@ -947,10 +948,10 @@ TEST_F(LibSerialTest, testSerialStreamToSerialPortReadWrite)
 //----------------------- Multiple Thread Unit Test -------------------------//
 
 
-// TEST_F(LibSerialTest, testMultipleThreadSerialPortReadWrite)
+// TEST_F(LibSerialTest, testMultiThreadedSerialPortReadWrite)
 // {
-//     SCOPED_TRACE("Test Multiple Threaded Serial Communications.");
-//     startSerialPortCommunicationsThread();
+//     SCOPED_TRACE("Test Multi-Threaded Serial Communications.");
+//     testMultiThreadedSerialPortReadWrite();
 // }
 
 

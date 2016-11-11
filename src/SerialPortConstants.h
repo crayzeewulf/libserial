@@ -73,21 +73,36 @@ namespace LibSerial
      *        software flow control with the serial port.
      */
     static constexpr char CTRL_S = 0x13;
+    
+    /**
+     * @note - For reference, below is a list of std::exception types:
+     *         logic_error 
+     *         invalid_argument
+     *         domain_error
+     *         length_error
+     *         out_of_range
+     *         future_error
+     *         runtime_error
+     *         range_error
+     *         overflow_error
+     *         underflow_error
+     *         regex_error
+     *         system_error
+     *         ios_base::failure
+     *         bad_typeid
+     *         bad_cast
+     *         bad_weak_ptr
+     *         bad_function_call
+     *         bad_alloc 
+     *         bad_array_new_length
+     *         bad_exception
+     */
 
     class NotOpen : public std::logic_error
     {
     public:
         NotOpen(const std::string& whatArg)
             : logic_error(whatArg)
-        {
-        }
-    };
-
-    class OpenFailed : public std::runtime_error
-    {
-    public:
-        OpenFailed(const std::string& whatArg)
-            : runtime_error(whatArg)
         {
         }
     };
@@ -101,6 +116,15 @@ namespace LibSerial
         }
     };
 
+    class OpenFailed : public std::runtime_error
+    {
+    public:
+        OpenFailed(const std::string& whatArg)
+            : runtime_error(whatArg)
+        {
+        }
+    };
+    
     class UnsupportedBaudRate : public std::runtime_error
     {
     public:

@@ -215,11 +215,10 @@ namespace LibSerial
          * @param dataBuffer The data buffer to place serial data into.
          * @param numOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
-         * @return Returns the number of bytes read.
          */
-        int Read(DataBuffer&        dataBuffer,
-                 const unsigned int numOfBytes = 0,
-                 const unsigned int msTimeout  = 0);
+        void Read(DataBuffer&        dataBuffer,
+                  const unsigned int numOfBytes = 0,
+                  const unsigned int msTimeout  = 0);
 
         /**
          * @brief Reads a single byte from the serial port.
@@ -228,10 +227,9 @@ namespace LibSerial
          *        throw a ReadTimeout exception. If msTimeout is 0,
          *        then this method will block until data is available.
          * @param msTimeout The timeout period in milliseconds.
-         * @return Returns the number of bytes read.
          */
-        int ReadByte(unsigned char&     charBuffer,
-                     const unsigned int msTimeout = 0);
+        void ReadByte(unsigned char&     charBuffer,
+                      const unsigned int msTimeout = 0);
 
         /**
          * @brief Reads a line of characters from the serial port.
@@ -246,11 +244,10 @@ namespace LibSerial
          *        end of a line.
          * @param msTimeout The timeout value to return if a line termination
          *        character is not read.
-         * @return Returns the number of bytes read.
          */
-        int ReadLine(std::string&       dataString,
-                     const char         lineTerminator = '\n',
-                     const unsigned int msTimeout = 0);
+        void ReadLine(std::string&       dataString,
+                      const char         lineTerminator = '\n',
+                      const unsigned int msTimeout = 0);
 
         /**
          * @brief Writes a single byte to the serial port.
