@@ -397,6 +397,20 @@ protected:
         serialPort2.Write(writeString + '\n');
         tcdrain(serialPort2.GetFileDescriptor());
 
+        serialPort1.Read(readString, writeString.size() + 1, timeOutMilliseconds);
+        ASSERT_EQ(readString, writeString + '\n');
+        ASSERT_EQ(readString.size(), writeString.size() + 1);
+        
+        serialPort2.Read(readString, writeString.size() + 1, timeOutMilliseconds);
+        ASSERT_EQ(readString, writeString + '\n');
+        ASSERT_EQ(readString.size(), writeString.size() + 1);
+    
+        serialPort1.Write(writeString + '\n');
+        tcdrain(serialPort1.GetFileDescriptor());
+
+        serialPort2.Write(writeString + '\n');
+        tcdrain(serialPort2.GetFileDescriptor());
+
         serialPort1.ReadLine(readString, '\n', timeOutMilliseconds);
         ASSERT_EQ(readString, writeString + '\n');
         ASSERT_EQ(readString.size(), writeString.size() + 1);
@@ -404,7 +418,7 @@ protected:
         serialPort2.ReadLine(readString, '\n', timeOutMilliseconds);
         ASSERT_EQ(readString, writeString + '\n');
         ASSERT_EQ(readString.size(), writeString.size() + 1);
-        
+       
         serialPort1.Close();
         serialPort2.Close();
         
@@ -669,10 +683,10 @@ protected:
         ASSERT_FALSE(serialStream1.IsOpen());
     }
 
-    void startSerialPortCommunicationsThread()
-    {
-
-    }
+    // void testMultiThreadedSerialPortReadWrite(SerialPort serialPort)
+    // {
+        
+    // }
 
 
     BaudRate        baudRates[25];
@@ -951,7 +965,8 @@ TEST_F(LibSerialTest, testSerialStreamToSerialPortReadWrite)
 // TEST_F(LibSerialTest, testMultiThreadedSerialPortReadWrite)
 // {
 //     SCOPED_TRACE("Test Multi-Threaded Serial Communications.");
-//     testMultiThreadedSerialPortReadWrite();
+//     testMultiThreadedSerialPortReadWrite(serialPort1);
+//     testMultiThreadedSerialPortReadWrite(serialPort2);
 // }
 
 
@@ -1026,10 +1041,7 @@ TEST_F(LibSerialTest, testSerialStreamToSerialPortReadWrite)
 // void* startSerialPortCommunicationsThread(void *args)
 // {
 //     LibSerialTest* libSerialTest  = (LibSerialTest*) args;
-//     LibSerialTest* libSerialTest2 = (LibSerialTest*) args;
-
 //     libSerialTest->startSerialPortCommunicationsThread(serialPort1);
-//     libSerialTest2->startSerialPortCommunicationsThread(serialPort2);
 
 //     return NULL;
 // }

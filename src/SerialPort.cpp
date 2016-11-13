@@ -200,6 +200,23 @@ namespace LibSerial
                   const unsigned int      msTimeout);
 
         /**
+         * @brief Reads the specified number of bytes from the serial port.
+         *        The method will timeout if no data is received in the specified
+         *        number of milliseconds (msTimeout). If msTimeout is 0, then
+         *        this method will block until all requested bytes are
+         *        received. If numOfBytes is zero, then this method will keep
+         *        reading data till no more data is available at the serial port.
+         *        In all cases, all read data is available in dataBuffer on
+         *        return from this method.
+         * @param dataString The data string read from the serial port.
+         * @param numOfBytes The number of bytes to read before returning.
+         * @param msTimeout The timeout period in milliseconds.
+         */
+        void Read(std::string&       dataString,
+                  const unsigned int numOfBytes = 0,
+                  const unsigned int msTimeout  = 0);
+
+        /**
          * @brief Reads a single byte from the serial port.
          *        If no data is available within the specified number
          *        of milliseconds (msTimeout), then this method will
@@ -524,6 +541,17 @@ namespace LibSerial
                      const unsigned int      msTimeout)
     {
         mImpl->Read(dataBuffer,
+                    numOfBytes,
+                    msTimeout);
+        return;
+    }
+
+    void
+    SerialPort::Read(std::string&       dataString,
+                     const unsigned int numOfBytes,
+                     const unsigned int msTimeout)
+    {
+        mImpl->Read(dataString,
                     numOfBytes,
                     msTimeout);
         return;
@@ -1529,6 +1557,85 @@ namespace LibSerial
                                remaining_ms);
 
                 dataBuffer.push_back(nextChar);
+            }
+        }
+        
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::Read(std::string&       dataString,
+                                     const unsigned int numOfBytes,
+                                     const unsigned int msTimeout)
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        unsigned int elapsed_ms;
+        unsigned int remaining_ms;
+
+        timeval entry_time;
+        timeval current_time;
+        timeval elapsed_time;
+
+        // Throw an exception if we are unable to read the current time.  
+        if (gettimeofday(&entry_time,
+                         NULL) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+        
+        // Empty the data string.
+        dataString.clear();
+        unsigned char nextChar = 0;
+
+        if (0 == numOfBytes)
+        {
+            // Read all available data if numOfBytes is zero.
+            while(this->IsDataAvailable())
+            {
+                this->ReadByte(nextChar,
+                               msTimeout);
+
+                dataString += nextChar;
+            }
+        }
+        else
+        {
+            for (unsigned int i=0; i<numOfBytes; ++i)
+            {
+                // Throw an exception if we are unable to read the current time.            
+                if (gettimeofday(&current_time,
+                                 NULL) < 0)
+                {
+                    throw std::runtime_error(strerror(errno));
+                }
+
+                // Obtain the elapsed time.
+                elapsed_time = current_time - entry_time;
+
+                // Calculate the elapsed number of milliseconds.
+                elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
+                              elapsed_time.tv_usec / MICROSECONDS_PER_MS);
+
+                // If more than msTimeout milliseconds have elapsed while
+                // waiting for data, then we throw a ReadTimeout exception.
+                if (msTimeout > 0 &&
+                    elapsed_ms > msTimeout)
+                {
+                    throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
+                }
+                
+                remaining_ms = msTimeout - elapsed_ms;
+
+                this->ReadByte(nextChar,
+                               remaining_ms);
+
+                dataString += nextChar;
             }
         }
         

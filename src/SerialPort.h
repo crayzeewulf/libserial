@@ -221,6 +221,23 @@ namespace LibSerial
                   const unsigned int msTimeout  = 0);
 
         /**
+         * @brief Reads the specified number of bytes from the serial port.
+         *        The method will timeout if no data is received in the specified
+         *        number of milliseconds (msTimeout). If msTimeout is 0, then
+         *        this method will block until all requested bytes are
+         *        received. If numOfBytes is zero, then this method will keep
+         *        reading data till no more data is available at the serial port.
+         *        In all cases, all read data is available in dataBuffer on
+         *        return from this method.
+         * @param dataString The data string read from the serial port.
+         * @param numOfBytes The number of bytes to read before returning.
+         * @param msTimeout The timeout period in milliseconds.
+         */
+        void Read(std::string&       dataString,
+                  const unsigned int numOfBytes = 0,
+                  const unsigned int msTimeout  = 0);
+
+        /**
          * @brief Reads a single byte from the serial port.
          *        If no data is available within the specified number
          *        of milliseconds (msTimeout), then this method will
