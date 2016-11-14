@@ -376,6 +376,20 @@ protected:
         ASSERT_EQ(readDataBuffer, writeDataBuffer);
         ASSERT_EQ(readDataBuffer.size(), writeDataBuffer.size());
 
+        serialPort1.Write(writeString);
+        tcdrain(serialPort1.GetFileDescriptor());
+
+        serialPort2.Write(writeString);
+        tcdrain(serialPort2.GetFileDescriptor());
+
+        serialPort1.Read(readString, writeString.size(), timeOutMilliseconds);
+        ASSERT_EQ(readString, writeString);
+        ASSERT_EQ(readString.size(), writeString.size());
+        
+        serialPort2.Read(readString, writeString.size(), timeOutMilliseconds);
+        ASSERT_EQ(readString, writeString);
+        ASSERT_EQ(readString.size(), writeString.size());
+    
         unsigned char writeByte;
         unsigned char readByte;
         
@@ -391,20 +405,6 @@ protected:
         serialPort2.ReadByte(readByte, timeOutMilliseconds);
         ASSERT_EQ(readByte, writeByte);
 
-        serialPort1.Write(writeString + '\n');
-        tcdrain(serialPort1.GetFileDescriptor());
-
-        serialPort2.Write(writeString + '\n');
-        tcdrain(serialPort2.GetFileDescriptor());
-
-        serialPort1.Read(readString, writeString.size() + 1, timeOutMilliseconds);
-        ASSERT_EQ(readString, writeString + '\n');
-        ASSERT_EQ(readString.size(), writeString.size() + 1);
-        
-        serialPort2.Read(readString, writeString.size() + 1, timeOutMilliseconds);
-        ASSERT_EQ(readString, writeString + '\n');
-        ASSERT_EQ(readString.size(), writeString.size() + 1);
-    
         serialPort1.Write(writeString + '\n');
         tcdrain(serialPort1.GetFileDescriptor());
 
