@@ -39,11 +39,13 @@ protected:
     pthread_t serialPort1CommunicationsThreadID;
     pthread_t serialPort2CommunicationsThreadID;
 
-    bool threadsRunning;
+    bool thread1Running;
+    bool thread2Running;
 
     virtual void SetUp()
     {
-        threadsRunning = false;
+        thread1Running = false;
+        thread2Running = false;
 
         writeString1 = "Quidquid latine dictum sit, altum sonatur. (Whatever is said in Latin sounds profound.)";
         writeString2 = "The universally interesting man is universally interested. - William Dean Howells";
@@ -665,7 +667,7 @@ protected:
     {
         engageSerialPortCommunicationsThreads();
         
-        while(threadsRunning)
+        while(thread1Running && thread2Running)
         {
             usleep(1000);
         }
@@ -708,6 +710,7 @@ protected:
             }
 
         serialPort1.Close();
+        thread1Running = false;
     }
 
     void serialPort2CommunicationsThreadLoop()
@@ -739,6 +742,7 @@ protected:
         }
 
         serialPort2.Close();
+        thread2Running = false;
     }
 
     void engageSerialPortCommunicationsThreads()
@@ -749,7 +753,8 @@ protected:
         pthread_mutex_init(&serialPort2CommunicationsThreadMutex, NULL);
         pthread_create(&serialPort2CommunicationsThreadID, NULL, &startSerialPort2CommunicationsThread, this);
 
-        threadsRunning = true;
+        thread1Running = true;
+        thread2Running = true;
         return;
     }
 
