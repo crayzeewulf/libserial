@@ -16,7 +16,7 @@
 #include <SerialStream.h>
 
 // Default Serial Port and Baud Rate.
-#define TEST_SERIAL_PORT   "/dev/ttyUSB0"
+#define TEST_SERIAL_PORT_1 "/dev/ttyUSB0"
 #define TEST_SERIAL_PORT_2 "/dev/ttyUSB1"
 
 using namespace LibSerial;
@@ -25,50 +25,28 @@ class LibSerialTest
     : public ::testing::Test
 {
 public:
-    LibSerialTest() : serialPort1(TEST_SERIAL_PORT), serialPort2(TEST_SERIAL_PORT_2) {}
-
-    /** @brief Locks the pthread_mutex_t for the communications thread. */
-    void communicationsDataLock();
-    
-    /** @brief Unlocks the pthread_mutex_t for the communications thread. */
-    void communicationsDataUnlock();
-    
-    /**
-     * @brief Gets the current time (since the epoch) in microseconds.
-     * @return The current time since epoch in microseconds.
-     */
-    long unsigned int getTimeInMicroSeconds();
-
-    /** @brief Engages a serial communications thread. */
-    void engageSerialCommunicationsThread();
-
-    /**
-     * @brief Receives available serial comms and writes data to the serial port.
-     * @param serialPort The serial port to read/write data to/from.
-     */
-    void serialCommunicationsThreadLoop(SerialPort serialPort);
-
-    /**
-     * @brief Public member to call from static thread engage entry point.
-     * @param serialPort The serial port to read/write data to/from.
-     */
-    void startSerialPortCommunicationsThread(SerialPort serialPort);
-
+    LibSerialTest() : serialPort1(TEST_SERIAL_PORT_1), serialPort2(TEST_SERIAL_PORT_2) {}
 
 protected:
     SerialPort serialPort1;
     SerialPort serialPort2;
 
     /** @brief The pthread mutex lock to lock data and avoid race conditions. */
-    pthread_mutex_t serialCommunicationsThreadMutex;
+    pthread_mutex_t serialPort1CommunicationsThreadMutex;
+    pthread_mutex_t serialPort2CommunicationsThreadMutex;
 
     /** @brief The pthread ID for the communicationsThread. */
-    pthread_t serialCommunicationsThreadID;
+    pthread_t serialPort1CommunicationsThreadID;
+    pthread_t serialPort2CommunicationsThreadID;
 
+    bool threadsRunning;
 
     virtual void SetUp()
     {
-        writeString = "Quidquid latine dictum sit, altum sonatur. (Whatever is said in Latin sounds profound.)";
+        threadsRunning = false;
+
+        writeString1 = "Quidquid latine dictum sit, altum sonatur. (Whatever is said in Latin sounds profound.)";
+        writeString2 = "The universally interesting man is universally interested. - William Dean Howells";
 
         baudRates[0]   =  BaudRate::BAUD_50;
         baudRates[1]   =  BaudRate::BAUD_75;
@@ -118,7 +96,7 @@ protected:
 
     void testSerialStreamOpenClose()
     {
-        serialStream1.Open(TEST_SERIAL_PORT);
+        serialStream1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialStream1.IsOpen());
 
         serialStream1.Close();
@@ -127,7 +105,7 @@ protected:
 
     void testSerialStreamReadWrite()
     {
-        serialStream1.Open(TEST_SERIAL_PORT);
+        serialStream1.Open(TEST_SERIAL_PORT_1);
         serialStream2.Open(TEST_SERIAL_PORT_2);
 
         ASSERT_TRUE(serialStream1.IsOpen());
@@ -142,9 +120,9 @@ protected:
         ASSERT_EQ(baudRate1, baudRates[16]);
         ASSERT_EQ(baudRate2, baudRates[16]);
 
-        serialStream1 << writeString << std::endl;
-        getline(serialStream2, readString);
-        ASSERT_EQ(readString, writeString);
+        serialStream1 << writeString1 << std::endl;
+        getline(serialStream2, readString1);
+        ASSERT_EQ(readString1, writeString1);
 
         serialStream1.Close();
         serialStream2.Close();
@@ -152,15 +130,15 @@ protected:
         ASSERT_FALSE(serialStream1.IsOpen());
         ASSERT_FALSE(serialStream2.IsOpen());
 
-        serialStream1.Open(TEST_SERIAL_PORT);
+        serialStream1.Open(TEST_SERIAL_PORT_1);
         serialStream2.Open(TEST_SERIAL_PORT_2);
 
         ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());        
 
-        serialStream2 << writeString << std::endl;
-        getline(serialStream1, readString);
-        ASSERT_EQ(readString, writeString);
+        serialStream2 << writeString2 << std::endl;
+        getline(serialStream1, readString2);
+        ASSERT_EQ(readString2, writeString2);
 
         writeByte = 'a';
         
@@ -182,7 +160,7 @@ protected:
         ASSERT_FALSE(serialStream1.IsOpen());
         ASSERT_FALSE(serialStream2.IsOpen());
 
-        serialStream1.Open(TEST_SERIAL_PORT);
+        serialStream1.Open(TEST_SERIAL_PORT_1);
         serialStream2.Open(TEST_SERIAL_PORT_2);
 
         ASSERT_TRUE(serialStream1.IsOpen());
@@ -211,7 +189,7 @@ protected:
 
     void testSerialStreamSetGetBaudRate()
     {
-        serialStream1.Open(TEST_SERIAL_PORT);
+        serialStream1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialStream1.IsOpen());
 
         size_t maxBaudIndex = 25;
@@ -229,7 +207,7 @@ protected:
 
     void testSerialStreamSetGetCharacterSize()
     {
-        serialStream1.Open(TEST_SERIAL_PORT);
+        serialStream1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialStream1.IsOpen());
 
         // @TODO - Why don't the smaller Character Size values work?
@@ -247,7 +225,7 @@ protected:
 
     void testSerialStreamSetGetFlowControl()
     {
-        serialStream1.Open(TEST_SERIAL_PORT);
+        serialStream1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialStream1.IsOpen());
 
         for (size_t i = 0; i < 3; i++)
@@ -264,7 +242,7 @@ protected:
 
     void testSerialStreamSetGetParity()
     {
-        serialStream1.Open(TEST_SERIAL_PORT);
+        serialStream1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialStream1.IsOpen());
 
         for (size_t i = 0; i < 3; i++)
@@ -283,7 +261,7 @@ protected:
     {
         StopBits numberOfStopBits;
 
-        serialStream1.Open(TEST_SERIAL_PORT);
+        serialStream1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialStream1.IsOpen());
 
         serialStream1.SetNumberOfStopBits(stopBits[0]);
@@ -300,7 +278,7 @@ protected:
 
     void testSerialStreamSetGetVMin()
     {
-        serialStream1.Open(TEST_SERIAL_PORT);
+        serialStream1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialStream1.IsOpen());
 
         for (short i = 0; i < 5; i++)
@@ -316,7 +294,7 @@ protected:
 
     void testSerialStreamSetGetVTime()
     {
-        serialStream1.Open(TEST_SERIAL_PORT);
+        serialStream1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialStream1.IsOpen());
 
         for (short i = 0; i < 5; i++)
@@ -376,19 +354,19 @@ protected:
         ASSERT_EQ(readDataBuffer, writeDataBuffer);
         ASSERT_EQ(readDataBuffer.size(), writeDataBuffer.size());
 
-        serialPort1.Write(writeString);
+        serialPort1.Write(writeString1);
         tcdrain(serialPort1.GetFileDescriptor());
 
-        serialPort2.Write(writeString);
+        serialPort2.Write(writeString2);
         tcdrain(serialPort2.GetFileDescriptor());
 
-        serialPort1.Read(readString, writeString.size(), timeOutMilliseconds);
-        ASSERT_EQ(readString, writeString);
-        ASSERT_EQ(readString.size(), writeString.size());
+        serialPort1.Read(readString2, writeString2.size(), timeOutMilliseconds);
+        ASSERT_EQ(readString2, writeString2);
+        ASSERT_EQ(readString2.size(), writeString2.size());
         
-        serialPort2.Read(readString, writeString.size(), timeOutMilliseconds);
-        ASSERT_EQ(readString, writeString);
-        ASSERT_EQ(readString.size(), writeString.size());
+        serialPort2.Read(readString1, writeString1.size(), timeOutMilliseconds);
+        ASSERT_EQ(readString1, writeString1);
+        ASSERT_EQ(readString1.size(), writeString1.size());
     
         unsigned char writeByte;
         unsigned char readByte;
@@ -405,19 +383,19 @@ protected:
         serialPort2.ReadByte(readByte, timeOutMilliseconds);
         ASSERT_EQ(readByte, writeByte);
 
-        serialPort1.Write(writeString + '\n');
+        serialPort1.Write(writeString1 + '\n');
         tcdrain(serialPort1.GetFileDescriptor());
 
-        serialPort2.Write(writeString + '\n');
+        serialPort2.Write(writeString2 + '\n');
         tcdrain(serialPort2.GetFileDescriptor());
 
-        serialPort1.ReadLine(readString, '\n', timeOutMilliseconds);
-        ASSERT_EQ(readString, writeString + '\n');
-        ASSERT_EQ(readString.size(), writeString.size() + 1);
+        serialPort1.ReadLine(readString2, '\n', timeOutMilliseconds);
+        ASSERT_EQ(readString2, writeString2 + '\n');
+        ASSERT_EQ(readString2.size(), writeString2.size() + 1);
         
-        serialPort2.ReadLine(readString, '\n', timeOutMilliseconds);
-        ASSERT_EQ(readString, writeString + '\n');
-        ASSERT_EQ(readString.size(), writeString.size() + 1);
+        serialPort2.ReadLine(readString1, '\n', timeOutMilliseconds);
+        ASSERT_EQ(readString1, writeString1 + '\n');
+        ASSERT_EQ(readString1.size(), writeString1.size() + 1);
        
         serialPort1.Close();
         serialPort2.Close();
@@ -666,15 +644,15 @@ protected:
         ASSERT_EQ(baudRate1, baudRates[16]);
         ASSERT_EQ(baudRate2, baudRates[16]);
 
-        serialStream1 << writeString << std::endl;
-        serialPort1.ReadLine(readString, '\n', timeOutMilliseconds);
-        ASSERT_EQ(readString, writeString + '\n');
-        ASSERT_EQ(readString.size(), writeString.size() + 1);
+        serialStream1 << writeString1 << std::endl;
+        serialPort1.ReadLine(readString1, '\n', timeOutMilliseconds);
+        ASSERT_EQ(readString1, writeString1 + '\n');
+        ASSERT_EQ(readString1.size(), writeString1.size() + 1);
        
-        serialPort1.Write(writeString + '\n');
+        serialPort1.Write(writeString2 + '\n');
         tcdrain(serialPort1.GetFileDescriptor());
-        getline(serialStream1, readString);
-        ASSERT_EQ(readString, writeString);
+        getline(serialStream1, readString2);
+        ASSERT_EQ(readString2, writeString2);
 
         serialPort1.Close();
         serialStream1.Close();
@@ -683,10 +661,111 @@ protected:
         ASSERT_FALSE(serialStream1.IsOpen());
     }
 
-    // void testMultiThreadedSerialPortReadWrite(SerialPort serialPort)
-    // {
+    void testMultiThreadedSerialPortReadWrite()
+    {
+        engageSerialPortCommunicationsThreads();
         
-    // }
+        while(threadsRunning)
+        {
+            usleep(1000);
+        }
+    }
+
+    long unsigned int getTimeInMicroSeconds()
+    {
+        std::chrono::high_resolution_clock::duration timeNow = 
+            std::chrono::high_resolution_clock::now().time_since_epoch();
+
+        return std::chrono::duration_cast<std::chrono::microseconds>(timeNow).count();
+    }
+
+    void serialPort1CommunicationsThreadLoop()
+    {
+        serialPort1.Open();
+        serialPort1.SetBaudRate(BaudRate::BAUD_115200);
+        tcflush(serialPort1.GetFileDescriptor(), TCIOFLUSH);
+
+        long unsigned int loopStartTimeMicroseconds = 0;
+        long unsigned int timeElapsedMicroSeconds = 0;
+        long unsigned int timeRemainingMicroSeconds = 0;
+        long unsigned int timeOutMilliseconds = 25;
+
+            while (timeElapsedMicroSeconds < 250000000)
+            {
+                loopStartTimeMicroseconds = getTimeInMicroSeconds();
+
+                serialPort1.Write(writeString1 + '\n');
+                tcdrain(serialPort1.GetFileDescriptor());
+
+                serialPort1.ReadLine(readString1, '\n', timeOutMilliseconds);
+                // ASSERT_EQ(readString, writeString + '\n');
+
+                timeRemainingMicroSeconds = getTimeInMicroSeconds() - loopStartTimeMicroseconds;
+
+                usleep(timeRemainingMicroSeconds);
+
+                timeElapsedMicroSeconds = getTimeInMicroSeconds() - loopStartTimeMicroseconds;
+            }
+
+        serialPort1.Close();
+    }
+
+    void serialPort2CommunicationsThreadLoop()
+    {
+        serialPort2.Open();
+        serialPort2.SetBaudRate(BaudRate::BAUD_115200);
+        tcflush(serialPort1.GetFileDescriptor(), TCIOFLUSH);
+
+        long unsigned int loopStartTimeMicroseconds = 0;
+        long unsigned int timeElapsedMicroSeconds = 0;
+        long unsigned int timeRemainingMicroSeconds = 0;
+        long unsigned int timeOutMilliseconds = 250;
+
+        while (timeElapsedMicroSeconds < 250000000)
+        {
+            loopStartTimeMicroseconds = getTimeInMicroSeconds();
+
+            serialPort2.Write(writeString2 + '\n');
+            tcdrain(serialPort2.GetFileDescriptor());
+
+            serialPort2.ReadLine(readString2, '\n', timeOutMilliseconds);
+            // ASSERT_EQ(readString, writeString + '\n');
+
+            timeRemainingMicroSeconds = getTimeInMicroSeconds() - loopStartTimeMicroseconds;
+
+            usleep(timeRemainingMicroSeconds);
+
+            timeElapsedMicroSeconds = getTimeInMicroSeconds() - loopStartTimeMicroseconds;
+        }
+
+        serialPort2.Close();
+    }
+
+    void engageSerialPortCommunicationsThreads()
+    {
+        pthread_mutex_init(&serialPort1CommunicationsThreadMutex, NULL);
+        pthread_create(&serialPort1CommunicationsThreadID, NULL, &startSerialPort1CommunicationsThread, this);
+
+        pthread_mutex_init(&serialPort2CommunicationsThreadMutex, NULL);
+        pthread_create(&serialPort2CommunicationsThreadID, NULL, &startSerialPort2CommunicationsThread, this);
+
+        threadsRunning = true;
+        return;
+    }
+
+    static void* startSerialPort1CommunicationsThread(void *args)
+    {
+        LibSerialTest* libSerialTest  = (LibSerialTest*) args;
+        libSerialTest->serialPort1CommunicationsThreadLoop();
+        return NULL;
+    }
+
+    static void* startSerialPort2CommunicationsThread(void *args)
+    {
+        LibSerialTest* libSerialTest  = (LibSerialTest*) args;
+        libSerialTest->serialPort2CommunicationsThreadLoop();
+        return NULL;
+    }
 
 
     BaudRate        baudRates[25];
@@ -698,8 +777,11 @@ protected:
     SerialStream serialStream1;
     SerialStream serialStream2;
 
-    std::string readString;
-    std::string writeString;
+    std::string readString1;
+    std::string writeString1;
+
+    std::string readString2;
+    std::string writeString2;
 
     char writeByte;
     char readByte;
@@ -961,87 +1043,8 @@ TEST_F(LibSerialTest, testSerialStreamToSerialPortReadWrite)
 
 //----------------------- Multiple Thread Unit Test -------------------------//
 
-
-// TEST_F(LibSerialTest, testMultiThreadedSerialPortReadWrite)
-// {
-//     SCOPED_TRACE("Test Multi-Threaded Serial Communications.");
-//     testMultiThreadedSerialPortReadWrite(serialPort1);
-//     testMultiThreadedSerialPortReadWrite(serialPort2);
-// }
-
-
-
-// void LibSerialTest::communicationsDataLock()
-// {
-//     pthread_mutex_lock(&serialCommunicationsThreadMutex);
-// }
-
-// void LibSerialTest::communicationsDataUnlock()
-// {
-//     pthread_mutex_unlock(&serialCommunicationsThreadMutex);
-// }
-
-// long unsigned int LibSerialTest::getTimeInMicroSeconds()
-// {
-//     std::chrono::high_resolution_clock::duration timeNow = 
-//         std::chrono::high_resolution_clock::now().time_since_epoch();
-
-//     return std::chrono::duration_cast<std::chrono::microseconds>(timeNow).count();
-// }
-
-// void LibSerialTest::startSerialPortCommunicationsThread(SerialPort serialPort)
-// {
-//     serialCommunicationsThreadLoop(serialPort);
-//     return;
-// }
-
-// void LibSerialTest::serialCommunicationsThreadLoop(SerialPort serialPort)
-// {
-//     serialPort.Open();
-//     serialPort.SetBaudRate(BaudRate::BAUD_115200);
-
-//     long unsigned int loopStartTimeMicroseconds = 0;
-//     long unsigned int timeElapsedMicroSeconds = 0;
-//     long unsigned int timeRemainingMicroSeconds = 0;
-//     long unsigned int timeOutMilliseconds = 25;
-
-//     while (timeElapsedMicroSeconds < 250000000)
-//     {
-//         loopStartTimeMicroseconds = LibSerialTest::getTimeInMicroSeconds();
-
-//         serialPort.Write(writeString + '\n');
-//         tcdrain(serialPort.GetFileDescriptor());
-
-//         bytesRead = serialPort.ReadLine(readString, '\n', timeOutMilliseconds);
-//         ASSERT_EQ(readString, writeString + '\n');
-//         ASSERT_EQ(bytesRead, writeString.size() + 1);
-
-//         timeRemainingMicroSeconds = LibSerialTest::getTimeInMicroSeconds() - loopStartTimeMicroseconds;
-
-//         usleep(timeRemainingMicroSeconds);
-
-//         timeElapsedMicroSeconds = LibSerialTest::getTimeInMicroSeconds() - loopStartTimeMicroseconds;
-//     }
-
-//     serialPort.Close();
-// }
-
-// void LibSerialTest::engageSerialCommunicationsThread()
-// {
-//     pthread_mutex_init(&serialCommunicationsThreadMutex, NULL);
-//     pthread_create(&serialCommunicationsThreadID, NULL, &startSerialPortCommunicationsThread, this);
-// }
-
-// /**
-//  * @brief Static callback entry point for the Serial Communications Thread
-//  * @param args Callback object pointer.
-//  */
-// void* startSerialPortCommunicationsThread(void* args);
-
-// void* startSerialPortCommunicationsThread(void *args)
-// {
-//     LibSerialTest* libSerialTest  = (LibSerialTest*) args;
-//     libSerialTest->startSerialPortCommunicationsThread(serialPort1);
-
-//     return NULL;
-// }
+TEST_F(LibSerialTest, testMultiThreadedSerialPortReadWrite)
+{
+    SCOPED_TRACE("Test Multi-Threaded Serial Communications.");
+    testMultiThreadedSerialPortReadWrite();
+}
