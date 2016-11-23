@@ -25,7 +25,7 @@
 /**
  * @brief Forward declarations.
  */
-class PosixSignalHandler ;
+class PosixSignalHandler;
 
 
 /**
@@ -45,29 +45,34 @@ public:
      *        class per process. This instance can be obtained using the
      *        GetInstance() method.
      */
-    static PosixSignalDispatcher& Instance() ;
+    static PosixSignalDispatcher& Instance();
 
     /**
-     * @brief Exception thrown when AttachHandler() fails due to a runtime
-     *         error.
+     * @brief Exception thrown when AttachHandler() fails due to a runtime error.
      */
     class CannotAttachHandler : public std::runtime_error
     {
     public:
-        CannotAttachHandler( const std::string& whatArg ) :
-            runtime_error(whatArg) { }
-    } ;
+        CannotAttachHandler(const std::string& whatArg)
+            : runtime_error(whatArg)
+        {
+            /* Empty */
+        }
+    };
 
     /**
      * @brief Exception thrown when DetachHandler() fails due to a runtime
-     *         error.
+     *        error.
      */
     class CannotDetachHandler : public std::runtime_error
     {
     public:
-        CannotDetachHandler( const std::string& whatArg ) :
-            runtime_error(whatArg) { }
-    } ;
+        CannotDetachHandler(const std::string& whatArg)
+            : runtime_error(whatArg)
+        {
+            /* Empty */
+        }
+    };
 
     /**
      * @brief Attaches a signal handler to the signal dispatcher. The signal
@@ -90,9 +95,8 @@ public:
      * @throw CannotDetachHandler This exception is thrown if the method cannot
      *        detach the handler.
      */
-    void AttachHandler( const int           posixSignalNumber,
-                        PosixSignalHandler& signalHandler )
-        throw( CannotAttachHandler ) ;
+    void AttachHandler(const int           posixSignalNumber,
+                       PosixSignalHandler& signalHandler);
 
     /**
      * @brief Detach the specified signal handler from the signal dispatcher.
@@ -108,10 +112,8 @@ public:
      * @throw std::logic_error This exception is thrown if any standard logic
      *        error is encountered.
      */
-    void DetachHandler( const int                 posixSignalNumber,
-                        const PosixSignalHandler& signalHandler )
-        throw( CannotDetachHandler,
-               std::logic_error ) ;
+    void DetachHandler(const int                 posixSignalNumber,
+                       const PosixSignalHandler& signalHandler);
 private:
     /**
      * @brief This is a singleton class and the only instances of this class
@@ -119,28 +121,29 @@ private:
      *        enforced by making the default constructor a private member
      *        disalloweing construction of new instances of this class
      */
-    PosixSignalDispatcher() ;
+    PosixSignalDispatcher();
 
     /**
      * @brief This class cannot be subclassed. We enforce this by making
      *        the destructor a private member.
      */
-    ~PosixSignalDispatcher() ;
+    ~PosixSignalDispatcher();
 
     /**
      * @brief Copying of an instance of this class is not allowed.
      *        We enforce this by making the copy constructor and the
      *        assignment operator private members.
      */
-    PosixSignalDispatcher( const PosixSignalDispatcher& otherInstance ) ;
+    PosixSignalDispatcher(const PosixSignalDispatcher& otherInstance) = delete;
+    PosixSignalDispatcher(PosixSignalDispatcher&&) = delete;
 
     /**
      * @brief Copying of an instance of this class is not allowed.
      *        We enforce this by making the copy constructor and the
      *        assignment operator private members.
      */
-    const PosixSignalDispatcher&
-    operator=( const PosixSignalDispatcher& otherInstance ) ;
-} ;
+    PosixSignalDispatcher& operator=(const PosixSignalDispatcher& otherInstance) = delete;
+    PosixSignalDispatcher& operator=(PosixSignalDispatcher&& otherInstance) = delete;
+};
 
 #endif

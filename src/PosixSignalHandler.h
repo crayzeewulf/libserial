@@ -34,14 +34,14 @@ public:
      *        received by the PosixSignalDispatcher that is managing
      *        this handler.
      */
-    virtual void HandlePosixSignal(int signalNumber) = 0 ;
+    virtual void HandlePosixSignal(const int signalNumber) = 0;
      
     /**
      * @brief Destructor is declared virtual as we expect this class to be
      *        subclassed. It is also declared pure abstract to make this
      *        class a pure abstract class.
      */
-    virtual ~PosixSignalHandler() = default ;
-} ;
+    virtual ~PosixSignalHandler() = default;
+};
 
 #endif // #ifndef _PosixSignalHandler_h_

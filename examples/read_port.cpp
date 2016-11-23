@@ -28,15 +28,24 @@ int main()
     }
 
     // Set the number of data bits.
-    serial_stream.SetCharSize( CharSize::CHAR_SIZE_8 ) ;
+    serial_stream.SetCharacterSize( CharacterSize::CHAR_SIZE_8 ) ;
     if ( ! serial_stream.good() ) 
     {
         std::cerr << "Error: Could not set the character size." << std::endl ;
         exit(1) ;
     }
 
+    // Turn off hardware flow control.
+    serial_stream.SetFlowControl( FlowControl::FLOW_CONTROL_NONE );
+    if (!serial_stream.good()) 
+    {
+        std::cerr << "Error: Could not use hardware flow control."
+                  << std::endl ;
+        exit(1) ;
+    }
+
     // Disable parity.
-    serial_stream.SetParity(SerialStreamBuf::PARITY_NONE);
+    serial_stream.SetParity( Parity::PARITY_NONE );
     
     if (!serial_stream.good()) 
     {
@@ -45,20 +54,11 @@ int main()
     }
 
     // Set the number of stop bits.
-    serial_stream.SetNumOfStopBits(1);
+    serial_stream.SetNumberOfStopBits( StopBits::STOP_BITS_1 );
     
     if (!serial_stream.good()) 
     {
         std::cerr << "Error: Could not set the number of stop bits."
-                  << std::endl ;
-        exit(1) ;
-    }
-
-    // Turn off hardware flow control.
-    serial_stream.SetFlowControl(SerialStreamBuf::FLOW_CONTROL_NONE);
-    if (!serial_stream.good()) 
-    {
-        std::cerr << "Error: Could not use hardware flow control."
                   << std::endl ;
         exit(1) ;
     }

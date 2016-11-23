@@ -22,11 +22,8 @@
 #define _SerialStreamBuf_h_
 
 #include "SerialPortConstants.h"
-#include "SerialPort.h"
 #include <memory>
-#include <streambuf>
-#include <string>
-#include <limits>
+
 
 namespace LibSerial 
 {
@@ -45,118 +42,22 @@ namespace LibSerial
      *        At present, this class uses unbuffered I/O and all calls
      *        to setbuf() will be ignored.
      */
-    class SerialStreamBuf : public std::streambuf 
+    class SerialStreamBuf : public std::streambuf
     {
     public:
 
         /**
-         * @brief The allowed parity values associated with
-         *        serial port communications.
-         * @deprecated This enumeration is deprecated and will be
-         *             removed in version 0.7.0.
-         *             Please use SerialPort::Parity instead.
-         */
-        enum ParityEnum 
-        {
-            PARITY_EVEN = SerialPort::PARITY_EVEN,
-            PARITY_ODD  = SerialPort::PARITY_ODD,
-            PARITY_NONE = SerialPort::PARITY_NONE,
-            PARITY_DEFAULT = SerialPort::PARITY_DEFAULT,
-            PARITY_INVALID   //!< Invalid parity value.
-        };
-
-
-        /**
-         * @brief The flow control setting values for a serial port.
-         *
-         * @deprecated This enumeration has been deprecated and
-         *             will be removed in version 0.7.0. Please use
-         *             SerialPort::FlowControl instead.
-         */
-        enum FlowControlEnum 
-        {
-            FLOW_CONTROL_HARD    = SerialPort::FLOW_CONTROL_HARD,
-            FLOW_CONTROL_SOFT    = SerialPort::FLOW_CONTROL_SOFT,
-            FLOW_CONTROL_NONE    = SerialPort::FLOW_CONTROL_NONE,
-            FLOW_CONTROL_DEFAULT = SerialPort::FLOW_CONTROL_DEFAULT,
-            FLOW_CONTROL_INVALID //!< Invalid flow control setting. 
-        };
-
-        /**
-             * @brief The default value of the baud rate of the serial port.
-             *
-             * @deprecated Please use SerialPort::BAUD_DEFAULT instead.
-             */
-        static constexpr BaudRate DEFAULT_BAUD = BaudRate::BAUD_DEFAULT;
-
-        /** 
-         * @brief The default value of the character size used during the
-         *        serial communication.
-         *
-         * @deprecated Please use SerialPort::CHAR_SIZE_DEFAULT instead.
-         */
-        static constexpr CharSize DEFAULT_CHAR_SIZE = CharSize::CHAR_SIZE_DEFAULT;
-
-        /** 
-         * @brief The default number of stop bits used.
-         *
-         * @deprecated Please use SerialPort::STOP_BITS_DEFAULT instead.
-         */
-        static constexpr short DEFAULT_NO_OF_STOP_BITS = 1;
-
-        /** 
-         * @brief The default parity setting.
-         *
-         * @deprecated Please use SerialPort::PARITY_DEFAULT instead.
-         */
-        static constexpr ParityEnum DEFAULT_PARITY = SerialStreamBuf::PARITY_DEFAULT;
-
-        /**
-         * @brief The default flow control setting.
-         *
-         * @deprecated Please use SerialPort::FLOW_CONTROL_DEFAULT instead.
-         */ 
-        static constexpr FlowControlEnum DEFAULT_FLOW_CONTROL = SerialStreamBuf::FLOW_CONTROL_DEFAULT;
-
-        /**
-         * @brief The default character buffer size.
-         *
-         * @deprecated VMIN and VTIME will not be supported starting
-         *             from version 0.7.0. Methods of SerialPort class
-         *             provide better mechanisms for implementing read
-         *             and write timeouts.
-         */
-        static constexpr short DEFAULT_VMIN = 1;
-
-        /**
-         * @brief The default character buffer timing.
-         *
-         * @deprecated VMIN and VTIME will not be supported starting
-         *             from version 0.7.0. Methods of SerialPort class
-         *             provide better mechanisms for implementing read
-         *             and write timeouts.
-         */
-        static constexpr short DEFAULT_VTIME = 0;
-
-        /**
          * @brief Default Constructor.
          */
-        SerialStreamBuf();
+        explicit SerialStreamBuf();
 
         /**
          *  @brief Default Destructor.  
          */
-        ~SerialStreamBuf();
+        virtual ~SerialStreamBuf();
 
         /**
-         * @brief Returns true if a previous call to open() succeeded
-         *        (returned a non-null value) and there has been no
-         *        intervening call to close.
-         */
-        bool is_open() const ;
-
-        /**
-         * @brief If is_open() != <tt>false</tt>, returns a null
+         * @brief If IsOpen() != <tt>false</tt>, returns a null
          *        pointer. Otherwise, initializes the <tt>streambuf</tt>
          *        as required. It then opens a file, if possible, whose
          *        name is given as the string <tt>filename</tt> using the
@@ -201,12 +102,11 @@ namespace LibSerial
          * @return Returns <tt>this</tt> on success, a null pointer
          *         otherwise.
          */
-        SerialStreamBuf* open( const std::string filename,
-                               std::ios_base::openmode mode =
-                               std::ios_base::in | std::ios_base::out ) ;
+        SerialStreamBuf* Open(const std::string& filename,
+                              std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out);
 
         /**
-         * @brief If is_open() == false, returns a null pointer.
+         * @brief If IsOpen() == false, returns a null pointer.
          *        If a put area exists, calls overflow(EOF) to flush
          *        characters. Finally it closes the file by calling 
          *        <tt>std::close(mFileDescriptor)</tt> where
@@ -222,101 +122,99 @@ namespace LibSerial
          *        characters and calls overflow(EOF) again. However,
          *        <b>this is not implemented here yet</b>.
          *
-         *        <b>Postcondition</b>: is_open() == <tt>false<tt>
+         *        <b>Postcondition</b>: IsOpen() == <tt>false<tt>
          *
          * @return Returns <tt>this</tt> on success, a null pointer
          *         otherwise.
          */
-        SerialStreamBuf* close();
+        SerialStreamBuf* Close();
+
+        /**
+         * @brief Returns true if a previous call to open() succeeded
+         *        (returned a non-null value) and there has been no
+         *        intervening call to close.
+         */
+        bool IsOpen();
+
+        /** 
+         * @brief This routine is called by open() in order to
+         *        initialize some parameters of the serial port and
+         *        setting its parameters to default values.
+         * @return -1 on failure and some other value on success. 
+         */
+        int InitializeSerialPort();
 
         /**
          * @brief Initializes the serial communication parameters to their
          *        default values.
          */
-        int SetParametersToDefault();
+        void SetParametersToDefault();
 
         /**
-         * @brief Sets the baud rate of the associated serial port unless 
-         *        is_open() != true, then returns -1.
-         * @param baudRate The baud rate value to be set.
-         * @return Returns the baud rate on success and BAUD_INVALID on
-         *         failure.
+         * @brief Sets the baud rate for the serial port to the specified value
+         * @param baudRate The baud rate to be set for the serial port.
          */
-        BaudRate SetBaudRate(const BaudRate baudRate );
+        void SetBaudRate(const BaudRate& baudRate);
 
         /**
-         * @return Returns the current baud rate of the serial port.
-         *         If the baud rate is not set to a valid value then it
-         *         returns BAUD_INVALID.
+         * @brief Gets the current baud rate for the serial port.
+         * @return Returns the baud rate.
          */
-        BaudRate GetBaudRate() const;
+        BaudRate GetBaudRate();
 
         /**
-         * @brief Sets the character size to be used during serial
-         *        communication.
-         * @param characterSize The size of the character to be set.
-         * @return Returns the character size on success and
-         *         CHAR_SIZE_INVALID on failure.
+         * @brief Sets the character size for the serial port.
+         * @param characterSize The character size to be set.
          */
-        CharSize SetCharSize(const CharSize charSize);
+        void SetCharacterSize(const CharacterSize& characterSize);
 
         /**
-         * @brief Gets the character size currently being used during
-         *        serial communication.
-         * @return Returns the character size currently being used during
-         *         serial communication.
+         * @brief Gets the character size being used for serial communication.
+         * @return Returns the current character size. 
          */
-        CharSize GetCharSize() const;
+        CharacterSize GetCharacterSize();
 
         /**
-         * @brief Sets the number of stop bits used during serial
-         *        communication. The only valid values are 1 and 2.
-         * @param numberOfStopBits The number of stop bits. (1 or 2). 
-         * @return Returns the number of stop bits or -1 on failure.
+         * @brief Sets flow control for the serial port.
+         * @param flowControl The flow control type to be set.
          */
-        short SetNumOfStopBits(const short numOfStopBits);
+        void SetFlowControl(const FlowControl& flowControl);
 
         /**
-         * @brief Get the number of stop bits being used during serial
-         *        communication.
-         * @return Returns the number of stop bits.  
+         * @brief Get the current flow control setting.
+         * @return Returns the flow control type of the serial port.
          */
-        short GetNumOfStopBits() const;
+        FlowControl GetFlowControl();
 
         /**
-         * @brief Sets the parity for serial communication.
-         * @param parityType The parity type value to be set. 
-         * @return Returns the parity type set.
+         * @brief Sets the parity type for the serial port.
+         * @param parityType The parity type to be set.
          */
-        ParityEnum SetParity(const ParityEnum parityType);
+        void SetParity(const Parity& parityType);
 
         /**
-         * @brief Gets the current parity setting for the serial port.
-         * @return Returns the parity setting for the serial port.
+         * @brief Gets the parity type for the serial port.
+         * @return Returns the parity type.
          */
-        ParityEnum GetParity() const;
+        Parity GetParity();
 
         /**
-         * @brief Sets the specified flow control.
-         * @param flowControlType The flow control type to be set.
-         * @return Returns the flow control type set.
+         * @brief Sets the number of stop bits to be used with the serial port.
+         * @param numberOfStopBits The number of stop bits to set.
          */
-        FlowControlEnum SetFlowControl(const FlowControlEnum flowControlType);
+        void SetNumberOfStopBits(const StopBits& numberOfStopBits);
 
         /**
-         * @brief Gets the current flow control setting.
-         * @return Returns the current flow control setting.
+         * @brief Gets the number of stop bits currently being used by the serial
+         * @return Returns the number of stop bits.
          */
-        FlowControlEnum GetFlowControl() const;
+        StopBits GetNumberOfStopBits();
 
         /**
-         * @brief Sets the minimum number of characters for non-canonical
-         *        reads.
-         * @note See VMIN in man termios(3).
+         * @brief Sets the minimum number of characters for non-canonical reads.
          * @param vMin the number of minimum characters to be set.
-         * @return Returns the minimum number of charcters set.
          */
-        short SetVMin(const short vmin);
+        void SetVMin(const short vmin);
 
         /**
          * @brief Gets the VMIN value for the device, which represents the
@@ -324,38 +222,22 @@ namespace LibSerial
          * @return Returns the minimum number of characters for
          *         non-canonical reads.
          */
-        short GetVMin() const;
+        short GetVMin();
 
         /** 
-         * @brief Sets character buffer timeout for non-canonical reads in
-         *        deciseconds.
-         * @param vtime The timeout value (in deciseconds) to be set.
-         * @return Returns the character buffer timeout for non-canonical
-         *         reads in deciseconds.
+         * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
+         * @param vtime The timeout value in deciseconds to be set.
          */
-        short SetVTime(const short vtime);
+        void SetVTime(const short vtime);
 
         /** 
-         * @brief Gets the current timeout value for non-canonical reads in
-         *        deciseconds.
-         * @return Returns the character buffer timeout for non-canonical
-         *         reads in deciseconds. 
+         * @brief Gets the current timeout value for non-canonical reads in deciseconds.
+         * @return Returns the character buffer timeout for non-canonical reads in deciseconds. 
          */
-        short GetVTime() const;
+        short GetVTime();
+
 
     protected:
-        /**
-         * @brief Character used to signal that I/O can start while using
-         *        software flow control with the serial port.
-         */
-        static const char CTRL_Q = 0x11;
-  
-        /**
-         * @brief Character used to signal that I/O should stop while using
-         *        software flow control with the serial port.
-         */
-        static const char CTRL_S = 0x13;
-
         /**
          * @brief Performs an operation that is defined separately for each
          *        class derived from streambuf. The default behavior is to
@@ -374,16 +256,7 @@ namespace LibSerial
                                        std::streamsize) override;
 
         /**
-         * @brief Reads upto n characters from the serial port and returns
-         *        them through the character array located at s.
-         * @return Returns the number of characters actually read from the
-         *         serial port. 
-         */
-        virtual std::streamsize xsgetn( char_type*      s, 
-                                        std::streamsize n ) override ;
-
-        /**
-         * @brief Writes upto n characters from the character sequence at 
+         * @brief Writes up to n characters from the character sequence at 
          *        char s to the serial port associated with the buffer. 
          *
          * @return Returns the number of characters that were successfully
@@ -393,33 +266,27 @@ namespace LibSerial
                                        std::streamsize  n) override;
            
         /**
-         * @brief Checks wether input is available on the port.
-         *        If you call \c SerialStream::in_avail, this method will
-         *        be called to check for available input.
-         *        \code
-         *        while(serial_port.rdbuf()->in_avail() > 0)
-         *        {
-         *            serial_port.get(ch);
-         *            ...
-         *        }
-         *        \endcode
+         * @brief Reads up to n characters from the serial port and returns
+         *        them through the character array located at s.
+         * @return Returns the number of characters actually read from the
+         *         serial port. 
          */
-        virtual std::streamsize showmanyc() override;
- 
+        virtual std::streamsize xsgetn(char_type*      s, 
+                                       std::streamsize n) override;
+
         /**
-         * @brief Writes the specified character to the associated serial
-         *        port.
-         * @param c The character to be written to the serial port.
+         * @brief Writes the specified character to the associated serial port.
+         * @param character The character to be written to the serial port.
          * @return Returns the character. 
          */
-        virtual int_type overflow(int_type c) override;
+        virtual int_type overflow(const int_type character) override;
 
         /**
          * @brief Reads and returns the next character from the associated
          *        serial port if one otherwise returns traits::eof(). This
          *        method is used for buffered I/O while uflow() is called
          *        for unbuffered I/O.
-         * @return The next character from the serial port. 
+         * @return Returns the next character from the serial port. 
          */
         virtual int_type underflow() override;
 
@@ -437,10 +304,25 @@ namespace LibSerial
          *        fails. This must be implemented for unbuffered I/O as all
          *        streambuf subclasses are required to provide putback of
          *        at least one character.
-         * @return Returns ???
+         * @param character The character to putback.
+         * @return Returns The character iff successful, otherwise eof to signal an error.
          */
-        virtual int_type pbackfail(int_type c = traits_type::eof()) override;
+        virtual int_type pbackfail(const int_type character = traits_type::eof()) override;
 
+        /**
+         * @brief Checks wether input is available on the port.
+         *        If you call \c SerialStream::in_avail, this method will
+         *        be called to check for available input.
+         *        \code
+         *        while(serial_port.rdbuf()->in_avail() > 0)
+         *        {
+         *            serial_port.get(ch);
+         *            ...
+         *        }
+         *        \endcode
+         */
+        virtual std::streamsize showmanyc() override;
+ 
         /**
          * @brief Copying and moving of instances of this class are prohibited.
          *        This allows the compiler to catch attempts to copy instances
@@ -455,7 +337,7 @@ namespace LibSerial
     private:
         class Implementation;
         std::unique_ptr<Implementation> mImpl;
-    } ; // class SerialStreamBuf
+    }; // class SerialStreamBuf
 } // namespace LibSerial
 
 #endif // #ifndef _SerialStreamBuf_h_
