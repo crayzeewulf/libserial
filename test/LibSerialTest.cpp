@@ -44,15 +44,15 @@ protected:
     pthread_t serialStream2CommunicationThreadID;
 
     /** @brief A flag to indicate if the thread is currently running. */
-    bool serialPortThread1Running;
-    bool serialPortThread2Running;
-    bool serialStreamThread1Running;
-    bool serialStreamThread2Running;
+    bool serialPort1ThreadRunning;
+    bool serialPort2ThreadRunning;
+    bool serialStream1ThreadRunning;
+    bool serialStream2ThreadRunning;
 
     virtual void SetUp()
     {
-        serialPortThread1Running = false;
-        serialPortThread2Running = false;
+        serialPort1ThreadRunning = false;
+        serialPort2ThreadRunning = false;
 
         writeString1 = "Quidquid latine dictum sit, altum sonatur. (Whatever is said in Latin sounds profound.)";
         writeString2 = "The universally interesting man is universally interested. - William Dean Howells";
@@ -674,7 +674,7 @@ protected:
     {
         engageSerialStreamCommunicationThreads();
         
-        while(serialStreamThread1Running && serialStreamThread2Running)
+        while(serialStream1ThreadRunning && serialStream2ThreadRunning)
         {
             usleep(1000);
         }
@@ -684,7 +684,7 @@ protected:
     {
         engageSerialPortCommunicationThreads();
         
-        while(serialPortThread1Running && serialPortThread2Running)
+        while(serialPort1ThreadRunning && serialPort2ThreadRunning)
         {
             usleep(1000);
         }
@@ -723,7 +723,7 @@ protected:
             }
 
         serialStream1.Close();
-        serialStreamThread1Running = false;
+        serialStream1ThreadRunning = false;
     }
 
     void serialStream2CommunicationThreadLoop()
@@ -751,7 +751,7 @@ protected:
             }
 
         serialStream2.Close();
-        serialStreamThread1Running = false;
+        serialStream2ThreadRunning = false;
     }
 
     void serialPort1CommunicationThreadLoop()
@@ -783,7 +783,7 @@ protected:
             }
 
         serialPort1.Close();
-        serialPortThread1Running = false;
+        serialPort1ThreadRunning = false;
     }
 
     void serialPort2CommunicationThreadLoop()
@@ -815,7 +815,7 @@ protected:
         }
 
         serialPort2.Close();
-        serialPortThread2Running = false;
+        serialPort2ThreadRunning = false;
     }
 
     void engageSerialPortCommunicationThreads()
@@ -826,8 +826,8 @@ protected:
         pthread_mutex_init(&serialPort2CommunicationThreadMutex, NULL);
         pthread_create(&serialPort2CommunicationThreadID, NULL, &startSerialPort2CommunicationThread, this);
 
-        serialPortThread1Running = true;
-        serialPortThread2Running = true;
+        serialPort1ThreadRunning = true;
+        serialPort2ThreadRunning = true;
         return;
     }
 
@@ -839,8 +839,8 @@ protected:
         pthread_mutex_init(&serialStream2CommunicationThreadMutex, NULL);
         pthread_create(&serialStream2CommunicationThreadID, NULL, &startSerialStream2CommunicationThread, this);
 
-        serialStreamThread1Running = true;
-        serialStreamThread2Running = true;
+        serialStream1ThreadRunning = true;
+        serialStream2ThreadRunning = true;
         return;
     }
 
