@@ -351,7 +351,7 @@ namespace LibSerial
         /**
          * @brief Mutex to control threaded access to mInputBuffer
          */
-        pthread_mutex_t mQueueMutex {};
+        pthread_mutex_t mInputBufferMutex {};
 
         /**
          * @brief Set the specified modem control line to the specified value. 
@@ -652,7 +652,7 @@ namespace LibSerial
         , mSerialPortName(serialPortName)
     {
         //Initializing the mutex
-        if (pthread_mutex_init(&mQueueMutex, NULL) != 0)
+        if (pthread_mutex_init(&mInputBufferMutex, NULL) != 0)
         {
             throw std::runtime_error(ERR_MSG_PTHREAD_MUTEX_ERROR);
         }
@@ -1474,9 +1474,9 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        pthread_mutex_lock(&mQueueMutex);
+        pthread_mutex_lock(&mInputBufferMutex);
         bool dataAvailableStatus = !mInputBuffer.empty();
-        pthread_mutex_unlock(&mQueueMutex);
+        pthread_mutex_unlock(&mInputBufferMutex);
 
         return dataAvailableStatus;
     }
@@ -1666,9 +1666,9 @@ namespace LibSerial
             throw std::runtime_error(strerror(errno));
         }
 
-        pthread_mutex_lock(&mQueueMutex);
+        pthread_mutex_lock(&mInputBufferMutex);
         int queueSize = this->mInputBuffer.size();
-        pthread_mutex_unlock(&mQueueMutex);
+        pthread_mutex_unlock(&mInputBufferMutex);
 
         // Wait for data to be available.
         while (queueSize == 0)
@@ -1698,17 +1698,17 @@ namespace LibSerial
             // Sleep for 1ms (1000us) for data to arrive.
             usleep(MICROSECONDS_PER_MS);
 
-            pthread_mutex_lock(&mQueueMutex);
+            pthread_mutex_lock(&mInputBufferMutex);
             queueSize = this->mInputBuffer.size();
-            pthread_mutex_unlock(&mQueueMutex);
+            pthread_mutex_unlock(&mInputBufferMutex);
         }
 
         // Return the first byte and remove it from the queue.
-        pthread_mutex_lock(&mQueueMutex);
+        pthread_mutex_lock(&mInputBufferMutex);
         charBuffer = this->mInputBuffer.front();
         this->mInputBuffer.pop();
         queueSize = this->mInputBuffer.size();
-        pthread_mutex_unlock(&mQueueMutex);
+        pthread_mutex_unlock(&mInputBufferMutex);
 
         return;
     }
@@ -1950,7 +1950,7 @@ namespace LibSerial
         }
 
         // Try to get the mutex
-        if (pthread_mutex_trylock(&mQueueMutex) == 0)
+        if (pthread_mutex_trylock(&mInputBufferMutex) == 0)
         {
             // Transfer any pending data from the mShadowInputBuffer
             // into the mInputBuffer.
@@ -1974,13 +1974,13 @@ namespace LibSerial
                 }
                 else
                 {
-                    pthread_mutex_unlock(&mQueueMutex);
+                    pthread_mutex_unlock(&mInputBufferMutex);
                     break;
                 }
             }
 
             // Release the mutex
-            pthread_mutex_unlock(&mQueueMutex);
+            pthread_mutex_unlock(&mInputBufferMutex);
         }
         else
         {
