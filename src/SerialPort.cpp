@@ -1978,11 +1978,6 @@ namespace LibSerial
                 {
                     mInputBuffer.push(next_byte);
                 }
-                else
-                {
-                    pthread_mutex_unlock(&mInputBufferMutex);
-                    break;
-                }
             }
 
             // Release the mutex
