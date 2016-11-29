@@ -756,7 +756,7 @@ namespace LibSerial
         }
 
         // Initialize the serial port. 
-        if (-1 == InitializeSerialPort())
+        if (InitializeSerialPort() < 0)
         {
             throw std::runtime_error(strerror(errno));
         }
@@ -815,16 +815,16 @@ namespace LibSerial
         // Use non-blocking mode while configuring the serial port. 
         int flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
         
-        if ( -1 == fcntl( this->mFileDescriptor, 
-                         F_SETFL, 
-                         flags | O_NONBLOCK ) )
+        if (fcntl(this->mFileDescriptor, 
+                  F_SETFL, 
+                  flags | O_NONBLOCK) < 0)
         {
             return -1;
         }
 
         // Flush out any garbage left behind in the buffers associated
         // with the port from any previous operations. 
-        if ( -1 == tcflush(this->mFileDescriptor, TCIOFLUSH) )
+        if (tcflush(this->mFileDescriptor, TCIOFLUSH) < 0)
         {
             return -1;
         }
@@ -835,9 +835,9 @@ namespace LibSerial
         // Allow all further communications to happen in blocking mode.
         flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
         
-        if ( -1 == fcntl( this->mFileDescriptor, 
+        if (fcntl( this->mFileDescriptor, 
                          F_SETFL, 
-                         flags & ~O_NONBLOCK ) )
+                         flags & ~O_NONBLOCK) < 0)
         {
             return -1;
         }
@@ -949,7 +949,7 @@ namespace LibSerial
     BaudRate
     SerialPort::Implementation::GetBaudRate()
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -985,7 +985,7 @@ namespace LibSerial
     void
     SerialPort::Implementation::SetCharacterSize(const CharacterSize& characterSize)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1037,7 +1037,7 @@ namespace LibSerial
     CharacterSize
     SerialPort::Implementation::GetCharacterSize()
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1061,7 +1061,7 @@ namespace LibSerial
     void
     SerialPort::Implementation::SetFlowControl(const FlowControl& flowControlType)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1125,7 +1125,7 @@ namespace LibSerial
     FlowControl
     SerialPort::Implementation::GetFlowControl()
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1175,7 +1175,7 @@ namespace LibSerial
     void
     SerialPort::Implementation::SetParity(const Parity& parityType)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1228,7 +1228,7 @@ namespace LibSerial
     Parity
     SerialPort::Implementation::GetParity()
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1269,7 +1269,7 @@ namespace LibSerial
     void
     SerialPort::Implementation::SetNumberOfStopBits(const StopBits& numberOfStopBits)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1314,7 +1314,7 @@ namespace LibSerial
     StopBits
     SerialPort::Implementation::GetNumberOfStopBits()
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1346,7 +1346,7 @@ namespace LibSerial
     void 
     SerialPort::Implementation::SetVMin(const short vmin)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1384,7 +1384,7 @@ namespace LibSerial
     short 
     SerialPort::Implementation::GetVMin()
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1407,7 +1407,7 @@ namespace LibSerial
     void 
     SerialPort::Implementation::SetVTime(const short vtime)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1445,7 +1445,7 @@ namespace LibSerial
     short 
     SerialPort::Implementation::GetVTime() 
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1468,7 +1468,7 @@ namespace LibSerial
     bool
     SerialPort::Implementation::IsDataAvailable()
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1487,7 +1487,7 @@ namespace LibSerial
                                      const unsigned int      numOfBytes,
                                      const unsigned int      msTimeout)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1569,7 +1569,7 @@ namespace LibSerial
                                      const unsigned int numOfBytes,
                                      const unsigned int msTimeout)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1647,7 +1647,7 @@ namespace LibSerial
     SerialPort::Implementation::ReadByte(unsigned char&     charBuffer,
                                          const unsigned int msTimeout)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1719,6 +1719,12 @@ namespace LibSerial
                                          const char         lineTerminator,
                                          const unsigned int msTimeout)
     {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+        
         // Clear the data string.
         dataString.clear();
 
@@ -1779,7 +1785,7 @@ namespace LibSerial
     void
     SerialPort::Implementation::WriteByte(const unsigned char dataByte)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1795,7 +1801,7 @@ namespace LibSerial
     void
     SerialPort::Implementation::Write(const SerialPort::DataBuffer& dataBuffer)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1846,7 +1852,7 @@ namespace LibSerial
     SerialPort::Implementation::Write(const unsigned char* dataBuffer,
                                       const unsigned int   bufferSize)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -2011,7 +2017,7 @@ namespace LibSerial
     SerialPort::Implementation::SetModemControlLine(const int  modemLine,
                                                     const bool lineState)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -2051,7 +2057,7 @@ namespace LibSerial
         }
 
         // Check for errors.
-        if (-1 == ioctl_result)
+        if (ioctl_result  < 0)
         {
             throw std::runtime_error(strerror(errno));
         }
@@ -2063,7 +2069,7 @@ namespace LibSerial
     bool
     SerialPort::Implementation::GetModemControlLine(const int modemLine)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -2087,9 +2093,9 @@ namespace LibSerial
         // Use an ioctl() call to get the state of the line.
         int serial_port_state = 0;
         
-        if (-1 == ioctl(mFileDescriptor,
-                        TIOCMGET,
-                        &serial_port_state))
+        if (ioctl(mFileDescriptor,
+                  TIOCMGET,
+                  &serial_port_state) < 0)
         {
             throw std::runtime_error(strerror(errno));
         }
