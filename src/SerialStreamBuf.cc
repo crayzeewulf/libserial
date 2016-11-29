@@ -426,15 +426,15 @@ namespace LibSerial
         
         if (mode == (ios_base::in | ios_base::out))
         {
-            flags = (O_RDWR | O_NOCTTY);
+            flags = (O_RDWR | O_NOCTTY | O_NONBLOCK);
         } 
         else if (mode == ios_base::in)
         {
-            flags = (O_RDONLY | O_NOCTTY);
+            flags = (O_RDONLY | O_NOCTTY | O_NONBLOCK);
         } 
         else if (mode == ios_base::out)
         {
-            flags = (O_WRONLY | O_NOCTTY);
+            flags = (O_WRONLY | O_NOCTTY | O_NONBLOCK);
         } 
         else 
         {
