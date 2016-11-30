@@ -760,27 +760,22 @@ protected:
         serialPort1.SetBaudRate(BaudRate::BAUD_115200);
         tcflush(serialPort1.GetFileDescriptor(), TCIOFLUSH);
 
-        long unsigned int loopStartTimeMicroseconds = 0;
+        long unsigned int loopStartTimeMicroseconds = getTimeInMicroSeconds();
         long unsigned int timeElapsedMicroSeconds = 0;
-        long unsigned int timeRemainingMicroSeconds = 0;
         long unsigned int timeOutMilliseconds = 25;
 
-            while (timeElapsedMicroSeconds < 250000000)
-            {
-                loopStartTimeMicroseconds = getTimeInMicroSeconds();
+        loopStartTimeMicroseconds = getTimeInMicroSeconds();
 
-                serialPort1.Write(writeString1 + '\n');
-                tcdrain(serialPort1.GetFileDescriptor());
+        while (timeElapsedMicroSeconds < 100000000)
+        {
+            serialPort1.Write(writeString1 + '\n');
+            tcdrain(serialPort1.GetFileDescriptor());
 
-                serialPort1.ReadLine(readString2, '\n', timeOutMilliseconds);
-                ASSERT_EQ(readString2, writeString2 + '\n');
+            serialPort1.ReadLine(readString2, '\n', timeOutMilliseconds);
+            ASSERT_EQ(readString2, writeString2 + '\n');
 
-                timeRemainingMicroSeconds = getTimeInMicroSeconds() - loopStartTimeMicroseconds;
-
-                usleep(timeRemainingMicroSeconds);
-
-                timeElapsedMicroSeconds = getTimeInMicroSeconds() - loopStartTimeMicroseconds;
-            }
+            timeElapsedMicroSeconds = getTimeInMicroSeconds() - loopStartTimeMicroseconds;
+        }
 
         serialPort1.Close();
         serialPort1ThreadRunning = false;
@@ -792,24 +787,19 @@ protected:
         serialPort2.SetBaudRate(BaudRate::BAUD_115200);
         tcflush(serialPort1.GetFileDescriptor(), TCIOFLUSH);
 
-        long unsigned int loopStartTimeMicroseconds = 0;
+        long unsigned int loopStartTimeMicroseconds = getTimeInMicroSeconds();
         long unsigned int timeElapsedMicroSeconds = 0;
-        long unsigned int timeRemainingMicroSeconds = 0;
-        long unsigned int timeOutMilliseconds = 250;
+        long unsigned int timeOutMilliseconds = 25;
 
-        while (timeElapsedMicroSeconds < 250000000)
+        loopStartTimeMicroseconds = getTimeInMicroSeconds();
+
+        while (timeElapsedMicroSeconds < 100000000)
         {
-            loopStartTimeMicroseconds = getTimeInMicroSeconds();
-
             serialPort2.Write(writeString2 + '\n');
             tcdrain(serialPort2.GetFileDescriptor());
 
             serialPort2.ReadLine(readString1, '\n', timeOutMilliseconds);
             ASSERT_EQ(readString1, writeString1 + '\n');
-
-            timeRemainingMicroSeconds = getTimeInMicroSeconds() - loopStartTimeMicroseconds;
-
-            usleep(timeRemainingMicroSeconds);
 
             timeElapsedMicroSeconds = getTimeInMicroSeconds() - loopStartTimeMicroseconds;
         }
