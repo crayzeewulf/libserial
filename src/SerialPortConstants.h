@@ -43,22 +43,14 @@ namespace LibSerial
     const int MICROSECONDS_PER_MS  =    1000;
     const int MILLISECONDS_PER_SEC =    1000;
     const int MICROSECONDS_PER_SEC = 1000000;
-        
+
     /**
      * @brief The default character buffer size.
-     * @deprecated VMIN and VTIME will not be supported starting
-     *             from version 0.7.0. Methods of SerialPort class
-     *             provide better mechanisms for implementing read
-     *             and write timeouts.
      */
-    static constexpr short VMIN_DEFAULT = 1;
+    static constexpr short VMIN_DEFAULT = 0;
 
     /**
      * @brief The default character buffer timing.
-     * @deprecated VMIN and VTIME will not be supported starting
-     *             from version 0.7.0. Methods of SerialPort class
-     *             provide better mechanisms for implementing read
-     *             and write timeouts.
      */
     static constexpr short VTIME_DEFAULT = 0;
     

@@ -35,11 +35,11 @@
 namespace
 {
     /**
-     * Return the difference between the two specified timeval values.
-     * This method subtracts secondOperand from firstOperand and returns
-     * the result as a timeval. The time represented by firstOperand must
-     * be later than the time represented by secondOperand. Otherwise,
-     * the result of this operator may be undefined.
+     * @brief Calculates the difference between the two specified timeval values.
+     *        This method subtracts secondOperand from firstOperand and returns
+     *        the result as a timeval. The time represented by firstOperand must
+     *        be later than the time represented by secondOperand.
+     * @return Returns the difference between the two specified timeval values.
      */
     const timeval
     operator-(const timeval& firstOperand,
@@ -50,6 +50,13 @@ namespace
          *        platform uses unsigned values for storing tv_sec and tv_usec
          *        members of struct timeval.
          */
+        if (firstOperand.tv_sec <= secondOperand.tv_sec &&
+            firstOperand.tv_usec < secondOperand.tv_usec)
+        {
+            // Throw and invalid argument exception if the firstOperand
+            // was an earlier time value than the secondOperand.
+            throw std::invalid_argument(strerror(errno));
+        }
 
         timeval result;
 
