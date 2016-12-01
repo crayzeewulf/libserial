@@ -83,9 +83,8 @@ namespace LibSerial
          * @brief This routine is called by open() in order to
          *        initialize some parameters of the serial port and
          *        setting its parameters to default values.
-         * @return -1 on failure and some other value on success. 
          */
-        int InitializeSerialPort();
+        void InitializeSerialPort();
 
         /**
          * @brief Sets all serial port paramters to their default values.
@@ -424,10 +423,11 @@ namespace LibSerial
         return mImpl->IsOpen();
     }
 
-    int
+    void
     SerialPort::InitializeSerialPort()
     {
-        return mImpl->InitializeSerialPort();
+        mImpl->InitializeSerialPort();
+        return;
     }
 
     void
@@ -756,10 +756,7 @@ namespace LibSerial
         }
 
         // Initialize the serial port. 
-        if (InitializeSerialPort() < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
+        InitializeSerialPort();
 
         return;
     }
@@ -803,7 +800,7 @@ namespace LibSerial
     }
 
     inline
-    int
+    void
     SerialPort::Implementation::InitializeSerialPort()
     {
         // Make sure that the serial port is open.
@@ -819,14 +816,14 @@ namespace LibSerial
                   F_SETFL, 
                   flags | O_NONBLOCK) < 0)
         {
-            return -1;
+            throw std::runtime_error(strerror(errno));
         }
 
         // Flush out any garbage left behind in the buffers associated
         // with the port from any previous operations. 
         if (tcflush(this->mFileDescriptor, TCIOFLUSH) < 0)
         {
-            return -1;
+            throw std::runtime_error(strerror(errno));
         }
 
         // Set up the default configuration for the serial port.
@@ -839,11 +836,11 @@ namespace LibSerial
                          F_SETFL, 
                          flags & ~O_NONBLOCK) < 0)
         {
-            return -1;
+            throw std::runtime_error(strerror(errno));
         }
 
         // Initialization was successful.
-        return 0;
+        return;
     }
 
     inline

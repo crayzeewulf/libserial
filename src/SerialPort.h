@@ -98,9 +98,8 @@ namespace LibSerial
          * @brief This routine is called by open() in order to
          *        initialize some parameters of the serial port and
          *        setting its parameters to default values.
-         * @return -1 on failure and some other value on success. 
          */
-        int InitializeSerialPort();
+        void InitializeSerialPort();
 
         /**
          * @brief Initializes the serial communication parameters to their
