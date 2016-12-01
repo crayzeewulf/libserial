@@ -43,7 +43,31 @@ namespace
      */
     const timeval
     operator-(const timeval& firstOperand,
-              const timeval& secondOperand);
+              const timeval& secondOperand)
+    {
+        /**
+         * @NOTE: This implementation may result in undefined behavior if the
+         *        platform uses unsigned values for storing tv_sec and tv_usec
+         *        members of struct timeval.
+         */
+
+        timeval result;
+
+        // Take the difference of individual members of the two operands.
+        result.tv_sec  = firstOperand.tv_sec - secondOperand.tv_sec;
+        result.tv_usec = firstOperand.tv_usec - secondOperand.tv_usec;
+
+        // If abs(result.tv_usec) is larger than MICROSECONDS_PER_SECOND,
+        // then increment/decrement result.tv_sec accordingly.
+        if (std::abs(result.tv_usec) > LibSerial::MICROSECONDS_PER_SEC)
+        {
+            int num_of_seconds = (result.tv_usec / LibSerial::MICROSECONDS_PER_SEC);
+            result.tv_sec  += num_of_seconds;
+            result.tv_usec -= (LibSerial::MICROSECONDS_PER_SEC * num_of_seconds);
+        }
+        
+        return result;
+    }
 }
 
 namespace LibSerial 
@@ -2093,36 +2117,5 @@ namespace LibSerial
         }
 
         return (serial_port_state & modemLine);
-    }
-}
-
-namespace
-{
-    const timeval
-    operator-(const timeval& firstOperand,
-              const timeval& secondOperand)
-    {
-        /**
-         * @NOTE: This implementation may result in undefined behavior if the
-         *        platform uses unsigned values for storing tv_sec and tv_usec
-         *        members of struct timeval.
-         */
-
-        timeval result;
-
-        // Take the difference of individual members of the two operands.
-        result.tv_sec  = firstOperand.tv_sec - secondOperand.tv_sec;
-        result.tv_usec = firstOperand.tv_usec - secondOperand.tv_usec;
-
-        // If abs(result.tv_usec) is larger than MICROSECONDS_PER_SECOND,
-        // then increment/decrement result.tv_sec accordingly.
-        if (std::abs(result.tv_usec) > LibSerial::MICROSECONDS_PER_SEC)
-        {
-            int num_of_seconds = (result.tv_usec / LibSerial::MICROSECONDS_PER_SEC);
-            result.tv_sec  += num_of_seconds;
-            result.tv_usec -= (LibSerial::MICROSECONDS_PER_SEC * num_of_seconds);
-        }
-        
-        return result;
     }
 }
