@@ -44,14 +44,14 @@ namespace LibSerial
             /* empty */
         }
 
-        SerialStreamBuf* Open(const string& filename,
+        void Open(const string& filename,
                               ios_base::openmode mode);
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
          *        lost and no more I/O can be performed on the serial port.
          */
-        SerialStreamBuf* Close();
+        void Close();
 
         /**
          * @brief Determines if the serial port is open for I/O.
@@ -228,18 +228,20 @@ namespace LibSerial
         return next_ch;
     }
 
-    SerialStreamBuf*
+    void
     SerialStreamBuf::Open(const string& filename,
                           ios_base::openmode mode) 
     {
-        return mImpl->Open(filename,
-                           mode);
+        mImpl->Open(filename,
+                    mode);
+        return;
     }
 
-    SerialStreamBuf*
+    void
     SerialStreamBuf::Close() 
     {
-        return mImpl->Close();
+        mImpl->Close();
+        return;
     }
 
     bool
@@ -409,7 +411,7 @@ namespace LibSerial
     }
 
     inline
-    SerialStreamBuf*
+    void
     SerialStreamBuf::Implementation::Open(const string& filename,
                                           ios_base::openmode mode) 
     {
@@ -438,7 +440,7 @@ namespace LibSerial
         } 
         else 
         {
-            return 0;
+            return;
         }
 
         // Try to open the serial port. 
@@ -495,11 +497,11 @@ namespace LibSerial
             throw std::runtime_error(strerror(errno));
         }
 
-        return (SerialStreamBuf*)this;
+        return;
     }
 
     inline
-    SerialStreamBuf*
+    void
     SerialStreamBuf::Implementation::Close() 
     {
         // Throw an exception if the serial port is not open.
@@ -520,15 +522,12 @@ namespace LibSerial
         // to an invalid value.
         if (close(mFileDescriptor) < 0) 
         {
-            // If the close failed then return a null pointer. 
-            return NULL;
+            throw std::runtime_error(strerror(errno));
         } 
 
         // Set the file descriptor to an invalid value, -1. 
         mFileDescriptor = -1;
-        
-        // On success, return "this" as required by the C++ standard.
-        return (SerialStreamBuf*)this;
+        return;
     }
 
     inline

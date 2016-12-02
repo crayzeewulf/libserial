@@ -84,11 +84,7 @@ SerialStream::Open(const std::string& fileName,
     }
 
     // Open the serial port. 
-    if (0 == mIOBuffer->Open(fileName, openMode))
-    {
-        setstate(badbit);    
-    }
-
+    mIOBuffer->Open(fileName, openMode);
     return;
 }
 
