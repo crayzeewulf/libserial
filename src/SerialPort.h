@@ -60,7 +60,26 @@ namespace LibSerial
         /**
          * @brief Default Constructor for a serial port object.
          */
-        explicit SerialPort(const std::string& serialPortName);
+        explicit SerialPort();
+
+        /**
+         * @brief Constructor that allows one to create a SerialPort
+         *        instance and also initialize the corresponding serial
+         *        port with the specified parameters.
+         * @param serialPortName The file descriptor of the serial stream object.
+         * @param baudRate The communications baud rate.
+         * @param characterSize The size of the character buffer for
+         *        storing read/write streams.
+         * @param parityType The parity type for the serial stream object.
+         * @param numberOfStopBits The number of stop bits.
+         * @param flowControlType Flow control for the serial data stream.
+         */
+        explicit SerialPort(const std::string&   serialPortName,
+                            const BaudRate&      baudRate        = BaudRate::BAUD_DEFAULT,
+                            const CharacterSize& characterSize   = CharacterSize::CHAR_SIZE_DEFAULT,
+                            const FlowControl&   flowControlType = FlowControl::FLOW_CONTROL_DEFAULT,
+                            const Parity&        parityType      = Parity::PARITY_DEFAULT,
+                            const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT);
 
         /**
          * @brief Default Destructor for a serial port object.
@@ -68,19 +87,10 @@ namespace LibSerial
         virtual ~SerialPort() noexcept;
 
         /**
-         * @brief Opens the serial port with the specified settings.
-         *        A serial port cannot be used until it has been opened.
-         * @param baudRate The serial port baud rate.
-         * @param charSize The serial port character size.
-         * @param flowControl The serial port flow control type.
-         * @param parityType The serial port parity type.
-         * @param stopBits The serial port number of stop bits.
+         * @brief Opens the serial port.
+         * @param serialPortName The name of the serial port to be opened.
          */
-        void Open(const BaudRate&      baudRate        = BaudRate::BAUD_DEFAULT,
-                  const CharacterSize& characterSize   = CharacterSize::CHAR_SIZE_DEFAULT,
-                  const FlowControl&   flowControlType = FlowControl::FLOW_CONTROL_DEFAULT,
-                  const Parity&        parityType      = Parity::PARITY_DEFAULT,
-                  const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT);
+        void Open(const std::string& serialPortName);
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be

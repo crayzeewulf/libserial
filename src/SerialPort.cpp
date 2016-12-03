@@ -20,8 +20,6 @@
  *****************************************************************************/
 
 #include "SerialPort.h"
-#include "PosixSignalDispatcher.h"
-#include "PosixSignalHandler.h"
 
 #include <cstring>
 #include <fcntl.h>
@@ -31,17 +29,34 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-
 namespace LibSerial 
 {
-    class SerialPort::Implementation : public PosixSignalHandler
+    class SerialPort::Implementation
     {
     public:
         /**
          * @brief Default Constructor.
-         * @param serialPortName The serial port name to be opened.
          */
-        Implementation(const std::string& serialPortName);
+        Implementation();
+
+        /**
+         * @brief Constructor that allows one to create a SerialPort
+         *        instance and also initialize the corresponding serial
+         *        port with the specified parameters.
+         * @param serialPortName The file descriptor of the serial stream object.
+         * @param baudRate The communications baud rate.
+         * @param characterSize The size of the character buffer for
+         *        storing read/write streams.
+         * @param parityType The parity type for the serial stream object.
+         * @param numberOfStopBits The number of stop bits.
+         * @param flowControlType Flow control for the serial data stream.
+         */
+        Implementation(const std::string&   serialPortName,
+                       const BaudRate&      baudRate,
+                       const CharacterSize& characterSize,
+                       const FlowControl&   flowControlType,
+                       const Parity&        parityType,
+                       const StopBits&      stopBits);
 
         /**
          * @brief Destructor.
@@ -50,8 +65,9 @@ namespace LibSerial
 
         /**
          * @brief Opens the serial port.
+         * @param serialPortName The name of the serial port to be opened.
          */
-        void Open();
+        void Open(const std::string& serialPortName);
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
@@ -287,23 +303,12 @@ namespace LibSerial
          */
         int GetFileDescriptor();
 
-        /*
-         * @brief This method must be defined by all subclasses of
-         *        PosixSignalHandler.
-         */
-        void HandlePosixSignal(const int signalNumber) override;
     private:
 
         /**
          * @brief The file descriptor corresponding to the serial port.
          */
         int mFileDescriptor {-1};
-
-        /**
-         * @brief Name of the serial port. On POSIX systems this is the name of
-         *        the device file.
-         */
-        std::string mSerialPortName {};
 
         /**
          * @brief Serial port settings are saved into this variable immediately
@@ -326,14 +331,6 @@ namespace LibSerial
         std::queue<unsigned char> mInputBuffer {};
 
         /**
-         * @brief In order to be thread safe, a second queue is implemented to store
-         *        bytes which are received while the queue is locked by the
-         *        ReadByte method. The content must be transfered to mInputBuffer
-         *        before further bytes are stored into it.
-         */
-        std::queue<unsigned char> mShadowInputBuffer {};
-
-        /**
          * @brief Mutex to control threaded access to mInputBuffer
          */
         pthread_mutex_t mInputBufferMutex {};
@@ -345,8 +342,7 @@ namespace LibSerial
          * @param lineState State of the modem line after successful
          *        call to this method.
          */
-        void
-        SetModemControlLine(const int modemLine,
+        void SetModemControlLine(const int modemLine,
                             const bool lineState);
 
         /**
@@ -356,12 +352,27 @@ namespace LibSerial
          * @return True if the specified line is currently set and false
          *         otherwise.
          */
-        bool
-        GetModemControlLine(const int modemLine);
+        bool GetModemControlLine(const int modemLine);
     };
 
-    SerialPort::SerialPort(const std::string& serialPortName)
-        : mImpl(new Implementation(serialPortName))
+    SerialPort::SerialPort()
+        : mImpl(new Implementation())
+    {
+        // Empty
+    }
+
+    SerialPort::SerialPort(const std::string&   serialPortName,
+                           const BaudRate&      baudRate,
+                           const CharacterSize& characterSize,
+                           const FlowControl&   flowControlType,
+                           const Parity&        parityType,
+                           const StopBits&      stopBits)
+        : mImpl(new Implementation(serialPortName,
+                                   baudRate,
+                                   characterSize,
+                                   flowControlType,
+                                   parityType,
+                                   stopBits))
     {
         // Empty
     }
@@ -378,21 +389,9 @@ namespace LibSerial
     }
 
     void
-    SerialPort::Open(const BaudRate&      baudRate,
-                     const CharacterSize& characterSize,
-                     const FlowControl&   flowControlType,
-                     const Parity&        parityType,
-                     const StopBits&      stopBits)
+    SerialPort::Open(const std::string& serialPortName) 
     {
-        // Open the serial port.
-        mImpl->Open();
-
-        // Set the various parameters of the serial port if it is open.
-        this->SetBaudRate(baudRate);
-        this->SetCharacterSize(characterSize);
-        this->SetFlowControl(flowControlType);
-        this->SetParity(parityType);
-        this->SetNumberOfStopBits(stopBits);
+        mImpl->Open(serialPortName);
         return;
     }
 
@@ -633,16 +632,42 @@ namespace LibSerial
 
     /** ------------------------------------------------------------ */
     inline
-    SerialPort::Implementation::Implementation(const std::string& serialPortName)
+    SerialPort::Implementation::Implementation()
         : mFileDescriptor(-1)
-        , mSerialPortName(serialPortName)
     {
         //Initializing the mutex
         if (pthread_mutex_init(&mInputBufferMutex, NULL) != 0)
         {
             throw std::runtime_error(ERR_MSG_PTHREAD_MUTEX_ERROR);
         }
+
+        return;
     }
+
+    inline
+    SerialPort::Implementation::Implementation(const std::string&   serialPortName,
+                                               const BaudRate&      baudRate,
+                                               const CharacterSize& characterSize,
+                                               const FlowControl&   flowControlType,
+                                               const Parity&        parityType,
+                                               const StopBits&      stopBits)
+        : mFileDescriptor(-1)
+    {
+        //Initializing the mutex
+        if (pthread_mutex_init(&mInputBufferMutex, NULL) != 0)
+        {
+            throw std::runtime_error(ERR_MSG_PTHREAD_MUTEX_ERROR);
+        }
+
+        this->Open(serialPortName);
+        this->SetBaudRate(baudRate);
+        this->SetCharacterSize(characterSize);
+        this->SetFlowControl(flowControlType);
+        this->SetParity(parityType);
+        this->SetNumberOfStopBits(stopBits);
+        return;
+    }
+
 
     inline
     SerialPort::Implementation::~Implementation()
@@ -658,7 +683,7 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::Open()
+    SerialPort::Implementation::Open(const std::string& serialPortName)
     {
         // Throw an exception if the port is already open.
         if (this->IsOpen())
@@ -673,32 +698,11 @@ namespace LibSerial
         flags = (O_RDWR | O_NOCTTY | O_NONBLOCK);
         
         // Try to open the serial port. 
-        mFileDescriptor = open(mSerialPortName.c_str(),
-                               flags);
+        mFileDescriptor = open(serialPortName.c_str(), flags);
         
         if (mFileDescriptor < 0)
         {
             close(mFileDescriptor);
-            throw OpenFailed(strerror(errno));
-        }
-
-        PosixSignalDispatcher& signal_dispatcher = PosixSignalDispatcher::Instance();
-        signal_dispatcher.AttachHandler(SIGIO,
-                                        *this);
-
-        // Direct all SIGIO and SIGURG signals for the port to the current process.
-        if (fcntl(mFileDescriptor,
-                  F_SETOWN,
-                  getpid()) < 0)
-        {
-            throw OpenFailed(strerror(errno));
-        }
-
-        // Enable asynchronous I/O with the serial port.
-        if (fcntl(mFileDescriptor,
-                  F_SETFL,
-                  FASYNC) < 0)
-        {
             throw OpenFailed(strerror(errno));
         }
 
@@ -756,10 +760,6 @@ namespace LibSerial
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
-
-        PosixSignalDispatcher& signal_dispatcher = PosixSignalDispatcher::Instance();
-        signal_dispatcher.DetachHandler(SIGIO,
-                                        *this);
 
         // Restore the old settings of the port.
         if (tcsetattr(mFileDescriptor,
@@ -1457,9 +1457,16 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        pthread_mutex_lock(&mInputBufferMutex);
-        bool dataAvailableStatus = !mInputBuffer.empty();
-        pthread_mutex_unlock(&mInputBufferMutex);
+        int num_of_bytes_available = 0;
+        bool dataAvailableStatus = false;
+
+        int result = ioctl(mFileDescriptor, FIONREAD, &num_of_bytes_available);
+        
+        if (result >= 0 &&
+            num_of_bytes_available > 0)
+        {
+            dataAvailableStatus = true;
+        }
 
         return dataAvailableStatus;
     }
@@ -1649,13 +1656,19 @@ namespace LibSerial
             throw std::runtime_error(strerror(errno));
         }
 
-        pthread_mutex_lock(&mInputBufferMutex);
-        int queueSize = this->mInputBuffer.size();
-        pthread_mutex_unlock(&mInputBufferMutex);
+        bool serialDataRead = false;
 
         // Wait for data to be available.
-        while (queueSize == 0)
+        while (!serialDataRead)
         {
+            if (read(mFileDescriptor,
+                         &charBuffer,
+                         1) > 0)
+            {
+                serialDataRead = true;
+                return;
+            }
+
             // Throw an exception if we are unable to read the current time.  
             if (gettimeofday(&current_time,
                              NULL) < 0)
@@ -1680,17 +1693,12 @@ namespace LibSerial
 
             // Sleep for 1ms (1000us) for data to arrive.
             usleep(MICROSECONDS_PER_MS);
-
-            pthread_mutex_lock(&mInputBufferMutex);
-            queueSize = this->mInputBuffer.size();
-            pthread_mutex_unlock(&mInputBufferMutex);
         }
 
         // Return the first byte and remove it from the queue.
         pthread_mutex_lock(&mInputBufferMutex);
         charBuffer = this->mInputBuffer.front();
         this->mInputBuffer.pop();
-        queueSize = this->mInputBuffer.size();
         pthread_mutex_unlock(&mInputBufferMutex);
 
         return;
@@ -1915,79 +1923,6 @@ namespace LibSerial
     SerialPort::Implementation::GetFileDescriptor()
     {
         return this->mFileDescriptor;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::HandlePosixSignal(const int signalNumber)
-    {
-        // We only want to deal with SIGIO signals here.
-        if (SIGIO != signalNumber)
-        {
-            return;
-        }
-
-        // Check if any data is available at the specified file descriptor.
-        int num_of_bytes_available = 0;
-        
-        if (ioctl(mFileDescriptor,
-                  FIONREAD,
-                  &num_of_bytes_available) < 0)
-        {
-            // Ignore any errors and return immediately.
-            return;
-        }
-
-        // Try to get the mutex
-        if (pthread_mutex_trylock(&mInputBufferMutex) == 0)
-        {
-            // Transfer any pending data from the mShadowInputBuffer
-            // into the mInputBuffer.
-            while(!mShadowInputBuffer.empty())
-            {
-                mInputBuffer.push(mShadowInputBuffer.front());
-                mShadowInputBuffer.pop();
-            }
-
-            // If data is available, read all available data and store
-            // it in the corresponding input buffer.
-            for(int i=0; i<num_of_bytes_available; ++i)
-            {
-                unsigned char next_byte;
-                
-                if (read(mFileDescriptor,
-                         &next_byte,
-                         1) > 0)
-                {
-                    mInputBuffer.push(next_byte);
-                }
-            }
-
-            // Release the mutex
-            pthread_mutex_unlock(&mInputBufferMutex);
-        }
-        else
-        {
-            // The Mutex was already locked, so all available data will be read
-            // from the serial port and stored in the mShadowInputBuffer.
-            for (int i=0; i<num_of_bytes_available; ++i)
-            {
-                unsigned char next_byte;
-                
-                if (read(mFileDescriptor,
-                         &next_byte,
-                         1) > 0)
-                {
-                    mShadowInputBuffer.push(next_byte);
-                }
-                else
-                {
-                    break;
-                }
-            }
-        }
-
-        return;
     }
 
     inline
