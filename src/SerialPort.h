@@ -339,6 +339,14 @@ namespace LibSerial
          */
         int GetFileDescriptor();
 
+    protected:
+        
+        /**
+         * @brief Forward declaration of the implementation class folowing
+         *        the PImpl idiom.
+         */
+        class Implementation;
+
     private:
         /**
          * @brief Prevents copying of objects of this class by declaring the copy
@@ -361,12 +369,6 @@ namespace LibSerial
          * @brief Move assignment is not allowed.
          */
         SerialPort& operator=(const SerialPort&& otherSerialPort) = delete;
-
-        /**
-         * @brief Forward declaration of the implementation class folowing
-         *        the PImpl idiom.
-         */
-        class Implementation;
 
         /**
          * @brief Pointer to implementation class instance.

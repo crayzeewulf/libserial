@@ -220,14 +220,6 @@ namespace LibSerial
         return;
     }
 
-    std::streambuf::int_type
-    SerialStreamBuf::uflow() 
-    {
-        int_type next_ch = underflow();
-        mImpl->mPutbackAvailable = false;
-        return next_ch;
-    }
-
     void
     SerialStreamBuf::Open(const string& filename,
                           ios_base::openmode mode) 
@@ -248,12 +240,6 @@ namespace LibSerial
     SerialStreamBuf::IsOpen() 
     {
         return mImpl->IsOpen();
-    }
-
-    std::streambuf* 
-    SerialStreamBuf::setbuf(char_type *, std::streamsize) 
-    {
-        return std::streambuf::setbuf(0, 0);
     }
 
     int
@@ -362,6 +348,12 @@ namespace LibSerial
         return mImpl->GetVTime();
     }
 
+    std::streambuf* 
+    SerialStreamBuf::setbuf(char_type *, std::streamsize) 
+    {
+        return std::streambuf::setbuf(0, 0);
+    }
+
     std::streamsize
     SerialStreamBuf::xsputn(const char_type *s, streamsize n)
     {
@@ -386,6 +378,13 @@ namespace LibSerial
         return mImpl->underflow();
     }
 
+    std::streambuf::int_type
+    SerialStreamBuf::uflow() 
+    {
+        int_type next_ch = underflow();
+        mImpl->mPutbackAvailable = false;
+        return next_ch;
+    }
 
     streambuf::int_type
     SerialStreamBuf::pbackfail(const int_type character)
@@ -492,10 +491,7 @@ namespace LibSerial
         }
 
         // Initialize the serial port.
-        if (InitializeSerialPort() < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
+        InitializeSerialPort();
 
         return;
     }
