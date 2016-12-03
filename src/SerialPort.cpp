@@ -32,44 +32,6 @@
 #include <unistd.h>
 
 
-namespace
-{
-    /**
-     * Return the difference between the two specified timeval values.
-     * This method subtracts secondOperand from firstOperand and returns
-     * the result as a timeval. The time represented by firstOperand must
-     * be later than the time represented by secondOperand. Otherwise,
-     * the result of this operator may be undefined.
-     */
-    const timeval
-    operator-(const timeval& firstOperand,
-              const timeval& secondOperand)
-    {
-        /**
-         * @NOTE: This implementation may result in undefined behavior if the
-         *        platform uses unsigned values for storing tv_sec and tv_usec
-         *        members of struct timeval.
-         */
-
-        timeval result;
-
-        // Take the difference of individual members of the two operands.
-        result.tv_sec  = firstOperand.tv_sec - secondOperand.tv_sec;
-        result.tv_usec = firstOperand.tv_usec - secondOperand.tv_usec;
-
-        // If abs(result.tv_usec) is larger than MICROSECONDS_PER_SECOND,
-        // then increment/decrement result.tv_sec accordingly.
-        if (std::abs(result.tv_usec) > LibSerial::MICROSECONDS_PER_SEC)
-        {
-            int num_of_seconds = (result.tv_usec / LibSerial::MICROSECONDS_PER_SEC);
-            result.tv_sec  += num_of_seconds;
-            result.tv_usec -= (LibSerial::MICROSECONDS_PER_SEC * num_of_seconds);
-        }
-        
-        return result;
-    }
-}
-
 namespace LibSerial 
 {
     class SerialPort::Implementation : public PosixSignalHandler
@@ -1558,7 +1520,7 @@ namespace LibSerial
                 }
 
                 // Obtain the elapsed time.
-                elapsed_time = current_time - entry_time;
+                timersub(&current_time, &entry_time, &elapsed_time);
 
                 // Calculate the elapsed number of milliseconds.
                 elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
@@ -1637,7 +1599,7 @@ namespace LibSerial
                 }
 
                 // Obtain the elapsed time.
-                elapsed_time = current_time - entry_time;
+                timersub(&current_time, &entry_time, &elapsed_time);
 
                 // Calculate the elapsed number of milliseconds.
                 elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
@@ -1702,7 +1664,7 @@ namespace LibSerial
             }
 
             // Obtain the total elapsed time.
-            elapsed_time = current_time - entry_time;
+            timersub(&current_time, &entry_time, &elapsed_time);
 
             // Calculate the elapsed number of milliseconds.
             elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
@@ -1778,7 +1740,7 @@ namespace LibSerial
             }
 
             // Obtain the elapsed time.
-            elapsed_time = current_time - entry_time;
+            timersub(&current_time, &entry_time, &elapsed_time);
 
             // Calculate the elapsed number of milliseconds.
             elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
