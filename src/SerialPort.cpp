@@ -248,23 +248,23 @@ namespace LibSerial
 
         /**
          * @brief Writes a single byte to the serial port.
-         * @param dataByte The byte to be written to the serial port.
+         * @param charbuffer The byte to be written to the serial port.
          */
-        void WriteByte(const unsigned char dataByte);
+        void WriteByte(const unsigned char charbuffer);
+
+        /**
+         * @brief Writes a DataBuffer vector to the serial port.
+         * @param charBuffer The data to be written to the serial port.
+         * @param charBufferSize The number of bytes to be written to the serial port.
+         */
+        void Write(const unsigned char* charBuffer,
+                   const unsigned int   charBufferSize);
 
         /**
          * @brief Writes a DataBuffer vector to the serial port.
          * @param dataBuffer The DataBuffer vector to be written to the serial port.
          */
         void Write(const SerialPort::DataBuffer& dataBuffer);
-
-        /**
-         * @brief Writes a DataBuffer vector to the serial port.
-         * @param dataBuffer The DataBuffer vector to be written to the serial port.
-         * @param bufferSize The number of bytes to be written to the serial port.
-         */
-        void Write(const unsigned char* dataBuffer,
-                   const unsigned int   bufferSize);
 
         /**
          * @brief Sets the serial port DTR line status.
@@ -563,9 +563,9 @@ namespace LibSerial
     }
 
     void
-    SerialPort::WriteByte(const unsigned char dataByte)
+    SerialPort::WriteByte(const unsigned char charBuffer)
     {
-        mImpl->WriteByte(dataByte);
+        mImpl->WriteByte(charBuffer);
         return;
     }
 
@@ -1774,7 +1774,7 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::WriteByte(const unsigned char dataByte)
+    SerialPort::Implementation::WriteByte(const unsigned char charBuffer)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1782,9 +1782,43 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        // Write the byte to the serial port.
-        this->Write(&dataByte,
+        this->Write(&charBuffer,
                     1);
+
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::Write(const unsigned char* charBuffer,
+                                      const unsigned int   charBufferSize)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Write the data to the serial port. Keep retrying if EAGAIN
+        // error is received and EWOULDBLOCK is not received.
+        int num_of_bytes_written = -1;
+        
+        do
+        {
+            num_of_bytes_written = write(mFileDescriptor,
+                                         charBuffer,
+                                         charBufferSize);
+        }
+        while (num_of_bytes_written <= 0 &&
+               errno == EAGAIN &&
+               errno != EWOULDBLOCK);
+
+        if (num_of_bytes_written < 0 ||
+            num_of_bytes_written < (int)charBufferSize)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
         return;
     }
 
@@ -1835,40 +1869,6 @@ namespace LibSerial
 
         // Free the allocated memory.
         delete [] local_buffer;
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::Write(const unsigned char* dataBuffer,
-                                      const unsigned int   bufferSize)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Write the data to the serial port. Keep retrying if EAGAIN
-        // error is received and EWOULDBLOCK is not received.
-        int num_of_bytes_written = -1;
-        
-        do
-        {
-            num_of_bytes_written = write(mFileDescriptor,
-                                         dataBuffer,
-                                         bufferSize);
-        }
-        while (num_of_bytes_written < 0 &&
-               errno == EAGAIN &&
-               errno != EWOULDBLOCK);
-
-        if (num_of_bytes_written < 0 ||
-            num_of_bytes_written < (int)bufferSize)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
-
         return;
     }
 

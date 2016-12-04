@@ -277,22 +277,19 @@ namespace LibSerial
 
         /**
          * @brief Writes a single byte to the serial port.
-         * @param dataByte The byte to be written to the serial port.
+         * @param charbuffer The byte to be written to the serial port.
          */
-        void WriteByte(const unsigned char dataByte);
+        void WriteByte(const unsigned char charbuffer);
 
         /**
          * @brief Writes a DataBuffer vector to the serial port.
-         * @param dataBuffer The DataBuffer vector to be written to the serial
-         *        port.
+         * @param dataBuffer The DataBuffer vector to be written to the serial port.
          */
-        void Write(const DataBuffer& dataBuffer);
+        void Write(const SerialPort::DataBuffer& dataBuffer);
 
         /**
          * @brief Writes a std::string to the serial port.
          * @param dataString The data string to be written to the serial port.
-         * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
-         * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
          */
         void Write(const std::string& dataString);
 
@@ -339,14 +336,6 @@ namespace LibSerial
          */
         int GetFileDescriptor();
 
-    protected:
-        
-        /**
-         * @brief Forward declaration of the implementation class folowing
-         *        the PImpl idiom.
-         */
-        class Implementation;
-
     private:
         /**
          * @brief Prevents copying of objects of this class by declaring the copy
@@ -369,6 +358,12 @@ namespace LibSerial
          * @brief Move assignment is not allowed.
          */
         SerialPort& operator=(const SerialPort&& otherSerialPort) = delete;
+
+        /**
+         * @brief Forward declaration of the implementation class folowing
+         *        the PImpl idiom.
+         */
+        class Implementation;
 
         /**
          * @brief Pointer to implementation class instance.
