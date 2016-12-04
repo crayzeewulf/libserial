@@ -706,7 +706,7 @@ protected:
         long unsigned int timeElapsedMicroSeconds = 0;
         long unsigned int timeRemainingMicroSeconds = 0;
 
-            while (timeElapsedMicroSeconds < 250000000)
+            while (timeElapsedMicroSeconds < 30000000)
             {
                 loopStartTimeMicroseconds = getTimeInMicroSeconds();
 
@@ -734,7 +734,7 @@ protected:
         long unsigned int timeElapsedMicroSeconds = 0;
         long unsigned int timeRemainingMicroSeconds = 0;
 
-            while (timeElapsedMicroSeconds < 250000000)
+            while (timeElapsedMicroSeconds < 30000000)
             {
                 loopStartTimeMicroseconds = getTimeInMicroSeconds();
 
@@ -765,7 +765,7 @@ protected:
 
         loopStartTimeMicroseconds = getTimeInMicroSeconds();
 
-        while (timeElapsedMicroSeconds < 100000000)
+        while (timeElapsedMicroSeconds < 30000000)
         {
             serialPort1.Write(writeString1 + '\n');
             tcdrain(serialPort1.GetFileDescriptor());
@@ -792,7 +792,7 @@ protected:
 
         loopStartTimeMicroseconds = getTimeInMicroSeconds();
 
-        while (timeElapsedMicroSeconds < 100000000)
+        while (timeElapsedMicroSeconds < 30000000)
         {
             serialPort2.Write(writeString2 + '\n');
             tcdrain(serialPort2.GetFileDescriptor());
