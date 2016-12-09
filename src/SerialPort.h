@@ -296,7 +296,7 @@ namespace LibSerial
         /**
          * @brief Writes a character array buffer to the serial port.
          * @param charBuffer The character array to be written to the serial port.
-         * @param numberOfBytes The number of bytes to be written to the serial port.
+         * @param numberOfBytes The number of bytes to write to the serial port.
          */
         void Write(const unsigned char* charBuffer,
                    const unsigned int   numberOfBytes);
