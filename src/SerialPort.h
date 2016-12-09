@@ -221,6 +221,23 @@ namespace LibSerial
          *        reading data till no more data is available at the serial port.
          *        In all cases, all read data is available in dataBuffer on
          *        return from this method.
+         * @param charBuffer The character array buffer to place serial data into.
+         * @param numOfBytes The number of bytes to read before returning.
+         * @param msTimeout The timeout period in milliseconds.
+         */
+        void Read(unsigned char&     charBuffer,
+                  const unsigned int numOfBytes = 0,
+                  const unsigned int msTimeout  = 0);
+
+        /**
+         * @brief Reads the specified number of bytes from the serial port.
+         *        The method will timeout if no data is received in the specified
+         *        number of milliseconds (msTimeout). If msTimeout is 0, then
+         *        this method will block until all requested bytes are
+         *        received. If numOfBytes is zero, then this method will keep
+         *        reading data till no more data is available at the serial port.
+         *        In all cases, all read data is available in dataBuffer on
+         *        return from this method.
          * @param dataBuffer The data buffer to place serial data into.
          * @param numOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
@@ -252,6 +269,7 @@ namespace LibSerial
          *        of milliseconds (msTimeout), then this method will
          *        throw a ReadTimeout exception. If msTimeout is 0,
          *        then this method will block until data is available.
+         * @param charbuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
         void ReadByte(unsigned char&     charBuffer,
@@ -276,22 +294,30 @@ namespace LibSerial
                       const unsigned int msTimeout = 0);
 
         /**
-         * @brief Writes a single byte to the serial port.
-         * @param charbuffer The byte to be written to the serial port.
+         * @brief Writes a character array buffer to the serial port.
+         * @param charBuffer The character array to be written to the serial port.
+         * @param numberOfBytes The number of bytes to be written to the serial port.
          */
-        void WriteByte(const unsigned char charbuffer);
+        void Write(const unsigned char* charBuffer,
+                   const unsigned int   numberOfBytes);
 
         /**
          * @brief Writes a DataBuffer vector to the serial port.
-         * @param dataBuffer The DataBuffer vector to be written to the serial port.
+         * @param dataBuffer The DataBuffer vector to write to the serial port.
          */
         void Write(const SerialPort::DataBuffer& dataBuffer);
 
         /**
          * @brief Writes a std::string to the serial port.
-         * @param dataString The data string to be written to the serial port.
+         * @param dataString The data string to write to the serial port.
          */
         void Write(const std::string& dataString);
+
+        /**
+         * @brief Writes a single byte to the serial port.
+         * @param charbuffer The byte to write to the serial port.
+         */
+        void WriteByte(const unsigned char charbuffer);
 
         /**
          * @brief Sets the DTR line to the specified value.

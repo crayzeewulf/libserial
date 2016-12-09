@@ -264,18 +264,12 @@ namespace LibSerial
                       const unsigned int msTimeout = 0);
 
         /**
-         * @brief Writes a single byte to the serial port.
-         * @param charbuffer The byte to be written to the serial port.
-         */
-        void WriteByte(const unsigned char charbuffer);
-
-        /**
-         * @brief Writes a DataBuffer vector to the serial port.
-         * @param charBuffer The data to be written to the serial port.
-         * @param charBufferSize The number of bytes to be written to the serial port.
+         * @brief Writes a character array buffer to the serial port.
+         * @param charBuffer The character array to be written to the serial port.
+         * @param numberOfBytes The number of bytes to be written to the serial port.
          */
         void Write(const unsigned char* charBuffer,
-                   const unsigned int   charBufferSize);
+                   const unsigned int   numberOfBytes);
 
         /**
          * @brief Writes a DataBuffer vector to the serial port.
@@ -288,6 +282,12 @@ namespace LibSerial
          * @param dataString The std::string to be written to the serial port.
          */
         void Write(const std::string& dataString);
+
+        /**
+         * @brief Writes a single byte to the serial port.
+         * @param charbuffer The byte to be written to the serial port.
+         */
+        void WriteByte(const unsigned char charbuffer);
 
         /**
          * @brief Sets the serial port DTR line status.
@@ -586,9 +586,11 @@ namespace LibSerial
     }
 
     void
-    SerialPort::WriteByte(const unsigned char charBuffer)
+    SerialPort::Write(const unsigned char* charBuffer,
+                      const unsigned int   numberOfBytes)
     {
-        mImpl->WriteByte(charBuffer);
+        mImpl->Write(charBuffer,
+                     numberOfBytes);
         return;
     }
 
@@ -603,6 +605,13 @@ namespace LibSerial
     SerialPort::Write(const std::string& dataString)
     {
         mImpl->Write(dataString);
+        return;
+    }
+
+    void
+    SerialPort::WriteByte(const unsigned char charBuffer)
+    {
+        mImpl->WriteByte(charBuffer);
         return;
     }
 
@@ -1820,22 +1829,6 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::WriteByte(const unsigned char charBuffer)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        this->Write(&charBuffer,
-                    1);
-
-        return;
-    }
-
-    inline
-    void
     SerialPort::Implementation::Write(const unsigned char* charBuffer,
                                       const unsigned int   charBufferSize)
     {
@@ -1904,6 +1897,22 @@ namespace LibSerial
 
         this->Write(reinterpret_cast<const unsigned char*>(dataString.c_str()),
                      dataString.length());
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::WriteByte(const unsigned char charBuffer)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        this->Write(&charBuffer,
+                    1);
+
         return;
     }
 
