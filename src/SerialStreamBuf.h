@@ -102,8 +102,8 @@ namespace LibSerial
          * @return Returns <tt>this</tt> on success, a null pointer
          *         otherwise.
          */
-        SerialStreamBuf* Open(const std::string& filename,
-                              std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out);
+        void Open(const std::string& filename,
+                  std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out);
 
         /**
          * @brief If IsOpen() == false, returns a null pointer.
@@ -127,7 +127,7 @@ namespace LibSerial
          * @return Returns <tt>this</tt> on success, a null pointer
          *         otherwise.
          */
-        SerialStreamBuf* Close();
+        void Close();
 
         /**
          * @brief Returns true if a previous call to open() succeeded

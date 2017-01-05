@@ -32,20 +32,6 @@
 #include <unistd.h>
 
 
-namespace
-{
-    /**
-     * Return the difference between the two specified timeval values.
-     * This method subtracts secondOperand from firstOperand and returns
-     * the result as a timeval. The time represented by firstOperand must
-     * be later than the time represented by secondOperand. Otherwise,
-     * the result of this operator may be undefined.
-     */
-    const timeval
-    operator-(const timeval& firstOperand,
-              const timeval& secondOperand);
-}
-
 namespace LibSerial 
 {
     class SerialPort::Implementation : public PosixSignalHandler
@@ -83,9 +69,8 @@ namespace LibSerial
          * @brief This routine is called by open() in order to
          *        initialize some parameters of the serial port and
          *        setting its parameters to default values.
-         * @return -1 on failure and some other value on success. 
          */
-        int InitializeSerialPort();
+        void InitializeSerialPort();
 
         /**
          * @brief Sets all serial port paramters to their default values.
@@ -247,23 +232,23 @@ namespace LibSerial
 
         /**
          * @brief Writes a single byte to the serial port.
-         * @param dataByte The byte to be written to the serial port.
+         * @param charbuffer The byte to be written to the serial port.
          */
-        void WriteByte(const unsigned char dataByte);
+        void WriteByte(const unsigned char charbuffer);
+
+        /**
+         * @brief Writes a DataBuffer vector to the serial port.
+         * @param charBuffer The data to be written to the serial port.
+         * @param charBufferSize The number of bytes to be written to the serial port.
+         */
+        void Write(const unsigned char* charBuffer,
+                   const unsigned int   charBufferSize);
 
         /**
          * @brief Writes a DataBuffer vector to the serial port.
          * @param dataBuffer The DataBuffer vector to be written to the serial port.
          */
         void Write(const SerialPort::DataBuffer& dataBuffer);
-
-        /**
-         * @brief Writes a DataBuffer vector to the serial port.
-         * @param dataBuffer The DataBuffer vector to be written to the serial port.
-         * @param bufferSize The number of bytes to be written to the serial port.
-         */
-        void Write(const unsigned char* dataBuffer,
-                   const unsigned int   bufferSize);
 
         /**
          * @brief Sets the serial port DTR line status.
@@ -351,7 +336,7 @@ namespace LibSerial
         /**
          * @brief Mutex to control threaded access to mInputBuffer
          */
-        pthread_mutex_t mQueueMutex {};
+        pthread_mutex_t mInputBufferMutex {};
 
         /**
          * @brief Set the specified modem control line to the specified value. 
@@ -424,10 +409,11 @@ namespace LibSerial
         return mImpl->IsOpen();
     }
 
-    int
+    void
     SerialPort::InitializeSerialPort()
     {
-        return mImpl->InitializeSerialPort();
+        mImpl->InitializeSerialPort();
+        return;
     }
 
     void
@@ -652,7 +638,7 @@ namespace LibSerial
         , mSerialPortName(serialPortName)
     {
         //Initializing the mutex
-        if (pthread_mutex_init(&mQueueMutex, NULL) != 0)
+        if (pthread_mutex_init(&mInputBufferMutex, NULL) != 0)
         {
             throw std::runtime_error(ERR_MSG_PTHREAD_MUTEX_ERROR);
         }
@@ -756,10 +742,7 @@ namespace LibSerial
         }
 
         // Initialize the serial port. 
-        if (-1 == InitializeSerialPort())
-        {
-            throw std::runtime_error(strerror(errno));
-        }
+        InitializeSerialPort();
 
         return;
     }
@@ -803,7 +786,7 @@ namespace LibSerial
     }
 
     inline
-    int
+    void
     SerialPort::Implementation::InitializeSerialPort()
     {
         // Make sure that the serial port is open.
@@ -815,18 +798,18 @@ namespace LibSerial
         // Use non-blocking mode while configuring the serial port. 
         int flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
         
-        if ( -1 == fcntl( this->mFileDescriptor, 
-                         F_SETFL, 
-                         flags | O_NONBLOCK ) )
+        if (fcntl(this->mFileDescriptor, 
+                  F_SETFL, 
+                  flags | O_NONBLOCK) < 0)
         {
-            return -1;
+            throw std::runtime_error(strerror(errno));
         }
 
         // Flush out any garbage left behind in the buffers associated
         // with the port from any previous operations. 
-        if ( -1 == tcflush(this->mFileDescriptor, TCIOFLUSH) )
+        if (tcflush(this->mFileDescriptor, TCIOFLUSH) < 0)
         {
-            return -1;
+            throw std::runtime_error(strerror(errno));
         }
 
         // Set up the default configuration for the serial port.
@@ -835,15 +818,15 @@ namespace LibSerial
         // Allow all further communications to happen in blocking mode.
         flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
         
-        if ( -1 == fcntl( this->mFileDescriptor, 
+        if (fcntl( this->mFileDescriptor, 
                          F_SETFL, 
-                         flags & ~O_NONBLOCK ) )
+                         flags & ~O_NONBLOCK) < 0)
         {
-            return -1;
+            throw std::runtime_error(strerror(errno));
         }
 
         // Initialization was successful.
-        return 0;
+        return;
     }
 
     inline
@@ -949,7 +932,7 @@ namespace LibSerial
     BaudRate
     SerialPort::Implementation::GetBaudRate()
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -985,7 +968,7 @@ namespace LibSerial
     void
     SerialPort::Implementation::SetCharacterSize(const CharacterSize& characterSize)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1037,7 +1020,7 @@ namespace LibSerial
     CharacterSize
     SerialPort::Implementation::GetCharacterSize()
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1061,7 +1044,7 @@ namespace LibSerial
     void
     SerialPort::Implementation::SetFlowControl(const FlowControl& flowControlType)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1125,7 +1108,7 @@ namespace LibSerial
     FlowControl
     SerialPort::Implementation::GetFlowControl()
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1175,7 +1158,7 @@ namespace LibSerial
     void
     SerialPort::Implementation::SetParity(const Parity& parityType)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1228,7 +1211,7 @@ namespace LibSerial
     Parity
     SerialPort::Implementation::GetParity()
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1269,7 +1252,7 @@ namespace LibSerial
     void
     SerialPort::Implementation::SetNumberOfStopBits(const StopBits& numberOfStopBits)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1314,7 +1297,7 @@ namespace LibSerial
     StopBits
     SerialPort::Implementation::GetNumberOfStopBits()
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1346,7 +1329,7 @@ namespace LibSerial
     void 
     SerialPort::Implementation::SetVMin(const short vmin)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1384,7 +1367,7 @@ namespace LibSerial
     short 
     SerialPort::Implementation::GetVMin()
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1407,7 +1390,7 @@ namespace LibSerial
     void 
     SerialPort::Implementation::SetVTime(const short vtime)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1445,7 +1428,7 @@ namespace LibSerial
     short 
     SerialPort::Implementation::GetVTime() 
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1468,15 +1451,15 @@ namespace LibSerial
     bool
     SerialPort::Implementation::IsDataAvailable()
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        pthread_mutex_lock(&mQueueMutex);
+        pthread_mutex_lock(&mInputBufferMutex);
         bool dataAvailableStatus = !mInputBuffer.empty();
-        pthread_mutex_unlock(&mQueueMutex);
+        pthread_mutex_unlock(&mInputBufferMutex);
 
         return dataAvailableStatus;
     }
@@ -1487,7 +1470,7 @@ namespace LibSerial
                                      const unsigned int      numOfBytes,
                                      const unsigned int      msTimeout)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1537,7 +1520,7 @@ namespace LibSerial
                 }
 
                 // Obtain the elapsed time.
-                elapsed_time = current_time - entry_time;
+                timersub(&current_time, &entry_time, &elapsed_time);
 
                 // Calculate the elapsed number of milliseconds.
                 elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
@@ -1569,7 +1552,7 @@ namespace LibSerial
                                      const unsigned int numOfBytes,
                                      const unsigned int msTimeout)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1616,7 +1599,7 @@ namespace LibSerial
                 }
 
                 // Obtain the elapsed time.
-                elapsed_time = current_time - entry_time;
+                timersub(&current_time, &entry_time, &elapsed_time);
 
                 // Calculate the elapsed number of milliseconds.
                 elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
@@ -1647,7 +1630,7 @@ namespace LibSerial
     SerialPort::Implementation::ReadByte(unsigned char&     charBuffer,
                                          const unsigned int msTimeout)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1666,9 +1649,9 @@ namespace LibSerial
             throw std::runtime_error(strerror(errno));
         }
 
-        pthread_mutex_lock(&mQueueMutex);
+        pthread_mutex_lock(&mInputBufferMutex);
         int queueSize = this->mInputBuffer.size();
-        pthread_mutex_unlock(&mQueueMutex);
+        pthread_mutex_unlock(&mInputBufferMutex);
 
         // Wait for data to be available.
         while (queueSize == 0)
@@ -1681,7 +1664,7 @@ namespace LibSerial
             }
 
             // Obtain the total elapsed time.
-            elapsed_time = current_time - entry_time;
+            timersub(&current_time, &entry_time, &elapsed_time);
 
             // Calculate the elapsed number of milliseconds.
             elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
@@ -1698,17 +1681,17 @@ namespace LibSerial
             // Sleep for 1ms (1000us) for data to arrive.
             usleep(MICROSECONDS_PER_MS);
 
-            pthread_mutex_lock(&mQueueMutex);
+            pthread_mutex_lock(&mInputBufferMutex);
             queueSize = this->mInputBuffer.size();
-            pthread_mutex_unlock(&mQueueMutex);
+            pthread_mutex_unlock(&mInputBufferMutex);
         }
 
         // Return the first byte and remove it from the queue.
-        pthread_mutex_lock(&mQueueMutex);
+        pthread_mutex_lock(&mInputBufferMutex);
         charBuffer = this->mInputBuffer.front();
         this->mInputBuffer.pop();
         queueSize = this->mInputBuffer.size();
-        pthread_mutex_unlock(&mQueueMutex);
+        pthread_mutex_unlock(&mInputBufferMutex);
 
         return;
     }
@@ -1719,6 +1702,12 @@ namespace LibSerial
                                          const char         lineTerminator,
                                          const unsigned int msTimeout)
     {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+        
         // Clear the data string.
         dataString.clear();
 
@@ -1751,7 +1740,7 @@ namespace LibSerial
             }
 
             // Obtain the elapsed time.
-            elapsed_time = current_time - entry_time;
+            timersub(&current_time, &entry_time, &elapsed_time);
 
             // Calculate the elapsed number of milliseconds.
             elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
@@ -1777,17 +1766,51 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::WriteByte(const unsigned char dataByte)
+    SerialPort::Implementation::WriteByte(const unsigned char charBuffer)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        // Write the byte to the serial port.
-        this->Write(&dataByte,
+        this->Write(&charBuffer,
                     1);
+
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::Write(const unsigned char* charBuffer,
+                                      const unsigned int   charBufferSize)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Write the data to the serial port. Keep retrying if EAGAIN
+        // error is received and EWOULDBLOCK is not received.
+        int num_of_bytes_written = -1;
+        
+        do
+        {
+            num_of_bytes_written = write(mFileDescriptor,
+                                         charBuffer,
+                                         charBufferSize);
+        }
+        while (num_of_bytes_written <= 0 &&
+               errno == EAGAIN &&
+               errno != EWOULDBLOCK);
+
+        if (num_of_bytes_written < 0 ||
+            num_of_bytes_written < (int)charBufferSize)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
         return;
     }
 
@@ -1795,7 +1818,7 @@ namespace LibSerial
     void
     SerialPort::Implementation::Write(const SerialPort::DataBuffer& dataBuffer)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -1838,40 +1861,6 @@ namespace LibSerial
 
         // Free the allocated memory.
         delete [] local_buffer;
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::Write(const unsigned char* dataBuffer,
-                                      const unsigned int   bufferSize)
-    {
-        // Make sure that the serial port is open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Write the data to the serial port. Keep retrying if EAGAIN
-        // error is received and EWOULDBLOCK is not received.
-        int num_of_bytes_written = -1;
-        
-        do
-        {
-            num_of_bytes_written = write(mFileDescriptor,
-                                         dataBuffer,
-                                         bufferSize);
-        }
-        while (num_of_bytes_written < 0 &&
-               errno == EAGAIN &&
-               errno != EWOULDBLOCK);
-
-        if (num_of_bytes_written < 0 ||
-            num_of_bytes_written < (int)bufferSize)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
-
         return;
     }
 
@@ -1950,7 +1939,7 @@ namespace LibSerial
         }
 
         // Try to get the mutex
-        if (pthread_mutex_trylock(&mQueueMutex) == 0)
+        if (pthread_mutex_trylock(&mInputBufferMutex) == 0)
         {
             // Transfer any pending data from the mShadowInputBuffer
             // into the mInputBuffer.
@@ -1972,15 +1961,10 @@ namespace LibSerial
                 {
                     mInputBuffer.push(next_byte);
                 }
-                else
-                {
-                    pthread_mutex_unlock(&mQueueMutex);
-                    break;
-                }
             }
 
             // Release the mutex
-            pthread_mutex_unlock(&mQueueMutex);
+            pthread_mutex_unlock(&mInputBufferMutex);
         }
         else
         {
@@ -2011,7 +1995,7 @@ namespace LibSerial
     SerialPort::Implementation::SetModemControlLine(const int  modemLine,
                                                     const bool lineState)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -2051,7 +2035,7 @@ namespace LibSerial
         }
 
         // Check for errors.
-        if (-1 == ioctl_result)
+        if (ioctl_result  < 0)
         {
             throw std::runtime_error(strerror(errno));
         }
@@ -2063,7 +2047,7 @@ namespace LibSerial
     bool
     SerialPort::Implementation::GetModemControlLine(const int modemLine)
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -2087,44 +2071,13 @@ namespace LibSerial
         // Use an ioctl() call to get the state of the line.
         int serial_port_state = 0;
         
-        if (-1 == ioctl(mFileDescriptor,
-                        TIOCMGET,
-                        &serial_port_state))
+        if (ioctl(mFileDescriptor,
+                  TIOCMGET,
+                  &serial_port_state) < 0)
         {
             throw std::runtime_error(strerror(errno));
         }
 
         return (serial_port_state & modemLine);
-    }
-}
-
-namespace
-{
-    const timeval
-    operator-(const timeval& firstOperand,
-              const timeval& secondOperand)
-    {
-        /**
-         * @NOTE: This implementation may result in undefined behavior if the
-         *        platform uses unsigned values for storing tv_sec and tv_usec
-         *        members of struct timeval.
-         */
-
-        timeval result;
-
-        // Take the difference of individual members of the two operands.
-        result.tv_sec  = firstOperand.tv_sec - secondOperand.tv_sec;
-        result.tv_usec = firstOperand.tv_usec - secondOperand.tv_usec;
-
-        // If abs(result.tv_usec) is larger than MICROSECONDS_PER_SECOND,
-        // then increment/decrement result.tv_sec accordingly.
-        if (std::abs(result.tv_usec) > LibSerial::MICROSECONDS_PER_SEC)
-        {
-            int num_of_seconds = (result.tv_usec / LibSerial::MICROSECONDS_PER_SEC);
-            result.tv_sec  += num_of_seconds;
-            result.tv_usec -= (LibSerial::MICROSECONDS_PER_SEC * num_of_seconds);
-        }
-        
-        return result;
     }
 }

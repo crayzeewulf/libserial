@@ -27,9 +27,9 @@ ADD_DEFINITIONS(
   -Wno-long-long  
   -Wno-psabi
   -Wno-variadic-macros
-  #-Wnon-virtual-dtor
+  -Wnon-virtual-dtor
   -Wpointer-arith
-  #-Wundef
+  -Wundef
   -Wuninitialized
   -Wunused-local-typedefs
   -Wwrite-strings
@@ -45,11 +45,6 @@ ADD_DEFINITIONS(
   -pthread
   )
 
-# Uncomment the following lines to compile for 32 bit architectures
-#SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -fms-extensions -m32")
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -fms-extensions -m32")
-
-# Uncomment the following lines to compile for 64 bit architectures
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -fms-extensions")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -fms-extensions")
 
