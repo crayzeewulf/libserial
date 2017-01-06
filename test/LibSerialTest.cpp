@@ -25,7 +25,6 @@ class LibSerialTest
     : public ::testing::Test
 {
 public:
-    LibSerialTest() : serialPort1(TEST_SERIAL_PORT_1), serialPort2(TEST_SERIAL_PORT_2) {}
 
 protected:
     SerialPort serialPort1;
@@ -55,7 +54,7 @@ protected:
         serialPort2ThreadRunning = false;
 
         writeString1 = "Quidquid latine dictum sit, altum sonatur. (Whatever is said in Latin sounds profound.)";
-        writeString2 = "The universally interesting man is universally interested. - William Dean Howells";
+        writeString2 = "The secret of the man who is universally interesting is that he is universally interested. - William Dean Howells";
 
         baudRates[0]   =  BaudRate::BAUD_50;
         baudRates[1]   =  BaudRate::BAUD_75;
@@ -322,7 +321,7 @@ protected:
 
     void testSerialPortOpenClose()
     {
-        serialPort1.Open();
+        serialPort1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialPort1.IsOpen());
 
         serialPort1.Close();
@@ -331,8 +330,8 @@ protected:
 
     void testSerialPortReadWrite(const int timeOutMilliseconds)
     {
-        serialPort1.Open();
-        serialPort2.Open();
+        serialPort1.Open(TEST_SERIAL_PORT_1);
+        serialPort2.Open(TEST_SERIAL_PORT_2);
         
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
@@ -415,8 +414,8 @@ protected:
 
     void testSerialPortIsDataAvailableTest()
     {
-        serialPort1.Open();
-        serialPort2.Open();
+        serialPort1.Open(TEST_SERIAL_PORT_1);
+        serialPort2.Open(TEST_SERIAL_PORT_2);
 
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
@@ -461,7 +460,7 @@ protected:
 
     void testSerialPortSetGetBaudRate()
     {
-        serialPort1.Open();
+        serialPort1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialPort1.IsOpen());
 
         size_t maxBaudIndex = 25;
@@ -479,7 +478,7 @@ protected:
 
     void testSerialPortSetGetCharacterSize()
     {
-        serialPort1.Open();
+        serialPort1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialPort1.IsOpen());
 
         // @TODO - Why don't the smaller CharSize values work?
@@ -496,7 +495,7 @@ protected:
 
     void testSerialPortSetGetFlowControl()
     {
-        serialPort1.Open();
+        serialPort1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialPort1.IsOpen());
 
         // @TODO - FLOW_CONTROL_SOFT flow control is not valid.
@@ -513,7 +512,7 @@ protected:
 
     void testSerialPortSetGetParity()
     {
-        serialPort1.Open();
+        serialPort1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialPort1.IsOpen());
 
         for (size_t i = 0; i < 3; i++)
@@ -529,10 +528,10 @@ protected:
 
     void testSerialPortSetGetStopBits()
     {
-        StopBits numberOfStopBits;
-
-        serialPort1.Open();
+        serialPort1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialPort1.IsOpen());
+        
+        StopBits numberOfStopBits;
 
         serialPort1.SetNumberOfStopBits(stopBits[0]);
         numberOfStopBits = serialPort1.GetNumberOfStopBits();
@@ -548,7 +547,7 @@ protected:
 
     void testSerialPortSetGetDTR()
     {
-        serialPort1.Open();
+        serialPort1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialPort1.IsOpen());
 
         serialPort1.SetDtr(true);
@@ -565,7 +564,7 @@ protected:
 
     void testSerialPortSetGetRTS()
     {
-        serialPort1.Open();
+        serialPort1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialPort1.IsOpen());
 
         serialPort1.SetRts(true);
@@ -582,7 +581,7 @@ protected:
 
     void testSerialPortGetCTS()
     {
-        serialPort1.Open();
+        serialPort1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialPort1.IsOpen());
 
         bool ctsLine = serialPort1.GetCts();
@@ -594,7 +593,7 @@ protected:
 
     void testSerialPortGetDSR()
     {
-        serialPort1.Open();
+        serialPort1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialPort1.IsOpen());
 
         bool dsrLine = serialPort1.GetDsr();
@@ -606,7 +605,7 @@ protected:
 
     void testSerialPortSetGetVMin()
     {
-        serialPort1.Open();
+        serialPort1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialPort1.IsOpen());
 
         for (short i = 0; i < 5; i++)
@@ -622,7 +621,7 @@ protected:
 
     void testSerialPortSetGetVTime()
     {
-        serialPort1.Open();
+        serialPort1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialPort1.IsOpen());
 
         for (short i = 0; i < 5; i++)
@@ -638,7 +637,7 @@ protected:
 
     void testSerialStreamToSerialPortReadWrite(const int timeOutMilliseconds)
     {
-        serialPort1.Open();
+        serialPort1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialPort1.IsOpen());
 
         serialStream1.Open(TEST_SERIAL_PORT_2);
@@ -707,7 +706,7 @@ protected:
         long unsigned int timeElapsedMicroSeconds = 0;
         long unsigned int timeRemainingMicroSeconds = 0;
 
-            while (timeElapsedMicroSeconds < 250000000)
+            while (timeElapsedMicroSeconds < 30000000)
             {
                 loopStartTimeMicroseconds = getTimeInMicroSeconds();
 
@@ -735,7 +734,7 @@ protected:
         long unsigned int timeElapsedMicroSeconds = 0;
         long unsigned int timeRemainingMicroSeconds = 0;
 
-            while (timeElapsedMicroSeconds < 250000000)
+            while (timeElapsedMicroSeconds < 30000000)
             {
                 loopStartTimeMicroseconds = getTimeInMicroSeconds();
 
@@ -756,7 +755,7 @@ protected:
 
     void serialPort1CommunicationThreadLoop()
     {
-        serialPort1.Open();
+        serialPort1.Open(TEST_SERIAL_PORT_1);
         serialPort1.SetBaudRate(BaudRate::BAUD_115200);
         tcflush(serialPort1.GetFileDescriptor(), TCIOFLUSH);
 
@@ -766,7 +765,7 @@ protected:
 
         loopStartTimeMicroseconds = getTimeInMicroSeconds();
 
-        while (timeElapsedMicroSeconds < 100000000)
+        while (timeElapsedMicroSeconds < 30000000)
         {
             serialPort1.Write(writeString1 + '\n');
             tcdrain(serialPort1.GetFileDescriptor());
@@ -783,7 +782,7 @@ protected:
 
     void serialPort2CommunicationThreadLoop()
     {
-        serialPort2.Open();
+        serialPort2.Open(TEST_SERIAL_PORT_2);
         serialPort2.SetBaudRate(BaudRate::BAUD_115200);
         tcflush(serialPort1.GetFileDescriptor(), TCIOFLUSH);
 
@@ -793,7 +792,7 @@ protected:
 
         loopStartTimeMicroseconds = getTimeInMicroSeconds();
 
-        while (timeElapsedMicroSeconds < 100000000)
+        while (timeElapsedMicroSeconds < 30000000)
         {
             serialPort2.Write(writeString2 + '\n');
             tcdrain(serialPort2.GetFileDescriptor());
