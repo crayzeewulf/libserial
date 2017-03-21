@@ -174,6 +174,9 @@ namespace LibSerial
         underflow();
 
         streambuf::int_type
+        uflow();
+
+        streambuf::int_type
         pbackfail(const int_type c);
 
         streamsize 
@@ -381,9 +384,7 @@ namespace LibSerial
     std::streambuf::int_type
     SerialStreamBuf::uflow() 
     {
-        int_type next_ch = underflow();
-        mImpl->mPutbackAvailable = false;
-        return next_ch;
+        return mImpl->uflow();
     }
 
     streambuf::int_type
@@ -1347,9 +1348,12 @@ namespace LibSerial
         }
         else
         {
+            FILE* filePointer = fdopen(mFileDescriptor, "r");
+            flockfile(filePointer);
             // If no putback character is available then we need to read one
             // character from the serial port.
             retval = read(mFileDescriptor, &next_ch, 1);
+            funlockfile(filePointer);
 
             // Make the next character the putback character. This has the
             // effect of returning the next character without changing gptr()
@@ -1374,6 +1378,21 @@ namespace LibSerial
         // Return the character as an int value as required by the C++
         // standard.
         return traits_type::to_int_type(next_ch);
+    }
+
+    inline
+    streambuf::int_type
+    SerialStreamBuf::Implementation::uflow() 
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        int_type next_ch = underflow();
+        mPutbackAvailable = false;
+        return next_ch;
     }
 
     inline

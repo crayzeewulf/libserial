@@ -1,6 +1,7 @@
 /***************************************************************************
  *   @file SerialStream.h                                                  *
- *   @copyright                                                            *
+ *   @copyright (C) 2004 by Manish Pagey                                      *
+ *   crayzeewulf@users.sourceforge.net                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
