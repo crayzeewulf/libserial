@@ -66,9 +66,9 @@ namespace LibSerial
     public:
         /**------------------------------------------------------------
          * Public Static Members
-         * ------------------------------------------------------------ 
+         * ------------------------------------------------------------
          */
-        
+
         /**
          * @brief This constructor takes a filename and an openmode to
          *        construct a SerialStream object. This results in a
@@ -103,7 +103,7 @@ namespace LibSerial
          *        instance and also initialize the corresponding serial
          *        port with the specified parameters. This was suggested
          *        by Witek Adamus (wit3k). 
-         * 
+         *
          * @note See https://sourceforge.net/tracker/index.php?func=detail&aid=2137885&group_id=9432&atid=359432
          *
          * @param fileName The file descriptor of the serial stream object.

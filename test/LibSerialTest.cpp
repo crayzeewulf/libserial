@@ -717,7 +717,6 @@ protected:
         }
 
         serialStream1.Close();
-        usleep(1000);
         serialStream1ThreadRunning = false;
         return;
     }
@@ -742,7 +741,6 @@ protected:
         }
 
         serialStream2.Close();
-        usleep(1000);
         serialStream2ThreadRunning = false;
         return;
     }
@@ -771,7 +769,6 @@ protected:
         }
 
         serialPort1.Close();
-        usleep(1000);
         serialPort1ThreadRunning = false;
         return;
     }
@@ -800,7 +797,6 @@ protected:
         }
 
         serialPort2.Close();
-        usleep(1000);
         serialPort2ThreadRunning = false;
         return;
     }
@@ -1139,10 +1135,12 @@ TEST_F(LibSerialTest, testMultiThreadSerialPortReadWrite)
 {
     SCOPED_TRACE("Test Multi-Thread Serial Port Communication.");
     testMultiThreadSerialPortReadWrite();
+    usleep(50000);
 }
 
 TEST_F(LibSerialTest, testMultiThreadSerialStreamReadWrite)
 {
     SCOPED_TRACE("Test Multi-Thread Serial Stream Communication.");
     testMultiThreadSerialStreamReadWrite();
+    usleep(50000);
 }

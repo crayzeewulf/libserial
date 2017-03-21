@@ -293,7 +293,7 @@ namespace LibSerial
          *        serial port if one otherwise returns traits::eof(). This
          *        method is used for buffered I/O while uflow() is called
          *        for unbuffered I/O.
-         * @return Returns the next character from the serial port. 
+         * @return Returns the next character from the serial port.
          */
         virtual int_type underflow() override;
 

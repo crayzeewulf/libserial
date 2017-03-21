@@ -412,7 +412,7 @@ namespace LibSerial
     }
 
     void
-    SerialPort::Open(const std::string& serialPortName) 
+    SerialPort::Open(const std::string& serialPortName)
     {
         mImpl->Open(serialPortName);
         return;
@@ -623,7 +623,7 @@ namespace LibSerial
     }
 
     bool
-    SerialPort::GetDtr() 
+    SerialPort::GetDtr()
     {
         return mImpl->GetDtr();
     }
@@ -636,14 +636,14 @@ namespace LibSerial
     }
 
     bool
-    SerialPort::GetRts() 
+    SerialPort::GetRts()
     {
         return mImpl->GetRts();
     }
 
 
     bool
-    SerialPort::GetCts() 
+    SerialPort::GetCts()
     {
         return mImpl->GetCts();
     }
@@ -874,7 +874,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -902,7 +902,7 @@ namespace LibSerial
         port_settings.c_cc[VTIME] = 0;
 
         // Apply the modified settings.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
@@ -916,7 +916,7 @@ namespace LibSerial
         SetNumberOfStopBits(StopBits::STOP_BITS_DEFAULT);
         SetVMin(VMIN_DEFAULT);
         SetVTime(VTIME_DEFAULT);
-        
+
         return;
     }
 
@@ -934,7 +934,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -949,7 +949,7 @@ namespace LibSerial
         }
 
         // Apply the modified settings.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
@@ -973,7 +973,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1009,7 +1009,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1037,7 +1037,7 @@ namespace LibSerial
         port_settings.c_cflag |= (tcflag_t)characterSize;
 
         // Apply the modified settings.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
@@ -1061,7 +1061,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1082,7 +1082,7 @@ namespace LibSerial
         }
 
         // Flush the input and output buffers associated with the port.
-        if (tcflush(mFileDescriptor,
+        if (tcflush(this->mFileDescriptor,
                     TCIOFLUSH) < 0)
         {
             throw OpenFailed(strerror(errno));
@@ -1092,7 +1092,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1125,7 +1125,7 @@ namespace LibSerial
         }
         
         // Apply the modified settings.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
@@ -1149,7 +1149,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1199,7 +1199,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1228,7 +1228,7 @@ namespace LibSerial
         }
 
         // Apply the modified port settings.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
@@ -1252,7 +1252,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1293,7 +1293,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1314,7 +1314,7 @@ namespace LibSerial
         }
 
         // Apply the modified settings.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
@@ -1338,7 +1338,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1375,7 +1375,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1384,7 +1384,7 @@ namespace LibSerial
         port_settings.c_cc[VMIN] = (cc_t)vmin;
 
         // Apply the modified settings.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
@@ -1408,7 +1408,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1436,7 +1436,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1445,7 +1445,7 @@ namespace LibSerial
         port_settings.c_cc[VTIME] = (cc_t)vtime;
 
         // Apply the modified settings.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
@@ -1469,7 +1469,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1491,7 +1491,9 @@ namespace LibSerial
         int num_of_bytes_available = 0;
         bool dataAvailableStatus = false;
 
-        int result = ioctl(mFileDescriptor, FIONREAD, &num_of_bytes_available);
+        int result = ioctl(this->mFileDescriptor,
+                           FIONREAD,
+                           &num_of_bytes_available);
         
         if (result >= 0 &&
             num_of_bytes_available > 0)
@@ -1523,7 +1525,7 @@ namespace LibSerial
         timeval current_time;
         timeval elapsed_time;
         
-        // Throw an exception if we are unable to read the current time.  
+        // Throw an exception if we are unable to read the current time.
         if (gettimeofday(&entry_time,
                          NULL) < 0)
         {
@@ -1533,7 +1535,7 @@ namespace LibSerial
         // Loop until the number of bytes requested have been read or the timeout has elapsed.
         while (number_of_bytes_read < (int)charBufferSize)
         {
-            read_result = read(mFileDescriptor,
+            read_result = read(this->mFileDescriptor,
                                &charBuffer + number_of_bytes_read,
                                charBufferSize - number_of_bytes_read);
 
@@ -1551,7 +1553,7 @@ namespace LibSerial
                 break;
             }
 
-            // Throw an exception if we are unable to read the current time.  
+            // Throw an exception if we are unable to read the current time.
             if (gettimeofday(&current_time,
                              NULL) < 0)
             {
@@ -1599,7 +1601,7 @@ namespace LibSerial
         timeval current_time;
         timeval elapsed_time;
 
-        // Throw an exception if we are unable to read the current time.  
+        // Throw an exception if we are unable to read the current time.
         if (gettimeofday(&entry_time,
                          NULL) < 0)
         {
@@ -1628,7 +1630,7 @@ namespace LibSerial
 
             for (unsigned int i=0; i<numberOfBytes; ++i)
             {
-                // Throw an exception if we are unable to read the current time.            
+                // Throw an exception if we are unable to read the current time.
                 if (gettimeofday(&current_time,
                                  NULL) < 0)
                 {
@@ -1658,7 +1660,7 @@ namespace LibSerial
                 dataBuffer.push_back(next_char);
             }
         }
-        
+
         return;
     }
 
@@ -1681,7 +1683,7 @@ namespace LibSerial
         timeval current_time;
         timeval elapsed_time;
 
-        // Throw an exception if we are unable to read the current time.  
+        // Throw an exception if we are unable to read the current time.
         if (gettimeofday(&entry_time,
                          NULL) < 0)
         {
@@ -1707,7 +1709,7 @@ namespace LibSerial
         {
             for (unsigned int i=0; i<numberOfBytes; ++i)
             {
-                // Throw an exception if we are unable to read the current time.            
+                // Throw an exception if we are unable to read the current time.
                 if (gettimeofday(&current_time,
                                  NULL) < 0)
                 {
@@ -1794,7 +1796,7 @@ namespace LibSerial
 
         while (next_char != lineTerminator)
         {
-            // Throw an exception if we are unable to read the current time.            
+            // Throw an exception if we are unable to read the current time.
             if (gettimeofday(&current_time,
                              NULL) < 0)
             {
@@ -1850,7 +1852,7 @@ namespace LibSerial
         
         do
         {
-            num_of_bytes_written = write(mFileDescriptor,
+            num_of_bytes_written = write(this->mFileDescriptor,
                                          charBuffer,
                                          charBufferSize);
         }
@@ -2043,14 +2045,14 @@ namespace LibSerial
         if (true == lineState)
         {
             int set_line_mask = modemLine;
-            ioctl_result = ioctl(mFileDescriptor, 
+            ioctl_result = ioctl(this->mFileDescriptor, 
                                  TIOCMBIS,
                                  &set_line_mask);
         }
         else
         {
             int reset_line_mask = modemLine;
-            ioctl_result = ioctl(mFileDescriptor, 
+            ioctl_result = ioctl(this->mFileDescriptor, 
                                  TIOCMBIC,
                                  &reset_line_mask);
         }
@@ -2092,7 +2094,7 @@ namespace LibSerial
         // Use an ioctl() call to get the state of the line.
         int serial_port_state = 0;
         
-        if (ioctl(mFileDescriptor,
+        if (ioctl(this->mFileDescriptor,
                   TIOCMGET,
                   &serial_port_state) < 0)
         {

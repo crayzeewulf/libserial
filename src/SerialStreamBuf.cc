@@ -183,7 +183,7 @@ namespace LibSerial
         showmanyc();
 
         /** 
-         * @brief The file descriptor associated with the serial port. 
+         * @brief The file descriptor associated with the serial port.
          */
         int mFileDescriptor;
 
@@ -214,7 +214,7 @@ namespace LibSerial
         return;
     }
 
-    SerialStreamBuf::~SerialStreamBuf() 
+    SerialStreamBuf::~SerialStreamBuf()
     {
         if (this->IsOpen()) 
         {
@@ -225,7 +225,7 @@ namespace LibSerial
 
     void
     SerialStreamBuf::Open(const string& filename,
-                          ios_base::openmode mode) 
+                          ios_base::openmode mode)
     {
         mImpl->Open(filename,
                     mode);
@@ -240,7 +240,7 @@ namespace LibSerial
     }
 
     bool
-    SerialStreamBuf::IsOpen() 
+    SerialStreamBuf::IsOpen()
     {
         return mImpl->IsOpen();
     }
@@ -266,7 +266,7 @@ namespace LibSerial
     }
 
     BaudRate
-    SerialStreamBuf::GetBaudRate() 
+    SerialStreamBuf::GetBaudRate()
     {
         return mImpl->GetBaudRate();
     }
@@ -306,7 +306,7 @@ namespace LibSerial
     }
 
     Parity
-    SerialStreamBuf::GetParity() 
+    SerialStreamBuf::GetParity()
     {
         return mImpl->GetParity();
     }
@@ -318,8 +318,8 @@ namespace LibSerial
         return;
     }
 
-    StopBits 
-    SerialStreamBuf::GetNumberOfStopBits() 
+    StopBits
+    SerialStreamBuf::GetNumberOfStopBits()
     {
         return mImpl->GetNumberOfStopBits();
     }
@@ -332,27 +332,27 @@ namespace LibSerial
     }
 
 
-    short 
+    short
     SerialStreamBuf::GetVMin()
     {
         return mImpl->GetVMin();
     }
 
-    void 
+    void
     SerialStreamBuf::SetVTime(const short vtime)
     {
         mImpl->SetVTime(vtime);
         return;
     }
 
-    short 
-    SerialStreamBuf::GetVTime() 
+    short
+    SerialStreamBuf::GetVTime()
     {
         return mImpl->GetVTime();
     }
 
-    std::streambuf* 
-    SerialStreamBuf::setbuf(char_type *, std::streamsize) 
+    std::streambuf*
+    SerialStreamBuf::setbuf(char_type *, std::streamsize)
     {
         return std::streambuf::setbuf(0, 0);
     }
@@ -382,7 +382,7 @@ namespace LibSerial
     }
 
     std::streambuf::int_type
-    SerialStreamBuf::uflow() 
+    SerialStreamBuf::uflow()
     {
         return mImpl->uflow();
     }
@@ -413,7 +413,7 @@ namespace LibSerial
     inline
     void
     SerialStreamBuf::Implementation::Open(const string& filename,
-                                          ios_base::openmode mode) 
+                                          ios_base::openmode mode)
     {
         // Throw an exception if the port is already open.
         if (this->IsOpen())
@@ -499,7 +499,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::Close() 
+    SerialStreamBuf::Implementation::Close()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -634,7 +634,7 @@ namespace LibSerial
         SetNumberOfStopBits(StopBits::STOP_BITS_DEFAULT);
         SetVMin(VMIN_DEFAULT);
         SetVTime(VTIME_DEFAULT);
-        
+
         return;
     }
 
@@ -751,7 +751,7 @@ namespace LibSerial
         }
 
         port_settings.c_cflag &= ~CSIZE;                               // Clear all CSIZE bits.
-        port_settings.c_cflag |= static_cast<tcflag_t>(characterSize); // Set the character size. 
+        port_settings.c_cflag |= static_cast<tcflag_t>(characterSize); // Set the character size.
 
         // Apply the modified settings.
         if (tcsetattr(mFileDescriptor,
@@ -854,7 +854,7 @@ namespace LibSerial
 
     inline
     FlowControl
-    SerialStreamBuf::Implementation::GetFlowControl() 
+    SerialStreamBuf::Implementation::GetFlowControl()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -904,7 +904,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetParity(const Parity& parityType) 
+    SerialStreamBuf::Implementation::SetParity(const Parity& parityType)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1174,7 +1174,7 @@ namespace LibSerial
 
     inline
     short 
-    SerialStreamBuf::Implementation::GetVTime() 
+    SerialStreamBuf::Implementation::GetVTime()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1227,7 +1227,8 @@ namespace LibSerial
 
     inline
     streamsize
-    SerialStreamBuf::Implementation::xsgetn(char_type *s, streamsize n) 
+    SerialStreamBuf::Implementation::xsgetn(char_type *s,
+                                            streamsize n)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1294,7 +1295,7 @@ namespace LibSerial
 
     inline
     streambuf::int_type
-    SerialStreamBuf::Implementation::overflow(const int_type character) 
+    SerialStreamBuf::Implementation::overflow(const int_type character)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1327,7 +1328,7 @@ namespace LibSerial
 
     inline
     streambuf::int_type
-    SerialStreamBuf::Implementation::underflow() 
+    SerialStreamBuf::Implementation::underflow()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1348,12 +1349,14 @@ namespace LibSerial
         }
         else
         {
-            FILE* filePointer = fdopen(mFileDescriptor, "r");
-            flockfile(filePointer);
+            // Create a FILE type from the file descriptor to allow the
+            // stream mutex to be locked.
+            FILE* file_pointer = fdopen(mFileDescriptor, "r");
+            flockfile(file_pointer);
             // If no putback character is available then we need to read one
             // character from the serial port.
             retval = read(mFileDescriptor, &next_ch, 1);
-            funlockfile(filePointer);
+            funlockfile(file_pointer);
 
             // Make the next character the putback character. This has the
             // effect of returning the next character without changing gptr()
@@ -1382,7 +1385,7 @@ namespace LibSerial
 
     inline
     streambuf::int_type
-    SerialStreamBuf::Implementation::uflow() 
+    SerialStreamBuf::Implementation::uflow()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1478,6 +1481,6 @@ namespace LibSerial
             }
         }
 
-        return retval;    
+        return retval;
     }
 }

@@ -18,7 +18,7 @@
  *   Free Software Foundation, Inc.,                                          *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
  *****************************************************************************/
- 
+
 #include "SerialStream.h"
 
 #include <cassert>
@@ -28,7 +28,7 @@
 using namespace LibSerial;
 
 SerialStream::SerialStream()
-    : std::iostream(0), mIOBuffer(0) 
+    : std::iostream(0), mIOBuffer(0)
 {
     // Close the stream
     Close();
@@ -45,7 +45,7 @@ SerialStream::~SerialStream()
     }
 }
 
-SerialStream::SerialStream(const std::string& fileName, 
+SerialStream::SerialStream(const std::string& fileName,
                            ios_base::openmode openMode)
     : std::iostream(0)
     , mIOBuffer(0) 
@@ -73,8 +73,8 @@ SerialStream::SerialStream(const std::string&   fileName,
 }
 
 void
-SerialStream::Open(const std::string& fileName, 
-                   std::ios_base::openmode openMode) 
+SerialStream::Open(const std::string& fileName,
+                   std::ios_base::openmode openMode)
 {
     // Create a new SerialStreamBuf if one does not exist. 
     if (! mIOBuffer)
@@ -90,7 +90,7 @@ SerialStream::Open(const std::string& fileName,
 }
 
 void 
-SerialStream::Close() 
+SerialStream::Close()
 {
     // If a SerialStreamBuf is associated with the SerialStream then
     // destroy it.
@@ -102,7 +102,7 @@ SerialStream::Close()
 }
 
 bool
-SerialStream::IsOpen() 
+SerialStream::IsOpen()
 {
     // Checks to see if mIOBuffer is a null buffer, if not, calls
     // the IsOpen() function on this streams SerialStreamBuf mIOBuffer
@@ -115,7 +115,7 @@ SerialStream::IsOpen()
 }
 
 void 
-SerialStream::SetBaudRate(const BaudRate& baudRate) 
+SerialStream::SetBaudRate(const BaudRate& baudRate)
 {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
 
@@ -167,7 +167,7 @@ SerialStream::GetBaudRate()
 }
 
 void
-SerialStream::SetCharacterSize(const CharacterSize& characterSize) 
+SerialStream::SetCharacterSize(const CharacterSize& characterSize)
 {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
 
