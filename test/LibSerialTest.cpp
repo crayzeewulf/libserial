@@ -46,6 +46,27 @@ protected:
     bool serialStream1ThreadRunning;
     bool serialStream2ThreadRunning;
 
+    BaudRate        baudRates[25];
+    CharacterSize   characterSizes[4];
+    FlowControl     flowControlTypes[3];
+    Parity          parityTypes[3];
+    StopBits        stopBits[2];
+
+    SerialStream serialStream1;
+    SerialStream serialStream2;
+
+    SerialPort serialPort1;
+    SerialPort serialPort2;
+
+    std::string readString1;
+    std::string writeString1;
+
+    std::string readString2;
+    std::string writeString2;
+
+    char writeByte;
+    char readByte;
+
     virtual void SetUp()
     {
         serialPort1ThreadRunning = false;
@@ -852,28 +873,6 @@ protected:
         libSerialTest->serialStream2CommunicationThreadLoop();
         return NULL;
     }
-
-
-    BaudRate        baudRates[25];
-    CharacterSize   characterSizes[4];
-    FlowControl     flowControlTypes[3];
-    Parity          parityTypes[3];
-    StopBits        stopBits[2];
-
-    SerialStream serialStream1;
-    SerialStream serialStream2;
-
-    SerialPort serialPort1;
-    SerialPort serialPort2;
-
-    std::string readString1;
-    std::string writeString1;
-
-    std::string readString2;
-    std::string writeString2;
-
-    char writeByte;
-    char readByte;
 };
 
 
@@ -1132,16 +1131,16 @@ TEST_F(LibSerialTest, testSerialStreamToSerialPortReadWrite)
 
 //----------------------- Multiple Thread Unit Tests ------------------------//
 
-TEST_F(LibSerialTest, testMultiThreadSerialPortReadWrite)
-{
-    SCOPED_TRACE("Test Multi-Thread Serial Port Communication.");
-    testMultiThreadSerialPortReadWrite();
-    usleep(250000);
-}
-
 TEST_F(LibSerialTest, testMultiThreadSerialStreamReadWrite)
 {
     SCOPED_TRACE("Test Multi-Thread Serial Stream Communication.");
     testMultiThreadSerialStreamReadWrite();
-    usleep(250000);
+    sleep(1);
+}
+
+TEST_F(LibSerialTest, testMultiThreadSerialPortReadWrite)
+{
+    SCOPED_TRACE("Test Multi-Thread Serial Port Communication.");
+    testMultiThreadSerialPortReadWrite();
+    sleep(1);
 }
