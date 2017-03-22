@@ -1135,12 +1135,12 @@ TEST_F(LibSerialTest, testMultiThreadSerialPortReadWrite)
 {
     SCOPED_TRACE("Test Multi-Thread Serial Port Communication.");
     testMultiThreadSerialPortReadWrite();
-    usleep(50000);
+    usleep(250000);
 }
 
 TEST_F(LibSerialTest, testMultiThreadSerialStreamReadWrite)
 {
     SCOPED_TRACE("Test Multi-Thread Serial Stream Communication.");
     testMultiThreadSerialStreamReadWrite();
-    usleep(50000);
+    usleep(250000);
 }

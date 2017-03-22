@@ -1349,14 +1349,9 @@ namespace LibSerial
         }
         else
         {
-            // Create a FILE type from the file descriptor to allow the
-            // stream mutex to be locked.
-            FILE* file_pointer = fdopen(mFileDescriptor, "r");
-            flockfile(file_pointer);
             // If no putback character is available then we need to read one
             // character from the serial port.
             retval = read(mFileDescriptor, &next_ch, 1);
-            funlockfile(file_pointer);
 
             // Make the next character the putback character. This has the
             // effect of returning the next character without changing gptr()
