@@ -27,8 +27,6 @@ class LibSerialTest
 public:
 
 protected:
-    SerialPort serialPort1;
-    SerialPort serialPort2;
 
     /** @brief The pthread mutex lock to lock data and avoid race conditions. */
     pthread_mutex_t serialPort1CommunicationThreadMutex;
@@ -864,6 +862,9 @@ protected:
 
     SerialStream serialStream1;
     SerialStream serialStream2;
+
+    SerialPort serialPort1;
+    SerialPort serialPort2;
 
     std::string readString1;
     std::string writeString1;
