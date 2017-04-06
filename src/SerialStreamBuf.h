@@ -165,7 +165,7 @@ namespace LibSerial
         /**
          * @brief Sets the character size for the serial port.
          * @param characterSize The character size to be set.
-         */
+         */ 
         void SetCharacterSize(const CharacterSize& characterSize);
 
         /**
@@ -238,6 +238,13 @@ namespace LibSerial
 
 
     protected:
+
+        /**
+         * @brief Forward declaration of the implementation class folowing
+         *        the PImpl idiom.
+         */
+        class Implementation;
+
         /**
          * @brief Performs an operation that is defined separately for each
          *        class derived from streambuf. The default behavior is to
@@ -286,7 +293,7 @@ namespace LibSerial
          *        serial port if one otherwise returns traits::eof(). This
          *        method is used for buffered I/O while uflow() is called
          *        for unbuffered I/O.
-         * @return Returns the next character from the serial port. 
+         * @return Returns the next character from the serial port.
          */
         virtual int_type underflow() override;
 
@@ -322,20 +329,34 @@ namespace LibSerial
          *        \endcode
          */
         virtual std::streamsize showmanyc() override;
- 
-        /**
-         * @brief Copying and moving of instances of this class are prohibited.
-         *        This allows the compiler to catch attempts to copy instances
-         *        of this class.
-         */
-        SerialStreamBuf(const SerialStreamBuf&) = delete;
-        SerialStreamBuf(SerialStreamBuf&&) = delete;
-
-        SerialStreamBuf& operator=(const SerialStreamBuf&) = delete;
-        SerialStreamBuf& operator=(SerialStreamBuf&&) = delete;
 
     private:
-        class Implementation;
+ 
+        /**
+         * @brief Prevents copying of objects of this class by declaring the copy
+         *        constructor private. This method is never defined.
+         */
+        SerialStreamBuf(const SerialStreamBuf&) = delete;
+
+        /**
+         * @brief Move construction is disallowed.
+         */
+        SerialStreamBuf(SerialStreamBuf&&) = delete;
+
+        /**
+         * @brief Prevents copying of objects of this class by declaring the
+         *        assignment operator private. This method is never defined.
+         */
+        SerialStreamBuf& operator=(const SerialStreamBuf&) = delete;
+
+        /**
+         * @brief Move assignment is not allowed.
+         */
+        SerialStreamBuf& operator=(SerialStreamBuf&&) = delete;
+
+        /**
+         * @brief Pointer to implementation class instance.
+         */
         std::unique_ptr<Implementation> mImpl;
     }; // class SerialStreamBuf
 } // namespace LibSerial
