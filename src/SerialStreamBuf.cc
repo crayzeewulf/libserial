@@ -46,7 +46,7 @@ namespace LibSerial
          * @param filename The name of the serial port to be opened.
          */
         void Open(const string& filename,
-                  ios_base::openmode mode);
+                  ios_base::openmode openMode);
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
@@ -258,10 +258,10 @@ namespace LibSerial
 
     void
     SerialStreamBuf::Open(const string& filename,
-                          ios_base::openmode mode)
+                          ios_base::openmode openMode)
     {
         mImpl->Open(filename,
-                    mode);
+                    openMode);
         return;
     }
 

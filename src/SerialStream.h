@@ -25,7 +25,6 @@
 #include "SerialStreamBuf.h"
 #include "SerialPortConstants.h"
 
-
 namespace LibSerial 
 {
     /**
@@ -96,7 +95,7 @@ namespace LibSerial
          *
          */
         explicit SerialStream(const std::string& fileName, 
-                              std::ios_base::openmode openMode = std::ios::in|std::ios::out);
+                              std::ios_base::openmode openMode = std::ios::in | std::ios::out);
 
         /**
          * @brief Constructor that allows one to create a SerialStream
@@ -248,12 +247,26 @@ namespace LibSerial
     private:
 
         /**
-         * @brief The copy constructor and the assignment operator are
-         *        declared but never defined. This allows the compiler
-         *        to catch any attempts to copy instances of this class.
+         * @brief Prevents copying of objects of this class by declaring the copy
+         *        constructor private. This method is never defined.
          */
-        SerialStream(const SerialStream&);
-        SerialStream& operator=(const SerialStream&);
+        SerialStream(const SerialStream& otherSerialStream) = delete;
+
+        /**
+         * @brief Move construction is disallowed.
+         */
+        SerialStream(const SerialStream&& otherSerialStream) = delete;
+
+        /**
+         * @brief Prevents copying of objects of this class by declaring the
+         *        assignment operator private. This method is never defined.
+         */
+        SerialStream& operator=(const SerialStream& otherSerialStream) = delete;
+
+        /**
+         * @brief Move assignment is not allowed.
+         */
+        SerialStream& operator=(const SerialStream&& otherSerialStream) = delete;
 
         /**
          * @brief The SerialStreamBuffer object that will be used by the

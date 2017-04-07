@@ -62,7 +62,7 @@ namespace LibSerial
          *        name is given as the string <tt>filename</tt> using the
          *        system call <tt>std::open(filename.c_str(), flags)</tt>.
          *        The value of parameter <tt>flags</tt> is obtained from
-         *        the value of the parameter mode. At present, only
+         *        the value of the parameter openMode. At present, only
          *        <tt>ios_base::in</tt> , <tt>ios_base::out</tt> , and
          *        (<tt>ios_base::in|ios_base::out</tt>) make sense for a
          *        serial port and hence all other settings result in the
@@ -73,7 +73,7 @@ namespace LibSerial
          *        <br>
          *
          *        where <tt>u_flags</tt> is obtained from the following
-         *        table depending on the value of the parameter mode:
+         *        table depending on the value of the parameter openMode:
          *
          *        <table align="center">
          *        <tr>
@@ -102,7 +102,7 @@ namespace LibSerial
          *         otherwise.
          */
         void Open(const std::string& filename,
-                  std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out);
+                  std::ios_base::openmode openMode = std::ios_base::in | std::ios_base::out);
 
         /**
          * @brief If IsOpen() == false, returns a null pointer.
