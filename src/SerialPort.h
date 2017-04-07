@@ -30,23 +30,12 @@
 namespace LibSerial 
 {
     /**
-     * @note This class attaches a handler to the SIGIO signal to detect
-     * the data arriving at a serial port. However, this signal handler
-     * will also call any signal handler that is already attached to
-     * this signal. However, if other parts of the application attach a
-     * signal handler to SIGIO after constructing an instance of SIGIO,
-     * they must ensure that they call the existing signal handler.
-     * Otherwise, it may not be possible to receive any data through
-     * the serial port using this class.
-     *
-     * @FIXME: Provide examples of the above potential problem.
-     *
-     * @todo The current implementation does not check if another process
-     * has locked the serial port device and does not lock the serial port
-     * device after opening it. This has been observed to cause problems
-     * while using this library while other programs such as minicom are
-     * also accessing the same device.  It will be useful to lock the
-     * serial port device when it is being used by this class.
+     * @TODO The current implementation does not check if another process
+     *       has locked the serial port device and does not lock the serial port
+     *       device after opening it. This has been observed to cause problems
+     *       while using this library while other programs such as minicom are
+     *       also accessing the same device.  It would be useful to lock the
+     *       serial port device when it is being used by this class.
      */
     class SerialPort
     {
@@ -66,7 +55,7 @@ namespace LibSerial
          * @brief Constructor that allows one to create a SerialPort
          *        instance and also initialize the corresponding serial
          *        port with the specified parameters.
-         * @param serialPortName The file descriptor of the serial stream object.
+         * @param fileName The file descriptor of the serial stream object.
          * @param baudRate The communications baud rate.
          * @param characterSize The size of the character buffer for
          *        storing read/write streams.
@@ -74,7 +63,7 @@ namespace LibSerial
          * @param numberOfStopBits The number of stop bits.
          * @param flowControlType Flow control for the serial data stream.
          */
-        explicit SerialPort(const std::string&   serialPortName,
+        explicit SerialPort(const std::string&   fileName,
                             const BaudRate&      baudRate        = BaudRate::BAUD_DEFAULT,
                             const CharacterSize& characterSize   = CharacterSize::CHAR_SIZE_DEFAULT,
                             const FlowControl&   flowControlType = FlowControl::FLOW_CONTROL_DEFAULT,
@@ -88,9 +77,9 @@ namespace LibSerial
 
         /**
          * @brief Opens the serial port.
-         * @param serialPortName The name of the serial port to be opened.
+         * @param fileName The name of the serial port to be opened.
          */
-        void Open(const std::string& serialPortName);
+        void Open(const std::string& fileName);
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
@@ -386,16 +375,18 @@ namespace LibSerial
         SerialPort& operator=(const SerialPort&& otherSerialPort) = delete;
 
         /**
-         * @brief Forward declaration of the implementation class folowing
+         * @brief Forward declaration of the Implementation class folowing
          *        the PImpl idiom.
          */
         class Implementation;
 
         /**
-         * @brief Pointer to implementation class instance.
+         * @brief Pointer to Implementation class instance.
          */
         std::unique_ptr<Implementation> mImpl;
-    };
-}
+
+    }; // class SerialPort
+    
+} // namespace LibSerial
 
 #endif // #ifndef _SerialPort_h_

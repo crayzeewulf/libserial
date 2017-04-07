@@ -43,7 +43,7 @@ namespace LibSerial
          * @brief Constructor that allows one to create a SerialPort
          *        instance and also initialize the corresponding serial
          *        port with the specified parameters.
-         * @param serialPortName The file descriptor of the serial stream object.
+         * @param fileName The file descriptor of the serial stream object.
          * @param baudRate The communications baud rate.
          * @param characterSize The size of the character buffer for
          *        storing read/write streams.
@@ -51,7 +51,7 @@ namespace LibSerial
          * @param numberOfStopBits The number of stop bits.
          * @param flowControlType Flow control for the serial data stream.
          */
-        Implementation(const std::string&   serialPortName,
+        Implementation(const std::string&   fileName,
                        const BaudRate&      baudRate,
                        const CharacterSize& characterSize,
                        const FlowControl&   flowControlType,
@@ -59,15 +59,15 @@ namespace LibSerial
                        const StopBits&      stopBits);
 
         /**
-         * @brief Destructor.
+         * @brief Default Destructor.
          */
         ~Implementation();
 
         /**
          * @brief Opens the serial port.
-         * @param serialPortName The name of the serial port to be opened.
+         * @param fileName The name of the serial port to be opened.
          */
-        void Open(const std::string& serialPortName);
+        void Open(const std::string& fileName);
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
@@ -341,32 +341,14 @@ namespace LibSerial
         termios mOldPortSettings {};
 
         /**
-         * @brief Circular buffer used to store the received data. This is done
-         *        asynchronously and helps prevent overflow of the corresponding 
-         *        tty's input buffer.
-         * 
-         * @TODO: The size of this buffer is allowed to increase indefinitely. If 
-         *        data keeps arriving at the serial port and is never read then this 
-         *        buffer will continue occupying more and more memory. We need to put a 
-         *        cap on the size of this buffer. It might even be worth providing a 
-         *        method to set the size of this buffer.  
-         */
-        std::queue<unsigned char> mInputBuffer {};
-
-        /**
-         * @brief Mutex to control threaded access to mInputBuffer
-         */
-        pthread_mutex_t mInputBufferMutex {};
-
-        /**
-         * @brief Set the specified modem control line to the specified value. 
+         * @brief Set the specified modem control line to the specified value.
          * @param modemLine One of the following four values: TIOCM_DTR,
          *        TIOCM_RTS, TIOCM_CTS, or TIOCM_DSR.
          * @param lineState State of the modem line after successful
          *        call to this method.
          */
         void SetModemControlLine(const int modemLine,
-                            const bool lineState);
+                                 const bool lineState);
 
         /**
          * @brief Get the current state of the specified modem control line.
@@ -381,23 +363,23 @@ namespace LibSerial
     SerialPort::SerialPort()
         : mImpl(new Implementation())
     {
-        // Empty
+        /* Empty */
     }
 
-    SerialPort::SerialPort(const std::string&   serialPortName,
+    SerialPort::SerialPort(const std::string&   fileName,
                            const BaudRate&      baudRate,
                            const CharacterSize& characterSize,
                            const FlowControl&   flowControlType,
                            const Parity&        parityType,
                            const StopBits&      stopBits)
-        : mImpl(new Implementation(serialPortName,
+        : mImpl(new Implementation(fileName,
                                    baudRate,
                                    characterSize,
                                    flowControlType,
                                    parityType,
                                    stopBits))
     {
-        // Empty
+        /* Empty */
     }
 
     SerialPort::~SerialPort()
@@ -412,9 +394,9 @@ namespace LibSerial
     }
 
     void
-    SerialPort::Open(const std::string& serialPortName)
+    SerialPort::Open(const std::string& fileName)
     {
-        mImpl->Open(serialPortName);
+        mImpl->Open(fileName);
         return;
     }
 
@@ -666,17 +648,11 @@ namespace LibSerial
     SerialPort::Implementation::Implementation()
         : mFileDescriptor(-1)
     {
-        //Initializing the mutex
-        if (pthread_mutex_init(&mInputBufferMutex, NULL) != 0)
-        {
-            throw std::runtime_error(ERR_MSG_PTHREAD_MUTEX_ERROR);
-        }
-
-        return;
+        /* empty */
     }
 
     inline
-    SerialPort::Implementation::Implementation(const std::string&   serialPortName,
+    SerialPort::Implementation::Implementation(const std::string&   fileName,
                                                const BaudRate&      baudRate,
                                                const CharacterSize& characterSize,
                                                const FlowControl&   flowControlType,
@@ -684,13 +660,7 @@ namespace LibSerial
                                                const StopBits&      stopBits)
         : mFileDescriptor(-1)
     {
-        //Initializing the mutex
-        if (pthread_mutex_init(&mInputBufferMutex, NULL) != 0)
-        {
-            throw std::runtime_error(ERR_MSG_PTHREAD_MUTEX_ERROR);
-        }
-
-        this->Open(serialPortName);
+        this->Open(fileName);
         this->SetBaudRate(baudRate);
         this->SetCharacterSize(characterSize);
         this->SetFlowControl(flowControlType);
@@ -714,7 +684,7 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::Open(const std::string& serialPortName)
+    SerialPort::Implementation::Open(const std::string& fileName)
     {
         // Throw an exception if the port is already open.
         if (this->IsOpen())
@@ -729,17 +699,17 @@ namespace LibSerial
         flags = (O_RDWR | O_NOCTTY | O_NONBLOCK);
         
         // Try to open the serial port. 
-        mFileDescriptor = open(serialPortName.c_str(), flags);
+        mFileDescriptor = open(fileName.c_str(), flags);
         
-        if (mFileDescriptor < 0)
+        if (this->mFileDescriptor < 0)
         {
-            close(mFileDescriptor);
+            close(this->mFileDescriptor);
             throw OpenFailed(strerror(errno));
         }
 
         // Save the current settings of the serial port so they can be
         // restored when the serial port is closed.
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &mOldPortSettings) < 0)
         {
             throw OpenFailed(strerror(errno));
@@ -762,7 +732,7 @@ namespace LibSerial
         port_settings.c_cc[VTIME] = 0;
 
         // Apply the modified settings.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
@@ -770,7 +740,7 @@ namespace LibSerial
         }
 
         // Flush the input and output buffers associated with the port.
-        if (tcflush(mFileDescriptor,
+        if (tcflush(this->mFileDescriptor,
                     TCIOFLUSH) < 0)
         {
             throw OpenFailed(strerror(errno));
@@ -793,19 +763,22 @@ namespace LibSerial
         }
 
         // Restore the old settings of the port.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &mOldPortSettings) < 0)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::runtime_error(strerror(errno));
         }
 
-        // Close the serial port file descriptor.
-        close(mFileDescriptor);
+        // Otherwise, close the serial port and set the file descriptor
+        // to an invalid value.
+        if (close(this->mFileDescriptor) < 0) 
+        {
+            throw std::runtime_error(strerror(errno));
+        } 
 
         // Set the file descriptor to an invalid value, -1. 
         mFileDescriptor = -1;
-
         return;
     }
 
@@ -820,7 +793,7 @@ namespace LibSerial
     void
     SerialPort::Implementation::InitializeSerialPort()
     {
-        // Make sure that the serial port is open.
+        // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -849,9 +822,9 @@ namespace LibSerial
         // Allow all further communications to happen in blocking mode.
         flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
         
-        if (fcntl( this->mFileDescriptor, 
-                         F_SETFL, 
-                         flags & ~O_NONBLOCK) < 0)
+        if (fcntl(this->mFileDescriptor, 
+                  F_SETFL, 
+                  flags & ~O_NONBLOCK) < 0)
         {
             throw std::runtime_error(strerror(errno));
         }
@@ -929,7 +902,7 @@ namespace LibSerial
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
-        
+
         // Get the current serial port settings.
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
@@ -942,10 +915,10 @@ namespace LibSerial
 
         // Set the baud rate for both input and output.
         if (cfsetspeed(&port_settings, (speed_t)baudRate) < 0 ||
-            cfsetospeed(&port_settings, (speed_t)baudRate) < 0 )
+            cfsetospeed(&port_settings, (speed_t)baudRate) < 0)
         {
             // If applying the baud rate settings fail, throw an exception.
-            throw UnsupportedBaudRate(ERR_MSG_UNSUPPORTED_BAUD_RATE);
+            throw std::runtime_error(ERR_MSG_INVALID_BAUD_RATE);
         }
 
         // Apply the modified settings.
@@ -953,7 +926,8 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw UnsupportedBaudRate(strerror(errno));
+            // If applying the settings fails, throw an exception.
+            throw std::runtime_error(strerror(errno));
         }
 
         return;
@@ -987,12 +961,12 @@ namespace LibSerial
         // equal. Otherwise, we do not know which one to return.
         if (input_baud != output_baud)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(ERR_MSG_INVALID_BAUD_RATE);
             return BaudRate::BAUD_INVALID;
         }
 
         // Obtain the input baud rate from the current settings.
-        return BaudRate(cfgetispeed(&port_settings));
+        return BaudRate(input_baud);
     }
 
     inline
@@ -1012,7 +986,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(ERR_MSG_INVALID_CHARACTER_SIZE);
         }
 
         // Set the character size to the specified value. If the character
@@ -1033,15 +1007,15 @@ namespace LibSerial
         }
 
         // Set the character size.
-        port_settings.c_cflag &= ~CSIZE;
-        port_settings.c_cflag |= (tcflag_t)characterSize;
+        port_settings.c_cflag &= ~CSIZE;                               // Clear all CSIZE bits.
+        port_settings.c_cflag |= static_cast<tcflag_t>(characterSize); // Set the character size.
 
         // Apply the modified settings.
         if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::runtime_error(strerror(errno));
         }
 
         return;
@@ -1095,7 +1069,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(ERR_MSG_INVALID_FLOW_CONTROL);
         }
 
         // Set the flow control. Hardware flow control uses the RTS (Ready
@@ -1129,7 +1103,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::runtime_error(strerror(errno));
         }
 
         return;
@@ -1232,7 +1206,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::runtime_error(strerror(errno));
         }
 
         return;
@@ -1276,7 +1250,7 @@ namespace LibSerial
             return Parity::PARITY_NONE; // no parity.
         }
 
-        return Parity::PARITY_INVALID; // execution should never reach here. 
+        return Parity::PARITY_INVALID; // execution should never reach here.
     }
 
     inline
@@ -1318,7 +1292,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::runtime_error(strerror(errno));
         }
 
         return;
@@ -1388,7 +1362,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::runtime_error(strerror(errno));
         }
 
         return;
@@ -1449,7 +1423,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::runtime_error(strerror(errno));
         }
 
         return;
@@ -1576,7 +1550,7 @@ namespace LibSerial
             }
 
             // Sleep for 1ms (1000us) for data to arrive.
-            usleep(MICROSECONDS_PER_MS);
+            usleep(1000);
         }
 
         return;
@@ -1791,9 +1765,6 @@ namespace LibSerial
             throw std::runtime_error(strerror(errno));
         }
 
-        const int MICROSECONDS_PER_MS  = 1000;
-        const int MILLISECONDS_PER_SEC = 1000;
-
         while (next_char != lineTerminator)
         {
             // Throw an exception if we are unable to read the current time.
@@ -1898,7 +1869,7 @@ namespace LibSerial
         }
 
         this->Write(reinterpret_cast<const unsigned char*>(dataString.c_str()),
-                     dataString.length());
+                    dataString.length());
         return;
     }
 

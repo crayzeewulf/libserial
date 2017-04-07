@@ -24,25 +24,13 @@
 #include <cassert>
 #include <termios.h>
 
-
 using namespace LibSerial;
 
 SerialStream::SerialStream()
-    : std::iostream(0), mIOBuffer(0)
+    : std::iostream(0)
+    , mIOBuffer(0)
 {
-    // Close the stream
-    Close();
-}
-
-
-SerialStream::~SerialStream() 
-{
-    // If a SerialStreamBuf is associated with this SerialStream
-    // then we need to destroy it here.
-    if (mIOBuffer)
-    {
-        delete mIOBuffer;
-    }
+    /* Empty */
 }
 
 SerialStream::SerialStream(const std::string& fileName,
@@ -72,12 +60,25 @@ SerialStream::SerialStream(const std::string&   fileName,
     return;
 }
 
+SerialStream::~SerialStream() 
+{
+    // If a SerialStreamBuf is associated with this SerialStream
+    // then we need to destroy it here.
+    if (mIOBuffer)
+    {
+        delete mIOBuffer;
+    }
+
+    // Close the stream
+    Close();
+}
+
 void
 SerialStream::Open(const std::string& fileName,
                    std::ios_base::openmode openMode)
 {
     // Create a new SerialStreamBuf if one does not exist. 
-    if (! mIOBuffer)
+    if (!mIOBuffer)
     {
         mIOBuffer = new SerialStreamBuf;
         assert(0 != mIOBuffer);
@@ -106,7 +107,7 @@ SerialStream::IsOpen()
 {
     // Checks to see if mIOBuffer is a null buffer, if not, calls
     // the IsOpen() function on this streams SerialStreamBuf mIOBuffer
-    if (! mIOBuffer)
+    if (!mIOBuffer)
     {
         return false;
     }

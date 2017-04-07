@@ -49,28 +49,28 @@ namespace LibSerial
      *
      *        Make sure you read the documentation of the standard fstream
      *        template before using this class because most of the
-     *        functionality is inherited from fstream. Also a lot of
+     *        functionality is inherited from fstream. Also, a lot of
      *        information about the various system calls used in the
      *        implementation can also be found in the Single Unix
      *        Specification (Version 2). A copy of this document can be
      *        obtained from <a href="http://www.UNIX-systems.org/">
      *        http://www.UNIX-systems.org/</a>. We will refer to this
      *        document as SUS-2.
-     *
-     * @author $Author: crayzeewulf 
-     *         $ <A HREF="pagey@gnudom.org">Manish P. Pagey</A>
-     * @version $Id: SerialStream.h,v 1.5 2004/05/06 18:32:02 crayzeewulf
      */
     class SerialStream : public std::iostream 
     {
     public:
-        /**------------------------------------------------------------
-         * Public Static Members
-         * ------------------------------------------------------------
-         */
 
         /**
-         * @brief This constructor takes a filename and an openmode to
+         * @brief Default Contructor.
+         *        Creates a new SerialStream object but does not open it.
+         *        The Open() method will need to be called explicitly on
+         *        the object to communicate with the serial port.
+         */
+        explicit SerialStream();
+  
+        /**
+         * @brief Constructor that takes a filename and an openmode to
          *        construct a SerialStream object. This results in a
          *        call to basic_fstream::open(s,mode). This is the only
          *        way to contruct an object of this class. We have to
@@ -122,24 +122,12 @@ namespace LibSerial
                      const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT);
 
         /**
-         * @brief Default Contructor.  Creates a new SerialStream object
-         *        but does not open it.
-         *        The Open() method will need to be called explicitly on
-         *        the object to communicate with the serial port.
-         */
-        explicit SerialStream();
-  
-        /**
-         * @brief Default Destructor. Closes the stream associated with
-         *        mFileDescriptor. Remaining actions are accomplished by
-         *        the fstream destructor.
+         * @brief Default Destructor.
+         *        Closes the stream associated with mFileDescriptor.
+         *        Remaining actions are accomplished by the fstream destructor.
          */
         virtual ~SerialStream(); 
 
-        /* -----------------------------------------------------------------
-         * Other Public Methods
-         * -----------------------------------------------------------------
-         */
         /**
          * @brief Opens the serial port associated with the specified
          *        filename, and the specified mode, mode.
@@ -255,22 +243,9 @@ namespace LibSerial
          */
         short GetVTime();
 
-        //-------------------------------------------------------------
-        //      Friends
-        //-------------------------------------------------------------
-
     protected:
-        //-------------------------------------------------------------
-        //      Protected Data Members
-        //-------------------------------------------------------------
 
-        //-------------------------------------------------------------
-        //      Protected Methods
-        //-------------------------------------------------------------
     private:
-        //-------------------------------------------------------------
-        //      Private Data Members
-        //-------------------------------------------------------------
 
         /**
          * @brief The copy constructor and the assignment operator are
@@ -285,30 +260,6 @@ namespace LibSerial
          *        stream to communicate with the serial port.
          */
         SerialStreamBuf *mIOBuffer;
-
-        //------------------------------------------------------------
-        //      Private Methods
-        //------------------------------------------------------------
-        
-        /**
-         * @brief Sets the serial port to ignore the modem status lines.
-         *        If the specified boolean parameter is false then the
-         *        meaning of this function is reversed i.e. the serial
-         *        port will start using the modem status lines.
-         *
-         *  @param ignore If true then the modem status lines will be
-         *  ignored otherwise they will be used during the
-         *  communication.
-         */
-        // void IgnoreModemStatusLines(bool ignore=true);
-
-        /**
-         * @brief Enables the serial port receiver. This will allow us to
-         *        read data from the serial port.
-         * @param enable The received will be enabled iff true, otherwise
-         *        it will be disabled.
-         */
-        // void EnableReceiver(bool enable=true);
 
     }; // class SerialStream
 

@@ -24,8 +24,7 @@
 #include "SerialPortConstants.h"
 #include <memory>
 
-
-namespace LibSerial 
+namespace LibSerial
 {
     /**
      * @brief This is the streambuf subclass used by SerialStream. This
@@ -52,7 +51,7 @@ namespace LibSerial
         explicit SerialStreamBuf();
 
         /**
-         *  @brief Default Destructor.  
+         *  @brief Default Destructor.
          */
         virtual ~SerialStreamBuf();
 
@@ -140,9 +139,8 @@ namespace LibSerial
          * @brief This routine is called by open() in order to
          *        initialize some parameters of the serial port and
          *        setting its parameters to default values.
-         * @return -1 on failure and some other value on success. 
          */
-        int InitializeSerialPort();
+        void InitializeSerialPort();
 
         /**
          * @brief Initializes the serial communication parameters to their
@@ -232,7 +230,7 @@ namespace LibSerial
 
         /** 
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
-         * @return Returns the character buffer timeout for non-canonical reads in deciseconds. 
+         * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
          */
         short GetVTime();
 
@@ -240,7 +238,7 @@ namespace LibSerial
     protected:
 
         /**
-         * @brief Forward declaration of the implementation class folowing
+         * @brief Forward declaration of the Implementation class folowing
          *        the PImpl idiom.
          */
         class Implementation;
@@ -264,8 +262,7 @@ namespace LibSerial
 
         /**
          * @brief Writes up to n characters from the character sequence at 
-         *        char s to the serial port associated with the buffer. 
-         *
+         *        char s to the serial port associated with the buffer.
          * @return Returns the number of characters that were successfully
          *         written to the serial port. 
          */
@@ -317,7 +314,7 @@ namespace LibSerial
         virtual int_type pbackfail(const int_type character = traits_type::eof()) override;
 
         /**
-         * @brief Checks wether input is available on the port.
+         * @brief Checks whether input is available on the port.
          *        If you call \c SerialStream::in_avail, this method will
          *        be called to check for available input.
          *        \code
@@ -327,6 +324,8 @@ namespace LibSerial
          *            ...
          *        }
          *        \endcode
+         * @return Returns 1 if characters are available at the serial port,
+         *         0 if no characters are available, and -1 if unsuccessful.
          */
         virtual std::streamsize showmanyc() override;
 
@@ -336,29 +335,31 @@ namespace LibSerial
          * @brief Prevents copying of objects of this class by declaring the copy
          *        constructor private. This method is never defined.
          */
-        SerialStreamBuf(const SerialStreamBuf&) = delete;
+        SerialStreamBuf(const SerialStreamBuf& otherSerialPort) = delete;
 
         /**
          * @brief Move construction is disallowed.
          */
-        SerialStreamBuf(SerialStreamBuf&&) = delete;
+        SerialStreamBuf(const SerialStreamBuf&& otherSerialPort) = delete;
 
         /**
          * @brief Prevents copying of objects of this class by declaring the
          *        assignment operator private. This method is never defined.
          */
-        SerialStreamBuf& operator=(const SerialStreamBuf&) = delete;
+        SerialStreamBuf& operator=(const SerialStreamBuf& otherSerialPort) = delete;
 
         /**
          * @brief Move assignment is not allowed.
          */
-        SerialStreamBuf& operator=(SerialStreamBuf&&) = delete;
+        SerialStreamBuf& operator=(const SerialStreamBuf&& otherSerialPort) = delete;
 
         /**
-         * @brief Pointer to implementation class instance.
+         * @brief Pointer to Implementation class instance.
          */
         std::unique_ptr<Implementation> mImpl;
+
     }; // class SerialStreamBuf
+
 } // namespace LibSerial
 
 #endif // #ifndef _SerialStreamBuf_h_
