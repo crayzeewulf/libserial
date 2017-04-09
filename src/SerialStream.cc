@@ -62,13 +62,13 @@ SerialStream::SerialStream(const std::string&   fileName,
 
 SerialStream::~SerialStream() 
 {
-    // If a SerialStreamBuf is associated with this SerialStream
-    // we need to destroy it.
-    if (mIOBuffer)
+    // Close the serial stream if it is open.
+    if (this->IsOpen())
     {
-        delete mIOBuffer;
-        mIOBuffer = 0;
+        this->Close();
     }
+
+    return;
 }
 
 void
@@ -88,7 +88,7 @@ SerialStream::Open(const std::string& fileName,
     return;
 }
 
-void 
+void
 SerialStream::Close()
 {
     // If a SerialStreamBuf is associated with this SerialStream
@@ -100,7 +100,6 @@ SerialStream::Close()
     }
 
     return;
-
 }
 
 bool
@@ -143,7 +142,7 @@ SerialStream::SetBaudRate(const BaudRate& baudRate)
 }
 
 BaudRate
-SerialStream::GetBaudRate() 
+SerialStream::GetBaudRate()
 {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
 
