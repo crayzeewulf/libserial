@@ -63,14 +63,13 @@ SerialStream::SerialStream(const std::string&   fileName,
 SerialStream::~SerialStream() 
 {
     // If a SerialStreamBuf is associated with this SerialStream
-    // then we need to destroy it here.
+    // we need to destroy it.
     if (mIOBuffer)
     {
+        mIOBuffer->Close();
         delete mIOBuffer;
+        mIOBuffer = 0;
     }
-
-    // Close the stream
-    Close();
 }
 
 void
@@ -93,20 +92,23 @@ SerialStream::Open(const std::string& fileName,
 void 
 SerialStream::Close()
 {
-    // If a SerialStreamBuf is associated with the SerialStream then
-    // destroy it.
+    // If a SerialStreamBuf is associated with this SerialStream
+    // we need to destroy it.
     if (mIOBuffer)
     {
+        mIOBuffer->Close();
         delete mIOBuffer;
         mIOBuffer = 0;
     }
+
+    return;
 }
 
 bool
 SerialStream::IsOpen()
 {
     // Checks to see if mIOBuffer is a null buffer, if not, calls
-    // the IsOpen() function on this streams SerialStreamBuf mIOBuffer
+    // the IsOpen() function on this stream's SerialStreamBuf mIOBuffer
     if (!mIOBuffer)
     {
         return false;
