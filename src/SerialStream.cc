@@ -66,7 +66,6 @@ SerialStream::~SerialStream()
     // we need to destroy it.
     if (mIOBuffer)
     {
-        mIOBuffer->Close();
         delete mIOBuffer;
         mIOBuffer = 0;
     }
@@ -96,12 +95,12 @@ SerialStream::Close()
     // we need to destroy it.
     if (mIOBuffer)
     {
-        mIOBuffer->Close();
         delete mIOBuffer;
         mIOBuffer = 0;
     }
 
     return;
+
 }
 
 bool
