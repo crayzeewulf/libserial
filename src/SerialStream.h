@@ -129,7 +129,7 @@ namespace LibSerial
 
         /**
          * @brief Opens the serial port associated with the specified
-         *        filename, and the specified mode, mode.
+         *        fileName, and the specified mode, openMode.
          * @param fileName The file descriptor of the serial stream object.
          * @param openMode The communication mode status when the serial
          *        communication port is opened.

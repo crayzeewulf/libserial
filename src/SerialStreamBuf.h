@@ -56,75 +56,18 @@ namespace LibSerial
         virtual ~SerialStreamBuf();
 
         /**
-         * @brief If IsOpen() != <tt>false</tt>, returns a null
-         *        pointer. Otherwise, initializes the <tt>streambuf</tt>
-         *        as required. It then opens a file, if possible, whose
-         *        name is given as the string <tt>filename</tt> using the
-         *        system call <tt>std::open(filename.c_str(), flags)</tt>.
-         *        The value of parameter <tt>flags</tt> is obtained from
-         *        the value of the parameter openMode. At present, only
-         *        <tt>ios_base::in</tt> , <tt>ios_base::out</tt> , and
-         *        (<tt>ios_base::in|ios_base::out</tt>) make sense for a
-         *        serial port and hence all other settings result in the
-         *        call to fail. The value of <tt>flags</tt> is obtained as:
-         *        <br>
-         *
-         *        <tt>flags = u_flags | O_NOCTTY</tt>
-         *        <br>
-         *
-         *        where <tt>u_flags</tt> is obtained from the following
-         *        table depending on the value of the parameter openMode:
-         *
-         *        <table align="center">
-         *        <tr>
-         *        <td> <b><tt>in</tt></b>      </td>
-         *        <td> <b><tt>out</tt></b>     </td>
-         *        <td> <b><tt>u_flags</tt></b> </td>
-         *        </tr>
-         *        <tr>
-         *        <td> + </td>
-         *        <td> </td>
-         *        <td> <tt>O_RDONLY</tt> </td>
-         *        </tr>
-         *        <tr>
-         *        <td> </td>
-         *        <td> + </td>
-         *        <td> <tt>O_WRONLY</tt> </td>
-         *        </tr>
-         *        <tr>
-         *        <td> + </td>
-         *        <td> + </td>
-         *        <td> <tt>O_RDWR</tt> </td>
-         *        </tr>
-         *        </table>
-         *
-         * @return Returns <tt>this</tt> on success, a null pointer
-         *         otherwise.
+         * @brief Opens the serial port associated with the specified
+         *        fileName, and the specified mode, openMode.
+         * @param fileName The file descriptor of the serial stream object.
+         * @param openMode The communication mode status when the serial
+         *        communication port is opened.
          */
         void Open(const std::string& filename,
                   std::ios_base::openmode openMode = std::ios_base::in | std::ios_base::out);
 
         /**
-         * @brief If IsOpen() == false, returns a null pointer.
-         *        If a put area exists, calls overflow(EOF) to flush
-         *        characters. Finally it closes the file by calling 
-         *        <tt>std::close(mFileDescriptor)</tt> where
-         *        mFileDescriptor is the value returned by the last call
-         *        to Open().
-         *
-         *        For the implementation of the corresponding function in
-         *        class filebuf, if the last virtual member function called
-         *        on <tt>*this</tt> (between underflow, overflow,
-         *        <tt>seekoff</tt>, and <tt>seekpos</tt>) was overflow then
-         *        it calls <tt>a_codecvt.unshift</tt> (possible several
-         *        times) to determine a termination sequence, inserts those
-         *        characters and calls overflow(EOF) again. However,
-         *        <b>this is not implemented here yet</b>.
-         *
-         *        <b>Postcondition</b>: IsOpen() == <tt>false<tt>
-         *
-         * @return Returns <tt>this</tt> on success, a null pointer
-         *         otherwise.
+         * @brief Closes the serial port. All settings of the serial port will be
+         *        lost and no more I/O can be performed on the serial port.
          */
         void Close();
 

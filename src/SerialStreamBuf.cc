@@ -24,8 +24,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-using namespace std;
-
 namespace LibSerial
 {
     class SerialStreamBuf::Implementation
@@ -42,11 +40,14 @@ namespace LibSerial
         ~Implementation();
 
         /**
-         * @brief Opens the serial port.
-         * @param filename The name of the serial port to be opened.
+         * @brief Opens the serial port associated with the specified
+         *        fileName, and the specified mode, openMode.
+         * @param fileName The file descriptor of the serial stream object.
+         * @param openMode The communication mode status when the serial
+         *        communication port is opened.
          */
-        void Open(const string& filename,
-                  ios_base::openmode openMode);
+        void Open(const std::string& filename,
+                  std::ios_base::openmode openMode);
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
@@ -163,7 +164,7 @@ namespace LibSerial
          * @return Returns the number of characters that were successfully
          *         written to the serial port. 
          */
-        streamsize xsputn(const char_type *s, streamsize n);
+        std::streamsize xsputn(const char_type *s, std::streamsize n);
 
         /**
          * @brief Reads up to n characters from the serial port and returns
@@ -171,14 +172,14 @@ namespace LibSerial
          * @return Returns the number of characters actually read from the
          *         serial port. 
          */
-        streamsize xsgetn(char_type *s, streamsize n);
+        std::streamsize xsgetn(char_type *s, std::streamsize n);
 
         /**
          * @brief Writes the specified character to the associated serial port.
          * @param character The character to be written to the serial port.
          * @return Returns the character. 
          */
-        streambuf::int_type overflow(const int_type c);
+        std::streambuf::int_type overflow(const int_type c);
 
         /**
          * @brief Reads and returns the next character from the associated
@@ -187,7 +188,7 @@ namespace LibSerial
          *        for unbuffered I/O.
          * @return Returns the next character from the serial port.
          */
-        streambuf::int_type underflow();
+        std::streambuf::int_type underflow();
 
         /**
          * @brief Reads and returns the next character from the associated
@@ -196,7 +197,7 @@ namespace LibSerial
          *        called for unbuffered I/O.
          * @return Returns the next character from the serial port.
          */
-        streambuf::int_type uflow();
+        std::streambuf::int_type uflow();
 
         /**
          * @brief This function is called when a putback of a character
@@ -206,14 +207,14 @@ namespace LibSerial
          * @param character The character to putback.
          * @return Returns The character iff successful, otherwise eof to signal an error.
          */
-        streambuf::int_type pbackfail(const int_type c);
+        std::streambuf::int_type pbackfail(const int_type c);
 
         /**
          * @brief Checks whether input is available on the port.
          * @return Returns 1 if characters are available at the serial port,
          *         0 if no characters are available, and -1 if unsuccessful.
          */
-        streamsize  showmanyc();
+        std::streamsize  showmanyc();
 
         /** 
          * @brief The file descriptor associated with the serial port.
@@ -257,8 +258,8 @@ namespace LibSerial
     }
 
     void
-    SerialStreamBuf::Open(const string& filename,
-                          ios_base::openmode openMode)
+    SerialStreamBuf::Open(const std::string& filename,
+                          std::ios_base::openmode openMode)
     {
         mImpl->Open(filename,
                     openMode);
@@ -391,24 +392,24 @@ namespace LibSerial
     }
 
     std::streamsize
-    SerialStreamBuf::xsputn(const char_type *s, streamsize n)
+    SerialStreamBuf::xsputn(const char_type *s, std::streamsize n)
     {
         return mImpl->xsputn(s, n);
     }
 
     std::streamsize
-    SerialStreamBuf::xsgetn(char_type *s, streamsize n)
+    SerialStreamBuf::xsgetn(char_type *s, std::streamsize n)
     {
         return mImpl->xsgetn(s, n);
     }
 
-    streambuf::int_type
+    std::streambuf::int_type
     SerialStreamBuf::overflow(const int_type character)
     {
         return mImpl->overflow(character);
     }
 
-    streambuf::int_type
+    std::streambuf::int_type
     SerialStreamBuf::underflow()
     {
         return mImpl->underflow();
@@ -420,7 +421,7 @@ namespace LibSerial
         return mImpl->uflow();
     }
 
-    streambuf::int_type
+    std::streambuf::int_type
     SerialStreamBuf::pbackfail(const int_type character)
     {
         return mImpl->pbackfail(character);
@@ -457,8 +458,8 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::Open(const string& filename,
-                                          ios_base::openmode mode)
+    SerialStreamBuf::Implementation::Open(const std::string& filename,
+                                          std::ios_base::openmode openMode)
     {
         // Throw an exception if the port is already open.
         if (this->IsOpen())
@@ -471,15 +472,15 @@ namespace LibSerial
         // Since we are dealing with the serial port we need to use the O_NOCTTY option.
         int flags;
         
-        if (mode == (ios_base::in | ios_base::out))
+        if (openMode == (std::ios_base::in | std::ios_base::out))
         {
             flags = (O_RDWR | O_NOCTTY | O_NONBLOCK);
         } 
-        else if (mode == ios_base::in)
+        else if (openMode == std::ios_base::in)
         {
             flags = (O_RDONLY | O_NOCTTY | O_NONBLOCK);
         } 
-        else if (mode == ios_base::out)
+        else if (openMode == std::ios_base::out)
         {
             flags = (O_WRONLY | O_NOCTTY | O_NONBLOCK);
         } 
@@ -1243,9 +1244,9 @@ namespace LibSerial
     }
 
     inline
-    streamsize
+    std::streamsize
     SerialStreamBuf::Implementation::xsputn(const char_type *s,
-                                            streamsize n) 
+                                            std::streamsize n) 
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1273,9 +1274,9 @@ namespace LibSerial
     }
 
     inline
-    streamsize
+    std::streamsize
     SerialStreamBuf::Implementation::xsgetn(char_type *s,
-                                            streamsize n)
+                                            std::streamsize n)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1341,7 +1342,7 @@ namespace LibSerial
     }
 
     inline
-    streambuf::int_type
+    std::streambuf::int_type
     SerialStreamBuf::Implementation::overflow(const int_type character)
     {
         // Throw an exception if the serial port is not open.
@@ -1374,7 +1375,7 @@ namespace LibSerial
     }
 
     inline
-    streambuf::int_type
+    std::streambuf::int_type
     SerialStreamBuf::Implementation::underflow()
     {
         // Throw an exception if the serial port is not open.
@@ -1426,7 +1427,7 @@ namespace LibSerial
     }
 
     inline
-    streambuf::int_type
+    std::streambuf::int_type
     SerialStreamBuf::Implementation::uflow()
     {
         // Throw an exception if the serial port is not open.
@@ -1441,7 +1442,7 @@ namespace LibSerial
     }
 
     inline
-    streambuf::int_type
+    std::streambuf::int_type
     SerialStreamBuf::Implementation::pbackfail(const int_type character) 
     {
         // Throw an exception if the serial port is not open.

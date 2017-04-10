@@ -76,10 +76,14 @@ namespace LibSerial
         virtual ~SerialPort() noexcept;
 
         /**
-         * @brief Opens the serial port.
-         * @param fileName The name of the serial port to be opened.
+         * @brief Opens the serial port associated with the specified
+         *        fileName, and the specified mode, openMode.
+         * @param fileName The file descriptor of the serial stream object.
+         * @param openMode The communication mode status when the serial
+         *        communication port is opened.
          */
-        void Open(const std::string& fileName);
+        void Open(const std::string& fileName,
+                  std::ios_base::openmode openMode = std::ios_base::in | std::ios_base::out);
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be

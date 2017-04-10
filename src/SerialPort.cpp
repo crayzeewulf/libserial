@@ -64,10 +64,14 @@ namespace LibSerial
         ~Implementation();
 
         /**
-         * @brief Opens the serial port.
-         * @param fileName The name of the serial port to be opened.
+         * @brief Opens the serial port associated with the specified
+         *        fileName, and the specified mode, openMode.
+         * @param fileName The file descriptor of the serial stream object.
+         * @param openMode The communication mode status when the serial
+         *        communication port is opened.
          */
-        void Open(const std::string& fileName);
+        void Open(const std::string& filename,
+                  std::ios_base::openmode openMode);
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
@@ -394,9 +398,11 @@ namespace LibSerial
     }
 
     void
-    SerialPort::Open(const std::string& fileName)
+    SerialPort::Open(const std::string& filename,
+                     std::ios_base::openmode openMode)
     {
-        mImpl->Open(fileName);
+        mImpl->Open(filename,
+                    openMode);
         return;
     }
 
@@ -660,7 +666,7 @@ namespace LibSerial
                                                const StopBits&      stopBits)
         : mFileDescriptor(-1)
     {
-        this->Open(fileName);
+        this->Open(fileName, std::ios_base::in | std::ios_base::out);
         this->SetBaudRate(baudRate);
         this->SetCharacterSize(characterSize);
         this->SetFlowControl(flowControlType);
@@ -684,7 +690,8 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::Open(const std::string& fileName)
+    SerialPort::Implementation::Open(const std::string& filename,
+                                     std::ios_base::openmode openMode)
     {
         // Throw an exception if the port is already open.
         if (this->IsOpen())
@@ -692,14 +699,30 @@ namespace LibSerial
             throw AlreadyOpen(ERR_MSG_PORT_ALREADY_OPEN);
         }
 
-        // Try to open the serial port and throw an exception if we are
-        // not able to open it.
-
+        // We only allow three different combinations of ios_base::openmode so we can
+        // use a switch here to construct the flags to be used with the open() system call.
+        // Since we are dealing with the serial port we need to use the O_NOCTTY option.
         int flags;
-        flags = (O_RDWR | O_NOCTTY | O_NONBLOCK);
         
+        if (openMode == (std::ios_base::in | std::ios_base::out))
+        {
+            flags = (O_RDWR | O_NOCTTY | O_NONBLOCK);
+        } 
+        else if (openMode == std::ios_base::in)
+        {
+            flags = (O_RDONLY | O_NOCTTY | O_NONBLOCK);
+        } 
+        else if (openMode == std::ios_base::out)
+        {
+            flags = (O_WRONLY | O_NOCTTY | O_NONBLOCK);
+        } 
+        else 
+        {
+            return;
+        }
+
         // Try to open the serial port. 
-        mFileDescriptor = open(fileName.c_str(), flags);
+        mFileDescriptor = open(filename.c_str(), flags);
         
         if (this->mFileDescriptor < 0)
         {
@@ -746,7 +769,7 @@ namespace LibSerial
             throw OpenFailed(strerror(errno));
         }
 
-        // Initialize the serial port. 
+        // Initialize the serial port.
         InitializeSerialPort();
 
         return;
