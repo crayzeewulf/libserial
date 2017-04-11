@@ -188,6 +188,21 @@ namespace LibSerial
         bool IsDataAvailable();
 
         /**
+         * @brief Flushes the serial port input buffer.
+         */
+        void FlushInputBuffer();
+
+        /**
+         * @brief Flushes the serial port output buffer.
+         */
+        void FlushOutputBuffer();
+
+        /**
+         * @brief Flushes the serial port input and output buffers.
+         */
+        void FlushIOBuffers();
+
+        /**
          * @brief Reads the specified number of bytes from the serial port.
          *        The method will timeout if no data is received in the specified
          *        number of milliseconds (msTimeout). If msTimeout is 0, then
@@ -532,6 +547,27 @@ namespace LibSerial
     }
 
     void
+    SerialPort::FlushInputBuffer()
+    {
+        mImpl->FlushInputBuffer();
+        return;
+    }
+
+    void
+    SerialPort::FlushOutputBuffer()
+    {
+        mImpl->FlushOutputBuffer();
+        return;
+    }
+
+    void
+    SerialPort::FlushIOBuffers()
+    {
+        mImpl->FlushIOBuffers();
+        return;
+    }
+
+    void
     SerialPort::Read(SerialPort::DataBuffer& dataBuffer,
                      const unsigned int      numberOfBytes,
                      const unsigned int      msTimeout)
@@ -628,7 +664,6 @@ namespace LibSerial
     {
         return mImpl->GetRts();
     }
-
 
     bool
     SerialPort::GetCts()
@@ -1498,6 +1533,50 @@ namespace LibSerial
         }
 
         return dataAvailableStatus;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::FlushInputBuffer()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        tcflush(this->mFileDescriptor, TCIFLUSH);
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::FlushOutputBuffer()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+
+        tcflush(this->mFileDescriptor, TCOFLUSH);
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::FlushIOBuffers()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        
+        tcflush(this->mFileDescriptor, TCIOFLUSH);
+        return;
     }
 
     inline

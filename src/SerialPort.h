@@ -174,7 +174,6 @@ namespace LibSerial
          * @brief Sets the minimum number of characters for non-canonical reads.
          * @note See VMIN in man termios(3).
          * @param vMin the number of minimum characters to be set.
-         * @return Returns the minimum number of charcters set.
          */
         void SetVMin(const short vmin);
 
@@ -204,6 +203,21 @@ namespace LibSerial
          * @return Returns true iff data is available to read.
          */
         bool IsDataAvailable();
+
+        /**
+         * @brief Flushes the serial port input buffer.
+         */
+        void FlushInputBuffer();
+
+        /**
+         * @brief Flushes the serial port output buffer.
+         */
+        void FlushOutputBuffer();
+
+        /**
+         * @brief Flushes the serial port input and output buffers.
+         */
+        void FlushIOBuffers();
 
         /**
          * @brief Reads the specified number of bytes from the serial port.

@@ -477,6 +477,54 @@ protected:
         ASSERT_FALSE(serialPort2.IsOpen());
     }
 
+    void testSerialPortFlushDataBuffers()
+    {
+        serialPort1.Open(TEST_SERIAL_PORT_1);
+        ASSERT_TRUE(serialPort1.IsOpen());
+
+        serialPort1.FlushInputBuffer();
+        ASSERT_FALSE(serialPort1.IsDataAvailable());
+
+        writeByte = 'A';
+        serialPort1.WriteByte(writeByte);
+        serialPort1.FlushOutputBuffer();
+
+        serialPort2.Open(TEST_SERIAL_PORT_2);
+
+        ASSERT_TRUE(serialPort2.IsOpen());
+        ASSERT_FALSE(serialPort1.IsDataAvailable());
+
+        serialPort2.FlushInputBuffer();
+
+        serialPort1.WriteByte(writeByte);
+        tcdrain(serialPort1.GetFileDescriptor());
+
+        usleep(2000);
+        ASSERT_TRUE(serialPort2.IsDataAvailable());
+
+        serialPort2.FlushInputBuffer();
+
+        ASSERT_FALSE(serialPort2.IsDataAvailable());
+
+        serialPort2.WriteByte(writeByte);
+        tcdrain(serialPort2.GetFileDescriptor());
+
+        usleep(2000);
+        ASSERT_TRUE(serialPort1.IsDataAvailable());
+        
+        serialPort1.WriteByte(writeByte);
+        serialPort1.FlushIOBuffers();
+
+        ASSERT_FALSE(serialPort1.IsDataAvailable());
+        ASSERT_FALSE(serialPort2.IsDataAvailable());
+
+        serialPort1.Close();
+        serialPort2.Close();
+        
+        ASSERT_FALSE(serialPort1.IsOpen());
+        ASSERT_FALSE(serialPort2.IsOpen());
+    }
+
     void testSerialPortSetGetBaudRate()
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
@@ -1001,6 +1049,16 @@ TEST_F(LibSerialTest, testSerialPortIsDataAvailableTest)
     for (size_t i = 0; i < 100; i++)
     {
         testSerialPortIsDataAvailableTest();
+    }
+}
+
+TEST_F(LibSerialTest, testSerialPortFlushDataBuffers)
+{
+    SCOPED_TRACE("Serial Port Flush Data Buffers Test");
+
+    for (size_t i = 0; i < 100; i++)
+    {
+        testSerialPortFlushDataBuffers();
     }
 }
 
