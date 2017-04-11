@@ -35,6 +35,25 @@ namespace LibSerial
         Implementation();
 
         /**
+         * @brief Constructor that allows one to create a SerialPort
+         *        instance and also initialize the corresponding serial
+         *        port with the specified parameters.
+         * @param fileName The file descriptor of the serial stream object.
+         * @param baudRate The communications baud rate.
+         * @param characterSize The size of the character buffer for
+         *        storing read/write streams.
+         * @param parityType The parity type for the serial stream object.
+         * @param numberOfStopBits The number of stop bits.
+         * @param flowControlType Flow control for the serial data stream.
+         */
+        Implementation(const std::string&   fileName,
+                       const BaudRate&      baudRate,
+                       const CharacterSize& characterSize,
+                       const FlowControl&   flowControlType,
+                       const Parity&        parityType,
+                       const StopBits&      stopBits);
+
+        /**
          * @brief Default Destructor.
          */
         ~Implementation();
@@ -248,11 +267,28 @@ namespace LibSerial
         return;
     }
 
+    SerialStreamBuf::SerialStreamBuf(const std::string&   fileName,
+                                     const BaudRate&      baudRate,
+                                     const CharacterSize& characterSize,
+                                     const FlowControl&   flowControlType,
+                                     const Parity&        parityType,
+                                     const StopBits&      stopBits)
+        : mImpl(new Implementation(fileName,
+                                   baudRate,
+                                   characterSize,
+                                   flowControlType,
+                                   parityType,
+                                   stopBits))
+    {
+        setbuf(0, 0);
+        return;
+    }
+
     SerialStreamBuf::~SerialStreamBuf()
     {
-        if (this->IsOpen()) 
+        if (mImpl->IsOpen()) 
         {
-            this->Close();
+            mImpl->Close();
         }
         return;
     }
@@ -445,6 +481,24 @@ namespace LibSerial
     }
 
     inline
+    SerialStreamBuf::Implementation::Implementation(const std::string&   fileName,
+                                                    const BaudRate&      baudRate,
+                                                    const CharacterSize& characterSize,
+                                                    const FlowControl&   flowControlType,
+                                                    const Parity&        parityType,
+                                                    const StopBits&      stopBits)
+        : mFileDescriptor(-1)
+    {
+        this->Open(fileName, std::ios_base::in | std::ios_base::out);
+        this->SetBaudRate(baudRate);
+        this->SetCharacterSize(characterSize);
+        this->SetFlowControl(flowControlType);
+        this->SetParity(parityType);
+        this->SetNumberOfStopBits(stopBits);
+        return;
+    }
+
+    inline
     SerialStreamBuf::Implementation::~Implementation()
     {
         // Close the serial port if it is open.
@@ -464,6 +518,7 @@ namespace LibSerial
         // Throw an exception if the port is already open.
         if (this->IsOpen())
         {
+            close(this->mFileDescriptor);
             throw AlreadyOpen(ERR_MSG_PORT_ALREADY_OPEN);
         }
 
@@ -490,7 +545,7 @@ namespace LibSerial
         }
 
         // Try to open the serial port. 
-        mFileDescriptor = open(filename.c_str(), flags);
+        this->mFileDescriptor = open(filename.c_str(), flags);
         
         if (this->mFileDescriptor < 0)
         {
@@ -569,7 +624,7 @@ namespace LibSerial
         } 
 
         // Set the file descriptor to an invalid value, -1. 
-        mFileDescriptor = -1;
+        this->mFileDescriptor = -1;
         return;
     }
 
@@ -577,7 +632,7 @@ namespace LibSerial
     bool
     SerialStreamBuf::Implementation::IsOpen()
     {
-        return (-1 != this->mFileDescriptor);
+        return (this->mFileDescriptor != -1);
     }
 
     inline

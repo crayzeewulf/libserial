@@ -52,8 +52,8 @@ namespace LibSerial
         explicit SerialPort();
 
         /**
-         * @brief Constructor that allows one to create a SerialPort
-         *        instance and also initialize the corresponding serial
+         * @brief Constructor that allows a SerialPort instance to be 
+         *        created and also initialize the corresponding serial
          *        port with the specified parameters.
          * @param fileName The file descriptor of the serial stream object.
          * @param baudRate The communications baud rate.

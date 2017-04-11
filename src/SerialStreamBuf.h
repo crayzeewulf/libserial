@@ -51,6 +51,25 @@ namespace LibSerial
         explicit SerialStreamBuf();
 
         /**
+         * @brief Constructor that allows a SerialPort instance to be 
+         *        created and also initialize the corresponding serial
+         *        port with the specified parameters.
+         * @param fileName The file descriptor of the serial stream object.
+         * @param baudRate The communications baud rate.
+         * @param characterSize The size of the character buffer for
+         *        storing read/write streams.
+         * @param parityType The parity type for the serial stream object.
+         * @param numberOfStopBits The number of stop bits.
+         * @param flowControlType Flow control for the serial data stream.
+         */
+        explicit SerialStreamBuf(const std::string&   fileName,
+                                 const BaudRate&      baudRate        = BaudRate::BAUD_DEFAULT,
+                                 const CharacterSize& characterSize   = CharacterSize::CHAR_SIZE_DEFAULT,
+                                 const FlowControl&   flowControlType = FlowControl::FLOW_CONTROL_DEFAULT,
+                                 const Parity&        parityType      = Parity::PARITY_DEFAULT,
+                                 const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT);
+
+        /**
          *  @brief Default Destructor.
          */
         virtual ~SerialStreamBuf();
@@ -181,12 +200,6 @@ namespace LibSerial
     protected:
 
         /**
-         * @brief Forward declaration of the Implementation class folowing
-         *        the PImpl idiom.
-         */
-        class Implementation;
-
-        /**
          * @brief Performs an operation that is defined separately for each
          *        class derived from streambuf. The default behavior is to
          *        do nothing if gptr() is non-null and gptr()!=egptr().
@@ -295,6 +308,12 @@ namespace LibSerial
          * @brief Move assignment is not allowed.
          */
         SerialStreamBuf& operator=(const SerialStreamBuf&& otherSerialPort) = delete;
+
+        /**
+         * @brief Forward declaration of the Implementation class folowing
+         *        the PImpl idiom.
+         */
+        class Implementation;
 
         /**
          * @brief Pointer to Implementation class instance.

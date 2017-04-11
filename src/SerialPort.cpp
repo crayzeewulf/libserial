@@ -675,7 +675,6 @@ namespace LibSerial
         return;
     }
 
-
     inline
     SerialPort::Implementation::~Implementation()
     {

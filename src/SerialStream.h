@@ -272,7 +272,7 @@ namespace LibSerial
          * @brief The SerialStreamBuffer object that will be used by the
          *        stream to communicate with the serial port.
          */
-        SerialStreamBuf *mIOBuffer;
+        SerialStreamBuf* mIOBuffer;
 
     }; // class SerialStream
 
