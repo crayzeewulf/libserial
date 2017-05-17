@@ -461,7 +461,6 @@ namespace LibSerial
         return mImpl->GetBaudRate();
     }
 
-
     void
     SerialPort::SetCharacterSize(const CharacterSize& characterSize)
     {

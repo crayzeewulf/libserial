@@ -450,7 +450,7 @@ protected:
         serialPort1.WriteByte(writeByte);
         tcdrain(serialPort1.GetFileDescriptor());
         
-        usleep(2000);
+        usleep(25000);
 
         ASSERT_TRUE(serialPort2.IsDataAvailable());
 
@@ -460,7 +460,7 @@ protected:
         serialPort2.WriteByte(writeByte);
         tcdrain(serialPort2.GetFileDescriptor());
                 
-        usleep(2000);
+        usleep(25000);
 
         ASSERT_TRUE(serialPort1.IsDataAvailable());
         
@@ -499,7 +499,7 @@ protected:
         serialPort1.WriteByte(writeByte);
         tcdrain(serialPort1.GetFileDescriptor());
 
-        usleep(2000);
+        usleep(25000);
         ASSERT_TRUE(serialPort2.IsDataAvailable());
 
         serialPort2.FlushInputBuffer();
@@ -509,7 +509,7 @@ protected:
         serialPort2.WriteByte(writeByte);
         tcdrain(serialPort2.GetFileDescriptor());
 
-        usleep(2000);
+        usleep(25000);
         ASSERT_TRUE(serialPort1.IsDataAvailable());
         
         serialPort1.WriteByte(writeByte);
