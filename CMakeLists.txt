@@ -27,9 +27,9 @@ ADD_DEFINITIONS(
   -Wno-long-long  
   -Wno-psabi
   -Wno-variadic-macros
-  -Wnon-virtual-dtor
+  #-Wnon-virtual-dtor
   -Wpointer-arith
-  -Wundef
+  #-Wundef
   -Wuninitialized
   -Wunused-local-typedefs
   -Wwrite-strings
@@ -45,6 +45,11 @@ ADD_DEFINITIONS(
   -pthread
   )
 
+# Uncomment the following lines to compile for 32 bit architectures
+#SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -fms-extensions -m32")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -fms-extensions -m32")
+
+# Uncomment the following lines to compile for 64 bit architectures
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -fms-extensions")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -fms-extensions")
 
@@ -52,8 +57,8 @@ SET(GTEST_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/gtest")
 
 EXTERNALPROJECT_ADD(GTestExternal
   PREFIX             "${GTEST_PREFIX}"
-  URL https://github.com/google/googletest/archive/release-1.7.0.tar.gz
-  URL_HASH SHA1=d7aa4b8536f3a007b480cf016be8a4333dbf4768
+  URL https://github.com/google/googletest/archive/release-1.8.0.tar.gz
+  URL_HASH SHA1=e7e646a6204638fe8e87e165292b8dd9cd4c36ed
   INSTALL_COMMAND ""
 
   #@TODO - Pull from Github rather than prebuilt zip file.
@@ -70,7 +75,7 @@ EXTERNALPROJECT_ADD(GTestExternal
 SET(LIBPREFIX "${CMAKE_STATIC_LIBRARY_PREFIX}")
 SET(LIBSUFFIX "${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
-SET(GTEST_LOCATION "${GTEST_PREFIX}/src/GTestExternal-build")
+SET(GTEST_LOCATION "${GTEST_PREFIX}/src/GTestExternal-build/googlemock/gtest/")
 SET(GTEST_LIBRARY  "${GTEST_LOCATION}/${LIBPREFIX}gtest${LIBSUFFIX}")
 SET(GTEST_MAINLIB  "${GTEST_LOCATION}/${LIBPREFIX}gtest_main${LIBSUFFIX}")
 
