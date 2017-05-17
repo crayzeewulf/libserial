@@ -568,6 +568,17 @@ namespace LibSerial
     }
 
     void
+    SerialPort::Read(unsigned char&     charBuffer,
+                     const unsigned int numberOfBytes,
+                     const unsigned int msTimeout)
+    {
+        mImpl->Read(charBuffer,
+                    numberOfBytes,
+                    msTimeout);
+        return;
+    }
+
+    void
     SerialPort::Read(SerialPort::DataBuffer& dataBuffer,
                      const unsigned int      numberOfBytes,
                      const unsigned int      msTimeout)
