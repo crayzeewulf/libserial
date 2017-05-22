@@ -22,7 +22,6 @@
 #include "SerialStream.h"
 
 #include <cassert>
-#include <termios.h>
 
 using namespace LibSerial;
 

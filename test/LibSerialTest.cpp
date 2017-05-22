@@ -4,12 +4,6 @@
  */
 
 #include <chrono>
-#include <iostream>
-#include <fstream>
-#include <cstdlib>
-#include <string>
-#include <unistd.h>
-
 
 #include <gtest/gtest.h>
 #include <SerialPort.h>

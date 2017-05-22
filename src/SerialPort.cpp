@@ -23,8 +23,6 @@
 
 #include <cstring>
 #include <fcntl.h>
-#include <queue>
-#include <signal.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <unistd.h>
