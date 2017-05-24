@@ -345,6 +345,20 @@ protected:
         ASSERT_EQ(baudRate1, baudRates[16]);
         ASSERT_EQ(baudRate2, baudRates[16]);
 
+        serialPort1.WriteByte(writeByte);
+        tcdrain(serialPort1.GetFileDescriptor());
+
+        serialPort2.WriteByte(writeByte);
+        tcdrain(serialPort2.GetFileDescriptor());
+        
+        unsigned char readByte;
+
+        serialPort1.Read(readByte, 1, timeOutMilliseconds);
+        ASSERT_EQ(readByte, writeByte);
+
+        serialPort2.Read(readByte, 1, timeOutMilliseconds);
+        ASSERT_EQ(readByte, writeByte);
+
         SerialPort::DataBuffer readDataBuffer;
         SerialPort::DataBuffer writeDataBuffer;
 
@@ -375,16 +389,13 @@ protected:
         serialPort2.Read(readString1, writeString1.size(), timeOutMilliseconds);
         ASSERT_EQ(readString1, writeString1);
         ASSERT_EQ(readString1.size(), writeString1.size());
-    
-        unsigned char writeByte;
-        unsigned char readByte;
-        
+
         serialPort1.WriteByte(writeByte);
         tcdrain(serialPort1.GetFileDescriptor());
 
         serialPort2.WriteByte(writeByte);
         tcdrain(serialPort2.GetFileDescriptor());
-        
+
         serialPort1.ReadByte(readByte, timeOutMilliseconds);
         ASSERT_EQ(readByte, writeByte);
 
@@ -423,9 +434,6 @@ protected:
         ASSERT_FALSE(serialPort1.IsDataAvailable());
         ASSERT_FALSE(serialPort2.IsDataAvailable());
 
-        unsigned char writeByte;
-        unsigned char readByte;
-
         writeByte = 'A';
 
         serialPort1.WriteByte(writeByte);
@@ -434,6 +442,8 @@ protected:
         usleep(25000);
 
         ASSERT_TRUE(serialPort2.IsDataAvailable());
+
+        unsigned char readByte;
 
         serialPort2.ReadByte(readByte, 1);
         ASSERT_EQ(readByte, writeByte);

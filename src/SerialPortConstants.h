@@ -26,7 +26,6 @@
 #include <limits>
 #include <termios.h>
 
-
 namespace LibSerial
 {
     /**
@@ -106,7 +105,7 @@ namespace LibSerial
     class AlreadyOpen : public std::logic_error
     {
     public:
-        AlreadyOpen( const std::string& whatArg)
+        AlreadyOpen(const std::string& whatArg)
             : logic_error(whatArg)
         {
         }
@@ -178,8 +177,7 @@ namespace LibSerial
     };
 
     /**
-     * @brief The allowed values of character sizes that can be used during
-     *        the serial communication.
+     * @brief The allowed character sizes.
      */
     enum class CharacterSize : tcflag_t
     {
