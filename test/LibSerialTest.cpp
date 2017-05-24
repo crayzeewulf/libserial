@@ -10,7 +10,7 @@
 #include <SerialPort.h>
 #include <SerialStream.h>
 
-// Default Serial Port and Baud Rate.
+// Default Serial Ports.
 #define TEST_SERIAL_PORT_1 "/dev/ttyUSB0"
 #define TEST_SERIAL_PORT_2 "/dev/ttyUSB1"
 
@@ -440,7 +440,6 @@ protected:
         tcdrain(serialPort1.GetFileDescriptor());
         
         usleep(25000);
-
         ASSERT_TRUE(serialPort2.IsDataAvailable());
 
         unsigned char readByte;
@@ -452,7 +451,6 @@ protected:
         tcdrain(serialPort2.GetFileDescriptor());
                 
         usleep(25000);
-
         ASSERT_TRUE(serialPort1.IsDataAvailable());
         
         serialPort1.ReadByte(readByte, 1);
