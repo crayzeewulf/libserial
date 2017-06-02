@@ -24,8 +24,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-using namespace std;
-
 namespace LibSerial
 {
     class SerialStreamBuf::Implementation
@@ -37,15 +35,38 @@ namespace LibSerial
         Implementation();
 
         /**
-         * @brief Destructor.
+         * @brief Constructor that allows one to create a SerialPort
+         *        instance and also initialize the corresponding serial
+         *        port with the specified parameters.
+         * @param fileName The file descriptor of the serial stream object.
+         * @param baudRate The communications baud rate.
+         * @param characterSize The size of the character buffer for
+         *        storing read/write streams.
+         * @param parityType The parity type for the serial stream object.
+         * @param numberOfStopBits The number of stop bits.
+         * @param flowControlType Flow control for the serial data stream.
          */
-        ~Implementation()
-        {
-            /* empty */
-        }
+        Implementation(const std::string&   fileName,
+                       const BaudRate&      baudRate,
+                       const CharacterSize& characterSize,
+                       const FlowControl&   flowControlType,
+                       const Parity&        parityType,
+                       const StopBits&      stopBits);
 
-        void Open(const string& filename,
-                              ios_base::openmode mode);
+        /**
+         * @brief Default Destructor.
+         */
+        ~Implementation();
+
+        /**
+         * @brief Opens the serial port associated with the specified
+         *        fileName, and the specified mode, openMode.
+         * @param fileName The file descriptor of the serial stream object.
+         * @param openMode The communication mode status when the serial
+         *        communication port is opened.
+         */
+        void Open(const std::string& filename,
+                  std::ios_base::openmode openMode);
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
@@ -63,9 +84,8 @@ namespace LibSerial
          * @brief This routine is called by open() in order to
          *        initialize some parameters of the serial port and
          *        setting its parameters to default values.
-         * @return -1 on failure and some other value on success. 
          */
-        int InitializeSerialPort();
+        void InitializeSerialPort();
 
         /**
          * @brief Sets all serial port paramters to their default values.
@@ -136,51 +156,84 @@ namespace LibSerial
          * @brief Sets the minimum number of characters for non-canonical reads.
          * @param vmin the number of minimum characters to be set.
          */
-        void
-        SetVMin(const short vmin);
+        void SetVMin(const short vmin);
 
         /**
          * @brief Gets the VMIN value for the device, which represents the
          *        minimum number of characters for non-canonical reads.
          * @return Returns the minimum number of characters for non-canonical reads.
          */
-        short
-        GetVMin();
+        short GetVMin();
 
         /** 
          * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
          * @param vtime The timeout value in deciseconds to be set.
          */
-        void
-        SetVTime(const short vtime);
+        void SetVTime(const short vtime);
 
         /** 
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds. 
          */
-        short
-        GetVTime();
+        short GetVTime();
 
-        streamsize
-        xsputn(const char_type *s, streamsize n);
+        /**
+         * @brief Writes up to n characters from the character sequence at 
+         *        char s to the serial port associated with the buffer. 
+         * @return Returns the number of characters that were successfully
+         *         written to the serial port. 
+         */
+        std::streamsize xsputn(const char_type *s, std::streamsize n);
 
-        streamsize
-        xsgetn(char_type *s, streamsize n);
+        /**
+         * @brief Reads up to n characters from the serial port and returns
+         *        them through the character array located at s.
+         * @return Returns the number of characters actually read from the
+         *         serial port. 
+         */
+        std::streamsize xsgetn(char_type *s, std::streamsize n);
 
-        streambuf::int_type
-        overflow(const int_type c);
+        /**
+         * @brief Writes the specified character to the associated serial port.
+         * @param character The character to be written to the serial port.
+         * @return Returns the character. 
+         */
+        std::streambuf::int_type overflow(const int_type c);
 
-        streambuf::int_type
-        underflow();
+        /**
+         * @brief Reads and returns the next character from the associated
+         *        serial port if one otherwise returns traits::eof(). This
+         *        method is used for buffered I/O while uflow() is called
+         *        for unbuffered I/O.
+         * @return Returns the next character from the serial port.
+         */
+        std::streambuf::int_type underflow();
 
-        streambuf::int_type
-        uflow();
+        /**
+         * @brief Reads and returns the next character from the associated
+         *        serial port if one otherwise returns traits::eof(). This
+         *        method is used for unbuffered I/O while underflow() is
+         *        called for unbuffered I/O.
+         * @return Returns the next character from the serial port.
+         */
+        std::streambuf::int_type uflow();
 
-        streambuf::int_type
-        pbackfail(const int_type c);
+        /**
+         * @brief This function is called when a putback of a character
+         *        fails. This must be implemented for unbuffered I/O as all
+         *        streambuf subclasses are required to provide putback of
+         *        at least one character.
+         * @param character The character to putback.
+         * @return Returns The character iff successful, otherwise eof to signal an error.
+         */
+        std::streambuf::int_type pbackfail(const int_type c);
 
-        streamsize 
-        showmanyc();
+        /**
+         * @brief Checks whether input is available on the port.
+         * @return Returns 1 if characters are available at the serial port,
+         *         0 if no characters are available, and -1 if unsuccessful.
+         */
+        std::streamsize  showmanyc();
 
         /** 
          * @brief The file descriptor associated with the serial port.
@@ -214,21 +267,38 @@ namespace LibSerial
         return;
     }
 
+    SerialStreamBuf::SerialStreamBuf(const std::string&   fileName,
+                                     const BaudRate&      baudRate,
+                                     const CharacterSize& characterSize,
+                                     const FlowControl&   flowControlType,
+                                     const Parity&        parityType,
+                                     const StopBits&      stopBits)
+        : mImpl(new Implementation(fileName,
+                                   baudRate,
+                                   characterSize,
+                                   flowControlType,
+                                   parityType,
+                                   stopBits))
+    {
+        setbuf(0, 0);
+        return;
+    }
+
     SerialStreamBuf::~SerialStreamBuf()
     {
-        if (this->IsOpen()) 
+        if (mImpl->IsOpen()) 
         {
-            this->Close();
+            mImpl->Close();
         }
         return;
     }
 
     void
-    SerialStreamBuf::Open(const string& filename,
-                          ios_base::openmode mode)
+    SerialStreamBuf::Open(const std::string& filename,
+                          std::ios_base::openmode openMode)
     {
         mImpl->Open(filename,
-                    mode);
+                    openMode);
         return;
     }
 
@@ -245,10 +315,11 @@ namespace LibSerial
         return mImpl->IsOpen();
     }
 
-    int
+    void
     SerialStreamBuf::InitializeSerialPort()
     {
-        return mImpl->InitializeSerialPort();
+        mImpl->InitializeSerialPort();
+        return;
     }
 
     void
@@ -331,7 +402,6 @@ namespace LibSerial
         return;
     }
 
-
     short
     SerialStreamBuf::GetVMin()
     {
@@ -358,24 +428,24 @@ namespace LibSerial
     }
 
     std::streamsize
-    SerialStreamBuf::xsputn(const char_type *s, streamsize n)
+    SerialStreamBuf::xsputn(const char_type *s, std::streamsize n)
     {
         return mImpl->xsputn(s, n);
     }
 
     std::streamsize
-    SerialStreamBuf::xsgetn(char_type *s, streamsize n)
+    SerialStreamBuf::xsgetn(char_type *s, std::streamsize n)
     {
         return mImpl->xsgetn(s, n);
     }
 
-    streambuf::int_type
+    std::streambuf::int_type
     SerialStreamBuf::overflow(const int_type character)
     {
         return mImpl->overflow(character);
     }
 
-    streambuf::int_type
+    std::streambuf::int_type
     SerialStreamBuf::underflow()
     {
         return mImpl->underflow();
@@ -387,7 +457,7 @@ namespace LibSerial
         return mImpl->uflow();
     }
 
-    streambuf::int_type
+    std::streambuf::int_type
     SerialStreamBuf::pbackfail(const int_type character)
     {
         return mImpl->pbackfail(character);
@@ -407,17 +477,48 @@ namespace LibSerial
         , mPutbackAvailable(false)
         , mPutbackChar(0)
     {
-        /* empty */
+        /* Empty */
+    }
+
+    inline
+    SerialStreamBuf::Implementation::Implementation(const std::string&   fileName,
+                                                    const BaudRate&      baudRate,
+                                                    const CharacterSize& characterSize,
+                                                    const FlowControl&   flowControlType,
+                                                    const Parity&        parityType,
+                                                    const StopBits&      stopBits)
+        : mFileDescriptor(-1)
+    {
+        this->Open(fileName, std::ios_base::in | std::ios_base::out);
+        this->SetBaudRate(baudRate);
+        this->SetCharacterSize(characterSize);
+        this->SetFlowControl(flowControlType);
+        this->SetParity(parityType);
+        this->SetNumberOfStopBits(stopBits);
+        return;
+    }
+
+    inline
+    SerialStreamBuf::Implementation::~Implementation()
+    {
+        // Close the serial port if it is open.
+        if (this->IsOpen())
+        {
+            this->Close();
+        }
+
+        return;
     }
 
     inline
     void
-    SerialStreamBuf::Implementation::Open(const string& filename,
-                                          ios_base::openmode mode)
+    SerialStreamBuf::Implementation::Open(const std::string& filename,
+                                          std::ios_base::openmode openMode)
     {
         // Throw an exception if the port is already open.
         if (this->IsOpen())
         {
+            close(this->mFileDescriptor);
             throw AlreadyOpen(ERR_MSG_PORT_ALREADY_OPEN);
         }
 
@@ -426,15 +527,15 @@ namespace LibSerial
         // Since we are dealing with the serial port we need to use the O_NOCTTY option.
         int flags;
         
-        if (mode == (ios_base::in | ios_base::out))
+        if (openMode == (std::ios_base::in | std::ios_base::out))
         {
             flags = (O_RDWR | O_NOCTTY | O_NONBLOCK);
         } 
-        else if (mode == ios_base::in)
+        else if (openMode == std::ios_base::in)
         {
             flags = (O_RDONLY | O_NOCTTY | O_NONBLOCK);
         } 
-        else if (mode == ios_base::out)
+        else if (openMode == std::ios_base::out)
         {
             flags = (O_WRONLY | O_NOCTTY | O_NONBLOCK);
         } 
@@ -444,17 +545,17 @@ namespace LibSerial
         }
 
         // Try to open the serial port. 
-        mFileDescriptor = open(filename.c_str(), flags);
+        this->mFileDescriptor = open(filename.c_str(), flags);
         
-        if (mFileDescriptor < 0)
+        if (this->mFileDescriptor < 0)
         {
-            close(mFileDescriptor);
+            close(this->mFileDescriptor);
             throw OpenFailed(strerror(errno));
         }
 
         // Save the current settings of the serial port so they can be
         // restored when the serial port is closed.
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &mOldPortSettings) < 0)
         {
             throw OpenFailed(strerror(errno));
@@ -477,7 +578,7 @@ namespace LibSerial
         port_settings.c_cc[VTIME] = 0;
 
         // Apply the modified settings.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
@@ -485,7 +586,7 @@ namespace LibSerial
         }
 
         // Flush the input and output buffers associated with the port.
-        if (tcflush(mFileDescriptor,
+        if (tcflush(this->mFileDescriptor,
                     TCIOFLUSH) < 0)
         {
             throw OpenFailed(strerror(errno));
@@ -508,22 +609,22 @@ namespace LibSerial
         }
 
         // Restore the old settings of the port.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &mOldPortSettings) < 0)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::runtime_error(strerror(errno));
         }
 
         // Otherwise, close the serial port and set the file descriptor
         // to an invalid value.
-        if (close(mFileDescriptor) < 0) 
+        if (close(this->mFileDescriptor) < 0) 
         {
             throw std::runtime_error(strerror(errno));
         } 
 
         // Set the file descriptor to an invalid value, -1. 
-        mFileDescriptor = -1;
+        this->mFileDescriptor = -1;
         return;
     }
 
@@ -531,11 +632,11 @@ namespace LibSerial
     bool
     SerialStreamBuf::Implementation::IsOpen()
     {
-        return (-1 != this->mFileDescriptor);
+        return (this->mFileDescriptor != -1);
     }
 
     inline
-    int
+    void
     SerialStreamBuf::Implementation::InitializeSerialPort()
     {
         // Throw an exception if the serial port is not open.
@@ -549,16 +650,16 @@ namespace LibSerial
         
         if (fcntl(this->mFileDescriptor, 
                   F_SETFL, 
-                  flags | O_NONBLOCK ) < 0)
+                  flags | O_NONBLOCK) < 0)
         {
-            return -1;
+            throw std::runtime_error(strerror(errno));
         }
 
         // Flush out any garbage left behind in the buffers associated
         // with the port from any previous operations. 
         if (tcflush(this->mFileDescriptor, TCIOFLUSH) < 0)
         {
-            return -1;
+            throw std::runtime_error(strerror(errno));
         }
 
         // Set up the default configuration for the serial port.
@@ -571,18 +672,18 @@ namespace LibSerial
                   F_SETFL, 
                   flags & ~O_NONBLOCK) < 0)
         {
-            return -1;
+            throw std::runtime_error(strerror(errno));
         }
 
         // Initialization was successful.
-        return 0;
+        return;
     }
 
     inline
     void 
     SerialStreamBuf::Implementation::SetParametersToDefault()
     {
-        // Throw an exception if the serial port is not open.
+        // Make sure that the serial port is open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
@@ -592,7 +693,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -620,7 +721,7 @@ namespace LibSerial
         port_settings.c_cc[VTIME] = 0;
 
         // Apply the modified settings.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
@@ -652,7 +753,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -663,15 +764,16 @@ namespace LibSerial
             cfsetospeed(&port_settings, (speed_t)baudRate) < 0)
         {
             // If applying the baud rate settings fail, throw an exception.
-            throw UnsupportedBaudRate(ERR_MSG_UNSUPPORTED_BAUD_RATE);
+            throw std::runtime_error(ERR_MSG_INVALID_BAUD_RATE);
         }
 
         // Apply the modified settings.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw UnsupportedBaudRate(strerror(errno));
+            // If applying the settings fails, throw an exception.
+            throw std::runtime_error(strerror(errno));
         }
 
         return;
@@ -691,7 +793,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -705,7 +807,7 @@ namespace LibSerial
         // equal. Otherwise, we do not know which one to return.
         if (input_baud != output_baud)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(ERR_MSG_INVALID_BAUD_RATE);
             return BaudRate::BAUD_INVALID;
         }
 
@@ -727,10 +829,10 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(ERR_MSG_INVALID_CHARACTER_SIZE);
         }
 
         // Set the character size to the specified value. If the character
@@ -750,15 +852,16 @@ namespace LibSerial
             port_settings.c_iflag |= ISTRIP;  // Set the ISTRIP flag.
         }
 
+        // Set the character size.
         port_settings.c_cflag &= ~CSIZE;                               // Clear all CSIZE bits.
         port_settings.c_cflag |= static_cast<tcflag_t>(characterSize); // Set the character size.
 
         // Apply the modified settings.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::runtime_error(strerror(errno));
         }
 
         return;
@@ -778,7 +881,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -799,7 +902,7 @@ namespace LibSerial
         }
 
         // Flush the input and output buffers associated with the port.
-        if (tcflush(mFileDescriptor,
+        if (tcflush(this->mFileDescriptor,
                     TCIOFLUSH) < 0)
         {
             throw OpenFailed(strerror(errno));
@@ -809,10 +912,10 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(ERR_MSG_INVALID_FLOW_CONTROL);
         }
 
         // Set the flow control. Hardware flow control uses the RTS (Ready
@@ -842,11 +945,11 @@ namespace LibSerial
         }
         
         // Apply the modified settings.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::runtime_error(strerror(errno));
         }
 
         return;
@@ -866,7 +969,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -916,7 +1019,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -944,12 +1047,12 @@ namespace LibSerial
             break;
         }
 
-        // Apply the modified settings.
-        if (tcsetattr(mFileDescriptor,
+        // Apply the modified port settings.
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::runtime_error(strerror(errno));
         }
 
         return;
@@ -969,7 +1072,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -993,7 +1096,7 @@ namespace LibSerial
             return Parity::PARITY_NONE; // no parity.
         }
 
-        return Parity::PARITY_INVALID; // execution should never reach here. 
+        return Parity::PARITY_INVALID; // execution should never reach here.
     }
 
     inline
@@ -1010,7 +1113,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1031,11 +1134,11 @@ namespace LibSerial
         }
 
         // Apply the modified settings.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::runtime_error(strerror(errno));
         }
 
         return;
@@ -1055,7 +1158,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1092,7 +1195,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1101,11 +1204,11 @@ namespace LibSerial
         port_settings.c_cc[VMIN] = (cc_t)vmin;
 
         // Apply the modified settings.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::runtime_error(strerror(errno));
         }
 
         return;
@@ -1125,7 +1228,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1153,7 +1256,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1162,11 +1265,11 @@ namespace LibSerial
         port_settings.c_cc[VTIME] = (cc_t)vtime;
 
         // Apply the modified settings.
-        if (tcsetattr(mFileDescriptor,
+        if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::runtime_error(strerror(errno));
         }
 
         return;
@@ -1186,7 +1289,7 @@ namespace LibSerial
         termios port_settings;
         memset(&port_settings, 0, sizeof(port_settings));
         
-        if (tcgetattr(mFileDescriptor,
+        if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -1196,9 +1299,9 @@ namespace LibSerial
     }
 
     inline
-    streamsize
+    std::streamsize
     SerialStreamBuf::Implementation::xsputn(const char_type *s,
-                                            streamsize n) 
+                                            std::streamsize n) 
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1213,7 +1316,7 @@ namespace LibSerial
         }
 
         // Write the n characters to the serial port. 
-        ssize_t retval = write(mFileDescriptor, s, n);
+        ssize_t retval = write(this->mFileDescriptor, s, n);
 
         // If the write failed then return 0. 
         if (retval <= 0)
@@ -1226,9 +1329,9 @@ namespace LibSerial
     }
 
     inline
-    streamsize
+    std::streamsize
     SerialStreamBuf::Implementation::xsgetn(char_type *s,
-                                            streamsize n)
+                                            std::streamsize n)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1262,7 +1365,7 @@ namespace LibSerial
             // starting from &s[1].
             if (n > 1)
             {
-                retval = read(mFileDescriptor, &s[1], n-1);
+                retval = read(this->mFileDescriptor, &s[1], n-1);
 
                 // If read was successful, then we need to increment retval by
                 // one to indicate that the putback character was prepended to
@@ -1277,7 +1380,7 @@ namespace LibSerial
         {
 
             // If no putback character is available then we try to read n characters.
-            retval = read(mFileDescriptor, s, n);
+            retval = read(this->mFileDescriptor, s, n);
         }
 
         // If retval == -1 then the read call had an error, otherwise, if
@@ -1294,7 +1397,7 @@ namespace LibSerial
     }
 
     inline
-    streambuf::int_type
+    std::streambuf::int_type
     SerialStreamBuf::Implementation::overflow(const int_type character)
     {
         // Throw an exception if the serial port is not open.
@@ -1304,7 +1407,7 @@ namespace LibSerial
         }
 
         // Try to write the specified character to the serial port. 
-        if (traits_type::eq_int_type( character, traits_type::eof()))
+        if (traits_type::eq_int_type(character, traits_type::eof()))
         {
             // If character is the eof character then we do nothing. 
             return traits_type::eof();
@@ -1313,7 +1416,7 @@ namespace LibSerial
         {
             // Otherwise we write the character to the serial port. 
             char out_ch = traits_type::to_char_type(character);
-            ssize_t retval = write(mFileDescriptor, &out_ch, 1);
+            ssize_t retval = write(this->mFileDescriptor, &out_ch, 1);
 
             // If the write failed then return eof. 
             if (retval <= 0)
@@ -1327,7 +1430,7 @@ namespace LibSerial
     }
 
     inline
-    streambuf::int_type
+    std::streambuf::int_type
     SerialStreamBuf::Implementation::underflow()
     {
         // Throw an exception if the serial port is not open.
@@ -1351,7 +1454,7 @@ namespace LibSerial
         {
             // If no putback character is available then we need to read one
             // character from the serial port.
-            retval = read(mFileDescriptor, &next_ch, 1);
+            retval = read(this->mFileDescriptor, &next_ch, 1);
 
             // Make the next character the putback character. This has the
             // effect of returning the next character without changing gptr()
@@ -1379,7 +1482,7 @@ namespace LibSerial
     }
 
     inline
-    streambuf::int_type
+    std::streambuf::int_type
     SerialStreamBuf::Implementation::uflow()
     {
         // Throw an exception if the serial port is not open.
@@ -1394,7 +1497,7 @@ namespace LibSerial
     }
 
     inline
-    streambuf::int_type
+    std::streambuf::int_type
     SerialStreamBuf::Implementation::pbackfail(const int_type character) 
     {
         // Throw an exception if the serial port is not open.
@@ -1456,7 +1559,7 @@ namespace LibSerial
             }
 
             // Try to read a character.
-            retval = read(mFileDescriptor, &mPutbackChar, 1);
+            retval = read(this->mFileDescriptor, &mPutbackChar, 1);
 
             if (retval == 1)
             {

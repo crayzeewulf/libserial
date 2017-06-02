@@ -22,27 +22,14 @@
 #include "SerialStream.h"
 
 #include <cassert>
-#include <termios.h>
-
 
 using namespace LibSerial;
 
 SerialStream::SerialStream()
-    : std::iostream(0), mIOBuffer(0)
+    : std::iostream(0)
+    , mIOBuffer(0)
 {
-    // Close the stream
-    Close();
-}
-
-
-SerialStream::~SerialStream() 
-{
-    // If a SerialStreamBuf is associated with this SerialStream
-    // then we need to destroy it here.
-    if (mIOBuffer)
-    {
-        delete mIOBuffer;
-    }
+    /* Empty */
 }
 
 SerialStream::SerialStream(const std::string& fileName,
@@ -72,12 +59,23 @@ SerialStream::SerialStream(const std::string&   fileName,
     return;
 }
 
+SerialStream::~SerialStream() 
+{
+    // Close the serial stream if it is open.
+    if (this->IsOpen())
+    {
+        this->Close();
+    }
+
+    return;
+}
+
 void
 SerialStream::Open(const std::string& fileName,
                    std::ios_base::openmode openMode)
 {
     // Create a new SerialStreamBuf if one does not exist. 
-    if (! mIOBuffer)
+    if (!mIOBuffer)
     {
         mIOBuffer = new SerialStreamBuf;
         assert(0 != mIOBuffer);
@@ -89,24 +87,26 @@ SerialStream::Open(const std::string& fileName,
     return;
 }
 
-void 
+void
 SerialStream::Close()
 {
-    // If a SerialStreamBuf is associated with the SerialStream then
-    // destroy it.
+    // If a SerialStreamBuf is associated with this SerialStream
+    // we need to destroy it.
     if (mIOBuffer)
     {
         delete mIOBuffer;
         mIOBuffer = 0;
     }
+
+    return;
 }
 
 bool
 SerialStream::IsOpen()
 {
     // Checks to see if mIOBuffer is a null buffer, if not, calls
-    // the IsOpen() function on this streams SerialStreamBuf mIOBuffer
-    if (! mIOBuffer)
+    // the IsOpen() function on this stream's SerialStreamBuf mIOBuffer
+    if (!mIOBuffer)
     {
         return false;
     }
@@ -141,7 +141,7 @@ SerialStream::SetBaudRate(const BaudRate& baudRate)
 }
 
 BaudRate
-SerialStream::GetBaudRate() 
+SerialStream::GetBaudRate()
 {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
 

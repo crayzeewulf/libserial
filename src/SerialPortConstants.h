@@ -26,40 +26,34 @@
 #include <limits>
 #include <termios.h>
 
-
 namespace LibSerial
 {
     /**
-     * Error messages utilized when throwing exceptions.
+     * @brief Error messages utilized when throwing exceptions.
      */
-    const std::string ERR_MSG_INVALID_FLOW_CONTROL  = "Invalid flow control.";
-    const std::string ERR_MSG_INVALID_PARITY        = "Invalid parity setting.";
-    const std::string ERR_MSG_INVALID_STOP_BITS     = "Invalid number of stop bits.";
-    const std::string ERR_MSG_READ_TIMEOUT          = "Read timeout";
-    const std::string ERR_MSG_PORT_ALREADY_OPEN     = "Serial port already open.";
-    const std::string ERR_MSG_PORT_NOT_OPEN         = "Serial port not open.";
-    const std::string ERR_MSG_PTHREAD_MUTEX_ERROR   = "Could not initialize mutex!";
-    const std::string ERR_MSG_UNSUPPORTED_BAUD_RATE = "Unsupported baud rate.";
+    const std::string ERR_MSG_INVALID_BAUD_RATE      = "Invalid baud rate.";
+    const std::string ERR_MSG_INVALID_CHARACTER_SIZE = "Invalid character size.";
+    const std::string ERR_MSG_INVALID_FLOW_CONTROL   = "Invalid flow control.";
+    const std::string ERR_MSG_INVALID_PARITY         = "Invalid parity setting.";
+    const std::string ERR_MSG_INVALID_STOP_BITS      = "Invalid number of stop bits.";
+    const std::string ERR_MSG_READ_TIMEOUT           = "Read timeout";
+    const std::string ERR_MSG_PORT_ALREADY_OPEN      = "Serial port already open.";
+    const std::string ERR_MSG_PORT_NOT_OPEN          = "Serial port not open.";
 
+    /**
+     * @brief Time conversion constants.
+     */
     const int MICROSECONDS_PER_MS  =    1000;
     const int MILLISECONDS_PER_SEC =    1000;
     const int MICROSECONDS_PER_SEC = 1000000;
         
     /**
      * @brief The default character buffer size.
-     * @deprecated VMIN and VTIME will not be supported starting
-     *             from version 0.7.0. Methods of SerialPort class
-     *             provide better mechanisms for implementing read
-     *             and write timeouts.
      */
     static constexpr short VMIN_DEFAULT = 1;
 
     /**
      * @brief The default character buffer timing.
-     * @deprecated VMIN and VTIME will not be supported starting
-     *             from version 0.7.0. Methods of SerialPort class
-     *             provide better mechanisms for implementing read
-     *             and write timeouts.
      */
     static constexpr short VTIME_DEFAULT = 0;
     
@@ -111,7 +105,7 @@ namespace LibSerial
     class AlreadyOpen : public std::logic_error
     {
     public:
-        AlreadyOpen( const std::string& whatArg)
+        AlreadyOpen(const std::string& whatArg)
             : logic_error(whatArg)
         {
         }
@@ -121,15 +115,6 @@ namespace LibSerial
     {
     public:
         OpenFailed(const std::string& whatArg)
-            : runtime_error(whatArg)
-        {
-        }
-    };
-    
-    class UnsupportedBaudRate : public std::runtime_error
-    {
-    public:
-        UnsupportedBaudRate(const std::string& whatArg)
             : runtime_error(whatArg)
         {
         }
@@ -145,10 +130,11 @@ namespace LibSerial
     };
 
     /**
-     * @brief The baud rates currently supported by the SUS-2 general terminal
-     *        interface specification. Note that B0 is not supported because
-     *        it is not really a baud rate (it causes the modem to hang up
-     *        i.e. drop DTR). Use the close() method instead.
+     * @brief The baud rates currently supported by the Single Unix
+     *        Specification V3 general terminal interface specification.
+     *        Note that B0 is not supported because it not actually a baud
+     *        rate, is used to terminate the connection, (i.e. drop DTR).
+     *        The Close() method should be used instead.
      */
     enum class BaudRate : speed_t
     {
@@ -171,8 +157,7 @@ namespace LibSerial
         BAUD_115200  = B115200,
         BAUD_230400  = B230400,
 
-        // Bug#1318912: B460800 is defined on Linux but not on Mac OSX.
-        // What about other operating systems?
+        // @note: >B230400 are defined in Linux but not other POSIX systems, (e.g. Mac OS X).
 #ifdef __linux__
         BAUD_460800  = B460800,
         BAUD_500000  = B500000,
@@ -192,16 +177,15 @@ namespace LibSerial
     };
 
     /**
-     * @brief The allowed values of character sizes that can be used during
-     *        the serial communication.
+     * @brief The allowed character sizes.
      */
     enum class CharacterSize : tcflag_t
     {
-        CHAR_SIZE_5       = CS5, //!< 5 bit characters.
-        CHAR_SIZE_6       = CS6, //!< 6 bit characters.
-        CHAR_SIZE_7       = CS7, //!< 7 bit characters.
-        CHAR_SIZE_8       = CS8, //!< 8 bit characters.
-        CHAR_SIZE_DEFAULT = CS8, //!< 8 bit characters.
+        CHAR_SIZE_5       = CS5, // !< 5 bit characters.
+        CHAR_SIZE_6       = CS6, // !< 6 bit characters.
+        CHAR_SIZE_7       = CS7, // !< 7 bit characters.
+        CHAR_SIZE_8       = CS8, // !< 8 bit characters.
+        CHAR_SIZE_DEFAULT = CS8, // !< 8 bit characters.
         CHAR_SIZE_INVALID = std::numeric_limits<tcflag_t>::max()
     };
 
@@ -222,10 +206,10 @@ namespace LibSerial
      */
     enum class Parity : tcflag_t
     {
-        PARITY_EVEN,                    //!< Even parity.
-        PARITY_ODD,                     //!< Odd parity.
-        PARITY_NONE,                    //!< No parity i.e. parity checking disabled.
-        PARITY_DEFAULT = PARITY_NONE,   //!< No parity i.e. parity checking disabled.
+        PARITY_EVEN,                    // Even parity.
+        PARITY_ODD,                     // Odd parity.
+        PARITY_NONE,                    // No parity i.e. parity checking disabled.
+        PARITY_DEFAULT = PARITY_NONE,   // No parity i.e. parity checking disabled.
         PARITY_INVALID = std::numeric_limits<tcflag_t>::max() //!< Invalid parity value.
     };
 
@@ -234,12 +218,12 @@ namespace LibSerial
      */
     enum class StopBits : tcflag_t
     {
-        STOP_BITS_1,                     //! 1 stop bit.
-        STOP_BITS_2,                     //! 2 stop bits.
-        STOP_BITS_DEFAULT = STOP_BITS_1, //! 1 stop bit.
+        STOP_BITS_1,                     // 1 stop bit.
+        STOP_BITS_2,                     // 2 stop bits.
+        STOP_BITS_DEFAULT = STOP_BITS_1, // 1 stop bit.
         STOP_BITS_INVALID = std::numeric_limits<tcflag_t>::max()
     };
 
-} /* LibSerial */ 
+} // namespace LibSerial
 
-#endif /* End of include guard: SERIALPORTCONSTANTS_H */
+#endif // #ifndef SERIALPORTCONSTANTS_H */

@@ -30,23 +30,12 @@
 namespace LibSerial 
 {
     /**
-     * @note This class attaches a handler to the SIGIO signal to detect
-     * the data arriving at a serial port. However, this signal handler
-     * will also call any signal handler that is already attached to
-     * this signal. However, if other parts of the application attach a
-     * signal handler to SIGIO after constructing an instance of SIGIO,
-     * they must ensure that they call the existing signal handler.
-     * Otherwise, it may not be possible to receive any data through
-     * the serial port using this class.
-     *
-     * @FIXME: Provide examples of the above potential problem.
-     *
-     * @todo The current implementation does not check if another process
-     * has locked the serial port device and does not lock the serial port
-     * device after opening it. This has been observed to cause problems
-     * while using this library while other programs such as minicom are
-     * also accessing the same device.  It will be useful to lock the
-     * serial port device when it is being used by this class.
+     * @TODO The current implementation does not check if another process
+     *       has locked the serial port device and does not lock the serial port
+     *       device after opening it. This has been observed to cause problems
+     *       while using this library while other programs such as minicom are
+     *       also accessing the same device.  It would be useful to lock the
+     *       serial port device when it is being used by this class.
      */
     class SerialPort
     {
@@ -63,10 +52,10 @@ namespace LibSerial
         explicit SerialPort();
 
         /**
-         * @brief Constructor that allows one to create a SerialPort
-         *        instance and also initialize the corresponding serial
+         * @brief Constructor that allows a SerialPort instance to be 
+         *        created and also initialize the corresponding serial
          *        port with the specified parameters.
-         * @param serialPortName The file descriptor of the serial stream object.
+         * @param fileName The file descriptor of the serial stream object.
          * @param baudRate The communications baud rate.
          * @param characterSize The size of the character buffer for
          *        storing read/write streams.
@@ -74,7 +63,7 @@ namespace LibSerial
          * @param numberOfStopBits The number of stop bits.
          * @param flowControlType Flow control for the serial data stream.
          */
-        explicit SerialPort(const std::string&   serialPortName,
+        explicit SerialPort(const std::string&   fileName,
                             const BaudRate&      baudRate        = BaudRate::BAUD_DEFAULT,
                             const CharacterSize& characterSize   = CharacterSize::CHAR_SIZE_DEFAULT,
                             const FlowControl&   flowControlType = FlowControl::FLOW_CONTROL_DEFAULT,
@@ -87,10 +76,14 @@ namespace LibSerial
         virtual ~SerialPort() noexcept;
 
         /**
-         * @brief Opens the serial port.
-         * @param serialPortName The name of the serial port to be opened.
+         * @brief Opens the serial port associated with the specified
+         *        fileName, and the specified mode, openMode.
+         * @param fileName The file descriptor of the serial stream object.
+         * @param openMode The communication mode status when the serial
+         *        communication port is opened.
          */
-        void Open(const std::string& serialPortName);
+        void Open(const std::string& fileName,
+                  std::ios_base::openmode openMode = std::ios_base::in | std::ios_base::out);
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
@@ -181,7 +174,6 @@ namespace LibSerial
          * @brief Sets the minimum number of characters for non-canonical reads.
          * @note See VMIN in man termios(3).
          * @param vMin the number of minimum characters to be set.
-         * @return Returns the minimum number of charcters set.
          */
         void SetVMin(const short vmin);
 
@@ -213,20 +205,35 @@ namespace LibSerial
         bool IsDataAvailable();
 
         /**
+         * @brief Flushes the serial port input buffer.
+         */
+        void FlushInputBuffer();
+
+        /**
+         * @brief Flushes the serial port output buffer.
+         */
+        void FlushOutputBuffer();
+
+        /**
+         * @brief Flushes the serial port input and output buffers.
+         */
+        void FlushIOBuffers();
+
+        /**
          * @brief Reads the specified number of bytes from the serial port.
          *        The method will timeout if no data is received in the specified
          *        number of milliseconds (msTimeout). If msTimeout is 0, then
          *        this method will block until all requested bytes are
-         *        received. If numOfBytes is zero, then this method will keep
+         *        received. If numberOfBytes is zero, then this method will keep
          *        reading data till no more data is available at the serial port.
          *        In all cases, all read data is available in dataBuffer on
          *        return from this method.
          * @param charBuffer The character array buffer to place serial data into.
-         * @param numOfBytes The number of bytes to read before returning.
+         * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
         void Read(unsigned char&     charBuffer,
-                  const unsigned int numOfBytes = 0,
+                  const unsigned int numberOfBytes = 0,
                   const unsigned int msTimeout  = 0);
 
         /**
@@ -234,16 +241,16 @@ namespace LibSerial
          *        The method will timeout if no data is received in the specified
          *        number of milliseconds (msTimeout). If msTimeout is 0, then
          *        this method will block until all requested bytes are
-         *        received. If numOfBytes is zero, then this method will keep
+         *        received. If numberOfBytes is zero, then this method will keep
          *        reading data till no more data is available at the serial port.
          *        In all cases, all read data is available in dataBuffer on
          *        return from this method.
          * @param dataBuffer The data buffer to place serial data into.
-         * @param numOfBytes The number of bytes to read before returning.
+         * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
         void Read(DataBuffer&        dataBuffer,
-                  const unsigned int numOfBytes = 0,
+                  const unsigned int numberOfBytes = 0,
                   const unsigned int msTimeout  = 0);
 
         /**
@@ -251,16 +258,16 @@ namespace LibSerial
          *        The method will timeout if no data is received in the specified
          *        number of milliseconds (msTimeout). If msTimeout is 0, then
          *        this method will block until all requested bytes are
-         *        received. If numOfBytes is zero, then this method will keep
+         *        received. If numberOfBytes is zero, then this method will keep
          *        reading data till no more data is available at the serial port.
          *        In all cases, all read data is available in dataBuffer on
          *        return from this method.
          * @param dataString The data string read from the serial port.
-         * @param numOfBytes The number of bytes to read before returning.
+         * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
         void Read(std::string&       dataString,
-                  const unsigned int numOfBytes = 0,
+                  const unsigned int numberOfBytes = 0,
                   const unsigned int msTimeout  = 0);
 
         /**
@@ -386,16 +393,18 @@ namespace LibSerial
         SerialPort& operator=(const SerialPort&& otherSerialPort) = delete;
 
         /**
-         * @brief Forward declaration of the implementation class folowing
+         * @brief Forward declaration of the Implementation class folowing
          *        the PImpl idiom.
          */
         class Implementation;
 
         /**
-         * @brief Pointer to implementation class instance.
+         * @brief Pointer to Implementation class instance.
          */
         std::unique_ptr<Implementation> mImpl;
-    };
-}
+
+    }; // class SerialPort
+    
+} // namespace LibSerial
 
 #endif // #ifndef _SerialPort_h_

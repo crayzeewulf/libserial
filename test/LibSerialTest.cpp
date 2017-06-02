@@ -4,18 +4,13 @@
  */
 
 #include <chrono>
-#include <iostream>
-#include <fstream>
-#include <cstdlib>
-#include <string>
-#include <unistd.h>
-
+#include <thread>
 
 #include <gtest/gtest.h>
 #include <SerialPort.h>
 #include <SerialStream.h>
 
-// Default Serial Port and Baud Rate.
+// Default Serial Ports.
 #define TEST_SERIAL_PORT_1 "/dev/ttyUSB0"
 #define TEST_SERIAL_PORT_2 "/dev/ttyUSB1"
 
@@ -27,24 +22,6 @@ class LibSerialTest
 public:
 
 protected:
-
-    /** @brief The pthread mutex lock to lock data and avoid race conditions. */
-    pthread_mutex_t serialPort1CommunicationThreadMutex;
-    pthread_mutex_t serialPort2CommunicationThreadMutex;
-    pthread_mutex_t serialStream1CommunicationThreadMutex;
-    pthread_mutex_t serialStream2CommunicationThreadMutex;
-
-    /** @brief The pthread ID for the communicationsThread. */
-    pthread_t serialPort1CommunicationThreadID;
-    pthread_t serialPort2CommunicationThreadID;
-    pthread_t serialStream1CommunicationThreadID;
-    pthread_t serialStream2CommunicationThreadID;
-
-    /** @brief A flag to indicate if the thread is currently running. */
-    bool serialPort1ThreadRunning;
-    bool serialPort2ThreadRunning;
-    bool serialStream1ThreadRunning;
-    bool serialStream2ThreadRunning;
 
     BaudRate        baudRates[25];
     CharacterSize   characterSizes[4];
@@ -69,9 +46,6 @@ protected:
 
     virtual void SetUp()
     {
-        serialPort1ThreadRunning = false;
-        serialPort2ThreadRunning = false;
-
         writeString1 = "Quidquid latine dictum sit, altum sonatur. (Whatever is said in Latin sounds profound.)";
         writeString2 = "The secret of the man who is universally interesting is that he is universally interested. - William Dean Howells";
 
@@ -118,7 +92,14 @@ protected:
         stopBits[1] = StopBits::STOP_BITS_2;
     }
 
+    long unsigned int getTimeInMicroSeconds()
+    {
+        std::chrono::high_resolution_clock::duration timeNow = 
+            std::chrono::high_resolution_clock::now().time_since_epoch();
 
+        return std::chrono::duration_cast<std::chrono::microseconds>(timeNow).count();
+    }
+    
     //---------------------- Serial Stream Unit Tests -----------------------//
 
     void testSerialStreamOpenClose()
@@ -364,6 +345,20 @@ protected:
         ASSERT_EQ(baudRate1, baudRates[16]);
         ASSERT_EQ(baudRate2, baudRates[16]);
 
+        serialPort1.WriteByte(writeByte);
+        tcdrain(serialPort1.GetFileDescriptor());
+
+        serialPort2.WriteByte(writeByte);
+        tcdrain(serialPort2.GetFileDescriptor());
+        
+        unsigned char readByte;
+
+        serialPort1.Read(readByte, 1, timeOutMilliseconds);
+        ASSERT_EQ(readByte, writeByte);
+
+        serialPort2.Read(readByte, 1, timeOutMilliseconds);
+        ASSERT_EQ(readByte, writeByte);
+
         SerialPort::DataBuffer readDataBuffer;
         SerialPort::DataBuffer writeDataBuffer;
 
@@ -394,16 +389,13 @@ protected:
         serialPort2.Read(readString1, writeString1.size(), timeOutMilliseconds);
         ASSERT_EQ(readString1, writeString1);
         ASSERT_EQ(readString1.size(), writeString1.size());
-    
-        unsigned char writeByte;
-        unsigned char readByte;
-        
+
         serialPort1.WriteByte(writeByte);
         tcdrain(serialPort1.GetFileDescriptor());
 
         serialPort2.WriteByte(writeByte);
         tcdrain(serialPort2.GetFileDescriptor());
-        
+
         serialPort1.ReadByte(readByte, timeOutMilliseconds);
         ASSERT_EQ(readByte, writeByte);
 
@@ -442,17 +434,15 @@ protected:
         ASSERT_FALSE(serialPort1.IsDataAvailable());
         ASSERT_FALSE(serialPort2.IsDataAvailable());
 
-        unsigned char writeByte;
-        unsigned char readByte;
-
         writeByte = 'A';
 
         serialPort1.WriteByte(writeByte);
         tcdrain(serialPort1.GetFileDescriptor());
         
-        usleep(2000);
-
+        usleep(25000);
         ASSERT_TRUE(serialPort2.IsDataAvailable());
+
+        unsigned char readByte;
 
         serialPort2.ReadByte(readByte, 1);
         ASSERT_EQ(readByte, writeByte);
@@ -460,12 +450,59 @@ protected:
         serialPort2.WriteByte(writeByte);
         tcdrain(serialPort2.GetFileDescriptor());
                 
-        usleep(2000);
-
+        usleep(25000);
         ASSERT_TRUE(serialPort1.IsDataAvailable());
         
         serialPort1.ReadByte(readByte, 1);
         ASSERT_EQ(readByte, writeByte);
+
+        ASSERT_FALSE(serialPort1.IsDataAvailable());
+        ASSERT_FALSE(serialPort2.IsDataAvailable());
+
+        serialPort1.Close();
+        serialPort2.Close();
+        
+        ASSERT_FALSE(serialPort1.IsOpen());
+        ASSERT_FALSE(serialPort2.IsOpen());
+    }
+
+    void testSerialPortFlushDataBuffers()
+    {
+        serialPort1.Open(TEST_SERIAL_PORT_1);
+        ASSERT_TRUE(serialPort1.IsOpen());
+
+        serialPort1.FlushInputBuffer();
+        ASSERT_FALSE(serialPort1.IsDataAvailable());
+
+        writeByte = 'A';
+        serialPort1.WriteByte(writeByte);
+        serialPort1.FlushOutputBuffer();
+
+        serialPort2.Open(TEST_SERIAL_PORT_2);
+
+        ASSERT_TRUE(serialPort2.IsOpen());
+        ASSERT_FALSE(serialPort1.IsDataAvailable());
+
+        serialPort2.FlushInputBuffer();
+
+        serialPort1.WriteByte(writeByte);
+        tcdrain(serialPort1.GetFileDescriptor());
+
+        usleep(25000);
+        ASSERT_TRUE(serialPort2.IsDataAvailable());
+
+        serialPort2.FlushInputBuffer();
+
+        ASSERT_FALSE(serialPort2.IsDataAvailable());
+
+        serialPort2.WriteByte(writeByte);
+        tcdrain(serialPort2.GetFileDescriptor());
+
+        usleep(25000);
+        ASSERT_TRUE(serialPort1.IsDataAvailable());
+        
+        serialPort1.WriteByte(writeByte);
+        serialPort1.FlushIOBuffers();
 
         ASSERT_FALSE(serialPort1.IsDataAvailable());
         ASSERT_FALSE(serialPort2.IsDataAvailable());
@@ -688,35 +725,7 @@ protected:
         ASSERT_FALSE(serialStream1.IsOpen());
     }
 
-    void testMultiThreadSerialStreamReadWrite()
-    {
-        engageSerialStreamCommunicationThreads();
-        
-        while(serialStream1ThreadRunning && serialStream2ThreadRunning)
-        {
-            usleep(1000);
-        }
-    }
-
-    void testMultiThreadSerialPortReadWrite()
-    {
-        engageSerialPortCommunicationThreads();
-        
-        while(serialPort1ThreadRunning && serialPort2ThreadRunning)
-        {
-            usleep(1000);
-        }
-    }
-
-    long unsigned int getTimeInMicroSeconds()
-    {
-        std::chrono::high_resolution_clock::duration timeNow = 
-            std::chrono::high_resolution_clock::now().time_since_epoch();
-
-        return std::chrono::duration_cast<std::chrono::microseconds>(timeNow).count();
-    }
-
-    void serialStream1CommunicationThreadLoop()
+    void serialStream1ThreadLoop()
     {
         serialStream1.Open(TEST_SERIAL_PORT_1);
         serialStream1.SetBaudRate(BaudRate::BAUD_115200);
@@ -736,11 +745,10 @@ protected:
         }
 
         serialStream1.Close();
-        serialStream1ThreadRunning = false;
         return;
     }
 
-    void serialStream2CommunicationThreadLoop()
+    void serialStream2ThreadLoop()
     {
         serialStream2.Open(TEST_SERIAL_PORT_2);
         serialStream2.SetBaudRate(BaudRate::BAUD_115200);
@@ -760,11 +768,10 @@ protected:
         }
 
         serialStream2.Close();
-        serialStream2ThreadRunning = false;
         return;
     }
 
-    void serialPort1CommunicationThreadLoop()
+    void serialPort1ThreadLoop()
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
         serialPort1.SetBaudRate(BaudRate::BAUD_115200);
@@ -788,11 +795,10 @@ protected:
         }
 
         serialPort1.Close();
-        serialPort1ThreadRunning = false;
         return;
     }
 
-    void serialPort2CommunicationThreadLoop()
+    void serialPort2ThreadLoop()
     {
         serialPort2.Open(TEST_SERIAL_PORT_2);
         serialPort2.SetBaudRate(BaudRate::BAUD_115200);
@@ -816,65 +822,27 @@ protected:
         }
 
         serialPort2.Close();
-        serialPort2ThreadRunning = false;
         return;
     }
 
-    void engageSerialPortCommunicationThreads()
+    void testMultiThreadSerialStreamReadWrite()
     {
-        pthread_mutex_init(&serialPort1CommunicationThreadMutex, NULL);
-        pthread_mutex_init(&serialPort2CommunicationThreadMutex, NULL);
+        std::thread serialStream1Thread(serialStream1ThreadLoop, this);
+        std::thread serialStream2Thread(serialStream2ThreadLoop, this);
 
-        pthread_create(&serialPort1CommunicationThreadID, NULL, &startSerialPort1CommunicationThread, this);
-        pthread_create(&serialPort2CommunicationThreadID, NULL, &startSerialPort2CommunicationThread, this);
-
-        serialPort1ThreadRunning = true;
-        serialPort2ThreadRunning = true;
-        return;
+        serialStream1Thread.join();
+        serialStream2Thread.join();
     }
 
-    void engageSerialStreamCommunicationThreads()
+    void testMultiThreadSerialPortReadWrite()
     {
-        pthread_mutex_init(&serialStream1CommunicationThreadMutex, NULL);
-        pthread_mutex_init(&serialStream2CommunicationThreadMutex, NULL);
+        std::thread serialPort1Thread(serialPort1ThreadLoop, this);
+        std::thread serialPort2Thread(serialPort2ThreadLoop, this);
 
-        pthread_create(&serialStream1CommunicationThreadID, NULL, &startSerialStream1CommunicationThread, this);
-        pthread_create(&serialStream2CommunicationThreadID, NULL, &startSerialStream2CommunicationThread, this);
-
-        serialStream1ThreadRunning = true;
-        serialStream2ThreadRunning = true;
-        return;
-    }
-
-    static void* startSerialPort1CommunicationThread(void *args)
-    {
-        LibSerialTest* libSerialTest  = (LibSerialTest*) args;
-        libSerialTest->serialPort1CommunicationThreadLoop();
-        return NULL;
-    }
-
-    static void* startSerialPort2CommunicationThread(void *args)
-    {
-        LibSerialTest* libSerialTest  = (LibSerialTest*) args;
-        libSerialTest->serialPort2CommunicationThreadLoop();
-        return NULL;
-    }
-
-    static void* startSerialStream1CommunicationThread(void *args)
-    {
-        LibSerialTest* libSerialTest  = (LibSerialTest*) args;
-        libSerialTest->serialStream1CommunicationThreadLoop();
-        return NULL;
-    }
-
-    static void* startSerialStream2CommunicationThread(void *args)
-    {
-        LibSerialTest* libSerialTest  = (LibSerialTest*) args;
-        libSerialTest->serialStream2CommunicationThreadLoop();
-        return NULL;
+        serialPort1Thread.join();
+        serialPort2Thread.join();
     }
 };
-
 
 
 //------------------------ Serial Stream Unit Tests -------------------------//
@@ -1001,6 +969,16 @@ TEST_F(LibSerialTest, testSerialPortIsDataAvailableTest)
     for (size_t i = 0; i < 100; i++)
     {
         testSerialPortIsDataAvailableTest();
+    }
+}
+
+TEST_F(LibSerialTest, testSerialPortFlushDataBuffers)
+{
+    SCOPED_TRACE("Serial Port Flush Data Buffers Test");
+
+    for (size_t i = 0; i < 100; i++)
+    {
+        testSerialPortFlushDataBuffers();
     }
 }
 
