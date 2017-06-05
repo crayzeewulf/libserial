@@ -284,13 +284,29 @@ protected:
         SerialPort::DataBuffer writeDataBuffer;
 
         // Test using ASCII characters.
-        for (size_t i = 48; i < 122; i++)
+        for (size_t i = 48; i < 123; i++)
         {
             writeDataBuffer.push_back(i);
         }
 
         serialPort.Write(writeDataBuffer);
-        serialPort2.Read(readDataBuffer, 74, 5);
+
+        try
+        {
+            serialPort2.Read(readDataBuffer, 75, 50);
+        }
+        catch(...)
+        {
+            std::cout << "ReadDataBuffer Timeout." << std::endl;
+
+            for (auto i = readDataBuffer.begin(); i < readDataBuffer.end(); i++)
+            {
+                std::cout << *i << ' ';
+            }
+
+            std::cout << std::endl;
+        }
+
         ASSERT_EQ(readDataBuffer, writeDataBuffer);
 
         serialPort.Close();
@@ -305,10 +321,18 @@ protected:
         ASSERT_TRUE(serialPort.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
-        serialPort.WriteByte((unsigned char)writeByte);
-        readByte = (char)serialPort2.ReadByte(5);
+        try
+        {
+            serialPort.WriteByte((unsigned char)writeByte);
+            readByte = (char)serialPort2.ReadByte(100);
+        }
+        catch(...)
+        {
+            std::cout << "ReadByte Timeout." << std::endl;
+        }
+
         ASSERT_EQ(readByte, writeByte);
-        
+
         serialPort.Close();
         serialPort2.Close();
         
@@ -321,10 +345,18 @@ protected:
         ASSERT_TRUE(serialPort.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
         
-        serialPort.Write(writeString + '\n');
-        readString = serialPort2.ReadLine(5);
+        try
+        {
+            serialPort.Write(writeString + '\n');
+            readString = serialPort2.ReadLine(100);
+        }
+        catch(...)
+        {
+            std::cout << "ReadLine Timeout." << std::endl;
+        }
+
         ASSERT_EQ(readString, writeString + '\n');
-        
+
         serialPort.Close();
         serialPort2.Close();
         
@@ -343,10 +375,10 @@ protected:
         ASSERT_FALSE(serialPort.IsDataAvailable());
 
         serialPort.WriteByte((unsigned char)writeByte);
-        usleep(1); // @TODO - This should be replaced to a call to tcdrain();
+        usleep(25000);
         ASSERT_TRUE(serialPort2.IsDataAvailable());
 
-        readByte = (char)serialPort2.ReadByte(1);
+        readByte = (char)serialPort2.ReadByte(25);
         ASSERT_FALSE(serialPort2.IsDataAvailable());
 
         serialPort.Close();
