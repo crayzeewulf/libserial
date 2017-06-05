@@ -19,11 +19,8 @@
  *****************************************************************************/
  
 #include "SerialStream.h"
-#include <fcntl.h>
-#include <cstdio>
+
 #include <termios.h>
-#include <fstream>
-#include <cassert>
 
 
 using namespace LibSerial ;

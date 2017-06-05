@@ -19,11 +19,11 @@
  
 #include "PosixSignalDispatcher.h"
 #include "PosixSignalHandler.h"
-#include <sstream>
-#include <map>
-#include <errno.h>
-#include <signal.h>
+
 #include <cstring>
+#include <map>
+#include <sstream>
+#include <signal.h>
 
 
 namespace

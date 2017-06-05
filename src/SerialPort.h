@@ -22,12 +22,9 @@
 #ifndef _SerialPort_h_
 #define _SerialPort_h_
 
-
-#include <string>
-#include <vector>
 #include <stdexcept>
 #include <termios.h>
-
+#include <vector>
 
 //
 // @todo - This class will be placed in LibSerial namespace in the next 
@@ -207,13 +204,6 @@ public:
                std::invalid_argument ) ;
 
     /**
-     * @brief Determines if the serial port is open for I/O.
-     * @return Returns true iff the serial port is open.
-     */
-    bool
-    IsOpen() const ;
-
-    /**
      * @brief Closes the serial port. All settings of the serial port will be
      *        lost and no more I/O can be performed on the serial port.
      * @throw NotOpen This exception is thrown if this method is called while
@@ -221,6 +211,23 @@ public:
      */
     void
     Close()
+        throw(NotOpen) ;
+
+    /**
+     * @brief Determines if the serial port is open for I/O.
+     * @return Returns true iff the serial port is open.
+     */
+    bool
+    IsOpen() const ;
+
+    /**
+     * @brief Checks if data is available at the input of the serial port.
+     * @throw NotOpen This exception is thrown if the method is called while
+     *        the serial port is not open.
+     * @return Returns true iff data is available to read.
+     */
+    bool
+    IsDataAvailable() const
         throw(NotOpen) ;
 
     /**
@@ -340,137 +347,6 @@ public:
         throw( NotOpen ) ;
 
     /**
-     * @brief Checks if data is available at the input of the serial port.
-     * @throw NotOpen This exception is thrown if the method is called while
-     *        the serial port is not open.
-     * @return Returns true iff data is available to read.
-     */
-    bool
-    IsDataAvailable() const
-        throw(NotOpen) ;
-
-    /**
-     * @brief Reads a single byte from the serial port.
-     *        If no data is available within the specified number
-     *        of milliseconds (msTimeout), then this method will
-     *        throw a ReadTimeout exception. If msTimeout is 0,
-     *        then this method will block until data is available.
-     * @param msTimeout The timeout period in milliseconds.
-     * @throw NotOpen This exception is thrown if this method is called while
-     *        the serial port is not open.
-     * @throw ReadTimeout This exception is thrown if the timeout value is
-     *        reached before a line termination character is received.
-     * @throw std::runtime_error This exception is thrown if any standard
-     *        runtime error is encountered.
-     * @return Returns the byte read.
-     */
-    unsigned char
-    ReadByte( const unsigned int msTimeout = 0 )
-        throw( NotOpen,
-               ReadTimeout,
-               std::runtime_error ) ;
-
-    
-    /**
-     * @brief A vector of character types to store data bytes read from the
-     *        serial port.
-     */
-    typedef std::vector<unsigned char> DataBuffer ;
-    
-    /**
-     * @brief Reads the specified number of bytes from the serial port.
-     *        The method will timeout if no data is received in the specified
-     *        number of milliseconds (msTimeout). If msTimeout is 0, then
-     *        this method will block until all requested bytes are
-     *        received. If numOfBytes is zero, then this method will keep
-     *        reading data till no more data is available at the serial port.
-     *        In all cases, all read data is available in dataBuffer on
-     *        return from this method.
-     * @param dataBuffer The data buffer to place serial data into.
-     * @param numOfBytes The number of bytes to read before returning.
-     * @param msTimeout The timeout period in milliseconds.
-     * @throw NotOpen This exception is thrown if this method is called while
-     *        the serial port is not open.
-     * @throw ReadTimeout This exception is thrown if the timeout value is
-     *        reached before a line termination character is received.
-     * @throw std::runtime_error This exception is thrown if any standard
-     *        runtime error is encountered.
-     */
-    void
-    Read( DataBuffer&        dataBuffer,
-          const unsigned int numOfBytes = 0,
-          const unsigned int msTimeout  = 0 )
-        throw( NotOpen,
-               ReadTimeout,
-               std::runtime_error ) ;
-
-    /**
-     * @brief Reads a line of characters from the serial port.
-     *        The method will timeout if no data is received in the specified
-     *        number of milliseconds (msTimeout). If msTimeout is 0, then
-     *        this method will block until a line terminator is received.
-     *        If a line terminator is read, a string will be returned,
-     *        however, if the timeout is reached, an exception will be thrown
-     *        and all previously read data will be lost.
-     * @param msTimeout The timeout value to return if a line termination
-     *        character is not read.
-     * @param lineTerminator The line termination character to specify the
-     *        end of a line.
-     * @throw NotOpen This exception is thrown if this method is called while
-     *        the serial port is not open.
-     * @throw ReadTimeout This exception is thrown if the timeout value is
-     *        reached before a line termination character is received.
-     * @throw std::runtime_error This exception is thrown if any standard
-     *        runtime error is encountered.
-     * @return Returns the line read from the serial port ending with the line
-     *         termination character iff sucessful.
-     */
-    const std::string
-    ReadLine( const unsigned int msTimeout = 0,
-              const char         lineTerminator = '\n' )
-        throw( NotOpen,
-               ReadTimeout,
-               std::runtime_error ) ;
-
-    /**
-     * @brief Writes a single byte to the serial port.
-     * @param dataByte The byte to be written to the serial port.
-     * @throw NotOpen This exception is thrown if this method is called while
-     *        the serial port is not open.
-     * @throw std::runtime_error This exception is thrown if any standard
-     *        runtime error is encountered.
-     */
-    void
-    WriteByte(const unsigned char dataByte)
-        throw( NotOpen,
-               std::runtime_error ) ;
-
-    /**
-     * @brief Writes a DataBuffer vector to the serial port.
-     * @param dataBuffer The DataBuffer vector to be written to the serial
-     *        port.
-     * @throw NotOpen This exception is thrown if this method is called while
-     *        the serial port is not open.
-     * @throw std::runtime_error This exception is thrown if any standard
-     *        runtime error is encountered.
-     */
-    void
-    Write(const DataBuffer& dataBuffer)
-        throw( NotOpen,
-               std::runtime_error ) ;
-
-    /**
-     * @brief Writes a std::string to the serial port.
-     * @param dataString The data string to be written to the serial port.
-     * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
-     * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
-     */
-    void
-    Write(const std::string& dataString)
-        throw( NotOpen,
-               std::runtime_error ) ;
-
-    /**
      * @brief Sets the DTR line to the specified value.
      * @param dtrState The line voltage state to be set,
      *        (true = high, false = low).
@@ -545,6 +421,127 @@ public:
     GetDsr() const
         throw( NotOpen,
                std::runtime_error ) ;
+    
+    /**
+     * @brief A vector of character types to store data bytes read from the
+     *        serial port.
+     */
+    typedef std::vector<unsigned char> DataBuffer ;
+    
+    /**
+     * @brief Reads the specified number of bytes from the serial port.
+     *        The method will timeout if no data is received in the specified
+     *        number of milliseconds (msTimeout). If msTimeout is 0, then
+     *        this method will block until all requested bytes are
+     *        received. If numOfBytes is zero, then this method will keep
+     *        reading data till no more data is available at the serial port.
+     *        In all cases, all read data is available in dataBuffer on
+     *        return from this method.
+     * @param dataBuffer The data buffer to place serial data into.
+     * @param numOfBytes The number of bytes to read before returning.
+     * @param msTimeout The timeout period in milliseconds.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw ReadTimeout This exception is thrown if the timeout value is
+     *        reached before a line termination character is received.
+     * @throw std::runtime_error This exception is thrown if any standard
+     *        runtime error is encountered.
+     */
+    void
+    Read( DataBuffer&        dataBuffer,
+          const unsigned int numOfBytes = 0,
+          const unsigned int msTimeout  = 0 )
+        throw( NotOpen,
+               ReadTimeout,
+               std::runtime_error ) ;
+
+    /**
+     * @brief Reads a single byte from the serial port.
+     *        If no data is available within the specified number
+     *        of milliseconds (msTimeout), then this method will
+     *        throw a ReadTimeout exception. If msTimeout is 0,
+     *        then this method will block until data is available.
+     * @param msTimeout The timeout period in milliseconds.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw ReadTimeout This exception is thrown if the timeout value is
+     *        reached before a line termination character is received.
+     * @throw std::runtime_error This exception is thrown if any standard
+     *        runtime error is encountered.
+     * @return Returns the byte read.
+     */
+    unsigned char
+    ReadByte( const unsigned int msTimeout = 0 )
+        throw( NotOpen,
+               ReadTimeout,
+               std::runtime_error ) ;
+
+    /**
+     * @brief Reads a line of characters from the serial port.
+     *        The method will timeout if no data is received in the specified
+     *        number of milliseconds (msTimeout). If msTimeout is 0, then
+     *        this method will block until a line terminator is received.
+     *        If a line terminator is read, a string will be returned,
+     *        however, if the timeout is reached, an exception will be thrown
+     *        and all previously read data will be lost.
+     * @param msTimeout The timeout value to return if a line termination
+     *        character is not read.
+     * @param lineTerminator The line termination character to specify the
+     *        end of a line.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw ReadTimeout This exception is thrown if the timeout value is
+     *        reached before a line termination character is received.
+     * @throw std::runtime_error This exception is thrown if any standard
+     *        runtime error is encountered.
+     * @return Returns the line read from the serial port ending with the line
+     *         termination character iff sucessful.
+     */
+    const std::string
+    ReadLine( const unsigned int msTimeout = 0,
+              const char         lineTerminator = '\n' )
+        throw( NotOpen,
+               ReadTimeout,
+               std::runtime_error ) ;
+
+    /**
+     * @brief Writes a DataBuffer vector to the serial port.
+     * @param dataBuffer The DataBuffer vector to be written to the serial
+     *        port.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw std::runtime_error This exception is thrown if any standard
+     *        runtime error is encountered.
+     */
+    void
+    Write(const DataBuffer& dataBuffer)
+        throw( NotOpen,
+               std::runtime_error ) ;
+
+    /**
+     * @brief Writes a std::string to the serial port.
+     * @param dataString The data string to be written to the serial port.
+     * @throw NotOpen This exception is thrown if this method is called while the serial port is not open.
+     * @throw std::runtime_error This exception is thrown if any standard runtime error is encountered.
+     */
+    void
+    Write(const std::string& dataString)
+        throw( NotOpen,
+               std::runtime_error ) ;
+
+    /**
+     * @brief Writes a single byte to the serial port.
+     * @param dataByte The byte to be written to the serial port.
+     * @throw NotOpen This exception is thrown if this method is called while
+     *        the serial port is not open.
+     * @throw std::runtime_error This exception is thrown if any standard
+     *        runtime error is encountered.
+     */
+    void
+    WriteByte(const unsigned char dataByte)
+        throw( NotOpen,
+               std::runtime_error ) ;
+
 private:
     /**
      * @brief Prevents copying of objects of this class by declaring the copy
