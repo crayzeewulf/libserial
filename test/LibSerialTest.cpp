@@ -48,8 +48,6 @@ protected:
     char writeByte;
     char readByte;
 
-    unsigned int timeOut = 30;
-
     virtual void SetUp()
     {
         writeString = "Quidquid latine dictum sit, altum sonatur. (Whatever is said in Latin sounds profound.)";
