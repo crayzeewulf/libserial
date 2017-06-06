@@ -78,10 +78,19 @@ namespace LibSerial
         void Close();
 
         /**
-         * @brief Determines if the serial port is open for I/O.
-         * @return Returns true iff the serial port is open.
+         * @brief Flushes the serial port input buffer.
          */
-        bool IsOpen();
+        void FlushInputBuffer();
+
+        /**
+         * @brief Flushes the serial port output buffer.
+         */
+        void FlushOutputBuffer();
+
+        /**
+         * @brief Flushes the serial port input and output buffers.
+         */
+        void FlushIOBuffers();
 
         /** 
          * @brief This routine is called by open() in order to
@@ -89,6 +98,17 @@ namespace LibSerial
          *        setting its parameters to default values.
          */
         void InitializeSerialPort();
+
+        /**
+         * @brief Determines if data is available at the serial port.
+         */
+        bool IsDataAvailable();
+
+        /**
+         * @brief Determines if the serial port is open for I/O.
+         * @return Returns true iff the serial port is open.
+         */
+        bool IsOpen();
 
         /**
          * @brief Sets all serial port paramters to their default values.
@@ -181,24 +201,41 @@ namespace LibSerial
         short GetVTime();
 
         /**
-         * @brief Determines if data is available at the serial port.
+         * @brief Sets the serial port DTR line status.
+         * @param dtrState The state to set the DTR line
          */
-        bool IsDataAvailable();
+        void SetDTR(const bool dtrState);
 
         /**
-         * @brief Flushes the serial port input buffer.
+         * @brief Gets the serial port DTR line status.
          */
-        void FlushInputBuffer();
+        bool GetDTR();
 
         /**
-         * @brief Flushes the serial port output buffer.
+         * @brief Sets the serial port RTS line status.
+         * @param dtrState The state to set the RTS line
          */
-        void FlushOutputBuffer();
+        void SetRTS(const bool rtsState);
 
         /**
-         * @brief Flushes the serial port input and output buffers.
+         * @brief Gets the serial port RTS line status.
          */
-        void FlushIOBuffers();
+        bool GetRTS();
+
+        /**
+         * @brief Gets the serial port CTS line status.
+         */
+        bool GetCTS();
+
+        /**
+         * @brief Gets the serial port DSR line status.
+         */
+        bool GetDSR();
+
+        /**
+         * @brief Gets the serial port file descriptor.
+         */
+        int GetFileDescriptor();
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -306,43 +343,6 @@ namespace LibSerial
          */
         void WriteByte(const unsigned char charbuffer);
 
-        /**
-         * @brief Sets the serial port DTR line status.
-         * @param dtrState The state to set the DTR line
-         */
-        void SetDtr(const bool dtrState);
-
-        /**
-         * @brief Gets the serial port DTR line status.
-         */
-        bool GetDtr();
-
-        /**
-         * @brief Sets the serial port RTS line status.
-         * @param dtrState The state to set the RTS line
-         */
-        void SetRts(const bool rtsState);
-
-        /**
-         * @brief Gets the serial port RTS line status.
-         */
-        bool GetRts();
-
-        /**
-         * @brief Gets the serial port CTS line status.
-         */
-        bool GetCts();
-
-        /**
-         * @brief Gets the serial port DSR line status.
-         */
-        bool GetDsr();
-
-        /**
-         * @brief Gets the serial port file descriptor.
-         */
-        int GetFileDescriptor();
-
     private:
 
         /**
@@ -426,10 +426,25 @@ namespace LibSerial
         return;
     }
 
-    bool
-    SerialPort::IsOpen()
+    void
+    SerialPort::FlushInputBuffer()
     {
-        return mImpl->IsOpen();
+        mImpl->FlushInputBuffer();
+        return;
+    }
+
+    void
+    SerialPort::FlushOutputBuffer()
+    {
+        mImpl->FlushOutputBuffer();
+        return;
+    }
+
+    void
+    SerialPort::FlushIOBuffers()
+    {
+        mImpl->FlushIOBuffers();
+        return;
     }
 
     void
@@ -437,6 +452,18 @@ namespace LibSerial
     {
         mImpl->InitializeSerialPort();
         return;
+    }
+
+    bool
+    SerialPort::IsDataAvailable()
+    {
+        return mImpl->IsDataAvailable();
+    }
+
+    bool
+    SerialPort::IsOpen()
+    {
+        return mImpl->IsOpen();
     }
 
     void
@@ -537,31 +564,48 @@ namespace LibSerial
         return mImpl->GetVTime();
     }
 
+    void
+    SerialPort::SetDTR(const bool dtrState)
+    {
+        mImpl->SetDTR(dtrState);
+        return;
+    }
+
     bool
-    SerialPort::IsDataAvailable()
+    SerialPort::GetDTR()
     {
-        return mImpl->IsDataAvailable();
+        return mImpl->GetDTR();
     }
 
     void
-    SerialPort::FlushInputBuffer()
+    SerialPort::SetRTS(const bool rtsState)
     {
-        mImpl->FlushInputBuffer();
+        mImpl->SetRTS(rtsState);
         return;
     }
 
-    void
-    SerialPort::FlushOutputBuffer()
+    bool
+    SerialPort::GetRTS()
     {
-        mImpl->FlushOutputBuffer();
-        return;
+        return mImpl->GetRTS();
     }
 
-    void
-    SerialPort::FlushIOBuffers()
+    bool
+    SerialPort::GetCTS()
     {
-        mImpl->FlushIOBuffers();
-        return;
+        return mImpl->GetCTS();
+    }
+
+    bool
+    SerialPort::GetDSR() 
+    {
+        return mImpl->GetDSR();
+    }
+
+    int
+    SerialPort::GetFileDescriptor()
+    {
+        return mImpl->GetFileDescriptor();
     }
 
     void
@@ -645,50 +689,6 @@ namespace LibSerial
     {
         mImpl->WriteByte(charBuffer);
         return;
-    }
-
-    void
-    SerialPort::SetDtr(const bool dtrState)
-    {
-        mImpl->SetDtr(dtrState);
-        return;
-    }
-
-    bool
-    SerialPort::GetDtr()
-    {
-        return mImpl->GetDtr();
-    }
-
-    void
-    SerialPort::SetRts(const bool rtsState)
-    {
-        mImpl->SetRts(rtsState);
-        return;
-    }
-
-    bool
-    SerialPort::GetRts()
-    {
-        return mImpl->GetRts();
-    }
-
-    bool
-    SerialPort::GetCts()
-    {
-        return mImpl->GetCts();
-    }
-
-    bool
-    SerialPort::GetDsr() 
-    {
-        return mImpl->GetDsr();
-    }
-
-    int
-    SerialPort::GetFileDescriptor()
-    {
-        return mImpl->GetFileDescriptor();
     }
 
 
@@ -848,10 +848,47 @@ namespace LibSerial
     }
 
     inline
-    bool
-    SerialPort::Implementation::IsOpen()
+    void
+    SerialPort::Implementation::FlushInputBuffer()
     {
-        return (-1 != this->mFileDescriptor);
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        tcflush(this->mFileDescriptor, TCIFLUSH);
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::FlushOutputBuffer()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+
+        tcflush(this->mFileDescriptor, TCOFLUSH);
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::FlushIOBuffers()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        
+        tcflush(this->mFileDescriptor, TCIOFLUSH);
+        return;
     }
 
     inline
@@ -896,6 +933,39 @@ namespace LibSerial
 
         // Initialization was successful.
         return;
+    }
+
+    inline
+    bool
+    SerialPort::Implementation::IsOpen()
+    {
+        return (-1 != this->mFileDescriptor);
+    }
+
+    inline
+    bool
+    SerialPort::Implementation::IsDataAvailable()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        int num_of_bytes_available = 0;
+        bool dataAvailableStatus = false;
+
+        int result = ioctl(this->mFileDescriptor,
+                           FIONREAD,
+                           &num_of_bytes_available);
+        
+        if (result >= 0 &&
+            num_of_bytes_available > 0)
+        {
+            dataAvailableStatus = true;
+        }
+
+        return dataAvailableStatus;
     }
 
     inline
@@ -1518,8 +1588,23 @@ namespace LibSerial
     }
 
     inline
+    void
+    SerialPort::Implementation::SetDTR(const bool dtrState)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        this->SetModemControlLine(TIOCM_DTR, 
+                                   dtrState);
+        return;
+    }
+
+    inline
     bool
-    SerialPort::Implementation::IsDataAvailable()
+    SerialPort::Implementation::GetDTR()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1527,39 +1612,132 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        int num_of_bytes_available = 0;
-        bool dataAvailableStatus = false;
+        return this->GetModemControlLine(TIOCM_DTR);
+    }    
 
-        int result = ioctl(this->mFileDescriptor,
-                           FIONREAD,
-                           &num_of_bytes_available);
+    inline
+    void
+    SerialPort::Implementation::SetRTS(const bool rtsState)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        this->SetModemControlLine(TIOCM_RTS, 
+                                  rtsState);
+        return;
+    }
+
+    inline
+    bool
+    SerialPort::Implementation::GetRTS()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        return this->GetModemControlLine(TIOCM_RTS);
+    }    
+
+    inline
+    bool
+    SerialPort::Implementation::GetCTS()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        return this->GetModemControlLine(TIOCM_CTS);
+    }    
+
+    inline
+    bool
+    SerialPort::Implementation::GetDSR()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        return this->GetModemControlLine(TIOCM_DSR);
+    }    
+
+    inline
+    int
+    SerialPort::Implementation::GetFileDescriptor()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        return this->mFileDescriptor;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::SetModemControlLine(const int  modemLine,
+                                                    const bool lineState)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        if (modemLine != TIOCM_LE  &&
+            modemLine != TIOCM_DTR &&
+            modemLine != TIOCM_RTS &&
+            modemLine != TIOCM_ST  &&
+            modemLine != TIOCM_SR  &&
+            modemLine != TIOCM_CTS &&
+            modemLine != TIOCM_CAR &&
+            modemLine != TIOCM_CD  &&
+            modemLine != TIOCM_RNG &&
+            modemLine != TIOCM_RI  &&
+            modemLine != TIOCM_DSR)
+        {
+            throw std::invalid_argument(strerror(errno));
+        }
+
+        // Set or unset the specified bit according to the value of lineState.
+        int ioctl_result = -1;
         
-        if (result >= 0 &&
-            num_of_bytes_available > 0)
+        if (true == lineState)
         {
-            dataAvailableStatus = true;
+            int set_line_mask = modemLine;
+            ioctl_result = ioctl(this->mFileDescriptor, 
+                                 TIOCMBIS,
+                                 &set_line_mask);
+        }
+        else
+        {
+            int reset_line_mask = modemLine;
+            ioctl_result = ioctl(this->mFileDescriptor, 
+                                 TIOCMBIC,
+                                 &reset_line_mask);
         }
 
-        return dataAvailableStatus;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::FlushInputBuffer()
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        // Check for errors.
+        if (ioctl_result  < 0)
         {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+            throw std::runtime_error(strerror(errno));
         }
 
-        tcflush(this->mFileDescriptor, TCIFLUSH);
         return;
     }
 
     inline
-    void
-    SerialPort::Implementation::FlushOutputBuffer()
+    bool
+    SerialPort::Implementation::GetModemControlLine(const int modemLine)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1567,24 +1745,32 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-
-        tcflush(this->mFileDescriptor, TCOFLUSH);
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::FlushIOBuffers()
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (modemLine != TIOCM_LE  &&
+            modemLine != TIOCM_DTR &&
+            modemLine != TIOCM_RTS &&
+            modemLine != TIOCM_ST  &&
+            modemLine != TIOCM_SR  &&
+            modemLine != TIOCM_CTS &&
+            modemLine != TIOCM_CAR &&
+            modemLine != TIOCM_CD  &&
+            modemLine != TIOCM_RNG &&
+            modemLine != TIOCM_RI  &&
+            modemLine != TIOCM_DSR)
         {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+            throw std::invalid_argument(strerror(errno));
         }
-
         
-        tcflush(this->mFileDescriptor, TCIOFLUSH);
-        return;
+        // Use an ioctl() call to get the state of the line.
+        int serial_port_state = 0;
+        
+        if (ioctl(this->mFileDescriptor,
+                  TIOCMGET,
+                  &serial_port_state) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        return (serial_port_state & modemLine);
     }
 
     inline
@@ -1996,191 +2182,5 @@ namespace LibSerial
                     1);
 
         return;
-    }
-    
-    inline
-    void
-    SerialPort::Implementation::SetDtr(const bool dtrState)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        this->SetModemControlLine(TIOCM_DTR, 
-                                   dtrState);
-        return;
-    }
-
-    inline
-    bool
-    SerialPort::Implementation::GetDtr()
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        return this->GetModemControlLine(TIOCM_DTR);
-    }    
-
-    inline
-    void
-    SerialPort::Implementation::SetRts(const bool rtsState)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        this->SetModemControlLine(TIOCM_RTS, 
-                                  rtsState);
-        return;
-    }
-
-    inline
-    bool
-    SerialPort::Implementation::GetRts()
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        return this->GetModemControlLine(TIOCM_RTS);
-    }    
-
-    inline
-    bool
-    SerialPort::Implementation::GetCts()
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        return this->GetModemControlLine(TIOCM_CTS);
-    }    
-
-    inline
-    bool
-    SerialPort::Implementation::GetDsr()
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        return this->GetModemControlLine(TIOCM_DSR);
-    }    
-
-    inline
-    int
-    SerialPort::Implementation::GetFileDescriptor()
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        return this->mFileDescriptor;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::SetModemControlLine(const int  modemLine,
-                                                    const bool lineState)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        if (modemLine != TIOCM_LE  &&
-            modemLine != TIOCM_DTR &&
-            modemLine != TIOCM_RTS &&
-            modemLine != TIOCM_ST  &&
-            modemLine != TIOCM_SR  &&
-            modemLine != TIOCM_CTS &&
-            modemLine != TIOCM_CAR &&
-            modemLine != TIOCM_CD  &&
-            modemLine != TIOCM_RNG &&
-            modemLine != TIOCM_RI  &&
-            modemLine != TIOCM_DSR)
-        {
-            throw std::invalid_argument(strerror(errno));
-        }
-
-        // Set or unset the specified bit according to the value of lineState.
-        int ioctl_result = -1;
-        
-        if (true == lineState)
-        {
-            int set_line_mask = modemLine;
-            ioctl_result = ioctl(this->mFileDescriptor, 
-                                 TIOCMBIS,
-                                 &set_line_mask);
-        }
-        else
-        {
-            int reset_line_mask = modemLine;
-            ioctl_result = ioctl(this->mFileDescriptor, 
-                                 TIOCMBIC,
-                                 &reset_line_mask);
-        }
-
-        // Check for errors.
-        if (ioctl_result  < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
-
-        return;
-    }
-
-    inline
-    bool
-    SerialPort::Implementation::GetModemControlLine(const int modemLine)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        if (modemLine != TIOCM_LE  &&
-            modemLine != TIOCM_DTR &&
-            modemLine != TIOCM_RTS &&
-            modemLine != TIOCM_ST  &&
-            modemLine != TIOCM_SR  &&
-            modemLine != TIOCM_CTS &&
-            modemLine != TIOCM_CAR &&
-            modemLine != TIOCM_CD  &&
-            modemLine != TIOCM_RNG &&
-            modemLine != TIOCM_RI  &&
-            modemLine != TIOCM_DSR)
-        {
-            throw std::invalid_argument(strerror(errno));
-        }
-        
-        // Use an ioctl() call to get the state of the line.
-        int serial_port_state = 0;
-        
-        if (ioctl(this->mFileDescriptor,
-                  TIOCMGET,
-                  &serial_port_state) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
-
-        return (serial_port_state & modemLine);
     }
 }

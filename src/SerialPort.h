@@ -92,10 +92,19 @@ namespace LibSerial
         void Close();
 
         /**
-         * @brief Determines if the serial port is open for I/O.
-         * @return Returns true iff the serial port is open.
+         * @brief Flushes the serial port input buffer.
          */
-        bool IsOpen();
+        void FlushInputBuffer();
+
+        /**
+         * @brief Flushes the serial port output buffer.
+         */
+        void FlushOutputBuffer();
+
+        /**
+         * @brief Flushes the serial port input and output buffers.
+         */
+        void FlushIOBuffers();
 
         /** 
          * @brief This routine is called by open() in order to
@@ -103,6 +112,18 @@ namespace LibSerial
          *        setting its parameters to default values.
          */
         void InitializeSerialPort();
+
+        /**
+         * @brief Checks if data is available at the input of the serial port.
+         * @return Returns true iff data is available to read.
+         */
+        bool IsDataAvailable();
+
+        /**
+         * @brief Determines if the serial port is open for I/O.
+         * @return Returns true iff the serial port is open.
+         */
+        bool IsOpen();
 
         /**
          * @brief Initializes the serial communication parameters to their
@@ -199,25 +220,47 @@ namespace LibSerial
         short GetVTime();
 
         /**
-         * @brief Checks if data is available at the input of the serial port.
-         * @return Returns true iff data is available to read.
+         * @brief Sets the DTR line to the specified value.
+         * @param dtrState The line voltage state to be set,
+         *        (true = high, false = low).
          */
-        bool IsDataAvailable();
+        void SetDTR(const bool dtrState = true);
 
         /**
-         * @brief Flushes the serial port input buffer.
+         * @brief Gets the status of the DTR line.
+         * @return Returns true iff the status of the DTR line is high.
          */
-        void FlushInputBuffer();
+        bool GetDTR();
 
         /**
-         * @brief Flushes the serial port output buffer.
+         * @brief Set the RTS line to the specified value.
+         * @param rtsState The line voltage state to be set,
+         *        (true = high, false = low).
          */
-        void FlushOutputBuffer();
+        void SetRTS(const bool rtsState = true);
 
         /**
-         * @brief Flushes the serial port input and output buffers.
+         * @brief Get the status of the RTS line.
+         * @return Returns true iff the status of the RTS line is high.
          */
-        void FlushIOBuffers();
+        bool GetRTS();
+
+        /**
+         * @brief Get the status of the CTS line.
+         * @return Returns true iff the status of the CTS line is high.
+         */
+        bool GetCTS();
+
+        /**
+         * @brief Get the status of the DSR line.
+         * @return Returns true iff the status of the DSR line is high.
+         */
+        bool GetDSR();
+
+        /**
+         * @brief Gets the serial port file descriptor.
+         */
+        int GetFileDescriptor();
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -325,49 +368,6 @@ namespace LibSerial
          * @param charbuffer The byte to write to the serial port.
          */
         void WriteByte(const unsigned char charbuffer);
-
-        /**
-         * @brief Sets the DTR line to the specified value.
-         * @param dtrState The line voltage state to be set,
-         *        (true = high, false = low).
-         */
-        void SetDtr(const bool dtrState = true);
-
-        /**
-         * @brief Gets the status of the DTR line.
-         * @return Returns true iff the status of the DTR line is high.
-         */
-        bool GetDtr();
-
-        /**
-         * @brief Set the RTS line to the specified value.
-         * @param rtsState The line voltage state to be set,
-         *        (true = high, false = low).
-         */
-        void SetRts(const bool rtsState = true);
-
-        /**
-         * @brief Get the status of the RTS line.
-         * @return Returns true iff the status of the RTS line is high.
-         */
-        bool GetRts();
-
-        /**
-         * @brief Get the status of the CTS line.
-         * @return Returns true iff the status of the CTS line is high.
-         */
-        bool GetCts();
-
-        /**
-         * @brief Get the status of the DSR line.
-         * @return Returns true iff the status of the DSR line is high.
-         */
-        bool GetDsr();
-
-        /**
-         * @brief Gets the serial port file descriptor.
-         */
-        int GetFileDescriptor();
 
     private:
         /**
