@@ -41,9 +41,6 @@ protected:
     std::string readString2  = " ";
     std::string writeString2 = " ";
 
-    char writeByte = 'a';
-    char readByte  = 'b';
-
     virtual void SetUp()
     {
         writeString1 = "Quidquid latine dictum sit, altum sonatur. (Whatever is said in Latin sounds profound.)";
@@ -240,15 +237,29 @@ protected:
         ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());        
 
-        writeByte = 'a';
-        serialStream1.write(&writeByte, 1);
-        serialStream2.read(&readByte, 1);
-        ASSERT_EQ(readByte, writeByte);
+        char writeByte1 = 'a';
+        char writeByte2 = 'A';
 
-        writeByte = 'A';
-        serialStream1 << writeByte;
-        serialStream2.read(&readByte, 1);
-        ASSERT_EQ(readByte, writeByte);
+        char readByte1  = 'b';
+        char readByte2  = 'B';
+
+        serialStream1.write(&writeByte1, 1);
+        serialStream2.write(&writeByte2, 1);
+
+        serialStream1.read(&readByte2, 1);
+        serialStream2.read(&readByte1, 1);
+
+        ASSERT_EQ(readByte1, writeByte1);
+        ASSERT_EQ(readByte2, writeByte2);
+
+        serialStream1 << writeByte1;
+        serialStream2 << writeByte2;
+
+        serialStream1.read(&readByte2, 1);
+        serialStream2.read(&readByte1, 1);
+
+        ASSERT_EQ(readByte1, writeByte1);
+        ASSERT_EQ(readByte2, writeByte2);
 
         serialStream1.Close();
         serialStream2.Close();
@@ -266,8 +277,13 @@ protected:
         ASSERT_TRUE(serialStream2.IsOpen());
 
         serialStream1 << writeString1 << std::endl;
+        serialStream2 << writeString2 << std::endl;
+
+        getline(serialStream1, readString2);
         getline(serialStream2, readString1);
+
         ASSERT_EQ(readString1, writeString1);
+        ASSERT_EQ(readString2, writeString2);
 
         serialStream1.Close();
         serialStream2.Close();
@@ -284,15 +300,29 @@ protected:
         ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());        
 
-        writeByte = 'a';
-        serialStream1.write(&writeByte, 1);
-        serialStream2.get(readByte);
-        ASSERT_EQ(readByte, writeByte);
+        char writeByte1 = 'a';
+        char writeByte2 = 'A';
 
-        writeByte = 'A';
-        serialStream1 << writeByte;
-        serialStream2.get(readByte);
-        ASSERT_EQ(readByte, writeByte);
+        char readByte1  = 'b';
+        char readByte2  = 'B';
+
+        serialStream1.write(&writeByte1, 1);
+        serialStream2.write(&writeByte2, 1);
+
+        serialStream1.get(readByte2);
+        serialStream2.get(readByte1);
+
+        ASSERT_EQ(readByte1, writeByte1);
+        ASSERT_EQ(readByte2, writeByte2);
+
+        serialStream1 << writeByte1;
+        serialStream2 << writeByte2;
+
+        serialStream1.get(readByte2);
+        serialStream2.get(readByte1);
+
+        ASSERT_EQ(readByte1, writeByte1);
+        ASSERT_EQ(readByte2, writeByte2);
 
         serialStream1.Close();
         serialStream2.Close();
@@ -327,7 +357,8 @@ protected:
         ASSERT_FALSE(serialPort1.IsDataAvailable());
         ASSERT_FALSE(serialPort2.IsDataAvailable());
 
-        writeByte = 'A';
+        char writeByte = 'A';
+
         serialPort1.WriteByte(writeByte);
         serialPort2.WriteByte(writeByte);
 
@@ -366,7 +397,8 @@ protected:
         ASSERT_FALSE(serialPort1.IsDataAvailable());
         ASSERT_FALSE(serialPort2.IsDataAvailable());
 
-        writeByte = 'A';
+        char writeByte = 'A';
+        
         serialPort1.WriteByte(writeByte);
         serialPort1.FlushOutputBuffer();
         
@@ -391,7 +423,7 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
-        writeByte = 'A';
+        char writeByte = 'a';
 
         serialPort1.WriteByte(writeByte);
         serialPort1.FlushIOBuffers();
@@ -435,15 +467,14 @@ protected:
         ASSERT_FALSE(serialPort1.IsDataAvailable());
         ASSERT_FALSE(serialPort2.IsDataAvailable());
 
-        writeByte = 'A';
+        char writeByte = 'a';
+        unsigned char readByte = 'b';
 
         serialPort1.WriteByte(writeByte);
         tcdrain(serialPort1.GetFileDescriptor());
         
         usleep(25000);
         ASSERT_TRUE(serialPort2.IsDataAvailable());
-
-        unsigned char readByte;
 
         serialPort2.ReadByte(readByte, 1);
         ASSERT_EQ(readByte, writeByte);
@@ -650,7 +681,7 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
 
         int fileDescriptor = serialPort1.GetFileDescriptor();
-        ASSERT_GE(fileDescriptor, 0);
+        ASSERT_GT(fileDescriptor, 0);
 
         serialPort1.Close();
         ASSERT_FALSE(serialPort1.IsOpen());
@@ -664,14 +695,15 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
+        char writeByte = 'a';
+        unsigned char readByte = 'b';
+
         serialPort1.WriteByte(writeByte);
         tcdrain(serialPort1.GetFileDescriptor());
 
         serialPort2.WriteByte(writeByte);
         tcdrain(serialPort2.GetFileDescriptor());
         
-        unsigned char readByte;
-
         serialPort1.Read(readByte, 1, timeOutMilliseconds);
         ASSERT_EQ(readByte, writeByte);
 
@@ -754,13 +786,14 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
+        char writeByte = 'a';
+        unsigned char readByte = 'b';
+
         serialPort1.WriteByte(writeByte);
         tcdrain(serialPort1.GetFileDescriptor());
 
         serialPort2.WriteByte(writeByte);
         tcdrain(serialPort2.GetFileDescriptor());
-
-        unsigned char readByte;
 
         serialPort1.ReadByte(readByte, timeOutMilliseconds);
         ASSERT_EQ(readByte, writeByte);
@@ -823,12 +856,14 @@ protected:
 
         serialStream1 << writeString1 << std::endl;
         serialPort1.ReadLine(readString1, '\n', timeOutMilliseconds);
+
         ASSERT_EQ(readString1, writeString1 + '\n');
         ASSERT_EQ(readString1.size(), writeString1.size() + 1);
        
         serialPort1.Write(writeString2 + '\n');
         tcdrain(serialPort1.GetFileDescriptor());
         getline(serialStream1, readString2);
+
         ASSERT_EQ(readString2, writeString2);
 
         serialPort1.Close();
@@ -1325,12 +1360,12 @@ TEST_F(LibSerialTest, testMultiThreadSerialStreamReadWrite)
 {
     SCOPED_TRACE("Test Multi-Thread Serial Stream Communication.");
     testMultiThreadSerialStreamReadWrite();
-    sleep(1);
+    // sleep(1);
 }
 
 TEST_F(LibSerialTest, testMultiThreadSerialPortReadWrite)
 {
     SCOPED_TRACE("Test Multi-Thread Serial Port Communication.");
     testMultiThreadSerialPortReadWrite();
-    sleep(1);
+    // sleep(1);
 }
