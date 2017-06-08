@@ -725,22 +725,34 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
-        SerialPort::DataBuffer readDataBuffer;
-        SerialPort::DataBuffer writeDataBuffer;
+        SerialPort::DataBuffer writeDataBuffer1;
+        SerialPort::DataBuffer writeDataBuffer2;
+
+        SerialPort::DataBuffer readDataBuffer1;
+        SerialPort::DataBuffer readDataBuffer2;
 
         // Test using ASCII characters.
-        for (size_t i = 48; i < 122; i++)
+        for (size_t i = 48; i <= 122; i++)
         {
-            writeDataBuffer.push_back(i);
+            writeDataBuffer1.push_back(i);
         }
 
-        serialPort1.Write(writeDataBuffer);
-        tcdrain(serialPort1.GetFileDescriptor());
-        
-        serialPort2.Read(readDataBuffer, 74, timeOutMilliseconds);
+        for (size_t i = 122; i >= 48; i--)
+        {
+            writeDataBuffer2.push_back(i);
+        }
 
-        ASSERT_EQ(readDataBuffer, writeDataBuffer);
-        ASSERT_EQ(readDataBuffer.size(), writeDataBuffer.size());
+        serialPort1.Write(writeDataBuffer1);
+        serialPort2.Write(writeDataBuffer2);
+
+        tcdrain(serialPort1.GetFileDescriptor());
+        tcdrain(serialPort2.GetFileDescriptor());
+        
+        serialPort1.Read(readDataBuffer2, 75, timeOutMilliseconds);
+        serialPort2.Read(readDataBuffer1, 75, timeOutMilliseconds);
+
+        ASSERT_EQ(readDataBuffer1, writeDataBuffer1);
+        ASSERT_EQ(readDataBuffer2, writeDataBuffer2);
 
         serialPort1.Close();
         serialPort2.Close();
@@ -1360,12 +1372,10 @@ TEST_F(LibSerialTest, testMultiThreadSerialStreamReadWrite)
 {
     SCOPED_TRACE("Test Multi-Thread Serial Stream Communication.");
     testMultiThreadSerialStreamReadWrite();
-    // sleep(1);
 }
 
 TEST_F(LibSerialTest, testMultiThreadSerialPortReadWrite)
 {
     SCOPED_TRACE("Test Multi-Thread Serial Port Communication.");
     testMultiThreadSerialPortReadWrite();
-    // sleep(1);
 }
