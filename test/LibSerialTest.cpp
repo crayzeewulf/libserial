@@ -620,59 +620,145 @@ protected:
     void testSerialPortSetGetDTR()
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
+        serialPort2.Open(TEST_SERIAL_PORT_2);
+
         ASSERT_TRUE(serialPort1.IsOpen());
+        ASSERT_TRUE(serialPort2.IsOpen());
+
+        bool dtrLine1 = false;
+        bool dtrLine2 = false;
 
         serialPort1.SetDTR(true);
-        bool dtrLine = serialPort1.GetDTR();
-        ASSERT_TRUE(dtrLine);
+        serialPort2.SetDTR(true);
+
+        dtrLine1 = serialPort1.GetDTR();
+        dtrLine2 = serialPort2.GetDTR();
+
+        ASSERT_TRUE(dtrLine1);
+        ASSERT_TRUE(dtrLine2);
 
         serialPort1.SetDTR(false);
-        dtrLine = serialPort1.GetDTR();
-        ASSERT_FALSE(dtrLine);
+        serialPort2.SetDTR(false);
+
+        dtrLine1 = serialPort1.GetDTR();
+        dtrLine2 = serialPort2.GetDTR();
+
+        ASSERT_FALSE(dtrLine1);
+        ASSERT_FALSE(dtrLine2);
 
         serialPort1.Close();
+        serialPort2.Close();
+
         ASSERT_FALSE(serialPort1.IsOpen());
+        ASSERT_FALSE(serialPort2.IsOpen());
     }
 
     void testSerialPortSetGetRTS()
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
+        serialPort2.Open(TEST_SERIAL_PORT_2);
+
         ASSERT_TRUE(serialPort1.IsOpen());
+        ASSERT_TRUE(serialPort2.IsOpen());
+
+        bool rtsLine1 = false;
+        bool rtsLine2 = false;
 
         serialPort1.SetRTS(true);
-        bool rtsLine = serialPort1.GetRTS();
-        ASSERT_TRUE(rtsLine);
+        serialPort2.SetRTS(true);
+        
+        rtsLine1 = serialPort1.GetRTS();
+        rtsLine2 = serialPort2.GetRTS();
+        
+        ASSERT_TRUE(rtsLine1);
+        ASSERT_TRUE(rtsLine2);
 
         serialPort1.SetRTS(false);
-        rtsLine = serialPort1.GetRTS();
-        ASSERT_FALSE(rtsLine);
+        serialPort2.SetRTS(false);
+        
+        rtsLine1 = serialPort1.GetRTS();
+        rtsLine2 = serialPort2.GetRTS();
+        
+        ASSERT_FALSE(rtsLine1);
+        ASSERT_FALSE(rtsLine2);
 
         serialPort1.Close();
+        serialPort2.Close();
+
         ASSERT_FALSE(serialPort1.IsOpen());
+        ASSERT_FALSE(serialPort2.IsOpen());
     }
 
-    void testSerialPortGetCTS()
+    void testSerialPortSetRTSGetCTS()
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
-        ASSERT_TRUE(serialPort1.IsOpen());
+        serialPort2.Open(TEST_SERIAL_PORT_2);
 
-        bool ctsLine = serialPort1.GetCTS();
-        ASSERT_FALSE(ctsLine);
+        ASSERT_TRUE(serialPort1.IsOpen());
+        ASSERT_TRUE(serialPort2.IsOpen());
+
+        bool ctsLine1 = false;
+        bool ctsLine2 = false;
+
+        serialPort1.SetRTS(true);
+        serialPort2.SetRTS(true);
+
+        ctsLine1 = serialPort1.GetCTS();
+        ctsLine2 = serialPort2.GetCTS();
+
+        ASSERT_TRUE(ctsLine1);
+        ASSERT_TRUE(ctsLine2);
+        
+        serialPort1.SetRTS(false);
+        serialPort2.SetRTS(false);
+
+        ctsLine1 = serialPort1.GetCTS();
+        ctsLine2 = serialPort2.GetCTS();
+
+        ASSERT_FALSE(ctsLine1);
+        ASSERT_FALSE(ctsLine2);
 
         serialPort1.Close();
+        serialPort2.Close();
+
         ASSERT_FALSE(serialPort1.IsOpen());
+        ASSERT_FALSE(serialPort2.IsOpen());
     }
 
-    void testSerialPortGetDSR()
+    void testSerialPortSetDTRGetDSR()
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
-        ASSERT_TRUE(serialPort1.IsOpen());
+        serialPort2.Open(TEST_SERIAL_PORT_2);
 
-        bool dsrStatus = serialPort1.GetDSR();
-        ASSERT_FALSE(dsrStatus);
+        ASSERT_TRUE(serialPort1.IsOpen());
+        ASSERT_TRUE(serialPort2.IsOpen());
+
+        bool dsrStatus1 = false;
+        bool dsrStatus2 = false;
+
+        serialPort1.SetDTR(true);
+        serialPort2.SetDTR(true);
+
+        dsrStatus1 = serialPort1.GetDSR();
+        dsrStatus2 = serialPort1.GetDSR();
+
+        ASSERT_TRUE(dsrStatus1);
+        ASSERT_TRUE(dsrStatus2);
+
+        serialPort1.SetDTR(false);
+        serialPort2.SetDTR(false);
+
+        dsrStatus1 = serialPort1.GetDSR();
+        dsrStatus2 = serialPort1.GetDSR();
+
+        ASSERT_FALSE(dsrStatus1);
+        ASSERT_FALSE(dsrStatus2);
 
         serialPort1.Close();
+        serialPort2.Close();
+
         ASSERT_FALSE(serialPort1.IsOpen());
+        ASSERT_FALSE(serialPort2.IsOpen());
     }
 
     void testSerialPortGetFileDescriptor()
@@ -1260,23 +1346,23 @@ TEST_F(LibSerialTest, testSerialPortSetGetRTS)
     }
 }
 
-TEST_F(LibSerialTest, testSerialPortGetCTS)
+TEST_F(LibSerialTest, testSerialPortSetRTSGetCTS)
 {
-    SCOPED_TRACE("Serial Port GetCTS() Test");
+    SCOPED_TRACE("Serial Port SetRTS() and GetCTS() Test");
     
     for (size_t i = 0; i < 100; i++)
     {
-        testSerialPortGetCTS();
+        testSerialPortSetRTSGetCTS();
     }
 }
 
-TEST_F(LibSerialTest, testSerialPortGetDSR)
+TEST_F(LibSerialTest, testSerialPortSetDTRGetDSR)
 {
-    SCOPED_TRACE("Serial Port GetDSR() Test");
+    SCOPED_TRACE("Serial Port SetDTR() and GetDSR() Test");
     
     for (size_t i = 0; i < 100; i++)
     {
-        testSerialPortGetDSR();
+        testSerialPortSetDTRGetDSR();
     }
 }
 
