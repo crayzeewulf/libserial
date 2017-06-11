@@ -1481,14 +1481,14 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        // If n is non-positive then we have nothing to do here.
+        // If n is less than 1 there is nothing to accomplish.
         if (n <= 0)
         {
             return 0;
         }
 
-        // Try to read upto n characters in the array s.
-        ssize_t retval {0};
+        // Try to read up to n characters in the array s.
+        ssize_t retval = -1;
 
         // If a putback character is available, then we need to read only
         // n-1 character.
@@ -1496,8 +1496,8 @@ namespace LibSerial
         {
             // Put the mPutbackChar at the beginning of the array 's'.
             // Increment retval to indicate that a character has been placed in s.
-            s[0] = mPutbackChar; 
-            ++retval;
+            s[0] = mPutbackChar;
+            retval++;
 
             // The putback character is no longer available. 
             mPutbackAvailable = false;
@@ -1514,7 +1514,7 @@ namespace LibSerial
                 // the array, s. If read failed then leave retval at -1.
                 if (retval != -1)
                 {
-                    retval ++;
+                    retval++;
                 }
             }
         }
@@ -1582,8 +1582,8 @@ namespace LibSerial
         }
 
         // Read the next character from the serial port. 
-        char next_ch;
-        ssize_t retval;
+        char next_ch = 0;
+        ssize_t retval = -1;
 
         // If a putback character is available then we return that
         // character. However, we are not supposed to change the value of
@@ -1681,7 +1681,7 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        int retval = -1;
+        ssize_t retval = -1;
 
         if (mPutbackAvailable)
         {
