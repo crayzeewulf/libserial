@@ -144,6 +144,34 @@ namespace LibSerial
         void Close();
 
         /**
+         * @brief Flushes the serial port input buffer.
+         */
+        void FlushInputBuffer();
+
+        /**
+         * @brief Flushes the serial port output buffer.
+         */
+        void FlushOutputBuffer();
+
+        /**
+         * @brief Flushes the serial port input and output buffers.
+         */
+        void FlushIOBuffers();
+
+        /** 
+         * @brief This routine is called by open() in order to
+         *        initialize some parameters of the serial port and
+         *        setting its parameters to default values.
+         */
+        void InitializeSerialPort();
+
+        /**
+         * @brief Checks if data is available at the input of the serial port.
+         * @return Returns true iff data is available to read.
+         */
+        bool IsDataAvailable();
+
+        /**
          * @brief Determines if the serial port is open for I/O.
          * @return Returns true iff the serial port is open.
          */
@@ -241,6 +269,11 @@ namespace LibSerial
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds. 
          */
         short GetVTime();
+
+        /**
+         * @brief Gets the serial port file descriptor.
+         */
+        int GetFileDescriptor();
 
     protected:
 

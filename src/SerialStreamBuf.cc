@@ -22,6 +22,7 @@
 
 #include <cstring>
 #include <fcntl.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 
 namespace LibSerial
@@ -75,10 +76,19 @@ namespace LibSerial
         void Close();
 
         /**
-         * @brief Determines if the serial port is open for I/O.
-         * @return Returns true iff the serial port is open.
+         * @brief Flushes the serial port input buffer.
          */
-        bool IsOpen();
+        void FlushInputBuffer();
+
+        /**
+         * @brief Flushes the serial port output buffer.
+         */
+        void FlushOutputBuffer();
+
+        /**
+         * @brief Flushes the serial port input and output buffers.
+         */
+        void FlushIOBuffers();
 
         /** 
          * @brief This routine is called by open() in order to
@@ -86,6 +96,17 @@ namespace LibSerial
          *        setting its parameters to default values.
          */
         void InitializeSerialPort();
+
+        /**
+         * @brief Determines if data is available at the serial port.
+         */
+        bool IsDataAvailable();
+
+        /**
+         * @brief Determines if the serial port is open for I/O.
+         * @return Returns true iff the serial port is open.
+         */
+        bool IsOpen();
 
         /**
          * @brief Sets all serial port paramters to their default values.
@@ -176,6 +197,11 @@ namespace LibSerial
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds. 
          */
         short GetVTime();
+
+        /**
+         * @brief Gets the serial port file descriptor.
+         */
+        int GetFileDescriptor();
 
         /**
          * @brief Writes up to n characters from the character sequence at 
@@ -309,10 +335,25 @@ namespace LibSerial
         return;
     }
 
-    bool
-    SerialStreamBuf::IsOpen()
+    void
+    SerialStreamBuf::FlushInputBuffer()
     {
-        return mImpl->IsOpen();
+        mImpl->FlushInputBuffer();
+        return;
+    }
+
+    void
+    SerialStreamBuf::FlushOutputBuffer()
+    {
+        mImpl->FlushOutputBuffer();
+        return;
+    }
+
+    void
+    SerialStreamBuf::FlushIOBuffers()
+    {
+        mImpl->FlushIOBuffers();
+        return;
     }
 
     void
@@ -320,6 +361,18 @@ namespace LibSerial
     {
         mImpl->InitializeSerialPort();
         return;
+    }
+
+    bool
+    SerialStreamBuf::IsDataAvailable()
+    {
+        return mImpl->IsDataAvailable();
+    }
+
+    bool
+    SerialStreamBuf::IsOpen()
+    {
+        return mImpl->IsOpen();
     }
 
     void
@@ -348,7 +401,6 @@ namespace LibSerial
         mImpl->SetCharacterSize(characterSize);
         return;
     }
-
 
     CharacterSize
     SerialStreamBuf::GetCharacterSize() 
@@ -419,6 +471,12 @@ namespace LibSerial
     SerialStreamBuf::GetVTime()
     {
         return mImpl->GetVTime();
+    }
+
+    int
+    SerialStreamBuf::GetFileDescriptor()
+    {
+        return mImpl->GetFileDescriptor();
     }
 
     std::streambuf*
@@ -518,7 +576,6 @@ namespace LibSerial
         // Throw an exception if the port is already open.
         if (this->IsOpen())
         {
-            close(this->mFileDescriptor);
             throw AlreadyOpen(ERR_MSG_PORT_ALREADY_OPEN);
         }
 
@@ -545,7 +602,7 @@ namespace LibSerial
         }
 
         // Try to open the serial port. 
-        this->mFileDescriptor = open(filename.c_str(), flags);
+        mFileDescriptor = open(filename.c_str(), flags);
         
         if (this->mFileDescriptor < 0)
         {
@@ -586,11 +643,7 @@ namespace LibSerial
         }
 
         // Flush the input and output buffers associated with the port.
-        if (tcflush(this->mFileDescriptor,
-                    TCIOFLUSH) < 0)
-        {
-            throw OpenFailed(strerror(errno));
-        }
+        this->FlushIOBuffers();
 
         // Initialize the serial port.
         InitializeSerialPort();
@@ -629,10 +682,58 @@ namespace LibSerial
     }
 
     inline
-    bool
-    SerialStreamBuf::Implementation::IsOpen()
+    void
+    SerialStreamBuf::Implementation::FlushInputBuffer()
     {
-        return (this->mFileDescriptor != -1);
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        if (tcflush(this->mFileDescriptor, TCIFLUSH) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    void
+    SerialStreamBuf::Implementation::FlushOutputBuffer()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+
+        if (tcflush(this->mFileDescriptor, TCOFLUSH) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    void
+    SerialStreamBuf::Implementation::FlushIOBuffers()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        if (tcflush(this->mFileDescriptor, TCIOFLUSH) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        return;
     }
 
     inline
@@ -657,17 +758,12 @@ namespace LibSerial
 
         // Flush out any garbage left behind in the buffers associated
         // with the port from any previous operations. 
-        if (tcflush(this->mFileDescriptor, TCIOFLUSH) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
+        this->FlushIOBuffers();
 
         // Set up the default configuration for the serial port.
         this->SetParametersToDefault();
 
         // Allow all further communications to happen in blocking mode.
-        flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
-        
         if (fcntl(this->mFileDescriptor, 
                   F_SETFL, 
                   flags & ~O_NONBLOCK) < 0)
@@ -677,6 +773,39 @@ namespace LibSerial
 
         // Initialization was successful.
         return;
+    }
+
+    inline
+    bool
+    SerialStreamBuf::Implementation::IsOpen()
+    {
+        return (-1 != this->mFileDescriptor);
+    }
+
+    inline
+    bool
+    SerialStreamBuf::Implementation::IsDataAvailable()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        int num_of_bytes_available = 0;
+        bool dataAvailableStatus = false;
+
+        int result = ioctl(this->mFileDescriptor,
+                           FIONREAD,
+                           &num_of_bytes_available);
+        
+        if (result >= 0 &&
+            num_of_bytes_available > 0)
+        {
+            dataAvailableStatus = true;
+        }
+
+        return dataAvailableStatus;
     }
 
     inline
@@ -1296,6 +1425,19 @@ namespace LibSerial
         }
 
         return port_settings.c_cc[VTIME];
+    }
+
+    inline
+    int
+    SerialStreamBuf::Implementation::GetFileDescriptor()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        return this->mFileDescriptor;
     }
 
     inline

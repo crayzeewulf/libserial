@@ -805,11 +805,7 @@ namespace LibSerial
         }
 
         // Flush the input and output buffers associated with the port.
-        if (tcflush(this->mFileDescriptor,
-                    TCIOFLUSH) < 0)
-        {
-            throw OpenFailed(strerror(errno));
-        }
+        this->FlushIOBuffers();
 
         // Initialize the serial port.
         InitializeSerialPort();
@@ -857,7 +853,11 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        tcflush(this->mFileDescriptor, TCIFLUSH);
+        if (tcflush(this->mFileDescriptor, TCIFLUSH) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
         return;
     }
 
@@ -872,7 +872,11 @@ namespace LibSerial
         }
 
 
-        tcflush(this->mFileDescriptor, TCOFLUSH);
+        if (tcflush(this->mFileDescriptor, TCOFLUSH) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
         return;
     }
 
@@ -886,8 +890,11 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        
-        tcflush(this->mFileDescriptor, TCIOFLUSH);
+        if (tcflush(this->mFileDescriptor, TCIOFLUSH) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
         return;
     }
 
@@ -913,17 +920,12 @@ namespace LibSerial
 
         // Flush out any garbage left behind in the buffers associated
         // with the port from any previous operations. 
-        if (tcflush(this->mFileDescriptor, TCIOFLUSH) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
+        this->FlushIOBuffers();
 
         // Set up the default configuration for the serial port.
         this->SetParametersToDefault();
 
         // Allow all further communications to happen in blocking mode.
-        flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
-        
         if (fcntl(this->mFileDescriptor, 
                   F_SETFL, 
                   flags & ~O_NONBLOCK) < 0)
@@ -1785,7 +1787,7 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        unsigned int elapsed_ms;
+        unsigned int elapsed_ms = 0;
         
         int number_of_bytes_read = 0;
         int read_result = 0;
@@ -1836,6 +1838,8 @@ namespace LibSerial
             elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
                           elapsed_time.tv_usec / MICROSECONDS_PER_MS);
 
+            std::cout << "elapsed_ms = " << elapsed_ms << std::endl;
+            
             // Throw a ReadTimeout exception if more than msTimeout milliseconds
             // have elapsed while waiting for data.
             if (msTimeout > 0 &&
