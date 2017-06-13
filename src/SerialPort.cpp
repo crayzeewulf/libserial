@@ -375,6 +375,19 @@ namespace LibSerial
          *         otherwise.
          */
         bool GetModemControlLine(const int modemLine);
+
+        /**
+         * @brief Sets the current state of the serial port blocking status.
+         * @param blockingStatus The serial port blocking status to be set,
+         *        true if to be set blocking, false if to be set non-blocking.
+         */
+        void SetPortBlockingStatus(const bool blockingStatus);
+
+        /**
+         * @brief Gets the current state of the serial port blocking status.
+         * @return True if port is blocking, false if port non-blocking.
+         */
+        bool GetPortBlockingStatus();
     };
 
     SerialPort::SerialPort()
@@ -908,30 +921,12 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        // Use non-blocking mode while configuring the serial port. 
-        int flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
-        
-        if (fcntl(this->mFileDescriptor, 
-                  F_SETFL, 
-                  flags | O_NONBLOCK) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
+        // Set up the default configuration for the serial port.
+        this->SetParametersToDefault();
 
         // Flush out any garbage left behind in the buffers associated
         // with the port from any previous operations. 
         this->FlushIOBuffers();
-
-        // Set up the default configuration for the serial port.
-        this->SetParametersToDefault();
-
-        // Allow all further communications to happen in blocking mode.
-        if (fcntl(this->mFileDescriptor, 
-                  F_SETFL, 
-                  flags & ~O_NONBLOCK) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
 
         // Initialization was successful.
         return;
@@ -1777,6 +1772,49 @@ namespace LibSerial
 
     inline
     void
+    SerialPort::Implementation::SetPortBlockingStatus(const bool blockingStatus)
+    {
+        int flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
+        
+        if (blockingStatus == true)
+        {
+            if (fcntl(this->mFileDescriptor, 
+                      F_SETFL, 
+                      flags &~ O_NONBLOCK) < 0)
+            {
+                throw std::runtime_error(strerror(errno));
+            }
+        }
+        else
+        {
+            if (fcntl(this->mFileDescriptor, 
+                      F_SETFL, 
+                      flags | O_NONBLOCK) < 0)
+            {
+                throw std::runtime_error(strerror(errno));
+            }
+        }
+    }
+
+    inline
+    bool
+    SerialPort::Implementation::GetPortBlockingStatus()
+    {
+        bool blocking_status = false;
+
+        int flags1 = fcntl(this->mFileDescriptor, F_GETFL, 0);
+        int flags2 = flags1 | O_NONBLOCK;
+        
+        if (flags1 == flags2)
+        {
+            blocking_status = true;
+        }
+
+        return blocking_status;
+    }
+
+    inline
+    void
     SerialPort::Implementation::Read(unsigned char&     charBuffer,
                                      const unsigned int charBufferSize,
                                      const unsigned int msTimeout)
@@ -1809,15 +1847,15 @@ namespace LibSerial
             read_result = read(this->mFileDescriptor,
                                &charBuffer + number_of_bytes_read,
                                charBufferSize - number_of_bytes_read);
-
-            if (read_result <= 0 &&
-                errno == EAGAIN &&
-                errno != EWOULDBLOCK)
+            if (read_result > 0)
+            {
+                number_of_bytes_read += read_result;
+            }
+            else if (read_result <= 0 &&
+                     errno != EWOULDBLOCK)
             {
                 throw std::runtime_error(strerror(errno));
             }
-
-            number_of_bytes_read += read_result;
 
             if (number_of_bytes_read == (int)charBufferSize)
             {
@@ -1838,8 +1876,6 @@ namespace LibSerial
             elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
                           elapsed_time.tv_usec / MICROSECONDS_PER_MS);
 
-            std::cout << "elapsed_ms = " << elapsed_ms << std::endl;
-            
             // Throw a ReadTimeout exception if more than msTimeout milliseconds
             // have elapsed while waiting for data.
             if (msTimeout > 0 &&
@@ -1867,31 +1903,32 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        unsigned int elapsed_ms;
-        unsigned int remaining_ms;
+        // Clear the data buffer.
+        dataBuffer.resize(0);
+        unsigned char next_char = 0;
+
+        unsigned int elapsed_ms = 0;
+        unsigned int remaining_ms = 0;
 
         timeval entry_time;
         timeval current_time;
         timeval elapsed_time;
-
+        
         // Throw an exception if we are unable to read the current time.
         if (gettimeofday(&entry_time,
                          NULL) < 0)
         {
             throw std::runtime_error(strerror(errno));
         }
-        
-        // Empty the data buffer.
-        dataBuffer.resize(0);
-        unsigned char next_char = 0;
 
-        if (0 == numberOfBytes)
+        if (numberOfBytes == 0)
         {
             // Read all available data if numberOfBytes is zero.
             while(this->IsDataAvailable())
             {
-                this->ReadByte(next_char,
-                               msTimeout);
+                this->Read(next_char,
+                           1,
+                           remaining_ms);
 
                 dataBuffer.push_back(next_char);
             }
@@ -1927,8 +1964,9 @@ namespace LibSerial
                 
                 remaining_ms = msTimeout - elapsed_ms;
 
-                this->ReadByte(next_char,
-                               remaining_ms);
+                this->Read(next_char,
+                           1,
+                           remaining_ms);
 
                 dataBuffer.push_back(next_char);
             }
@@ -1949,33 +1987,35 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        unsigned int elapsed_ms;
-        unsigned int remaining_ms;
+        // Clear the data string.
+        dataString.clear();
+
+        unsigned char next_char = 0;
+
+        unsigned int elapsed_ms = 0;
+        unsigned int remaining_ms = 0;
 
         timeval entry_time;
         timeval current_time;
         timeval elapsed_time;
-
+        
         // Throw an exception if we are unable to read the current time.
         if (gettimeofday(&entry_time,
                          NULL) < 0)
         {
             throw std::runtime_error(strerror(errno));
         }
-        
-        // Empty the data string.
-        dataString.clear();
-        unsigned char nextChar = 0;
 
-        if (0 == numberOfBytes)
+        if (numberOfBytes == 0)
         {
             // Read all available data if numberOfBytes is zero.
             while(this->IsDataAvailable())
             {
-                this->ReadByte(nextChar,
-                               msTimeout);
+                this->Read(next_char,
+                           1,
+                           remaining_ms);
 
-                dataString += nextChar;
+                dataString += next_char;
             }
         }
         else
@@ -2003,13 +2043,14 @@ namespace LibSerial
                 {
                     throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
                 }
-                
+
                 remaining_ms = msTimeout - elapsed_ms;
 
-                this->ReadByte(nextChar,
-                               remaining_ms);
+                this->Read(next_char,
+                           1,
+                           remaining_ms);
 
-                dataString += nextChar;
+                dataString += next_char;
             }
         }
         
@@ -2050,8 +2091,8 @@ namespace LibSerial
 
         unsigned char next_char = 0;
 
-        unsigned int elapsed_ms;
-        unsigned int remaining_ms;
+        unsigned int elapsed_ms = 0;
+        unsigned int remaining_ms = 0;
 
         timeval entry_time;
         timeval current_time;
@@ -2090,8 +2131,9 @@ namespace LibSerial
 
             remaining_ms = msTimeout - elapsed_ms;
 
-            this->ReadByte(next_char,
-                           remaining_ms);
+            this->Read(next_char,
+                       1,
+                       remaining_ms);
 
             dataString += next_char;
         }

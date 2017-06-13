@@ -262,18 +262,6 @@ namespace LibSerial
         std::streamsize  showmanyc();
 
         /** 
-         * @brief The file descriptor associated with the serial port.
-         */
-        int mFileDescriptor;
-
-        /**
-         * @brief Serial port settings are saved into this variable immediately
-         *        after the port is opened. These settings are restored when the
-         *        serial port is closed.
-         */
-        termios mOldPortSettings {};
-
-        /** 
          * @brief True if a putback value is available in mPutbackChar. 
          */
         bool mPutbackAvailable;
@@ -284,6 +272,33 @@ namespace LibSerial
          *        This character contains the putback character.
          */
         char mPutbackChar;
+
+    private:
+
+        /**
+         * @brief Sets the current state of the serial port blocking status.
+         * @param blockingStatus The serial port blocking status to be set,
+         *        true if to be set blocking, false if to be set non-blocking.
+         */
+        void SetPortBlockingStatus(const bool blockingStatus);
+
+        /**
+         * @brief Gets the current state of the serial port blocking status.
+         * @return True if port is blocking, false if port non-blocking.
+         */
+        bool GetPortBlockingStatus();
+
+        /** 
+         * @brief The file descriptor associated with the serial port.
+         */
+        int mFileDescriptor;
+
+        /**
+         * @brief Serial port settings are saved into this variable immediately
+         *        after the port is opened. These settings are restored when the
+         *        serial port is closed.
+         */
+        termios mOldPortSettings {};
     };
 
     SerialStreamBuf::SerialStreamBuf()
@@ -531,9 +546,9 @@ namespace LibSerial
     /** ------------------------------------------------------------ */
     inline
     SerialStreamBuf::Implementation::Implementation()
-        : mFileDescriptor(-1)
-        , mPutbackAvailable(false)
+        : mPutbackAvailable(false)
         , mPutbackChar(0)
+        , mFileDescriptor(-1)
     {
         /* Empty */
     }
@@ -746,30 +761,15 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        // Use non-blocking mode while configuring the serial port. 
-        int flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
-        
-        if (fcntl(this->mFileDescriptor, 
-                  F_SETFL, 
-                  flags | O_NONBLOCK) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
+        // Set up the default configuration for the serial port.
+        this->SetParametersToDefault();
 
         // Flush out any garbage left behind in the buffers associated
         // with the port from any previous operations. 
         this->FlushIOBuffers();
 
-        // Set up the default configuration for the serial port.
-        this->SetParametersToDefault();
-
         // Allow all further communications to happen in blocking mode.
-        if (fcntl(this->mFileDescriptor, 
-                  F_SETFL, 
-                  flags & ~O_NONBLOCK) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
+        this->SetPortBlockingStatus(true);
 
         // Initialization was successful.
         return;
@@ -1438,6 +1438,49 @@ namespace LibSerial
         }
 
         return this->mFileDescriptor;
+    }
+
+    inline
+    void
+    SerialStreamBuf::Implementation::SetPortBlockingStatus(const bool blockingStatus)
+    {
+        int flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
+        
+        if (blockingStatus == true)
+        {
+            if (fcntl(this->mFileDescriptor, 
+                      F_SETFL, 
+                      flags &~ O_NONBLOCK) < 0)
+            {
+                throw std::runtime_error(strerror(errno));
+            }
+        }
+        else
+        {
+            if (fcntl(this->mFileDescriptor, 
+                      F_SETFL, 
+                      flags | O_NONBLOCK) < 0)
+            {
+                throw std::runtime_error(strerror(errno));
+            }
+        }
+    }
+
+    inline
+    bool
+    SerialStreamBuf::Implementation::GetPortBlockingStatus()
+    {
+        bool blocking_status = false;
+
+        int flags1 = fcntl(this->mFileDescriptor, F_GETFL, 0);
+        int flags2 = flags1 | O_NONBLOCK;
+        
+        if (flags1 == flags2)
+        {
+            blocking_status = true;
+        }
+
+        return blocking_status;
     }
 
     inline

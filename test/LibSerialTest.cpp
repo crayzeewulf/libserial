@@ -25,7 +25,7 @@ public:
 
 protected:
 
-    size_t timeOutMilliseconds = 30;
+    size_t timeOutMilliseconds = 25;
     size_t threadTimeOutMicroseconds = 5000000;
 
     BaudRate        baudRates[25];
@@ -1055,17 +1055,17 @@ protected:
         ASSERT_EQ(readByte1, writeByte1);
         ASSERT_EQ(readByte2, writeByte2);
 
-        // try
-        // {
-        //     serialPort1.Read(readByte1, 1, 1);
-        //     serialPort2.Read(readByte2, 1, 1);
-        // }
-        // catch(...)
-        // {
-        //     timeOutTestPass = true;
-        // }
-        //
-        // ASSERT_TRUE(timeOutTestPass);
+        try
+        {
+            serialPort1.Read(readByte1, 1, 1);
+            serialPort2.Read(readByte2, 1, 1);
+        }
+        catch(...)
+        {
+            timeOutTestPass = true;
+        }
+
+        ASSERT_TRUE(timeOutTestPass);
 
         serialPort1.Close();
         serialPort2.Close();
@@ -1113,17 +1113,17 @@ protected:
         ASSERT_EQ(readDataBuffer1, writeDataBuffer1);
         ASSERT_EQ(readDataBuffer2, writeDataBuffer2);
 
-        // try
-        // {
-        //     serialPort1.Read(readDataBuffer1, 1, 1);
-        //     serialPort2.Read(readDataBuffer2, 1, 1);
-        // }
-        // catch(ReadTimeout)
-        // {
-        //     timeOutTestPass = true;
-        // }
-        //
-        // ASSERT_TRUE(timeOutTestPass);
+        try
+        {
+            serialPort1.Read(readDataBuffer1, 1, 1);
+            serialPort2.Read(readDataBuffer2, 1, 1);
+        }
+        catch(ReadTimeout)
+        {
+            timeOutTestPass = true;
+        }
+        
+        ASSERT_TRUE(timeOutTestPass);
 
         serialPort1.Close();
         serialPort2.Close();
@@ -1154,17 +1154,17 @@ protected:
         ASSERT_EQ(readString1, writeString1);
         ASSERT_EQ(readString2, writeString2);
 
-        // try
-        // {
-        //     serialPort1.Read(readString1, writeString1.size(), 1);
-        //     serialPort2.Read(readString2, writeString2.size(), 1);
-        // }
-        // catch(ReadTimeout)
-        // {
-        //     timeOutTestPass = true;
-        // }
-        //
-        // ASSERT_TRUE(timeOutTestPass);
+        try
+        {
+            serialPort1.Read(readString1, writeString1.size(), 1);
+            serialPort2.Read(readString2, writeString2.size(), 1);
+        }
+        catch(ReadTimeout)
+        {
+            timeOutTestPass = true;
+        }
+        
+        ASSERT_TRUE(timeOutTestPass);
 
         serialPort1.Close();
         serialPort2.Close();
@@ -1201,17 +1201,17 @@ protected:
         ASSERT_EQ(readByte1, writeByte1);
         ASSERT_EQ(readByte2, writeByte2);
 
-        // try
-        // {
-        //     serialPort1.ReadByte(readByte1, 1);
-        //     serialPort2.ReadByte(readByte2, 1);
-        // }
-        // catch(ReadTimeout)
-        // {
-        //     timeOutTestPass = true;
-        // }
-        //
-        // ASSERT_TRUE(timeOutTestPass);
+        try
+        {
+            serialPort1.ReadByte(readByte1, 1);
+            serialPort2.ReadByte(readByte2, 1);
+        }
+        catch(ReadTimeout)
+        {
+            timeOutTestPass = true;
+        }
+        
+        ASSERT_TRUE(timeOutTestPass);
 
         serialPort1.Close();
         serialPort2.Close();
@@ -1242,17 +1242,17 @@ protected:
         ASSERT_EQ(readString1, writeString1 + '\n');
         ASSERT_EQ(readString2, writeString2 + '\n');
        
-        // try
-        // {
-        //     serialPort1.ReadLine(readString2, '\n', 1);
-        //     serialPort2.ReadLine(readString1, '\n', 1);
-        // }
-        // catch(ReadTimeout)
-        // {
-        //     timeOutTestPass = true;
-        // }
-        //
-        // ASSERT_TRUE(timeOutTestPass);
+        try
+        {
+            serialPort1.ReadLine(readString2, '\n', 1);
+            serialPort2.ReadLine(readString1, '\n', 1);
+        }
+        catch(ReadTimeout)
+        {
+            timeOutTestPass = true;
+        }
+        
+        ASSERT_TRUE(timeOutTestPass);
 
         serialPort1.Close();
         serialPort2.Close();
@@ -1353,11 +1353,20 @@ protected:
         while (timeElapsedMicroSeconds < threadTimeOutMicroseconds)
         {
             serialPort1.Write(writeString1 + '\n');
-            tcdrain(serialPort1.GetFileDescriptor());
+            // tcdrain(serialPort1.GetFileDescriptor());
 
-            serialPort1.ReadLine(readString2, '\n', timeOutMilliseconds);
-            ASSERT_EQ(readString2, writeString2 + '\n');
-
+            try
+            {
+                serialPort1.ReadLine(readString2, '\n', timeOutMilliseconds);
+                ASSERT_EQ(readString2, writeString2 + '\n');
+            }
+            catch(ReadTimeout)
+            {
+                usleep(50000);
+                serialPort1.FlushIOBuffers();
+                readString2.clear();
+            }
+            
             timeElapsedMicroSeconds = getTimeInMicroSeconds() - threadLoopStartTimeMicroseconds;
         }
 
@@ -1377,12 +1386,19 @@ protected:
         while (timeElapsedMicroSeconds < threadTimeOutMicroseconds)
         {
             serialPort2.Write(writeString2 + '\n');
-
-            tcdrain(serialPort2.GetFileDescriptor());
-
-            serialPort2.ReadLine(readString1, '\n', timeOutMilliseconds);
-
-            ASSERT_EQ(readString1, writeString1 + '\n');
+            // tcdrain(serialPort2.GetFileDescriptor());
+            
+            try
+            {
+                serialPort2.ReadLine(readString1, '\n', timeOutMilliseconds);
+                ASSERT_EQ(readString1, writeString1 + '\n');
+            }
+            catch(ReadTimeout)
+            {
+                usleep(50000);
+                serialPort2.FlushIOBuffers();
+                readString1.clear();
+            }
 
             timeElapsedMicroSeconds = getTimeInMicroSeconds() - threadLoopStartTimeMicroseconds;
         }
