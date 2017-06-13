@@ -104,7 +104,7 @@ namespace LibSerial
         /**
          * @brief Sets all serial port paramters to their default values.
          */
-        void SetParametersToDefault();
+        void SetDefaultSerialPortParameters();
 
         /**
          * @brief Sets the baud rate for the serial port to the specified value
@@ -269,6 +269,31 @@ namespace LibSerial
     private:
 
         /**
+         * @brief Sets the default Linux specific line discipline modes.
+         */
+        void SetDefaultLinuxSpecificModes();
+
+        /**
+         * @brief Sets the default serial port input modes.
+         */
+        void SetDefaultInputModes();
+
+        /**
+         * @brief Sets the default serial port output modes.
+         */
+        void SetDefaultOutputModes();
+
+        /**
+         * @brief Sets the default serial port control modes.
+         */
+        void SetDefaultControlModes();
+
+        /**
+         * @brief Sets the default serial port local modes.
+         */
+        void SetDefaultLocalModes();
+        
+        /**
          * @brief Sets the current state of the serial port blocking status.
          * @param blockingStatus The serial port blocking status to be set,
          *        true if to be set blocking, false if to be set non-blocking.
@@ -377,9 +402,9 @@ namespace LibSerial
     }
 
     void
-    SerialStreamBuf::SetParametersToDefault()
+    SerialStreamBuf::SetDefaultSerialPortParameters()
     {
-        mImpl->SetParametersToDefault();
+        mImpl->SetDefaultSerialPortParameters();
         return;
     }
 
@@ -481,16 +506,10 @@ namespace LibSerial
     }
 
     std::streambuf*
-    SerialStreamBuf::setbuf(char_type *, std::streamsize)
+    SerialStreamBuf::setbuf(char_type *s, std::streamsize n)
     {
-        return std::streambuf::setbuf(0, 0);
+        return std::streambuf::setbuf(s, n);
     }
-
-    // std::streambuf*
-    // SerialStreamBuf::setbuf(char_type *s, std::streamsize n)
-    // {
-    //     return std::streambuf::setbuf(s, n);
-    // }
 
     std::streamsize
     SerialStreamBuf::xsputn(const char_type *s, std::streamsize n)
@@ -625,35 +644,11 @@ namespace LibSerial
             throw OpenFailed(strerror(errno));
         }
 
-        // Assemble the new port settings.
-        termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
-
-        // Enable the receiver (CREAD) and ignore modem control lines (CLOCAL).
-        port_settings.c_cflag |= CREAD | CLOCAL;
-
-        // Set the VMIN and VTIME parameters to zero by default. VMIN is
-        // the minimum number of characters for non-canonical read and
-        // VTIME is the timeout in deciseconds for non-canonical
-        // read. Setting both of these parameters to zero implies that a
-        // read will return immediately only giving the currently
-        // available characters.
-        port_settings.c_cc[VMIN] = 0;
-        port_settings.c_cc[VTIME] = 0;
-
-        // Apply the modified settings.
-        if (tcsetattr(this->mFileDescriptor,
-                      TCSANOW,
-                      &port_settings) < 0)
-        {
-            throw OpenFailed(strerror(errno));
-        }
+        // Set up the default configuration for the serial port.
+        this->SetDefaultSerialPortParameters();
 
         // Flush the input and output buffers associated with the port.
         this->FlushIOBuffers();
-
-        // Set up the default configuration for the serial port.
-        this->SetParametersToDefault();
 
         // @NOTE - Stream communications need to happen in blocking mode.
         this->SetPortBlockingStatus(true);
@@ -781,7 +776,7 @@ namespace LibSerial
 
     inline
     void 
-    SerialStreamBuf::Implementation::SetParametersToDefault()
+    SerialStreamBuf::Implementation::SetDefaultSerialPortParameters()
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())
@@ -789,44 +784,14 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        // Get the current serial port settings.
-        termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
-        
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
+        #ifdef __linux__
+            SetDefaultLinuxSpecificModes();
+        #endif
 
-        port_settings.c_iflag = IGNBRK;
-        port_settings.c_oflag = 0;
-        port_settings.c_cflag = B115200 | CS8 | CLOCAL | CREAD;
-        port_settings.c_lflag = 0;
-
-        // :TRICKY:
-        // termios.c_line is not a standard element of the termios structure (as 
-        // per the Single Unix Specification 2. This is only present under Linux.
-    #ifdef __linux__
-        port_settings.c_line = '\0';
-    #endif
-
-        // Set the VMIN and VTIME parameters to zero by default. VMIN is
-        // the minimum number of characters for non-canonical read and
-        // VTIME is the timeout in deciseconds for non-canonical
-        // read. Setting both of these parameters to zero implies that a
-        // read will return immediately only giving the currently
-        // available characters.
-        port_settings.c_cc[VMIN] = 0;
-        port_settings.c_cc[VTIME] = 0;
-
-        // Apply the modified settings.
-        if (tcsetattr(this->mFileDescriptor,
-                      TCSANOW,
-                      &port_settings) < 0)
-        {
-            throw OpenFailed(strerror(errno));
-        }
+        SetDefaultInputModes();
+        SetDefaultOutputModes();
+        SetDefaultControlModes();
+        SetDefaultLocalModes();
 
         SetBaudRate(BaudRate::BAUD_DEFAULT);
         SetCharacterSize(CharacterSize::CHAR_SIZE_DEFAULT);
@@ -1415,6 +1380,12 @@ namespace LibSerial
     void
     SerialStreamBuf::Implementation::SetPortBlockingStatus(const bool blockingStatus)
     {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
         int flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
         
         if (blockingStatus == true)
@@ -1441,6 +1412,12 @@ namespace LibSerial
     bool
     SerialStreamBuf::Implementation::GetPortBlockingStatus()
     {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
         bool blocking_status = false;
 
         int flags1 = fcntl(this->mFileDescriptor, F_GETFL, 0);
@@ -1452,6 +1429,175 @@ namespace LibSerial
         }
 
         return blocking_status;
+    }
+
+    inline
+    void
+    SerialStreamBuf::Implementation::SetDefaultLinuxSpecificModes()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(this->mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // @NOTE - termios.c_line is not a standard element of the termios
+        // structure, (as per the Single Unix Specification 3).
+        port_settings.c_line = '\0';
+
+        // Apply the modified settings.
+        if (tcsetattr(this->mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw OpenFailed(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    void
+    SerialStreamBuf::Implementation::SetDefaultInputModes()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(this->mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // Ignore Break conditions on input.
+        port_settings.c_iflag = IGNBRK;
+
+        // Apply the modified settings.
+        if (tcsetattr(this->mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw OpenFailed(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    void
+    SerialStreamBuf::Implementation::SetDefaultOutputModes()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(this->mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        port_settings.c_oflag = 0;
+
+        // Apply the modified settings.
+        if (tcsetattr(this->mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw OpenFailed(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    void
+    SerialStreamBuf::Implementation::SetDefaultControlModes()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(this->mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // Enable the receiver (CREAD) and ignore modem control lines (CLOCAL).
+        port_settings.c_cflag |= CREAD | CLOCAL;
+
+        // Apply the modified settings.
+        if (tcsetattr(this->mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw OpenFailed(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    void
+    SerialStreamBuf::Implementation::SetDefaultLocalModes()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(this->mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        port_settings.c_lflag = 0;
+
+        // Apply the modified settings.
+        if (tcsetattr(this->mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw OpenFailed(strerror(errno));
+        }
+
+        return;
     }
 
     inline
@@ -1610,7 +1756,9 @@ namespace LibSerial
         {
             // If no putback character is available then we need to read one
             // character from the serial port.
-            retval = read(this->mFileDescriptor, &next_ch, 1);
+            retval = read(this->mFileDescriptor,
+                          &next_ch,
+                          1);
 
             // Make the next character the putback character. This has the
             // effect of returning the next character without changing gptr()
@@ -1705,14 +1853,7 @@ namespace LibSerial
         else
         {
             // Switch to non-blocking read.
-            int flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
-            
-            if (fcntl(this->mFileDescriptor, 
-                      F_SETFL, 
-                      flags | O_NONBLOCK) < 0)
-            {
-                return -1;
-            }
+            this->SetPortBlockingStatus(false);
 
             // Try to read a character.
             retval = read(this->mFileDescriptor, &mPutbackChar, 1);
@@ -1727,12 +1868,7 @@ namespace LibSerial
             }
 
             // Switch back to blocking read.
-            if (fcntl(this->mFileDescriptor,
-                      F_SETFL, 
-                      flags) < 0)
-            {
-                return -1;
-            }
+            this->SetPortBlockingStatus(true);
         }
 
         return retval;

@@ -119,10 +119,9 @@ namespace LibSerial
         bool IsOpen();
 
         /**
-         * @brief Initializes the serial communication parameters to their
-         *        default values.
+         * @brief Sets all serial port paramters to their default values.
          */
-        void SetParametersToDefault();
+        void SetDefaultSerialPortParameters();
 
         /**
          * @brief Sets the baud rate for the serial port to the specified value
