@@ -1037,28 +1037,31 @@ protected:
 
         bool timeOutTestPass = false;
 
-        char writeByte1 = 'a';
-        char writeByte2 = 'A';
+        char writeBuffer1[] = "abc";
+        char writeBuffer2[] = "ABC";
 
-        unsigned char readByte1  = 'b';
-        unsigned char readByte2  = 'B';
+        unsigned char readBuffer1[3] = {};
+        unsigned char readBuffer2[3] = {};
 
-        serialPort1.WriteByte(writeByte1);
-        serialPort2.WriteByte(writeByte2);
+        serialPort1.Write(writeBuffer1);
+        serialPort2.Write(writeBuffer2);
 
         tcdrain(serialPort1.GetFileDescriptor());
         tcdrain(serialPort2.GetFileDescriptor());
 
-        serialPort1.Read(readByte2, 1, timeOutMilliseconds);
-        serialPort2.Read(readByte1, 1, timeOutMilliseconds);
+        serialPort1.Read(*readBuffer1, 3, timeOutMilliseconds);
+        serialPort2.Read(*readBuffer2, 3, timeOutMilliseconds);
 
-        ASSERT_EQ(readByte1, writeByte1);
-        ASSERT_EQ(readByte2, writeByte2);
+        for (size_t i = 0; i < 3; i++)
+        {
+            ASSERT_EQ(readBuffer1[i], writeBuffer2[i]);
+            ASSERT_EQ(readBuffer2[i], writeBuffer1[i]);
+        }
 
         try
         {
-            serialPort1.Read(readByte1, 1, 1);
-            serialPort2.Read(readByte2, 1, 1);
+            serialPort1.Read(*readBuffer1, 3, 1);
+            serialPort2.Read(*readBuffer2, 3, 1);
         }
         catch(...)
         {
