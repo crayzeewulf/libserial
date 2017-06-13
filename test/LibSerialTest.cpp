@@ -1308,7 +1308,8 @@ protected:
         size_t threadLoopStartTimeMicroseconds = getTimeInMicroSeconds();
         size_t timeElapsedMicroSeconds = 0;
 
-        while (timeElapsedMicroSeconds < threadTimeOutMicroseconds)
+        while (timeElapsedMicroSeconds < threadTimeOutMicroseconds &&
+               serialStream2.IsOpen())
         {
             serialStream1 << writeString1 << std::endl;
             getline(serialStream1, readString2);
@@ -1329,7 +1330,8 @@ protected:
         size_t threadLoopStartTimeMicroseconds = getTimeInMicroSeconds();
         size_t timeElapsedMicroSeconds = 0;
 
-        while (timeElapsedMicroSeconds < threadTimeOutMicroseconds)
+        while (timeElapsedMicroSeconds < threadTimeOutMicroseconds &&
+               serialStream1.IsOpen())
         {
             serialStream2 << writeString2 << std::endl;
 
@@ -1356,7 +1358,6 @@ protected:
         while (timeElapsedMicroSeconds < threadTimeOutMicroseconds)
         {
             serialPort1.Write(writeString1 + '\n');
-            // tcdrain(serialPort1.GetFileDescriptor());
 
             try
             {
@@ -1389,7 +1390,6 @@ protected:
         while (timeElapsedMicroSeconds < threadTimeOutMicroseconds)
         {
             serialPort2.Write(writeString2 + '\n');
-            // tcdrain(serialPort2.GetFileDescriptor());
             
             try
             {
