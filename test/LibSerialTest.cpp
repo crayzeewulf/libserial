@@ -26,7 +26,7 @@ public:
 protected:
 
     size_t timeOutMilliseconds = 25;
-    size_t threadTimeOutMicroseconds = 5000000;
+    size_t threadTimeOutMicroseconds = 2500000;
 
     BaudRate        baudRates[25];
     CharacterSize   characterSizes[4];

@@ -179,32 +179,6 @@ SerialStream::FlushIOBuffers()
     return;
 }
 
-void
-SerialStream::InitializeSerialPort()
-{
-    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
-
-    // Make sure that we are dealing with a SerialStreamBuf before
-    // proceeding. This check also makes sure that we have a non-NULL
-    // buffer associated with this stream.
-    if (my_buffer)
-    {
-        // Try to initialize the serial port with the correspoding
-        // function of the SerialStreamBuf class.
-        my_buffer->InitializeSerialPort();
-    }
-    else
-    {
-        // If the dynamic_cast above failed then we either have a NULL
-        // streambuf associated with this stream or we have a buffer
-        // of class other than SerialStreamBuf. In either case, we
-        // have a problem and we should stop all I/O using this stream.
-        setstate(badbit);
-    }
-
-    return;
-}
-
 bool
 SerialStream::IsOpen()
 {

@@ -90,13 +90,6 @@ namespace LibSerial
          */
         void FlushIOBuffers();
 
-        /** 
-         * @brief This routine is called by open() in order to
-         *        initialize some parameters of the serial port and
-         *        setting its parameters to default values.
-         */
-        void InitializeSerialPort();
-
         /**
          * @brief Determines if data is available at the serial port.
          */
@@ -371,13 +364,6 @@ namespace LibSerial
         return;
     }
 
-    void
-    SerialStreamBuf::InitializeSerialPort()
-    {
-        mImpl->InitializeSerialPort();
-        return;
-    }
-
     bool
     SerialStreamBuf::IsDataAvailable()
     {
@@ -499,6 +485,12 @@ namespace LibSerial
     {
         return std::streambuf::setbuf(0, 0);
     }
+
+    // std::streambuf*
+    // SerialStreamBuf::setbuf(char_type *s, std::streamsize n)
+    // {
+    //     return std::streambuf::setbuf(s, n);
+    // }
 
     std::streamsize
     SerialStreamBuf::xsputn(const char_type *s, std::streamsize n)
@@ -660,8 +652,11 @@ namespace LibSerial
         // Flush the input and output buffers associated with the port.
         this->FlushIOBuffers();
 
-        // Initialize the serial port.
-        InitializeSerialPort();
+        // Set up the default configuration for the serial port.
+        this->SetParametersToDefault();
+
+        // @NOTE - Stream communications need to happen in blocking mode.
+        this->SetPortBlockingStatus(true);
 
         return;
     }
@@ -748,30 +743,6 @@ namespace LibSerial
             throw std::runtime_error(strerror(errno));
         }
 
-        return;
-    }
-
-    inline
-    void
-    SerialStreamBuf::Implementation::InitializeSerialPort()
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Set up the default configuration for the serial port.
-        this->SetParametersToDefault();
-
-        // Flush out any garbage left behind in the buffers associated
-        // with the port from any previous operations. 
-        this->FlushIOBuffers();
-
-        // Allow all further communications to happen in blocking mode.
-        this->SetPortBlockingStatus(true);
-
-        // Initialization was successful.
         return;
     }
 

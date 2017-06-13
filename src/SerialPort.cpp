@@ -92,13 +92,6 @@ namespace LibSerial
          */
         void FlushIOBuffers();
 
-        /** 
-         * @brief This routine is called by open() in order to
-         *        initialize some parameters of the serial port and
-         *        setting its parameters to default values.
-         */
-        void InitializeSerialPort();
-
         /**
          * @brief Determines if data is available at the serial port.
          */
@@ -460,13 +453,6 @@ namespace LibSerial
         return;
     }
 
-    void
-    SerialPort::InitializeSerialPort()
-    {
-        mImpl->InitializeSerialPort();
-        return;
-    }
-
     bool
     SerialPort::IsDataAvailable()
     {
@@ -820,8 +806,8 @@ namespace LibSerial
         // Flush the input and output buffers associated with the port.
         this->FlushIOBuffers();
 
-        // Initialize the serial port.
-        InitializeSerialPort();
+        // Set up the default configuration for the serial port.
+        this->SetParametersToDefault();
 
         return;
     }
@@ -908,27 +894,6 @@ namespace LibSerial
             throw std::runtime_error(strerror(errno));
         }
 
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::InitializeSerialPort()
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Set up the default configuration for the serial port.
-        this->SetParametersToDefault();
-
-        // Flush out any garbage left behind in the buffers associated
-        // with the port from any previous operations. 
-        this->FlushIOBuffers();
-
-        // Initialization was successful.
         return;
     }
 
@@ -1847,6 +1812,7 @@ namespace LibSerial
             read_result = read(this->mFileDescriptor,
                                &charBuffer + number_of_bytes_read,
                                charBufferSize - number_of_bytes_read);
+            
             if (read_result > 0)
             {
                 number_of_bytes_read += read_result;

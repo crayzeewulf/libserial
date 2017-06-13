@@ -158,13 +158,6 @@ namespace LibSerial
          */
         void FlushIOBuffers();
 
-        /** 
-         * @brief This routine is called by open() in order to
-         *        initialize some parameters of the serial port and
-         *        setting its parameters to default values.
-         */
-        void InitializeSerialPort();
-
         /**
          * @brief Checks if data is available at the input of the serial port.
          * @return Returns true iff data is available to read.
