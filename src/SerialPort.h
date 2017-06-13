@@ -260,10 +260,9 @@ namespace LibSerial
          *        The method will timeout if no data is received in the specified
          *        number of milliseconds (msTimeout). If msTimeout is 0, then
          *        this method will block until all requested bytes are
-         *        received. If numberOfBytes is zero, then this method will keep
-         *        reading data till no more data is available at the serial port.
-         *        In all cases, all read data is available in dataBuffer on
-         *        return from this method.
+         *        received. If numberOfBytes is zero, the method will return
+         *        immediately. In all cases, received data remains available
+         *        in the charBuffer on return from this method.
          * @param charBuffer The character array buffer to place serial data into.
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
@@ -279,7 +278,7 @@ namespace LibSerial
          *        this method will block until all requested bytes are
          *        received. If numberOfBytes is zero, then this method will keep
          *        reading data till no more data is available at the serial port.
-         *        In all cases, all read data is available in dataBuffer on
+         *        In all cases, received data is available in dataBuffer on
          *        return from this method.
          * @param dataBuffer The data buffer to place serial data into.
          * @param numberOfBytes The number of bytes to read before returning.
@@ -296,7 +295,7 @@ namespace LibSerial
          *        this method will block until all requested bytes are
          *        received. If numberOfBytes is zero, then this method will keep
          *        reading data till no more data is available at the serial port.
-         *        In all cases, all read data is available in dataBuffer on
+         *        In all cases, received data is available in dataBuffer on
          *        return from this method.
          * @param dataString The data string read from the serial port.
          * @param numberOfBytes The number of bytes to read before returning.

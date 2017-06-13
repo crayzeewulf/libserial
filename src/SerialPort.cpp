@@ -1781,13 +1781,18 @@ namespace LibSerial
     inline
     void
     SerialPort::Implementation::Read(unsigned char&     charBuffer,
-                                     const unsigned int charBufferSize,
+                                     const unsigned int numberOfBytes,
                                      const unsigned int msTimeout)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        if (numberOfBytes == 0)
+        {
+            return;
         }
 
         unsigned int elapsed_ms = 0;
@@ -1807,27 +1812,27 @@ namespace LibSerial
         }
 
         // Loop until the number of bytes requested have been read or the timeout has elapsed.
-        while (number_of_bytes_read < (int)charBufferSize)
+        while (number_of_bytes_read < (int)numberOfBytes)
         {
             read_result = read(this->mFileDescriptor,
                                &charBuffer + number_of_bytes_read,
-                               charBufferSize - number_of_bytes_read);
+                               numberOfBytes - number_of_bytes_read);
             
             if (read_result > 0)
             {
                 number_of_bytes_read += read_result;
+
+                if (number_of_bytes_read == (int)numberOfBytes)
+                {
+                    break;
+                }
             }
             else if (read_result <= 0 &&
                      errno != EWOULDBLOCK)
             {
                 throw std::runtime_error(strerror(errno));
             }
-
-            if (number_of_bytes_read == (int)charBufferSize)
-            {
-                break;
-            }
-
+            
             // Throw an exception if we are unable to read the current time.
             if (gettimeofday(&current_time,
                              NULL) < 0)
@@ -2110,7 +2115,7 @@ namespace LibSerial
     inline
     void
     SerialPort::Implementation::Write(const unsigned char* charBuffer,
-                                      const unsigned int   charBufferSize)
+                                      const unsigned int   numberOfBytes)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2119,7 +2124,7 @@ namespace LibSerial
         }
 
         // Nothing needs to be done if there is no data in the buffer.
-        if (charBufferSize <= 0)
+        if (numberOfBytes <= 0)
         {
             return;
         }
@@ -2132,14 +2137,14 @@ namespace LibSerial
         {
             num_of_bytes_written = write(this->mFileDescriptor,
                                          charBuffer,
-                                         charBufferSize);
+                                         numberOfBytes);
         }
         while (num_of_bytes_written <= 0 &&
                errno == EAGAIN &&
                errno != EWOULDBLOCK);
 
         if (num_of_bytes_written < 0 ||
-            num_of_bytes_written < (int)charBufferSize)
+            num_of_bytes_written < (int)numberOfBytes)
         {
             throw std::runtime_error(strerror(errno));
         }
