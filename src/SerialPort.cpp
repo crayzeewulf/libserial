@@ -871,7 +871,6 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-
         if (tcflush(this->mFileDescriptor, TCOFLUSH) < 0)
         {
             throw std::runtime_error(strerror(errno));
@@ -915,15 +914,15 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        int num_of_bytes_available = 0;
+        int number_of_bytes_available = 0;
         bool dataAvailableStatus = false;
 
         int result = ioctl(this->mFileDescriptor,
                            FIONREAD,
-                           &num_of_bytes_available);
+                           &number_of_bytes_available);
         
         if (result >= 0 &&
-            num_of_bytes_available > 0)
+            number_of_bytes_available > 0)
         {
             dataAvailableStatus = true;
         }
@@ -1750,10 +1749,9 @@ namespace LibSerial
 
         bool blocking_status = false;
 
-        int flags1 = fcntl(this->mFileDescriptor, F_GETFL, 0);
-        int flags2 = flags1 | O_NONBLOCK;
+        int flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
         
-        if (flags1 == flags2)
+        if (flags == (flags | O_NONBLOCK))
         {
             blocking_status = true;
         }

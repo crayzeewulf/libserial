@@ -236,20 +236,24 @@ namespace LibSerial
         /**
          * @brief Writes up to n characters from the character sequence at 
          *        char s to the serial port associated with the buffer.
+         * @param character Pointer to the character buffer to write to the serial port.
+         * @param numberOfBytes The number of characters to write to the serial port.
          * @return Returns the number of characters that were successfully
          *         written to the serial port. 
          */
-        virtual std::streamsize xsputn(const char_type* s, 
-                                       std::streamsize  n) override;
+        virtual std::streamsize xsputn(const char_type* character, 
+                                       std::streamsize numberOfBytes) override;
            
         /**
          * @brief Reads up to n characters from the serial port and returns
          *        them through the character array located at s.
+         * @param character Pointer to the character buffer to write to the serial port.
+         * @param numberOfBytes The number of characters to write to the serial port.
          * @return Returns the number of characters actually read from the
          *         serial port. 
          */
-        virtual std::streamsize xsgetn(char_type*      s, 
-                                       std::streamsize n) override;
+        virtual std::streamsize xsgetn(char_type* character, 
+                                       std::streamsize numberOfBytes) override;
 
         /**
          * @brief Writes the specified character to the associated serial port.

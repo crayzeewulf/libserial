@@ -506,21 +506,21 @@ namespace LibSerial
     }
 
     std::streambuf*
-    SerialStreamBuf::setbuf(char_type *s, std::streamsize n)
+    SerialStreamBuf::setbuf(char_type* character, std::streamsize numberOfBytes)
     {
-        return std::streambuf::setbuf(s, n);
+        return std::streambuf::setbuf(character, numberOfBytes);
     }
 
     std::streamsize
-    SerialStreamBuf::xsputn(const char_type *s, std::streamsize n)
+    SerialStreamBuf::xsputn(const char_type* character, std::streamsize numberOfBytes)
     {
-        return mImpl->xsputn(s, n);
+        return mImpl->xsputn(character, numberOfBytes);
     }
 
     std::streamsize
-    SerialStreamBuf::xsgetn(char_type *s, std::streamsize n)
+    SerialStreamBuf::xsgetn(char_type* character, std::streamsize numberOfBytes)
     {
-        return mImpl->xsgetn(s, n);
+        return mImpl->xsgetn(character, numberOfBytes);
     }
 
     std::streambuf::int_type
@@ -1602,8 +1602,8 @@ namespace LibSerial
 
     inline
     std::streamsize
-    SerialStreamBuf::Implementation::xsputn(const char_type *s,
-                                            std::streamsize n) 
+    SerialStreamBuf::Implementation::xsputn(const char_type* character,
+                                            std::streamsize numberOfBytes) 
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1611,29 +1611,29 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
         
-        // If n is non-positive then we have nothing to do here.
-        if (n <= 0)
+        // If n is less than 1 there is nothing to accomplish.
+        if (numberOfBytes <= 0)
         {
             return 0;
         }
 
         // Write the n characters to the serial port. 
-        ssize_t retval = write(this->mFileDescriptor, s, n);
+        ssize_t result = write(this->mFileDescriptor, character, numberOfBytes);
 
         // If the write failed then return 0. 
-        if (retval <= 0)
+        if (result <= 0)
         {
             return 0;
         }
 
         // Otherwise, return the number of bytes actually written.
-        return retval;
+        return result;
     }
 
     inline
     std::streamsize
-    SerialStreamBuf::Implementation::xsgetn(char_type *s,
-                                            std::streamsize n)
+    SerialStreamBuf::Implementation::xsgetn(char_type* character,
+                                            std::streamsize numberOfBytes)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1642,60 +1642,60 @@ namespace LibSerial
         }
 
         // If n is less than 1 there is nothing to accomplish.
-        if (n <= 0)
+        if (numberOfBytes <= 0)
         {
             return 0;
         }
 
         // Try to read up to n characters in the array s.
-        ssize_t retval = -1;
+        ssize_t result = -1;
 
         // If a putback character is available, then we need to read only
         // n-1 character.
         if (mPutbackAvailable)
         {
             // Put the mPutbackChar at the beginning of the array 's'.
-            // Increment retval to indicate that a character has been placed in s.
-            s[0] = mPutbackChar;
-            retval++;
+            // Increment result to indicate that a character has been placed in s.
+            character[0] = mPutbackChar;
+            result++;
 
             // The putback character is no longer available. 
             mPutbackAvailable = false;
 
             // If we need to read more than one character, then call read()
-            // and try to read n-1 more characters and put them at location
-            // starting from &s[1].
-            if (n > 1)
+            // and try to read numberOfBytes-1 more characters and put them
+            // at location starting from &character[1].
+            if (numberOfBytes > 1)
             {
-                retval = read(this->mFileDescriptor, &s[1], n-1);
+                result = read(this->mFileDescriptor, &character[1], numberOfBytes-1);
 
-                // If read was successful, then we need to increment retval by
+                // If read was successful, then we need to increment result by
                 // one to indicate that the putback character was prepended to
-                // the array, s. If read failed then leave retval at -1.
-                if (retval != -1)
+                // the array, s. If read failed then leave result at -1.
+                if (result != -1)
                 {
-                    retval++;
+                    result++;
                 }
             }
         }
         else
         {
-
-            // If no putback character is available then we try to read n characters.
-            retval = read(this->mFileDescriptor, s, n);
+            // If no putback character is available then we try to
+            // read numberOfBytes characters.
+            result = read(this->mFileDescriptor, character, numberOfBytes);
         }
 
-        // If retval == -1 then the read call had an error, otherwise, if
-        // retval == 0 then we could not read the characters. In either
+        // If result == -1 then the read call had an error, otherwise, if
+        // result == 0 then we could not read the characters. In either
         // case, we return 0 to indicate that no characters could be read
         // from the serial port.
-        if (retval <= 0)
+        if (result <= 0)
         {
             return 0;
         }
 
         // Return the number of characters actually read from the serial port.
-        return retval;
+        return result;
     }
 
     inline
@@ -1717,11 +1717,11 @@ namespace LibSerial
         else
         {
             // Otherwise we write the character to the serial port. 
-            char out_ch = traits_type::to_char_type(character);
-            ssize_t retval = write(this->mFileDescriptor, &out_ch, 1);
+            char out_char = traits_type::to_char_type(character);
+            ssize_t result = write(this->mFileDescriptor, &out_char, 1);
 
             // If the write failed then return eof. 
-            if (retval <= 0)
+            if (result <= 0)
             {
                 return traits_type::eof();
             }
@@ -1742,33 +1742,31 @@ namespace LibSerial
         }
 
         // Read the next character from the serial port. 
-        char next_ch = 0;
-        ssize_t retval = -1;
+        char next_char = 0;
+        ssize_t result = -1;
 
         // If a putback character is available then we return that
         // character. However, we are not supposed to change the value of
         // gptr() in this routine so we leave mPutbackAvailable set to true.
         if (mPutbackAvailable)
         {
-            next_ch = mPutbackChar;
+            next_char = mPutbackChar;
         }
         else
         {
             // If no putback character is available then we need to read one
             // character from the serial port.
-            retval = read(this->mFileDescriptor,
-                          &next_ch,
-                          1);
+            result = read(this->mFileDescriptor, &next_char, 1);
 
             // Make the next character the putback character. This has the
             // effect of returning the next character without changing gptr()
             // as required by the C++ standard.
-            if (retval == 1)
+            if (result == 1)
             {
-                mPutbackChar = next_ch;
+                mPutbackChar = next_char;
                 mPutbackAvailable = true;
             }
-            else if (retval <= 0)
+            else if (result <= 0)
             {
                 // If we had a problem reading the character, we return
                 // traits::eof().
@@ -1782,7 +1780,7 @@ namespace LibSerial
 
         // Return the character as an int value as required by the C++
         // standard.
-        return traits_type::to_int_type(next_ch);
+        return traits_type::to_int_type(next_char);
     }
 
     inline
@@ -1795,9 +1793,11 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        int_type next_ch = underflow();
+        int_type next_char = underflow();
+
         mPutbackAvailable = false;
-        return next_ch;
+
+        return next_char;
     }
 
     inline
@@ -1843,34 +1843,19 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        ssize_t retval = -1;
+        ssize_t result = -1;
+        ssize_t number_of_bytes_available = 0;
 
-        if (mPutbackAvailable)
+        result = ioctl(this->mFileDescriptor,
+                       FIONREAD,
+                       &number_of_bytes_available);
+
+        if (result >= 0 &&
+            number_of_bytes_available > 0)
         {
-            // We still have a character left in the buffer.
-            retval = 1;
-        }
-        else
-        {
-            // Switch to non-blocking read.
-            this->SetPortBlockingStatus(false);
-
-            // Try to read a character.
-            retval = read(this->mFileDescriptor, &mPutbackChar, 1);
-
-            if (retval == 1)
-            {
-                mPutbackAvailable = true;
-            }
-            else
-            {
-                retval = 0;
-            }
-
-            // Switch back to blocking read.
-            this->SetPortBlockingStatus(true);
+            mPutbackAvailable = true;
         }
 
-        return retval;
+        return number_of_bytes_available;
     }
 }
