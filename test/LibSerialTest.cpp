@@ -28,8 +28,11 @@ protected:
 
     std::mutex mutex;
 
+    bool threadLoop1Active = false;
+    bool threadLoop2Active = false;
+
     size_t timeOutMilliseconds = 250;
-    size_t threadTimeOutMicroseconds = 2500000;
+    size_t threadTimeOutMicroseconds = 1000000;
 
     size_t failureRate = 0;
     size_t loopCount = 0;
@@ -46,11 +49,11 @@ protected:
     SerialPort serialPort1;
     SerialPort serialPort2;
 
-    std::string readString1  = " ";
-    std::string writeString1 = " ";
+    std::string readString1  = "";
+    std::string writeString1 = "";
 
-    std::string readString2  = " ";
-    std::string writeString2 = " ";
+    std::string readString2  = "";
+    std::string writeString2 = "";
 
     virtual void SetUp()
     {
@@ -1313,11 +1316,16 @@ protected:
         size_t threadLoopStartTimeMicroseconds = getTimeInMicroSeconds();
         size_t timeElapsedMicroSeconds = 0;
 
+        mutex.lock();
+        threadLoop1Active = true;
+        mutex.unlock();
+
         while (timeElapsedMicroSeconds < threadTimeOutMicroseconds)
         {
             serialStream1 << writeString1 << std::endl;
 
-            if (serialStream1.IsDataAvailable())
+            if (threadLoop2Active == true &&
+                serialStream1.IsDataAvailable())
             {
                 getline(serialStream1, readString2);
 
@@ -1336,6 +1344,10 @@ protected:
             mutex.unlock();
         }
 
+        mutex.lock();
+        threadLoop1Active = false;
+        mutex.unlock();
+
         serialStream1.Close();
         return;
     }
@@ -1348,11 +1360,16 @@ protected:
         size_t threadLoopStartTimeMicroseconds = getTimeInMicroSeconds();
         size_t timeElapsedMicroSeconds = 0;
 
+        mutex.lock();
+        threadLoop2Active = true;
+        mutex.unlock();
+
         while (timeElapsedMicroSeconds < threadTimeOutMicroseconds)
         {
             serialStream2 << writeString2 << std::endl;
 
-            if (serialStream2.IsDataAvailable())
+            if (threadLoop1Active == true &&
+                serialStream2.IsDataAvailable())
             {
                 getline(serialStream2, readString1);
 
@@ -1371,6 +1388,10 @@ protected:
             mutex.unlock();
         }
 
+        mutex.lock();
+        threadLoop2Active = false;
+        mutex.unlock();
+
         serialStream2.Close();
         return;
     }
@@ -1384,13 +1405,18 @@ protected:
         size_t threadLoopStartTimeMicroseconds = getTimeInMicroSeconds();
         size_t timeElapsedMicroSeconds = 0;
 
+        mutex.lock();
+        threadLoop1Active = true;
+        mutex.unlock();
+
         while (timeElapsedMicroSeconds < threadTimeOutMicroseconds)
         {
             try
             {
                 serialPort1.Write(writeString1 + '\n');
 
-                if (serialPort1.IsDataAvailable())
+                if (threadLoop2Active == true &&
+                    serialPort1.IsDataAvailable())
                 {
                     serialPort1.ReadLine(readString2, '\n', timeOutMilliseconds);
 
@@ -1413,6 +1439,10 @@ protected:
             mutex.unlock();
         }
 
+        mutex.lock();
+        threadLoop1Active = false;
+        mutex.unlock();
+
         serialPort1.Close();
         return;
     }
@@ -1426,13 +1456,18 @@ protected:
         size_t threadLoopStartTimeMicroseconds = getTimeInMicroSeconds();
         size_t timeElapsedMicroSeconds = 0;
 
+        mutex.lock();
+        threadLoop2Active = true;
+        mutex.unlock();
+
         while (timeElapsedMicroSeconds < threadTimeOutMicroseconds)
         {
             try
             {
                 serialPort2.Write(writeString2 + '\n');
                 
-                if (serialPort2.IsDataAvailable())
+                if (threadLoop1Active == true &&
+                    serialPort2.IsDataAvailable())
                 {
                     serialPort2.ReadLine(readString1, '\n', timeOutMilliseconds);
 
@@ -1454,6 +1489,10 @@ protected:
             loopCount++;
             mutex.unlock();
         }
+
+        mutex.lock();
+        threadLoop2Active = false;
+        mutex.unlock();
 
         serialPort2.Close();
         return;
@@ -1633,86 +1672,6 @@ TEST_F(LibSerialTest, testSerialStreamGetWriteByte)
     for (size_t i = 0; i < numberOfTestIterations; i++)
     {
         testSerialStreamGetWriteByte();
-    }
-}
-
-TEST_F(LibSerialTest, testSerialStreamSetBuf)
-{
-    SCOPED_TRACE("Serial Stream SetBuf() Test");
-    
-    for (size_t i = 0; i < numberOfTestIterations; i++)
-    {
-        void testSerialStreamSetBuf();
-    }
-}
-
-TEST_F(LibSerialTest, testSerialStreamXPutsN)
-{
-    SCOPED_TRACE("Serial Stream XPutsN() Test");
-    
-    for (size_t i = 0; i < numberOfTestIterations; i++)
-    {
-        void testSerialStreamXPutsN();
-    }
-}
-
-TEST_F(LibSerialTest, testSerialStreamXGetsN)
-{
-    SCOPED_TRACE("Serial Stream XGetsN() Test");
-    
-    for (size_t i = 0; i < numberOfTestIterations; i++)
-    {
-        void testSerialStreamXGetsN();
-    }
-}
-
-TEST_F(LibSerialTest, testSerialStreamOverFlow)
-{
-    SCOPED_TRACE("Serial Stream OverFlow() Test");
-    
-    for (size_t i = 0; i < numberOfTestIterations; i++)
-    {
-        void testSerialStreamOverFlow();
-    }
-}
-
-TEST_F(LibSerialTest, testSerialStreamUnderFlow)
-{
-    SCOPED_TRACE("Serial Stream UnderFlow() Test");
-    
-    for (size_t i = 0; i < numberOfTestIterations; i++)
-    {
-        void testSerialStreamUnderFlow();
-    }
-}
-
-TEST_F(LibSerialTest, testSerialStreamUFlow)
-{
-    SCOPED_TRACE("Serial Stream UFlow() Test");
-    
-    for (size_t i = 0; i < numberOfTestIterations; i++)
-    {
-        void testSerialStreamUFlow();
-    }
-}
-
-TEST_F(LibSerialTest, testSerialStreamPBackFail)
-{
-    SCOPED_TRACE("Serial Stream PBackFail() Test");
-    
-    for (size_t i = 0; i < numberOfTestIterations; i++)
-    {
-        void testSerialStreamPBackFail();
-    }
-}
-
-TEST_F(LibSerialTest, testSerialStreamShowManyC)
-{
-    SCOPED_TRACE("Serial Stream ShowManyC() Test");
-    
-    for (size_t i = 0; i < numberOfTestIterations; i++)
-    {
-        void testSerialStreamShowManyC();
     }
 }
 
@@ -1962,7 +1921,6 @@ TEST_F(LibSerialTest, testMultiThreadSerialStreamReadWrite)
     for (size_t i = 0; i < numberOfTestIterations; i++)
     {
         testMultiThreadSerialStreamReadWrite();
-        usleep(50000);
     }
 
     double failRate = 100. * failureRate / loopCount;
