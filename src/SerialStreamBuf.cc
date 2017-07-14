@@ -608,7 +608,7 @@ namespace LibSerial
         // We only allow three different combinations of ios_base::openmode so we can
         // use a switch here to construct the flags to be used with the open() system call.
         // Since we are dealing with the serial port we need to use the O_NOCTTY option.
-        int flags;
+        int flags = 0;
         
         if (openMode == (std::ios_base::in | std::ios_base::out))
         {

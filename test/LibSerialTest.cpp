@@ -22,7 +22,7 @@ class LibSerialTest
 {
 public:
     
-    size_t numberOfTestIterations = 100;
+    size_t numberOfTestIterations = 10;
 
 protected:
 
@@ -138,7 +138,7 @@ protected:
 
         serialStream1.FlushInputBuffer();
         serialStream2.FlushInputBuffer();
-        
+
         ASSERT_FALSE(serialStream1.IsDataAvailable());
         ASSERT_FALSE(serialStream2.IsDataAvailable());
 
@@ -163,7 +163,7 @@ protected:
 
         serialStream1.Close();
         serialStream2.Close();
-        
+
         ASSERT_FALSE(serialStream1.IsOpen());
         ASSERT_FALSE(serialStream2.IsOpen());
     }
@@ -178,15 +178,15 @@ protected:
 
         serialStream1.FlushInputBuffer();
         serialStream2.FlushInputBuffer();
-        
+
         ASSERT_FALSE(serialStream1.IsDataAvailable());
         ASSERT_FALSE(serialStream2.IsDataAvailable());
 
         char writeByte = 'A';
-        
+
         serialStream1.write(&writeByte, 1);
         serialStream1.FlushOutputBuffer();
-        
+
         serialStream2.write(&writeByte, 1);
         serialStream2.FlushOutputBuffer();
 
@@ -195,7 +195,7 @@ protected:
 
         serialStream1.Close();
         serialStream2.Close();
-        
+
         ASSERT_FALSE(serialStream1.IsOpen());
         ASSERT_FALSE(serialStream2.IsOpen());
     }
@@ -257,7 +257,7 @@ protected:
 
         serialStream1.write(&writeByte, 1);
         tcdrain(serialStream1.GetFileDescriptor());
-        
+
         usleep(25000);
         ASSERT_TRUE(serialStream2.IsDataAvailable());
 
@@ -266,10 +266,10 @@ protected:
 
         serialStream2.write(&writeByte, 1);
         tcdrain(serialStream2.GetFileDescriptor());
-                
+
         usleep(25000);
         ASSERT_TRUE(serialStream1.IsDataAvailable());
-        
+
         serialStream1.read(&readByte, 1);
         ASSERT_EQ(readByte, writeByte);
 
@@ -615,7 +615,7 @@ protected:
 
         serialPort1.FlushInputBuffer();
         serialPort2.FlushInputBuffer();
-        
+
         ASSERT_FALSE(serialPort1.IsDataAvailable());
         ASSERT_FALSE(serialPort2.IsDataAvailable());
 
@@ -640,7 +640,7 @@ protected:
 
         serialPort1.Close();
         serialPort2.Close();
-        
+
         ASSERT_FALSE(serialPort1.IsOpen());
         ASSERT_FALSE(serialPort2.IsOpen());
     }
@@ -655,7 +655,7 @@ protected:
 
         serialPort1.FlushInputBuffer();
         serialPort2.FlushInputBuffer();
-        
+
         ASSERT_FALSE(serialPort1.IsDataAvailable());
         ASSERT_FALSE(serialPort2.IsDataAvailable());
 
@@ -663,7 +663,7 @@ protected:
         
         serialPort1.WriteByte(writeByte);
         serialPort1.FlushOutputBuffer();
-        
+
         serialPort2.WriteByte(writeByte);
         serialPort2.FlushOutputBuffer();
 
@@ -713,7 +713,7 @@ protected:
 
         serialPort1.Close();
         serialPort2.Close();
-        
+
         ASSERT_FALSE(serialPort1.IsOpen());
         ASSERT_FALSE(serialPort2.IsOpen());
     }
@@ -734,7 +734,7 @@ protected:
 
         serialPort1.WriteByte(writeByte);
         tcdrain(serialPort1.GetFileDescriptor());
-        
+
         usleep(25000);
         ASSERT_TRUE(serialPort2.IsDataAvailable());
 
@@ -743,10 +743,10 @@ protected:
 
         serialPort2.WriteByte(writeByte);
         tcdrain(serialPort2.GetFileDescriptor());
-                
+
         usleep(25000);
         ASSERT_TRUE(serialPort1.IsDataAvailable());
-        
+
         serialPort1.ReadByte(readByte, 1);
         ASSERT_EQ(readByte, writeByte);
 
@@ -755,7 +755,7 @@ protected:
 
         serialPort1.Close();
         serialPort2.Close();
-        
+
         ASSERT_FALSE(serialPort1.IsOpen());
         ASSERT_FALSE(serialPort2.IsOpen());
     }
@@ -832,7 +832,7 @@ protected:
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
         ASSERT_TRUE(serialPort1.IsOpen());
-        
+
         StopBits numberOfStopBits;
 
         serialPort1.SetNumberOfStopBits(stopBits[0]);
@@ -928,10 +928,10 @@ protected:
 
         serialPort1.SetRTS(true);
         serialPort2.SetRTS(true);
-        
+
         rtsLine1 = serialPort1.GetRTS();
         rtsLine2 = serialPort2.GetRTS();
-        
+
         ASSERT_TRUE(rtsLine1);
         ASSERT_TRUE(rtsLine2);
 
@@ -970,7 +970,7 @@ protected:
 
         ASSERT_TRUE(ctsLine1);
         ASSERT_TRUE(ctsLine2);
-        
+
         serialPort1.SetRTS(false);
         serialPort2.SetRTS(false);
 
@@ -1039,7 +1039,7 @@ protected:
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
         serialPort2.Open(TEST_SERIAL_PORT_2);
-        
+
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
@@ -1080,7 +1080,7 @@ protected:
 
         serialPort1.Close();
         serialPort2.Close();
-        
+
         ASSERT_FALSE(serialPort1.IsOpen());
         ASSERT_FALSE(serialPort2.IsOpen());
     }
@@ -1089,7 +1089,7 @@ protected:
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
         serialPort2.Open(TEST_SERIAL_PORT_2);
-        
+
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
@@ -1117,7 +1117,7 @@ protected:
 
         tcdrain(serialPort1.GetFileDescriptor());
         tcdrain(serialPort2.GetFileDescriptor());
-        
+
         serialPort1.Read(readDataBuffer2, 75, timeOutMilliseconds);
         serialPort2.Read(readDataBuffer1, 75, timeOutMilliseconds);
 
@@ -1138,7 +1138,7 @@ protected:
 
         serialPort1.Close();
         serialPort2.Close();
-        
+
         ASSERT_FALSE(serialPort1.IsOpen());
         ASSERT_FALSE(serialPort2.IsOpen());
     }
@@ -1147,7 +1147,7 @@ protected:
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
         serialPort2.Open(TEST_SERIAL_PORT_2);
-        
+
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
@@ -1188,7 +1188,7 @@ protected:
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
         serialPort2.Open(TEST_SERIAL_PORT_2);
-        
+
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
@@ -1221,12 +1221,12 @@ protected:
         {
             timeOutTestPass = true;
         }
-        
+
         ASSERT_TRUE(timeOutTestPass);
 
         serialPort1.Close();
         serialPort2.Close();
-        
+
         ASSERT_FALSE(serialPort1.IsOpen());
         ASSERT_FALSE(serialPort2.IsOpen());
     }
@@ -1235,7 +1235,7 @@ protected:
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
         serialPort2.Open(TEST_SERIAL_PORT_2);
-        
+
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
@@ -1252,7 +1252,7 @@ protected:
 
         ASSERT_EQ(readString1, writeString1 + '\n');
         ASSERT_EQ(readString2, writeString2 + '\n');
-       
+
         try
         {
             serialPort1.ReadLine(readString2, '\n', 1);
@@ -1262,12 +1262,12 @@ protected:
         {
             timeOutTestPass = true;
         }
-        
+
         ASSERT_TRUE(timeOutTestPass);
 
         serialPort1.Close();
         serialPort2.Close();
-        
+
         ASSERT_FALSE(serialPort1.IsOpen());
         ASSERT_FALSE(serialPort2.IsOpen());
     }
@@ -1282,10 +1282,10 @@ protected:
 
         serialPort1.SetBaudRate(baudRates[16]);
         serialStream1.SetBaudRate(baudRates[16]);
-        
+
         BaudRate baudRate1 = serialPort1.GetBaudRate();
         BaudRate baudRate2 = serialStream1.GetBaudRate();
-        
+
         ASSERT_EQ(baudRate1, baudRates[16]);
         ASSERT_EQ(baudRate2, baudRates[16]);
 
@@ -1294,7 +1294,7 @@ protected:
 
         ASSERT_EQ(readString1, writeString1 + '\n');
         ASSERT_EQ(readString1.size(), writeString1.size() + 1);
-       
+
         serialPort1.Write(writeString2 + '\n');
         tcdrain(serialPort1.GetFileDescriptor());
         getline(serialStream1, readString2);
@@ -1303,7 +1303,7 @@ protected:
 
         serialPort1.Close();
         serialStream1.Close();
-        
+
         ASSERT_FALSE(serialPort1.IsOpen());
         ASSERT_FALSE(serialStream1.IsOpen());
     }
@@ -1336,9 +1336,9 @@ protected:
                     mutex.unlock();
                 }
             }
-            
+
             timeElapsedMicroSeconds = getTimeInMicroSeconds() - threadLoopStartTimeMicroseconds;
-            
+
             mutex.lock();
             loopCount++;
             mutex.unlock();
@@ -1431,7 +1431,7 @@ protected:
             catch(...)
             {
             }
-            
+
             timeElapsedMicroSeconds = getTimeInMicroSeconds() - threadLoopStartTimeMicroseconds;
 
             mutex.lock();
