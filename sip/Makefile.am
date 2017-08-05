@@ -30,7 +30,6 @@ siplibserialSerialPort.cpp \
 siplibserialSerialPortNotOpen.cpp \
 siplibserialSerialPortOpenFailed.cpp \
 siplibserialSerialPortReadTimeout.cpp \
-siplibserialSerialPortUnsupportedBaudRate.cpp \
 siplibserialstd.cpp \
 siplibserialstdexception.cpp \
 siplibserialstdinvalid_argument.cpp \

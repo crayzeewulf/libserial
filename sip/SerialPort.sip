@@ -3,8 +3,6 @@ class SerialPort /NoDefaultCtors/
 {
 %TypeHeaderCode
 #include <SerialPort.h>
-#include <SerialPortConstants.h>
-#include <termios.h>
 %End
 public:
     enum BaudRate
@@ -98,7 +96,7 @@ public:
         ReadTimeout( const std::string& whatArg ) ;
         virtual ~ReadTimeout() throw() ;
 %MethodCode
-	        return ;
+            return ;
 %End
     } ;
 
