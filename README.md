@@ -1,4 +1,4 @@
-#Libserial
+# Libserial
 
 ----
 LibSerial provides a convenient, object oriented approach to accessing serial ports on POSIX systems.
@@ -16,7 +16,6 @@ make -f Makefile.dist
 You can skip this step if you are using a release package (which already contains the `configure` script). Once you have the `configure` script, run the following commands:
 
 ```
-    shell
     ./configure 
     make
     make install

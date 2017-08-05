@@ -56,6 +56,7 @@ doc
 /doc/man/
 /doxygen.conf
 /examples/readport
+/examples/readport_01
 /examples/writeport
 /install-sh
 /libserial.pc
