@@ -571,7 +571,9 @@ namespace LibSerial
                                                     const FlowControl&   flowControlType,
                                                     const Parity&        parityType,
                                                     const StopBits&      stopBits)
-        : mFileDescriptor(-1)
+        : mPutbackAvailable(false)
+        , mPutbackChar(0)
+        , mFileDescriptor(-1)
     {
         this->Open(fileName, std::ios_base::in | std::ios_base::out);
         this->SetBaudRate(baudRate);
