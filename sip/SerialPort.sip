@@ -25,39 +25,44 @@ public:
         BAUD_57600   = B57600,
         BAUD_115200  = B115200,
         BAUD_230400  = B230400,
-        BAUD_DEFAULT = BAUD_57600
+        BAUD_DEFAULT = BAUD_115200,
+        // BAUD_INVALID = std::numeric_limits<speed_t>::max()
     } ;
 
     enum CharacterSize
     {
-        CHAR_SIZE_5  = CS5, //!< 5 bit characters.
-        CHAR_SIZE_6  = CS6, //!< 6 bit characters.
-        CHAR_SIZE_7  = CS7, //!< 7 bit characters.
-        CHAR_SIZE_8  = CS8, //!< 8 bit characters.
-        CHAR_SIZE_DEFAULT = CHAR_SIZE_8
+        CHAR_SIZE_5       = CS5, //!< 5 bit characters.
+        CHAR_SIZE_6       = CS6, //!< 6 bit characters.
+        CHAR_SIZE_7       = CS7, //!< 7 bit characters.
+        CHAR_SIZE_8       = CS8, //!< 8 bit characters.
+        CHAR_SIZE_DEFAULT = CS8, // !< 8 bit characters.
+        // CHAR_SIZE_INVALID = std::numeric_limits<tcflag_t>::max()
     } ;
 
     enum FlowControl
     {
-        FLOW_CONTROL_HARD,
-        // FLOW_CONTROL_SOFT,
+        FLOW_CONTROL_HARDWARE,
+        FLOW_CONTROL_SOFTWARE,
         FLOW_CONTROL_NONE,
-        FLOW_CONTROL_DEFAULT = FLOW_CONTROL_NONE
+        FLOW_CONTROL_DEFAULT = FLOW_CONTROL_NONE,
+        // FLOW_CONTROL_INVALID = std::numeric_limits<tcflag_t>::max()
     } ;
 
     enum Parity
     {
-        PARITY_EVEN,     //!< Even parity.
-        PARITY_ODD,      //!< Odd parity.
-        PARITY_NONE,     //!< No parity i.e. parity checking disabled.
-        PARITY_DEFAULT = PARITY_NONE
+        PARITY_EVEN,                    // Even parity.
+        PARITY_ODD,                     // Odd parity.
+        PARITY_NONE,                    // No parity i.e. parity checking disabled.
+        PARITY_DEFAULT = PARITY_NONE,   // No parity i.e. parity checking disabled.
+        // PARITY_INVALID = std::numeric_limits<tcflag_t>::max() //!< Invalid parity value.
     } ;
 
     enum StopBits
     {
-        STOP_BITS_1,   //! 1 stop bit.
-        STOP_BITS_2,   //! 2 stop bits.
-        STOP_BITS_DEFAULT = STOP_BITS_1
+        STOP_BITS_1,                     // 1 stop bit.
+        STOP_BITS_2,                     // 2 stop bits.
+        STOP_BITS_DEFAULT = STOP_BITS_1, // 1 stop bit.
+        // STOP_BITS_INVALID = std::numeric_limits<tcflag_t>::max()
     } ;
 
     class NotOpen : std::logic_error

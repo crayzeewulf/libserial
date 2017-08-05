@@ -1,7 +1,7 @@
 SIPFILES = \
+SerialPort.sip \
 exception.sip \
 libserial.sip \
-SerialPort.sip \
 stdexcept.sip \
 string.sip \
 vector.sip 
@@ -25,9 +25,9 @@ clean-local: Makefile.sip
 
 CLEANFILES = \
 siplibserialcmodule.cpp \
-siplibserialSerialPortAlreadyOpen.cpp \
 siplibserialSerialPort.cpp \
 siplibserialSerialPortNotOpen.cpp \
+siplibserialSerialPortAlreadyOpen.cpp \
 siplibserialSerialPortOpenFailed.cpp \
 siplibserialSerialPortReadTimeout.cpp \
 siplibserialstd.cpp \
