@@ -17,7 +17,7 @@ int main(int argc, char** argv)
     // Instantiate a SerialStream object then open the serial port.
     SerialStream serial_stream;
 
-    serial_stream.Open("/dev/ttyUSB0");
+    serial_stream.Open("/dev/ttyUSB1");
     
     // Check that the serial stream has opened correctly.
     if (!serial_stream.good()) 

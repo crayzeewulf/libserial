@@ -23,10 +23,23 @@ You can skip this step if you are using a release package (which already contain
 ```
 
 ----
-If you are a developer, to compile and run the unit tests simply run the compile script:
+If you are a developer, in order to run the unit tests, first ensure serial port names are appropriate for your hardware configuration in LibSerialTest.cpp:
+
+```
+#define TEST_SERIAL_PORT_1 "/dev/ttyUSB0"
+#define TEST_SERIAL_PORT_2 "/dev/ttyUSB1"
+```
+
+Next, compile the unit tests by running the compile script:
 
 ```
     ./compile.sh
+```
+
+Finally, you can run the unit tests:
+
+```
+./build/bin/unitTests
 ```
 
 ----
