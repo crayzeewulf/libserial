@@ -6,4 +6,4 @@ include_HEADERS = SerialStreamBuf.h SerialStream.h SerialPort.h \
 		SerialPortConstants.h
 
 libserial_la_SOURCES = SerialStreamBuf.cc SerialStreamBuf.h SerialStream.cc \
-		SerialStream.h SerialPort.cpp SerialPort.h
+		SerialStream.h SerialPort.cpp SerialPort.h SerialPortConstants.h

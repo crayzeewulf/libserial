@@ -1,5 +1,7 @@
 AM_CXXFLAGS = -Weffc++
 
+lib_LTLIBRARIES = libserial.la
+
 noinst_PROGRAMS = unit_tests
 
 include_HEADERS = SerialStreamBuf.h SerialStream.h SerialPort.h \
