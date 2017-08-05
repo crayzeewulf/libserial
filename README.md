@@ -28,7 +28,7 @@ You can skip this step if you are using a release package (which already contain
 If you are a developer, to compile and run the unit tests simply run the compile script:
 
 ```
-    ./compile
+    ./compile.sh
 ```
 
 ----
