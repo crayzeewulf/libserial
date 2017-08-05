@@ -50,4 +50,5 @@ doc/UML/Makefile
 doc/Makefile
 examples/Makefile
 src/Makefile
+test/MakeFile
 libserial.pc])
