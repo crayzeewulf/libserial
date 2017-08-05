@@ -74,10 +74,25 @@ m4/lt~obsolete.m4
 
 # Python files
 sip/configure.py
+sip/libserial.sbf
+sip/Makefile.sip
+sip/sipAPIlibserial.h
 sip/siplibserialstdvector1300.cpp
 sip/siplibserialstdvector1800.cpp
 sip/siplibserialstdvector1900.cpp
 sip/siplibserialstdvector2400.cpp
+sip/siplibserialSerialPort.cpp
+sip/siplibserialSerialPortAlreadyOpen.cpp
+sip/siplibserialSerialPortNotOpen.cpp
+sip/siplibserialSerialPortOpenFailed.cpp
+sip/siplibserialSerialPortReadTimeout.cpp
+sip/siplibserialcmodule.cpp
+sip/siplibserialstd.cpp
+sip/siplibserialstdexception.cpp
+sip/siplibserialstdinvalid_argument.cpp
+sip/siplibserialstdlogic_error.cpp
+sip/siplibserialstdruntime_error.cpp
+sip/siplibserialstdstring.cpp
 
 # Boost unit test files
 src/unit_tests

@@ -7,7 +7,7 @@ class SerialPort /NoDefaultCtors/
 #include <termios.h>
 %End
 public:
-    enum class BaudRate : speed_t
+    enum BaudRate
     {
         BAUD_50      = B50,
         BAUD_75      = B75,
@@ -30,7 +30,7 @@ public:
         BAUD_DEFAULT = BAUD_57600
     } ;
 
-    enum class CharacterSize : tcflag_t
+    enum CharacterSize
     {
         CHAR_SIZE_5  = CS5, //!< 5 bit characters.
         CHAR_SIZE_6  = CS6, //!< 6 bit characters.
@@ -39,7 +39,7 @@ public:
         CHAR_SIZE_DEFAULT = CHAR_SIZE_8
     } ;
 
-    enum class FlowControl : tcflag_t
+    enum FlowControl
     {
         FLOW_CONTROL_HARD,
         // FLOW_CONTROL_SOFT,
@@ -47,7 +47,7 @@ public:
         FLOW_CONTROL_DEFAULT = FLOW_CONTROL_NONE
     } ;
 
-    enum class Parity : tcflag_t
+    enum Parity
     {
         PARITY_EVEN,     //!< Even parity.
         PARITY_ODD,      //!< Odd parity.
@@ -55,7 +55,7 @@ public:
         PARITY_DEFAULT = PARITY_NONE
     } ;
 
-    enum class StopBits : tcflag_t
+    enum StopBits
     {
         STOP_BITS_1,   //! 1 stop bit.
         STOP_BITS_2,   //! 2 stop bits.
@@ -85,7 +85,7 @@ public:
     class OpenFailed : std::runtime_error
     {
     public:
-        OpenFailed(const std::string& whatArg) ;
+        OpenFailed( const std::string& whatArg ) ;
         virtual ~OpenFailed() throw() ;
 %MethodCode
 	        return ;
@@ -95,7 +95,7 @@ public:
     class ReadTimeout : std::runtime_error
     {
     public:
-        ReadTimeout() ;
+        ReadTimeout( const std::string& whatArg ) ;
         virtual ~ReadTimeout() throw() ;
 %MethodCode
 	        return ;
@@ -114,7 +114,6 @@ public:
           const FlowControl   flowControl = FLOW_CONTROL_DEFAULT )
         throw( SerialPort::AlreadyOpen,
                SerialPort::OpenFailed,
-               SerialPort::UnsupportedBaudRate,
                std::invalid_argument ) ;
 
     void
@@ -153,8 +152,7 @@ public:
 
     void
     SetBaudRate( const BaudRate baudRate )
-        throw( SerialPort::UnsupportedBaudRate,
-               SerialPort::NotOpen,
+        throw( SerialPort::NotOpen,
                std::invalid_argument ) ;
 
     BaudRate
@@ -285,7 +283,7 @@ public:
 
     void
     ReadLine( std::string&       dataString,
-              const char         lineTerminator = '\n',
+              const char         lineTerminator = "\n",
               const unsigned int msTimeout = 0 )
         throw( SerialPort::NotOpen,
                SerialPort::ReadTimeout,
@@ -313,9 +311,5 @@ public:
                std::runtime_error ) ;
 
 private:
-    SerialPort( const SerialPort& otherSerialPort ) = delete ;
-    SerialPort( const SerialPort&& otherSerialPort ) = delete ;
-
-    SerialPort& operator = ( const SerialPort& otherSerialPort ) = delete ;
-    SerialPort& operator = ( const SerialPort&& otherSerialPort ) = delete ;
+    SerialPort( const SerialPort& otherSerialPort ) ;
 } ;
