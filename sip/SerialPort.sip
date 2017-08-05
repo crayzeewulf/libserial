@@ -3,9 +3,11 @@ class SerialPort /NoDefaultCtors/
 {
 %TypeHeaderCode
 #include <SerialPort.h>
+#include <SerialPortConstants.h>
 %End
 public:
-    enum BaudRate {
+    enum class BaudRate : speed_t
+    {
         BAUD_50      = B50,
         BAUD_75      = B75,
         BAUD_110     = B110,
@@ -24,11 +26,11 @@ public:
         BAUD_57600   = B57600,
         BAUD_115200  = B115200,
         BAUD_230400  = B230400,
-        BAUD_460800  = B460800,
         BAUD_DEFAULT = BAUD_57600
     } ;
 
-    enum CharacterSize {
+    enum class CharacterSize : tcflag_t
+    {
         CHAR_SIZE_5  = CS5, //!< 5 bit characters.
         CHAR_SIZE_6  = CS6, //!< 6 bit characters.
         CHAR_SIZE_7  = CS7, //!< 7 bit characters.
@@ -36,24 +38,27 @@ public:
         CHAR_SIZE_DEFAULT = CHAR_SIZE_8
     } ;
 
-    enum StopBits {
-        STOP_BITS_1,   //! 1 stop bit.
-        STOP_BITS_2,   //! 2 stop bits.
-        STOP_BITS_DEFAULT = STOP_BITS_1
+    enum class FlowControl : tcflag_t
+    {
+        FLOW_CONTROL_HARD,
+        // FLOW_CONTROL_SOFT,
+        FLOW_CONTROL_NONE,
+        FLOW_CONTROL_DEFAULT = FLOW_CONTROL_NONE
     } ;
 
-    enum Parity {
+    enum class Parity : tcflag_t
+    {
         PARITY_EVEN,     //!< Even parity.
         PARITY_ODD,      //!< Odd parity.
         PARITY_NONE,     //!< No parity i.e. parity checking disabled.
         PARITY_DEFAULT = PARITY_NONE
     } ;
 
-    enum FlowControl {
-        FLOW_CONTROL_HARD,
-        // FLOW_CONTROL_SOFT,
-        FLOW_CONTROL_NONE,
-        FLOW_CONTROL_DEFAULT = FLOW_CONTROL_NONE
+    enum class StopBits : tcflag_t
+    {
+        STOP_BITS_1,   //! 1 stop bit.
+        STOP_BITS_2,   //! 2 stop bits.
+        STOP_BITS_DEFAULT = STOP_BITS_1
     } ;
 
     class NotOpen : std::logic_error
@@ -66,31 +71,21 @@ public:
 %End
     } ;
 
-    class OpenFailed : std::runtime_error
-    {
-    public:
-        OpenFailed(const std::string& whatArg) ;
-        virtual ~OpenFailed() throw() ;
-%MethodCode
-	        return ;
-%End
-    } ;
-
     class AlreadyOpen : std::logic_error
     {
     public:
         AlreadyOpen( const std::string& whatArg ) ;
         virtual ~AlreadyOpen() throw() ;
 %MethodCode
-	        return ;
+            return ;
 %End
     } ;
 
-    class UnsupportedBaudRate : std::runtime_error
+    class OpenFailed : std::runtime_error
     {
     public:
-        UnsupportedBaudRate( const std::string& whatArg ) ;
-        virtual ~UnsupportedBaudRate() throw() ;
+        OpenFailed(const std::string& whatArg) ;
+        virtual ~OpenFailed() throw() ;
 %MethodCode
 	        return ;
 %End
@@ -121,12 +116,39 @@ public:
                SerialPort::UnsupportedBaudRate,
                std::invalid_argument ) ;
 
-    bool
-    IsOpen() const ;
-
     void
     Close()
-        throw(SerialPort::NotOpen) ;
+        throw( SerialPort::NotOpen ) ;
+
+    void
+    FlushInputBuffer()
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
+
+    void
+    FlushOutputBuffer()
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
+    
+    void
+    FlushIOBuffers()
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
+    
+    bool
+    IsDataAvailable()
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
+
+    bool
+    IsOpen()
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
+
+    void
+    SetDefaultSerialPortParameters()
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
 
     void
     SetBaudRate( const BaudRate baudRate )
@@ -140,12 +162,22 @@ public:
                std::runtime_error ) ;
 
     void
-    SetCharSize( const CharacterSize charSize )
+    SetCharacterSize( const CharacterSize characterSize )
         throw( SerialPort::NotOpen,
                std::invalid_argument ) ;
+    
     CharacterSize
-    GetCharSize() const
+    GetCharacterSize() const
         throw(SerialPort::NotOpen) ;
+
+    void
+    SetFlowControl( const FlowControl flowControlType )
+        throw( SerialPort::NotOpen,
+               std::invalid_argument ) ;
+
+    FlowControl
+    GetFlowControl() const
+        throw( SerialPort::NotOpen ) ;
 
     void
     SetParity( const Parity parityType )
@@ -157,53 +189,113 @@ public:
         throw(SerialPort::NotOpen) ;
 
     void
-    SetNumOfStopBits( const StopBits numOfStopBits )
+    SetNumberOfStopBits( const StopBits numOfStopBits )
         throw( SerialPort::NotOpen,
                std::invalid_argument ) ;
 
     StopBits
-    GetNumOfStopBits() const
+    GetNumberOfStopBits() const
         throw(SerialPort::NotOpen) ;
 
     void
-    SetFlowControl( const FlowControl   flowControl )
+    SetVMin( const short vmin )
         throw( SerialPort::NotOpen,
-               std::invalid_argument ) ;
+               std::runtime_error ) ;
 
-    FlowControl
-    GetFlowControl() const
-        throw( SerialPort::NotOpen ) ;
+    short
+    GetVMin()
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
+
+    void
+    SetVTime( const short vtime )
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
+
+    short
+    GetVTime()
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;   
+
+    void
+    SetDTR( const bool dtrState = true )
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
+    bool
+    GetDTR() 
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
+    void
+    SetRTS( const bool rtsState = true )
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
 
     bool
-    IsDataAvailable() const
-        throw(SerialPort::NotOpen) ;
+    GetRTS() 
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
 
-    unsigned char
-    ReadByte( const unsigned int msTimeout = 0 )
+    bool
+    GetCTS() 
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
+
+    bool
+    GetDSR() 
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
+
+    int
+    GetFileDescriptor() 
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
+
+    void
+    Read( unsigned char&     charBuffer,
+          const unsigned int numberOfBytes = 0,
+          const unsigned int msTimeout  = 0 )
         throw( SerialPort::NotOpen,
                SerialPort::ReadTimeout,
                std::runtime_error ) ;
 
     typedef std::vector<unsigned char> DataBuffer ;
     void
-	Read( SerialPort::DataBuffer& dataBuffer,
+    Read( SerialPort::DataBuffer& dataBuffer,
           const unsigned int numOfBytes = 0,
           const unsigned int msTimeout  = 0 )
         throw( SerialPort::NotOpen,
                SerialPort::ReadTimeout,
                std::runtime_error ) ;
 
-    const std::string
-    ReadLine( const unsigned int msTimeout,
-              const char         lineTerminator )
+    void
+    Read( std::string&       dataString,
+          const unsigned int numberOfBytes = 0,
+          const unsigned int msTimeout  = 0 )
         throw( SerialPort::NotOpen,
                SerialPort::ReadTimeout,
                std::runtime_error ) ;
-    void
-    WriteByte(const unsigned char dataByte)
+
+    unsigned char
+    ReadByte( unsigned char&     charBuffer,
+              const unsigned int msTimeout = 0 )
         throw( SerialPort::NotOpen,
+               SerialPort::ReadTimeout,
                std::runtime_error ) ;
 
+    void
+    ReadLine( std::string&       dataString,
+              const char         lineTerminator = '\n',
+              const unsigned int msTimeout = 0 )
+        throw( SerialPort::NotOpen,
+               SerialPort::ReadTimeout,
+               std::runtime_error ) ;
+
+    void
+    Write( const unsigned char* charBuffer,
+           const unsigned int   numberOfBytes )
+        throw( SerialPort::NotOpen,
+               std::runtime_error ) ;
+    
     void
     Write( const SerialPort::DataBuffer& dataBuffer)
         throw( SerialPort::NotOpen,
@@ -215,43 +307,14 @@ public:
                std::runtime_error ) ;
 
     void
-    SetDtr( const bool dtrState = true )
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
-    bool
-    GetDtr() const 
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
-    void
-    SetRts( const bool rtsState = true )
+    WriteByte(const unsigned char charbuffer)
         throw( SerialPort::NotOpen,
                std::runtime_error ) ;
 
-    bool
-    GetRts() const 
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
-
-    //void
-    //SetCts( const bool ctsState = true )
-    //    throw( SerialPort::NotOpen,
-    //           std::runtime_error ) ;
-    
-    bool
-    GetCts() const 
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
-
-    //void
-    //SetDsr( const bool dsrState = true )
-    //    throw( SerialPort::NotOpen,
-    //           std::runtime_error ) ;
-    
-    bool
-    GetDsr() const 
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
 private:
-    SerialPort( const SerialPort& otherSerialPort ) ;
-} ;
+    SerialPort( const SerialPort& otherSerialPort ) = delete ;
+    SerialPort( const SerialPort&& otherSerialPort ) = delete ;
 
+    SerialPort& operator = ( const SerialPort& otherSerialPort ) = delete ;
+    SerialPort& operator = ( const SerialPort&& otherSerialPort ) = delete ;
+} ;
