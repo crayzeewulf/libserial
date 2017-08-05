@@ -4,6 +4,7 @@ class SerialPort /NoDefaultCtors/
 %TypeHeaderCode
 #include <SerialPort.h>
 #include <SerialPortConstants.h>
+#include <termios.h>
 %End
 public:
     enum class BaudRate : speed_t

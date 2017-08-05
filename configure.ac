@@ -49,6 +49,8 @@ libserial.spec
 doc/UML/Makefile
 doc/Makefile
 examples/Makefile
+sip/configure.py
+sip/Makefile
 src/Makefile
 test/MakeFile
 libserial.pc])
