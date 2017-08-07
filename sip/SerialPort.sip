@@ -1,18 +1,19 @@
-class SerialPort /NoDefaultCtors/
+class SerialPort
 {
+
 %TypeHeaderCode
 #include <SerialPort.h>
-#include <SerialPortConstants.h>
 %End
+
 public:
     explicit SerialPort();
 
     explicit SerialPort(const std::string&   fileName,
-                        const BaudRate&      baudRate        = BaudRate::BAUD_DEFAULT,
-                        const CharacterSize& characterSize   = CharacterSize::CHAR_SIZE_DEFAULT,
-                        const FlowControl&   flowControlType = FlowControl::FLOW_CONTROL_DEFAULT,
-                        const Parity&        parityType      = Parity::PARITY_DEFAULT,
-                        const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT);
+                        const LibSerial::BaudRate&      baudRate        = BaudRate::BAUD_DEFAULT,
+                        const LibSerial::CharacterSize& characterSize   = CharacterSize::CHAR_SIZE_DEFAULT,
+                        const LibSerial::FlowControl&   flowControlType = FlowControl::FLOW_CONTROL_DEFAULT,
+                        const LibSerial::Parity&        parityType      = Parity::PARITY_DEFAULT,
+                        const LibSerial::StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT);
 
     virtual ~SerialPort();
 
@@ -42,31 +43,31 @@ public:
     SetDefaultSerialPortParameters();
 
     void
-    SetBaudRate(const BaudRate baudRate);
+    SetBaudRate(const LibSerial::BaudRate baudRate);
 
     BaudRate
     GetBaudRate();
 
     void
-    SetCharacterSize(const CharacterSize characterSize);
+    SetCharacterSize(const LibSerial::CharacterSize characterSize);
     
     CharacterSize
     GetCharacterSize();
 
     void
-    SetFlowControl(const FlowControl flowControlType);
+    SetFlowControl(const LibSerial::FlowControl flowControlType);
 
     FlowControl
     GetFlowControl();
 
     void
-    SetParity(const Parity parityType);
+    SetParity(const LibSerial::Parity parityType);
 
     Parity
     GetParity();
 
     void
-    SetNumberOfStopBits(const StopBits numOfStopBits);
+    SetNumberOfStopBits(const LibSerial::StopBits numOfStopBits);
 
     StopBits
     GetNumberOfStopBits();
