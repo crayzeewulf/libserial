@@ -19,11 +19,11 @@
  
 #include "PosixSignalDispatcher.h"
 #include "PosixSignalHandler.h"
-#include <sstream>
-#include <map>
-#include <errno.h>
-#include <signal.h>
+
 #include <cstring>
+#include <map>
+#include <sstream>
+#include <signal.h>
 
 
 namespace
@@ -286,7 +286,8 @@ namespace
          *
          * https://sourceforge.net/p/libserial/patches/3/
          */
-        if (signalNumber != SIGIO) {
+        if (signalNumber != SIGIO)
+        {
             std::stringstream err_msg ; 
             err_msg << "Invalid or unexpected signal: " << signalNumber ;
             throw std::runtime_error(err_msg.str()) ;

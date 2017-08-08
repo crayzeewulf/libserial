@@ -22,7 +22,7 @@
 #define _SerialStream_h_
 
 #include <SerialStreamBuf.h>
-#include <string>
+
 #include <fstream>
 
 extern "C++" 

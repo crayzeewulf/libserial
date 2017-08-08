@@ -19,16 +19,9 @@
  *****************************************************************************/
 
 #include "SerialStreamBuf.h"
-#include <iostream>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <cassert>
-#include <fstream>
-#include <limits.h>
-#include <strings.h>
 
+#include <fcntl.h>
+#include <strings.h>
 
 using namespace std ;
 using namespace LibSerial ;
@@ -43,7 +36,7 @@ const SerialStreamBuf::CharSizeEnum
 SerialStreamBuf::DEFAULT_CHAR_SIZE       = SerialStreamBuf::CHAR_SIZE_DEFAULT ;
 
 const short
-SerialStreamBuf::DEFAULT_NO_OF_STOP_BITS = 1                  ;
+SerialStreamBuf::DEFAULT_NO_OF_STOP_BITS = 1 ;
 
 const SerialStreamBuf::ParityEnum
 SerialStreamBuf::DEFAULT_PARITY          = SerialStreamBuf::PARITY_DEFAULT ;
@@ -52,10 +45,10 @@ const SerialStreamBuf::FlowControlEnum
 SerialStreamBuf::DEFAULT_FLOW_CONTROL    = SerialStreamBuf::FLOW_CONTROL_DEFAULT ;
 
 const short
-SerialStreamBuf::DEFAULT_VMIN            = 1                  ;
+SerialStreamBuf::DEFAULT_VMIN            = 1 ;
 
 const short
-SerialStreamBuf::DEFAULT_VTIME           = 0                  ;
+SerialStreamBuf::DEFAULT_VTIME           = 0 ;
 
 
 class SerialStreamBuf::Implementation
@@ -259,7 +252,8 @@ SerialStreamBuf::open( const string filename,
     {
         return 0 ;
     }
-    /* switch( mode ) {
+    /* switch( mode )
+       {
        case ios_base::in:
        flags = O_RDONLY ;
        break ;
@@ -896,7 +890,8 @@ SerialStreamBuf::Implementation::CharSize() const
     // Extract the character size from the terminal settings. 
     //
     int char_size = (term_setting.c_cflag & CSIZE) ;
-    switch( char_size ) {
+    switch( char_size )
+    {
     case CS5:
         return CHAR_SIZE_5 ; break ;
     case CS6:
@@ -906,10 +901,8 @@ SerialStreamBuf::Implementation::CharSize() const
     case CS8:
         return CHAR_SIZE_8 ; break ;
     default:
-        //
         // If we get an invalid character, we set the badbit for the
         // stream associated with the serial port.
-        //
         return CHAR_SIZE_INVALID ;
         break ;
     } ;
