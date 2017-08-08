@@ -101,6 +101,84 @@ SerialStream::Close()
     return;
 }
 
+void
+SerialStream::FlushInputBuffer()
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to flush the input buffers the serial port with the correspoding
+        // function of the SerialStreamBuf class.
+        my_buffer->FlushInputBuffer();
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer
+        // of class other than SerialStreamBuf. In either case, we
+        // have a problem and we should stop all I/O using this stream.
+        setstate(badbit);
+    }
+
+    return;
+}
+
+void
+SerialStream::FlushOutputBuffer()
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to flush the output buffers the serial port with the correspoding
+        // function of the SerialStreamBuf class.
+        my_buffer->FlushOutputBuffer();
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer
+        // of class other than SerialStreamBuf. In either case, we
+        // have a problem and we should stop all I/O using this stream.
+        setstate(badbit);
+    }
+
+    return;
+}
+
+void
+SerialStream::FlushIOBuffers()
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to flush the I/O buffers the serial port with the correspoding
+        // function of the SerialStreamBuf class.
+        my_buffer->FlushIOBuffers();
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer
+        // of class other than SerialStreamBuf. In either case, we
+        // have a problem and we should stop all I/O using this stream.
+        setstate(badbit);
+    }
+
+    return;
+}
+
 bool
 SerialStream::IsOpen()
 {
@@ -112,6 +190,31 @@ SerialStream::IsOpen()
     }
 
     return mIOBuffer->IsOpen();
+}
+
+bool
+SerialStream::IsDataAvailable()
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to determine if data is available with the correspoding
+        // function of the SerialStreamBuf class.
+        return my_buffer->IsDataAvailable();
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer
+        // of class other than SerialStreamBuf. In either case, we
+        // have a problem and we should stop all I/O using this stream.
+        setstate(badbit);
+        return false;
+    }
 }
 
 void 
@@ -463,6 +566,30 @@ SerialStream::GetVTime()
     {
         // Try to get the vTime duration in deciseconds.
         return my_buffer->GetVTime();
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer of
+        // class other than SerialStreamBuf. In either case, we have a
+        // problem and we should stop all I/O using this stream.
+        setstate(badbit);
+        return -1;
+    }
+}
+
+int
+SerialStream::GetFileDescriptor()
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to get the file descriptor.
+        return my_buffer->GetFileDescriptor();
     }
     else
     {

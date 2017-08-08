@@ -78,22 +78,35 @@ namespace LibSerial
         void Close();
 
         /**
+         * @brief Flushes the serial port input buffer.
+         */
+        void FlushInputBuffer();
+
+        /**
+         * @brief Flushes the serial port output buffer.
+         */
+        void FlushOutputBuffer();
+
+        /**
+         * @brief Flushes the serial port input and output buffers.
+         */
+        void FlushIOBuffers();
+
+        /**
+         * @brief Determines if data is available at the serial port.
+         */
+        bool IsDataAvailable();
+
+        /**
          * @brief Determines if the serial port is open for I/O.
          * @return Returns true iff the serial port is open.
          */
         bool IsOpen();
 
-        /** 
-         * @brief This routine is called by open() in order to
-         *        initialize some parameters of the serial port and
-         *        setting its parameters to default values.
-         */
-        void InitializeSerialPort();
-
         /**
          * @brief Sets all serial port paramters to their default values.
          */
-        void SetParametersToDefault();
+        void SetDefaultSerialPortParameters();
 
         /**
          * @brief Sets the baud rate for the serial port to the specified value
@@ -181,24 +194,41 @@ namespace LibSerial
         short GetVTime();
 
         /**
-         * @brief Determines if data is available at the serial port.
+         * @brief Sets the serial port DTR line status.
+         * @param dtrState The state to set the DTR line
          */
-        bool IsDataAvailable();
+        void SetDTR(const bool dtrState);
 
         /**
-         * @brief Flushes the serial port input buffer.
+         * @brief Gets the serial port DTR line status.
          */
-        void FlushInputBuffer();
+        bool GetDTR();
 
         /**
-         * @brief Flushes the serial port output buffer.
+         * @brief Sets the serial port RTS line status.
+         * @param dtrState The state to set the RTS line
          */
-        void FlushOutputBuffer();
+        void SetRTS(const bool rtsState);
 
         /**
-         * @brief Flushes the serial port input and output buffers.
+         * @brief Gets the serial port RTS line status.
          */
-        void FlushIOBuffers();
+        bool GetRTS();
+
+        /**
+         * @brief Gets the serial port CTS line status.
+         */
+        bool GetCTS();
+
+        /**
+         * @brief Gets the serial port DSR line status.
+         */
+        bool GetDSR();
+
+        /**
+         * @brief Gets the serial port file descriptor.
+         */
+        int GetFileDescriptor();
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -306,56 +336,7 @@ namespace LibSerial
          */
         void WriteByte(const unsigned char charbuffer);
 
-        /**
-         * @brief Sets the serial port DTR line status.
-         * @param dtrState The state to set the DTR line
-         */
-        void SetDtr(const bool dtrState);
-
-        /**
-         * @brief Gets the serial port DTR line status.
-         */
-        bool GetDtr();
-
-        /**
-         * @brief Sets the serial port RTS line status.
-         * @param dtrState The state to set the RTS line
-         */
-        void SetRts(const bool rtsState);
-
-        /**
-         * @brief Gets the serial port RTS line status.
-         */
-        bool GetRts();
-
-        /**
-         * @brief Gets the serial port CTS line status.
-         */
-        bool GetCts();
-
-        /**
-         * @brief Gets the serial port DSR line status.
-         */
-        bool GetDsr();
-
-        /**
-         * @brief Gets the serial port file descriptor.
-         */
-        int GetFileDescriptor();
-
     private:
-
-        /**
-         * @brief The file descriptor corresponding to the serial port.
-         */
-        int mFileDescriptor {-1};
-
-        /**
-         * @brief Serial port settings are saved into this variable immediately
-         *        after the port is opened. These settings are restored when the
-         *        serial port is closed.
-         */
-        termios mOldPortSettings {};
 
         /**
          * @brief Set the specified modem control line to the specified value.
@@ -375,6 +356,56 @@ namespace LibSerial
          *         otherwise.
          */
         bool GetModemControlLine(const int modemLine);
+
+        /**
+         * @brief Sets the current state of the serial port blocking status.
+         * @param blockingStatus The serial port blocking status to be set,
+         *        true if to be set blocking, false if to be set non-blocking.
+         */
+        void SetPortBlockingStatus(const bool blockingStatus);
+
+        /**
+         * @brief Gets the current state of the serial port blocking status.
+         * @return True if port is blocking, false if port non-blocking.
+         */
+        bool GetPortBlockingStatus();
+
+        /**
+         * @brief Sets the default Linux specific line discipline modes.
+         */
+        void SetDefaultLinuxSpecificModes();
+
+        /**
+         * @brief Sets the default serial port input modes.
+         */
+        void SetDefaultInputModes();
+
+        /**
+         * @brief Sets the default serial port output modes.
+         */
+        void SetDefaultOutputModes();
+
+        /**
+         * @brief Sets the default serial port control modes.
+         */
+        void SetDefaultControlModes();
+
+        /**
+         * @brief Sets the default serial port local modes.
+         */
+        void SetDefaultLocalModes();
+
+        /**
+         * @brief The file descriptor corresponding to the serial port.
+         */
+        int mFileDescriptor {-1};
+
+        /**
+         * @brief Serial port settings are saved into this variable immediately
+         *        after the port is opened. These settings are restored when the
+         *        serial port is closed.
+         */
+        termios mOldPortSettings {};
     };
 
     SerialPort::SerialPort()
@@ -426,6 +457,33 @@ namespace LibSerial
         return;
     }
 
+    void
+    SerialPort::FlushInputBuffer()
+    {
+        mImpl->FlushInputBuffer();
+        return;
+    }
+
+    void
+    SerialPort::FlushOutputBuffer()
+    {
+        mImpl->FlushOutputBuffer();
+        return;
+    }
+
+    void
+    SerialPort::FlushIOBuffers()
+    {
+        mImpl->FlushIOBuffers();
+        return;
+    }
+
+    bool
+    SerialPort::IsDataAvailable()
+    {
+        return mImpl->IsDataAvailable();
+    }
+
     bool
     SerialPort::IsOpen()
     {
@@ -433,16 +491,9 @@ namespace LibSerial
     }
 
     void
-    SerialPort::InitializeSerialPort()
+    SerialPort::SetDefaultSerialPortParameters()
     {
-        mImpl->InitializeSerialPort();
-        return;
-    }
-
-    void
-    SerialPort::SetParametersToDefault()
-    {
-        mImpl->SetParametersToDefault();
+        mImpl->SetDefaultSerialPortParameters();
         return;
     }
 
@@ -537,31 +588,48 @@ namespace LibSerial
         return mImpl->GetVTime();
     }
 
+    void
+    SerialPort::SetDTR(const bool dtrState)
+    {
+        mImpl->SetDTR(dtrState);
+        return;
+    }
+
     bool
-    SerialPort::IsDataAvailable()
+    SerialPort::GetDTR()
     {
-        return mImpl->IsDataAvailable();
+        return mImpl->GetDTR();
     }
 
     void
-    SerialPort::FlushInputBuffer()
+    SerialPort::SetRTS(const bool rtsState)
     {
-        mImpl->FlushInputBuffer();
+        mImpl->SetRTS(rtsState);
         return;
     }
 
-    void
-    SerialPort::FlushOutputBuffer()
+    bool
+    SerialPort::GetRTS()
     {
-        mImpl->FlushOutputBuffer();
-        return;
+        return mImpl->GetRTS();
     }
 
-    void
-    SerialPort::FlushIOBuffers()
+    bool
+    SerialPort::GetCTS()
     {
-        mImpl->FlushIOBuffers();
-        return;
+        return mImpl->GetCTS();
+    }
+
+    bool
+    SerialPort::GetDSR() 
+    {
+        return mImpl->GetDSR();
+    }
+
+    int
+    SerialPort::GetFileDescriptor()
+    {
+        return mImpl->GetFileDescriptor();
     }
 
     void
@@ -647,50 +715,6 @@ namespace LibSerial
         return;
     }
 
-    void
-    SerialPort::SetDtr(const bool dtrState)
-    {
-        mImpl->SetDtr(dtrState);
-        return;
-    }
-
-    bool
-    SerialPort::GetDtr()
-    {
-        return mImpl->GetDtr();
-    }
-
-    void
-    SerialPort::SetRts(const bool rtsState)
-    {
-        mImpl->SetRts(rtsState);
-        return;
-    }
-
-    bool
-    SerialPort::GetRts()
-    {
-        return mImpl->GetRts();
-    }
-
-    bool
-    SerialPort::GetCts()
-    {
-        return mImpl->GetCts();
-    }
-
-    bool
-    SerialPort::GetDsr() 
-    {
-        return mImpl->GetDsr();
-    }
-
-    int
-    SerialPort::GetFileDescriptor()
-    {
-        return mImpl->GetFileDescriptor();
-    }
-
 
     /** ------------------------------------------------------------ */
     inline
@@ -744,7 +768,7 @@ namespace LibSerial
         // We only allow three different combinations of ios_base::openmode so we can
         // use a switch here to construct the flags to be used with the open() system call.
         // Since we are dealing with the serial port we need to use the O_NOCTTY option.
-        int flags;
+        int flags = 0;
         
         if (openMode == (std::ios_base::in | std::ios_base::out))
         {
@@ -780,39 +804,11 @@ namespace LibSerial
             throw OpenFailed(strerror(errno));
         }
 
-        // Assemble the new port settings.
-        termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
-
-        // Enable the receiver (CREAD) and ignore modem control lines (CLOCAL).
-        port_settings.c_cflag |= CREAD | CLOCAL;
-
-        // Set the VMIN and VTIME parameters to zero by default. VMIN is
-        // the minimum number of characters for non-canonical read and
-        // VTIME is the timeout in deciseconds for non-canonical
-        // read. Setting both of these parameters to zero implies that a
-        // read will return immediately only giving the currently
-        // available characters.
-        port_settings.c_cc[VMIN] = 0;
-        port_settings.c_cc[VTIME] = 0;
-
-        // Apply the modified settings.
-        if (tcsetattr(this->mFileDescriptor,
-                      TCSANOW,
-                      &port_settings) < 0)
-        {
-            throw OpenFailed(strerror(errno));
-        }
+        // Set up the default configuration for the serial port.
+        this->SetDefaultSerialPortParameters();
 
         // Flush the input and output buffers associated with the port.
-        if (tcflush(this->mFileDescriptor,
-                    TCIOFLUSH) < 0)
-        {
-            throw OpenFailed(strerror(errno));
-        }
-
-        // Initialize the serial port.
-        InitializeSerialPort();
+        this->FlushIOBuffers();
 
         return;
     }
@@ -848,15 +844,8 @@ namespace LibSerial
     }
 
     inline
-    bool
-    SerialPort::Implementation::IsOpen()
-    {
-        return (-1 != this->mFileDescriptor);
-    }
-
-    inline
     void
-    SerialPort::Implementation::InitializeSerialPort()
+    SerialPort::Implementation::FlushInputBuffer()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -864,43 +853,86 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        // Use non-blocking mode while configuring the serial port. 
-        int flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
-        
-        if (fcntl(this->mFileDescriptor, 
-                  F_SETFL, 
-                  flags | O_NONBLOCK) < 0)
+        if (tcflush(this->mFileDescriptor, TCIFLUSH) < 0)
         {
             throw std::runtime_error(strerror(errno));
         }
 
-        // Flush out any garbage left behind in the buffers associated
-        // with the port from any previous operations. 
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::FlushOutputBuffer()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        if (tcflush(this->mFileDescriptor, TCOFLUSH) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::FlushIOBuffers()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
         if (tcflush(this->mFileDescriptor, TCIOFLUSH) < 0)
         {
             throw std::runtime_error(strerror(errno));
         }
 
-        // Set up the default configuration for the serial port.
-        this->SetParametersToDefault();
-
-        // Allow all further communications to happen in blocking mode.
-        flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
-        
-        if (fcntl(this->mFileDescriptor, 
-                  F_SETFL, 
-                  flags & ~O_NONBLOCK) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
-
-        // Initialization was successful.
         return;
     }
 
     inline
+    bool
+    SerialPort::Implementation::IsOpen()
+    {
+        return (-1 != this->mFileDescriptor);
+    }
+
+    inline
+    bool
+    SerialPort::Implementation::IsDataAvailable()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        int number_of_bytes_available = 0;
+        bool dataAvailableStatus = false;
+
+        int result = ioctl(this->mFileDescriptor,
+                           FIONREAD,
+                           &number_of_bytes_available);
+        
+        if (result >= 0 &&
+            number_of_bytes_available > 0)
+        {
+            dataAvailableStatus = true;
+        }
+
+        return dataAvailableStatus;
+    }
+
+    inline
     void 
-    SerialPort::Implementation::SetParametersToDefault()
+    SerialPort::Implementation::SetDefaultSerialPortParameters()
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())
@@ -908,44 +940,14 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        // Get the current serial port settings.
-        termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
-        
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
+        #ifdef __linux__
+            SetDefaultLinuxSpecificModes();
+        #endif
 
-        port_settings.c_iflag = IGNBRK;
-        port_settings.c_oflag = 0;
-        port_settings.c_cflag = B115200 | CS8 | CLOCAL | CREAD;
-        port_settings.c_lflag = 0;
-
-        // :TRICKY:
-        // termios.c_line is not a standard element of the termios structure (as 
-        // per the Single Unix Specification 2. This is only present under Linux.
-    #ifdef __linux__
-        port_settings.c_line = '\0';
-    #endif
-
-        // Set the VMIN and VTIME parameters to zero by default. VMIN is
-        // the minimum number of characters for non-canonical read and
-        // VTIME is the timeout in deciseconds for non-canonical
-        // read. Setting both of these parameters to zero implies that a
-        // read will return immediately only giving the currently
-        // available characters.
-        port_settings.c_cc[VMIN] = 0;
-        port_settings.c_cc[VTIME] = 0;
-
-        // Apply the modified settings.
-        if (tcsetattr(this->mFileDescriptor,
-                      TCSANOW,
-                      &port_settings) < 0)
-        {
-            throw OpenFailed(strerror(errno));
-        }
+        SetDefaultInputModes();
+        SetDefaultOutputModes();
+        SetDefaultControlModes();
+        SetDefaultLocalModes();
 
         SetBaudRate(BaudRate::BAUD_DEFAULT);
         SetCharacterSize(CharacterSize::CHAR_SIZE_DEFAULT);
@@ -1518,489 +1520,8 @@ namespace LibSerial
     }
 
     inline
-    bool
-    SerialPort::Implementation::IsDataAvailable()
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        int num_of_bytes_available = 0;
-        bool dataAvailableStatus = false;
-
-        int result = ioctl(this->mFileDescriptor,
-                           FIONREAD,
-                           &num_of_bytes_available);
-        
-        if (result >= 0 &&
-            num_of_bytes_available > 0)
-        {
-            dataAvailableStatus = true;
-        }
-
-        return dataAvailableStatus;
-    }
-
-    inline
     void
-    SerialPort::Implementation::FlushInputBuffer()
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        tcflush(this->mFileDescriptor, TCIFLUSH);
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::FlushOutputBuffer()
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-
-        tcflush(this->mFileDescriptor, TCOFLUSH);
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::FlushIOBuffers()
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        
-        tcflush(this->mFileDescriptor, TCIOFLUSH);
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::Read(unsigned char&     charBuffer,
-                                     const unsigned int charBufferSize,
-                                     const unsigned int msTimeout)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        unsigned int elapsed_ms;
-        
-        int number_of_bytes_read = 0;
-        int read_result = 0;
-
-        timeval entry_time;
-        timeval current_time;
-        timeval elapsed_time;
-        
-        // Throw an exception if we are unable to read the current time.
-        if (gettimeofday(&entry_time,
-                         NULL) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
-
-        // Loop until the number of bytes requested have been read or the timeout has elapsed.
-        while (number_of_bytes_read < (int)charBufferSize)
-        {
-            read_result = read(this->mFileDescriptor,
-                               &charBuffer + number_of_bytes_read,
-                               charBufferSize - number_of_bytes_read);
-
-            if (read_result <= 0 &&
-                errno == EAGAIN &&
-                errno != EWOULDBLOCK)
-            {
-                throw std::runtime_error(strerror(errno));
-            }
-
-            number_of_bytes_read += read_result;
-
-            if (number_of_bytes_read == (int)charBufferSize)
-            {
-                break;
-            }
-
-            // Throw an exception if we are unable to read the current time.
-            if (gettimeofday(&current_time,
-                             NULL) < 0)
-            {
-                throw std::runtime_error(strerror(errno));
-            }
-
-            // Obtain the total elapsed time.
-            timersub(&current_time, &entry_time, &elapsed_time);
-
-            // Calculate the elapsed number of milliseconds.
-            elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
-                          elapsed_time.tv_usec / MICROSECONDS_PER_MS);
-
-            // Throw a ReadTimeout exception if more than msTimeout milliseconds
-            // have elapsed while waiting for data.
-            if (msTimeout > 0 &&
-                elapsed_ms > msTimeout)
-            {
-                throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
-            }
-
-            // Sleep for 1ms (1000us) for data to arrive.
-            usleep(1000);
-        }
-
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::Read(SerialPort::DataBuffer& dataBuffer,
-                                     const unsigned int      numberOfBytes,
-                                     const unsigned int      msTimeout)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        unsigned int elapsed_ms;
-        unsigned int remaining_ms;
-
-        timeval entry_time;
-        timeval current_time;
-        timeval elapsed_time;
-
-        // Throw an exception if we are unable to read the current time.
-        if (gettimeofday(&entry_time,
-                         NULL) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
-        
-        // Empty the data buffer.
-        dataBuffer.resize(0);
-        unsigned char next_char = 0;
-
-        if (0 == numberOfBytes)
-        {
-            // Read all available data if numberOfBytes is zero.
-            while(this->IsDataAvailable())
-            {
-                this->ReadByte(next_char,
-                               msTimeout);
-
-                dataBuffer.push_back(next_char);
-            }
-        }
-        else
-        {
-            // Reserve enough space in the buffer to store the incoming data.
-            dataBuffer.reserve(numberOfBytes);
-
-            for (unsigned int i=0; i<numberOfBytes; ++i)
-            {
-                // Throw an exception if we are unable to read the current time.
-                if (gettimeofday(&current_time,
-                                 NULL) < 0)
-                {
-                    throw std::runtime_error(strerror(errno));
-                }
-
-                // Obtain the elapsed time.
-                timersub(&current_time, &entry_time, &elapsed_time);
-
-                // Calculate the elapsed number of milliseconds.
-                elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
-                              elapsed_time.tv_usec / MICROSECONDS_PER_MS);
-
-                // If more than msTimeout milliseconds have elapsed while
-                // waiting for data, then we throw a ReadTimeout exception.
-                if (msTimeout > 0 &&
-                    elapsed_ms > msTimeout)
-                {
-                    throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
-                }
-                
-                remaining_ms = msTimeout - elapsed_ms;
-
-                this->ReadByte(next_char,
-                               remaining_ms);
-
-                dataBuffer.push_back(next_char);
-            }
-        }
-
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::Read(std::string&       dataString,
-                                     const unsigned int numberOfBytes,
-                                     const unsigned int msTimeout)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        unsigned int elapsed_ms;
-        unsigned int remaining_ms;
-
-        timeval entry_time;
-        timeval current_time;
-        timeval elapsed_time;
-
-        // Throw an exception if we are unable to read the current time.
-        if (gettimeofday(&entry_time,
-                         NULL) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
-        
-        // Empty the data string.
-        dataString.clear();
-        unsigned char nextChar = 0;
-
-        if (0 == numberOfBytes)
-        {
-            // Read all available data if numberOfBytes is zero.
-            while(this->IsDataAvailable())
-            {
-                this->ReadByte(nextChar,
-                               msTimeout);
-
-                dataString += nextChar;
-            }
-        }
-        else
-        {
-            for (unsigned int i=0; i<numberOfBytes; ++i)
-            {
-                // Throw an exception if we are unable to read the current time.
-                if (gettimeofday(&current_time,
-                                 NULL) < 0)
-                {
-                    throw std::runtime_error(strerror(errno));
-                }
-
-                // Obtain the elapsed time.
-                timersub(&current_time, &entry_time, &elapsed_time);
-
-                // Calculate the elapsed number of milliseconds.
-                elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
-                              elapsed_time.tv_usec / MICROSECONDS_PER_MS);
-
-                // If more than msTimeout milliseconds have elapsed while
-                // waiting for data, then we throw a ReadTimeout exception.
-                if (msTimeout > 0 &&
-                    elapsed_ms > msTimeout)
-                {
-                    throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
-                }
-                
-                remaining_ms = msTimeout - elapsed_ms;
-
-                this->ReadByte(nextChar,
-                               remaining_ms);
-
-                dataString += nextChar;
-            }
-        }
-        
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::ReadByte(unsigned char&     charBuffer,
-                                         const unsigned int msTimeout)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        this->Read(charBuffer,
-                   1,
-                   msTimeout);
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::ReadLine(std::string&       dataString,
-                                         const char         lineTerminator,
-                                         const unsigned int msTimeout)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-        
-        // Clear the data string.
-        dataString.clear();
-
-        unsigned char next_char = 0;
-
-        unsigned int elapsed_ms;
-        unsigned int remaining_ms;
-
-        timeval entry_time;
-        timeval current_time;
-        timeval elapsed_time;
-        
-        // Throw an exception if we are unable to read the current time.
-        if (gettimeofday(&entry_time,
-                         NULL) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
-
-        while (next_char != lineTerminator)
-        {
-            // Throw an exception if we are unable to read the current time.
-            if (gettimeofday(&current_time,
-                             NULL) < 0)
-            {
-                throw std::runtime_error(strerror(errno));
-            }
-
-            // Obtain the elapsed time.
-            timersub(&current_time, &entry_time, &elapsed_time);
-
-            // Calculate the elapsed number of milliseconds.
-            elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
-                          elapsed_time.tv_usec / MICROSECONDS_PER_MS);
-
-            // If more than msTimeout milliseconds have elapsed while
-            // waiting for data, then we throw a ReadTimeout exception.
-            if (msTimeout > 0 &&
-                elapsed_ms > msTimeout)
-            {
-                throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
-            }
-
-            remaining_ms = msTimeout - elapsed_ms;
-
-            this->ReadByte(next_char,
-                           remaining_ms);
-
-            dataString += next_char;
-        }
-        
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::Write(const unsigned char* charBuffer,
-                                      const unsigned int   charBufferSize)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Nothing needs to be done if there is no data in the buffer.
-        if (charBufferSize <= 0)
-        {
-            return;
-        }
-
-        // Write the data to the serial port. Keep retrying if EAGAIN
-        // error is received and EWOULDBLOCK is not received.
-        int num_of_bytes_written = -1;
-        
-        do
-        {
-            num_of_bytes_written = write(this->mFileDescriptor,
-                                         charBuffer,
-                                         charBufferSize);
-        }
-        while (num_of_bytes_written <= 0 &&
-               errno == EAGAIN &&
-               errno != EWOULDBLOCK);
-
-        if (num_of_bytes_written < 0 ||
-            num_of_bytes_written < (int)charBufferSize)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
-
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::Write(const SerialPort::DataBuffer& dataBuffer)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        std::string data_string(dataBuffer.begin(),
-                                dataBuffer.end());
-
-        this->Write(data_string);
-        
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::Write(const std::string& dataString)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        this->Write(reinterpret_cast<const unsigned char*>(dataString.c_str()),
-                    dataString.length());
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::WriteByte(const unsigned char charBuffer)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        this->Write(&charBuffer,
-                    1);
-
-        return;
-    }
-    
-    inline
-    void
-    SerialPort::Implementation::SetDtr(const bool dtrState)
+    SerialPort::Implementation::SetDTR(const bool dtrState)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2015,7 +1536,7 @@ namespace LibSerial
 
     inline
     bool
-    SerialPort::Implementation::GetDtr()
+    SerialPort::Implementation::GetDTR()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2028,7 +1549,7 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::SetRts(const bool rtsState)
+    SerialPort::Implementation::SetRTS(const bool rtsState)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2043,7 +1564,7 @@ namespace LibSerial
 
     inline
     bool
-    SerialPort::Implementation::GetRts()
+    SerialPort::Implementation::GetRTS()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2056,7 +1577,7 @@ namespace LibSerial
 
     inline
     bool
-    SerialPort::Implementation::GetCts()
+    SerialPort::Implementation::GetCTS()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2069,7 +1590,7 @@ namespace LibSerial
 
     inline
     bool
-    SerialPort::Implementation::GetDsr()
+    SerialPort::Implementation::GetDSR()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2182,5 +1703,651 @@ namespace LibSerial
         }
 
         return (serial_port_state & modemLine);
+    }
+
+    inline
+    void
+    SerialPort::Implementation::SetPortBlockingStatus(const bool blockingStatus)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        int flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
+        
+        if (blockingStatus == true)
+        {
+            if (fcntl(this->mFileDescriptor, 
+                      F_SETFL, 
+                      flags &~ O_NONBLOCK) < 0)
+            {
+                throw std::runtime_error(strerror(errno));
+            }
+        }
+        else
+        {
+            if (fcntl(this->mFileDescriptor, 
+                      F_SETFL, 
+                      flags | O_NONBLOCK) < 0)
+            {
+                throw std::runtime_error(strerror(errno));
+            }
+        }
+    }
+
+    inline
+    bool
+    SerialPort::Implementation::GetPortBlockingStatus()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        bool blocking_status = false;
+
+        int flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
+        
+        if (flags == (flags | O_NONBLOCK))
+        {
+            blocking_status = true;
+        }
+
+        return blocking_status;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::SetDefaultLinuxSpecificModes()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(this->mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // @NOTE - termios.c_line is not a standard element of the termios
+        // structure, (as per the Single Unix Specification 3).
+        port_settings.c_line = '\0';
+
+        // Apply the modified settings.
+        if (tcsetattr(this->mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw OpenFailed(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::SetDefaultInputModes()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(this->mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // Ignore Break conditions on input.
+        port_settings.c_iflag = IGNBRK;
+
+        // Apply the modified settings.
+        if (tcsetattr(this->mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw OpenFailed(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::SetDefaultOutputModes()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(this->mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        port_settings.c_oflag = 0;
+
+        // Apply the modified settings.
+        if (tcsetattr(this->mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw OpenFailed(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::SetDefaultControlModes()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(this->mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // Enable the receiver (CREAD) and ignore modem control lines (CLOCAL).
+        port_settings.c_cflag |= CREAD | CLOCAL;
+
+        // Apply the modified settings.
+        if (tcsetattr(this->mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw OpenFailed(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::SetDefaultLocalModes()
+    {
+        // Make sure that the serial port is open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Get the current serial port settings.
+        termios port_settings;
+        memset(&port_settings, 0, sizeof(port_settings));
+        
+        if (tcgetattr(this->mFileDescriptor,
+                      &port_settings) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        port_settings.c_lflag = 0;
+
+        // Apply the modified settings.
+        if (tcsetattr(this->mFileDescriptor,
+                      TCSANOW,
+                      &port_settings) < 0)
+        {
+            throw OpenFailed(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::Read(unsigned char&     charBuffer,
+                                     const unsigned int numberOfBytes,
+                                     const unsigned int msTimeout)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        if (numberOfBytes == 0)
+        {
+            return;
+        }
+
+        unsigned int elapsed_ms = 0;
+        
+        int number_of_bytes_read = 0;
+        int read_result = 0;
+
+        timeval entry_time;
+        timeval current_time;
+        timeval elapsed_time;
+        
+        // Throw an exception if we are unable to read the current time.
+        if (gettimeofday(&entry_time,
+                         NULL) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // Loop until the number of bytes requested have been read or the timeout has elapsed.
+        while (number_of_bytes_read < (int)numberOfBytes)
+        {
+            read_result = read(this->mFileDescriptor,
+                               &charBuffer + number_of_bytes_read,
+                               numberOfBytes - number_of_bytes_read);
+            
+            if (read_result > 0)
+            {
+                number_of_bytes_read += read_result;
+
+                if (number_of_bytes_read == (int)numberOfBytes)
+                {
+                    break;
+                }
+            }
+            else if (read_result <= 0 &&
+                     errno != EWOULDBLOCK)
+            {
+                throw std::runtime_error(strerror(errno));
+            }
+            
+            // Throw an exception if we are unable to read the current time.
+            if (gettimeofday(&current_time,
+                             NULL) < 0)
+            {
+                throw std::runtime_error(strerror(errno));
+            }
+
+            // Obtain the total elapsed time.
+            timersub(&current_time, &entry_time, &elapsed_time);
+
+            // Calculate the elapsed number of milliseconds.
+            elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
+                          elapsed_time.tv_usec / MICROSECONDS_PER_MS);
+
+            // Throw a ReadTimeout exception if more than msTimeout milliseconds
+            // have elapsed while waiting for data.
+            if (msTimeout > 0 &&
+                elapsed_ms > msTimeout)
+            {
+                throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
+            }
+
+            // Sleep for 1ms (1000us) for data to arrive.
+            usleep(1000);
+        }
+
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::Read(SerialPort::DataBuffer& dataBuffer,
+                                     const unsigned int      numberOfBytes,
+                                     const unsigned int      msTimeout)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Clear the data buffer.
+        dataBuffer.resize(0);
+        unsigned char next_char = 0;
+
+        unsigned int elapsed_ms = 0;
+        unsigned int remaining_ms = 0;
+
+        timeval entry_time;
+        timeval current_time;
+        timeval elapsed_time;
+        
+        // Throw an exception if we are unable to read the current time.
+        if (gettimeofday(&entry_time,
+                         NULL) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        if (numberOfBytes == 0)
+        {
+            // Read all available data if numberOfBytes is zero.
+            while(this->IsDataAvailable())
+            {
+                this->Read(next_char,
+                           1,
+                           remaining_ms);
+
+                dataBuffer.push_back(next_char);
+            }
+        }
+        else
+        {
+            // Reserve enough space in the buffer to store the incoming data.
+            dataBuffer.reserve(numberOfBytes);
+
+            for (unsigned int i=0; i<numberOfBytes; ++i)
+            {
+                // Throw an exception if we are unable to read the current time.
+                if (gettimeofday(&current_time,
+                                 NULL) < 0)
+                {
+                    throw std::runtime_error(strerror(errno));
+                }
+
+                // Obtain the elapsed time.
+                timersub(&current_time, &entry_time, &elapsed_time);
+
+                // Calculate the elapsed number of milliseconds.
+                elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
+                              elapsed_time.tv_usec / MICROSECONDS_PER_MS);
+
+                // If more than msTimeout milliseconds have elapsed while
+                // waiting for data, then we throw a ReadTimeout exception.
+                if (msTimeout > 0 &&
+                    elapsed_ms > msTimeout)
+                {
+                    throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
+                }
+                
+                remaining_ms = msTimeout - elapsed_ms;
+
+                this->Read(next_char,
+                           1,
+                           remaining_ms);
+
+                dataBuffer.push_back(next_char);
+            }
+        }
+
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::Read(std::string&       dataString,
+                                     const unsigned int numberOfBytes,
+                                     const unsigned int msTimeout)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Clear the data string.
+        dataString.clear();
+
+        unsigned char next_char = 0;
+
+        unsigned int elapsed_ms = 0;
+        unsigned int remaining_ms = 0;
+
+        timeval entry_time;
+        timeval current_time;
+        timeval elapsed_time;
+        
+        // Throw an exception if we are unable to read the current time.
+        if (gettimeofday(&entry_time,
+                         NULL) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        if (numberOfBytes == 0)
+        {
+            // Read all available data if numberOfBytes is zero.
+            while(this->IsDataAvailable())
+            {
+                this->Read(next_char,
+                           1,
+                           remaining_ms);
+
+                dataString += next_char;
+            }
+        }
+        else
+        {
+            for (unsigned int i=0; i<numberOfBytes; ++i)
+            {
+                // Throw an exception if we are unable to read the current time.
+                if (gettimeofday(&current_time,
+                                 NULL) < 0)
+                {
+                    throw std::runtime_error(strerror(errno));
+                }
+
+                // Obtain the elapsed time.
+                timersub(&current_time, &entry_time, &elapsed_time);
+
+                // Calculate the elapsed number of milliseconds.
+                elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
+                              elapsed_time.tv_usec / MICROSECONDS_PER_MS);
+
+                // If more than msTimeout milliseconds have elapsed while
+                // waiting for data, then we throw a ReadTimeout exception.
+                if (msTimeout > 0 &&
+                    elapsed_ms > msTimeout)
+                {
+                    throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
+                }
+
+                remaining_ms = msTimeout - elapsed_ms;
+
+                this->Read(next_char,
+                           1,
+                           remaining_ms);
+
+                dataString += next_char;
+            }
+        }
+        
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::ReadByte(unsigned char&     charBuffer,
+                                         const unsigned int msTimeout)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        this->Read(charBuffer,
+                   1,
+                   msTimeout);
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::ReadLine(std::string&       dataString,
+                                         const char         lineTerminator,
+                                         const unsigned int msTimeout)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+        
+        // Clear the data string.
+        dataString.clear();
+
+        unsigned char next_char = 0;
+
+        unsigned int elapsed_ms = 0;
+        unsigned int remaining_ms = 0;
+
+        timeval entry_time;
+        timeval current_time;
+        timeval elapsed_time;
+        
+        // Throw an exception if we are unable to read the current time.
+        if (gettimeofday(&entry_time,
+                         NULL) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        while (next_char != lineTerminator)
+        {
+            // Throw an exception if we are unable to read the current time.
+            if (gettimeofday(&current_time,
+                             NULL) < 0)
+            {
+                throw std::runtime_error(strerror(errno));
+            }
+
+            // Obtain the elapsed time.
+            timersub(&current_time, &entry_time, &elapsed_time);
+
+            // Calculate the elapsed number of milliseconds.
+            elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
+                          elapsed_time.tv_usec / MICROSECONDS_PER_MS);
+
+            // If more than msTimeout milliseconds have elapsed while
+            // waiting for data, then we throw a ReadTimeout exception.
+            if (msTimeout > 0 &&
+                elapsed_ms > msTimeout)
+            {
+                throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
+            }
+
+            remaining_ms = msTimeout - elapsed_ms;
+
+            this->Read(next_char,
+                       1,
+                       remaining_ms);
+
+            dataString += next_char;
+        }
+        
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::Write(const unsigned char* charBuffer,
+                                      const unsigned int   numberOfBytes)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Nothing needs to be done if there is no data in the buffer.
+        if (numberOfBytes <= 0)
+        {
+            return;
+        }
+
+        // Write the data to the serial port. Keep retrying if EAGAIN
+        // error is received and EWOULDBLOCK is not received.
+        int num_of_bytes_written = -1;
+        
+        do
+        {
+            num_of_bytes_written = write(this->mFileDescriptor,
+                                         charBuffer,
+                                         numberOfBytes);
+        }
+        while (num_of_bytes_written <= 0 &&
+               errno == EAGAIN &&
+               errno != EWOULDBLOCK);
+
+        if (num_of_bytes_written < 0 ||
+            num_of_bytes_written < (int)numberOfBytes)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::Write(const SerialPort::DataBuffer& dataBuffer)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        std::string data_string(dataBuffer.begin(),
+                                dataBuffer.end());
+
+        this->Write(data_string);
+        
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::Write(const std::string& dataString)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        this->Write(reinterpret_cast<const unsigned char*>(dataString.c_str()),
+                    dataString.length());
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::WriteByte(const unsigned char charBuffer)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        this->Write(&charBuffer,
+                    1);
+
+        return;
     }
 }

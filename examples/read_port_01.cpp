@@ -3,13 +3,20 @@
 #include <unistd.h>
 #include <cstdlib>
 
+using namespace LibSerial;
+
 int main()
 {
-    //
-    // Simple example that uses SerialPort class. 
-    //
-    SerialPort serial_port ("/dev/ttyUSB0") ;
-    serial_port.Open() ;
-    std::cout << serial_port.ReadLine() ; 
-    return EXIT_SUCCESS ;
+    // A simple example using the SerialPort class.
+    SerialPort serial_port;
+
+    serial_port.Open("/dev/ttyUSB0");
+
+    std::string my_string;
+
+    serial_port.ReadLine(my_string);
+
+    std::cout << my_string;
+
+    return EXIT_SUCCESS;
 }

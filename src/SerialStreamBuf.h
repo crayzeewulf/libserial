@@ -91,24 +91,36 @@ namespace LibSerial
         void Close();
 
         /**
-         * @brief Returns true if a previous call to open() succeeded
-         *        (returned a non-null value) and there has been no
-         *        intervening call to close.
+         * @brief Flushes the serial port input buffer.
+         */
+        void FlushInputBuffer();
+
+        /**
+         * @brief Flushes the serial port output buffer.
+         */
+        void FlushOutputBuffer();
+
+        /**
+         * @brief Flushes the serial port input and output buffers.
+         */
+        void FlushIOBuffers();
+
+        /**
+         * @brief Checks if data is available at the input of the serial port.
+         * @return Returns true iff data is available to read.
+         */
+        bool IsDataAvailable();
+
+        /**
+         * @brief Determines if the serial port is open for I/O.
+         * @return Returns true iff the serial port is open.
          */
         bool IsOpen();
 
-        /** 
-         * @brief This routine is called by open() in order to
-         *        initialize some parameters of the serial port and
-         *        setting its parameters to default values.
-         */
-        void InitializeSerialPort();
-
         /**
-         * @brief Initializes the serial communication parameters to their
-         *        default values.
+         * @brief Sets all serial port paramters to their default values.
          */
-        void SetParametersToDefault();
+        void SetDefaultSerialPortParameters();
 
         /**
          * @brief Sets the baud rate for the serial port to the specified value
@@ -196,6 +208,11 @@ namespace LibSerial
          */
         short GetVTime();
 
+        /**
+         * @brief Gets the serial port file descriptor.
+         */
+        int GetFileDescriptor();
+
 
     protected:
 
@@ -219,20 +236,24 @@ namespace LibSerial
         /**
          * @brief Writes up to n characters from the character sequence at 
          *        char s to the serial port associated with the buffer.
+         * @param character Pointer to the character buffer to write to the serial port.
+         * @param numberOfBytes The number of characters to write to the serial port.
          * @return Returns the number of characters that were successfully
          *         written to the serial port. 
          */
-        virtual std::streamsize xsputn(const char_type* s, 
-                                       std::streamsize  n) override;
+        virtual std::streamsize xsputn(const char_type* character, 
+                                       std::streamsize numberOfBytes) override;
            
         /**
          * @brief Reads up to n characters from the serial port and returns
          *        them through the character array located at s.
+         * @param character Pointer to the character buffer to write to the serial port.
+         * @param numberOfBytes The number of characters to write to the serial port.
          * @return Returns the number of characters actually read from the
          *         serial port. 
          */
-        virtual std::streamsize xsgetn(char_type*      s, 
-                                       std::streamsize n) override;
+        virtual std::streamsize xsgetn(char_type* character, 
+                                       std::streamsize numberOfBytes) override;
 
         /**
          * @brief Writes the specified character to the associated serial port.
