@@ -14,7 +14,7 @@ int main(int argc, char** argv)
         std::cerr << "Usage: " << argv[0] << " <filename>" << std::endl;
         return 1;
     }
-    // Instantiate a SerialStream object then open the serial port.
+    // Instantiate a SerialStream object and open the serial port.
     SerialStream serial_stream;
 
     serial_stream.Open("/dev/ttyUSB1");

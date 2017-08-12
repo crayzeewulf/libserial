@@ -1,0 +1,11 @@
+AM_CXXFLAGS = -Weffc++
+
+AM_CPPFLAGS = -I@top_srcdir@/src
+
+noinst_PROGRAMS = unit_tests LibSerialUnitTests
+
+unit_tests_SOURCES = unit_tests.cpp
+unit_tests_LDADD = ../src/libserial.la -lboost_unit_test_framework
+
+LibSerialUnitTests_SOURCES = LibSerialUnitTests.cpp
+LibSerialUnitTests_LDADD = ../src/libserial.la -lgtest
