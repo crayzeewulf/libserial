@@ -16,9 +16,9 @@ make -f Makefile.dist
 You can skip this step if you are using a release package (which already contains the `configure` script). Once you have the `configure` script, run the following commands:
 
 ```
-    ./configure 
-    make
-    make install
+./configure 
+make
+make install
 ```
 
 ----
@@ -29,16 +29,16 @@ If you are a developer, in order to run the unit tests, first ensure serial port
 #define TEST_SERIAL_PORT_2 "/dev/ttyUSB1"
 ```
 
-Next, compile the unit tests by running the compile script:
+Next, compile the GTest unit tests by running the compile script:
 
 ```
-    ./compile.sh
+./compile.sh
 ```
 
-Finally, you can run the unit tests:
+The unit tests can then be executed with the following:
 
 ```
-./build/bin/unitTests
+./build/bin/LibSerialUnitTests
 ```
 
 ----

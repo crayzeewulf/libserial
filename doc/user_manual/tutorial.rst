@@ -58,28 +58,7 @@ Setting the Character Size
    //
    // Use 8 bit wide characters. 
    //
-   my_serial_port.SetCharSize( SerialStreamBuf::CHAR_SIZE_8 ) ;
-
-Setting the Number of Stop Bits
--------------------------------
-
-.. code-block:: c++
-
-   //
-   // Use one stop bit. 
-   //
-   my_serial_port.SetNumOfStopBits(1) ;
-
-Setting the Parity Type
------------------------
-
-
-.. code-block:: c++
-
-   //
-   // Use odd parity during serial communication. 
-   // 
-   my_serial_port.SetParity( SerialStreamBuf::PARITY_ODD ) ;
+   my_serial_port.SetCharacterSize( SerialStreamBuf::CHAR_SIZE_8 ) ;
 
 Setting the Flow-Control Type
 -----------------------------
@@ -90,6 +69,29 @@ Setting the Flow-Control Type
    // Use hardware flow-control. 
    //
    my_serial_port.SetFlowControl( SerialStreamBuf::FLOW_CONTROL_HARD ) ;
+
+
+Setting the Parity Type
+-----------------------
+
+.. code-block:: c++
+
+   //
+   // Use odd parity during serial communication. 
+   // 
+   my_serial_port.SetParity( SerialStreamBuf::PARITY_ODD ) ;
+
+
+Setting the Number of Stop Bits
+-------------------------------
+
+.. code-block:: c++
+
+   //
+   // Use one stop bit. 
+   //
+   my_serial_port.SetNumberOfStopBits(1) ;
+
 
 Reading Characters
 ------------------

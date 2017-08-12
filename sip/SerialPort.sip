@@ -3,17 +3,18 @@ class SerialPort
 
 %TypeHeaderCode
 #include <SerialPort.h>
+using namespace LibSerial;
 %End
 
 public:
     explicit SerialPort();
 
     explicit SerialPort(const std::string&   fileName,
-                        const LibSerial::BaudRate&      baudRate        = BaudRate::BAUD_DEFAULT,
-                        const LibSerial::CharacterSize& characterSize   = CharacterSize::CHAR_SIZE_DEFAULT,
-                        const LibSerial::FlowControl&   flowControlType = FlowControl::FLOW_CONTROL_DEFAULT,
-                        const LibSerial::Parity&        parityType      = Parity::PARITY_DEFAULT,
-                        const LibSerial::StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT);
+                        const LibSerial::BaudRate&      baudRate        = LibSerial::BaudRate::BAUD_DEFAULT,
+                        const LibSerial::CharacterSize& characterSize   = LibSerial::CharacterSize::CHAR_SIZE_DEFAULT,
+                        const LibSerial::FlowControl&   flowControlType = LibSerial::FlowControl::FLOW_CONTROL_DEFAULT,
+                        const LibSerial::Parity&        parityType      = LibSerial::Parity::PARITY_DEFAULT,
+                        const LibSerial::StopBits&      stopBits        = LibSerial::StopBits::STOP_BITS_DEFAULT);
 
     virtual ~SerialPort();
 
@@ -45,31 +46,31 @@ public:
     void
     SetBaudRate(const LibSerial::BaudRate baudRate);
 
-    BaudRate
+    LibSerial::BaudRate
     GetBaudRate();
 
     void
     SetCharacterSize(const LibSerial::CharacterSize characterSize);
     
-    CharacterSize
+    LibSerial::CharacterSize
     GetCharacterSize();
 
     void
     SetFlowControl(const LibSerial::FlowControl flowControlType);
 
-    FlowControl
+    LibSerial::FlowControl
     GetFlowControl();
 
     void
     SetParity(const LibSerial::Parity parityType);
 
-    Parity
+    LibSerial::Parity
     GetParity();
 
     void
     SetNumberOfStopBits(const LibSerial::StopBits numOfStopBits);
 
-    StopBits
+    LibSerial::StopBits
     GetNumberOfStopBits();
 
     void
@@ -122,13 +123,13 @@ public:
          const unsigned int numberOfBytes = 0,
          const unsigned int msTimeout  = 0);
 
-    unsigned char
+    void
     ReadByte(unsigned char&     charBuffer,
              const unsigned int msTimeout = 0);
 
     void
     ReadLine(std::string&       dataString,
-             const char         lineTerminator = "\n",
+             const char         lineTerminator = 10, // Sip does not like '\n'
              const unsigned int msTimeout = 0);
 
     void

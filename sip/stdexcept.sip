@@ -39,9 +39,9 @@ namespace std
 %End
   public:
     explicit invalid_argument(const std::string&  __arg);
-    virtual ~invalid_argument() throw() ;
+    virtual ~invalid_argument() throw();
 %MethodCode
-	        return ;
+	        return;
 %End
   };
 };
