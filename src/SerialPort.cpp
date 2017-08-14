@@ -243,6 +243,23 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
+        void Read(char&              charBuffer,
+                  const unsigned int numberOfBytes = 0,
+                  const unsigned int msTimeout = 0);
+
+        /**
+         * @brief Reads the specified number of bytes from the serial port.
+         *        The method will timeout if no data is received in the specified
+         *        number of milliseconds (msTimeout). If msTimeout is 0, then
+         *        this method will block until all requested bytes are
+         *        received. If numberOfBytes is zero, then this method will keep
+         *        reading data till no more data is available at the serial port.
+         *        In all cases, all read data is available in dataBuffer on
+         *        return from this method.
+         * @param charBuffer The character buffer to place serial data into.
+         * @param numberOfBytes The number of bytes to read before returning.
+         * @param msTimeout The timeout period in milliseconds.
+         */
         void Read(unsigned char&     charBuffer,
                   const unsigned int numberOfBytes = 0,
                   const unsigned int msTimeout = 0);
@@ -289,6 +306,17 @@ namespace LibSerial
          *        then this method will block until data is available.
          * @param msTimeout The timeout period in milliseconds.
          */
+        void ReadByte(char&              charBuffer, 
+                      const unsigned int msTimeout = 0);
+
+        /**
+         * @brief Reads a single byte from the serial port.
+         *        If no data is available within the specified number
+         *        of milliseconds (msTimeout), then this method will
+         *        throw a ReadTimeout exception. If msTimeout is 0,
+         *        then this method will block until data is available.
+         * @param msTimeout The timeout period in milliseconds.
+         */
         void ReadByte(unsigned char&     charBuffer, 
                       const unsigned int msTimeout = 0);
 
@@ -315,6 +343,14 @@ namespace LibSerial
          * @param charBuffer The character array to be written to the serial port.
          * @param numberOfBytes The number of bytes to be written to the serial port.
          */
+        void Write(const char*        charBuffer,
+                   const unsigned int numberOfBytes);
+
+         /**
+         * @brief Writes a character array buffer to the serial port.
+         * @param charBuffer The character array to be written to the serial port.
+         * @param numberOfBytes The number of bytes to be written to the serial port.
+         */
         void Write(const unsigned char* charBuffer,
                    const unsigned int   numberOfBytes);
 
@@ -329,6 +365,12 @@ namespace LibSerial
          * @param dataString The std::string to be written to the serial port.
          */
         void Write(const std::string& dataString);
+
+        /**
+         * @brief Writes a single byte to the serial port.
+         * @param charbuffer The byte to be written to the serial port.
+         */
+        void WriteByte(const char charbuffer);
 
         /**
          * @brief Writes a single byte to the serial port.
@@ -633,6 +675,17 @@ namespace LibSerial
     }
 
     void
+    SerialPort::Read(char&              charBuffer,
+                     const unsigned int numberOfBytes,
+                     const unsigned int msTimeout)
+    {
+        mImpl->Read(charBuffer,
+                    numberOfBytes,
+                    msTimeout);
+        return;
+    }
+
+    void
     SerialPort::Read(unsigned char&     charBuffer,
                      const unsigned int numberOfBytes,
                      const unsigned int msTimeout)
@@ -666,6 +719,15 @@ namespace LibSerial
     }
 
     void
+    SerialPort::ReadByte(char&              charBuffer,
+                         const unsigned int msTimeout)
+    {
+        mImpl->ReadByte(charBuffer,
+                        msTimeout);
+        return;
+    }
+
+    void
     SerialPort::ReadByte(unsigned char&     charBuffer,
                          const unsigned int msTimeout)
     {
@@ -682,6 +744,15 @@ namespace LibSerial
         mImpl->ReadLine(dataString,
                         lineTerminator,
                         msTimeout);
+        return;
+    }
+
+    void
+    SerialPort::Write(const char*        charBuffer,
+                      const unsigned int numberOfBytes)
+    {
+        mImpl->Write(charBuffer,
+                     numberOfBytes);
         return;
     }
 
@@ -705,6 +776,13 @@ namespace LibSerial
     SerialPort::Write(const std::string& dataString)
     {
         mImpl->Write(dataString);
+        return;
+    }
+
+    void
+    SerialPort::WriteByte(const char charBuffer)
+    {
+        mImpl->WriteByte(charBuffer);
         return;
     }
 
@@ -1930,6 +2008,90 @@ namespace LibSerial
 
     inline
     void
+    SerialPort::Implementation::Read(char&              charBuffer,
+                                     const unsigned int numberOfBytes,
+                                     const unsigned int msTimeout)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        if (numberOfBytes == 0)
+        {
+            return;
+        }
+
+        unsigned int elapsed_ms = 0;
+        
+        int number_of_bytes_read = 0;
+        int read_result = 0;
+
+        timeval entry_time;
+        timeval current_time;
+        timeval elapsed_time;
+        
+        // Throw an exception if we are unable to read the current time.
+        if (gettimeofday(&entry_time,
+                         NULL) < 0)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        // Loop until the number of bytes requested have been read or the timeout has elapsed.
+        while (number_of_bytes_read < (int)numberOfBytes)
+        {
+            read_result = read(this->mFileDescriptor,
+                               &charBuffer + number_of_bytes_read,
+                               numberOfBytes - number_of_bytes_read);
+            
+            if (read_result > 0)
+            {
+                number_of_bytes_read += read_result;
+
+                if (number_of_bytes_read == (int)numberOfBytes)
+                {
+                    break;
+                }
+            }
+            else if (read_result <= 0 &&
+                     errno != EWOULDBLOCK)
+            {
+                throw std::runtime_error(strerror(errno));
+            }
+            
+            // Throw an exception if we are unable to read the current time.
+            if (gettimeofday(&current_time,
+                             NULL) < 0)
+            {
+                throw std::runtime_error(strerror(errno));
+            }
+
+            // Obtain the total elapsed time.
+            timersub(&current_time, &entry_time, &elapsed_time);
+
+            // Calculate the elapsed number of milliseconds.
+            elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
+                          elapsed_time.tv_usec / MICROSECONDS_PER_MS);
+
+            // Throw a ReadTimeout exception if more than msTimeout milliseconds
+            // have elapsed while waiting for data.
+            if (msTimeout > 0 &&
+                elapsed_ms > msTimeout)
+            {
+                throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
+            }
+
+            // Sleep for 1ms (1000us) for data to arrive.
+            usleep(1000);
+        }
+
+        return;
+    }
+
+    inline
+    void
     SerialPort::Implementation::Read(unsigned char&     charBuffer,
                                      const unsigned int numberOfBytes,
                                      const unsigned int msTimeout)
@@ -2180,6 +2342,23 @@ namespace LibSerial
 
     inline
     void
+    SerialPort::Implementation::ReadByte(char&              charBuffer,
+                                         const unsigned int msTimeout)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        this->Read(charBuffer,
+                   1,
+                   msTimeout);
+        return;
+    }
+
+    inline
+    void
     SerialPort::Implementation::ReadByte(unsigned char&     charBuffer,
                                          const unsigned int msTimeout)
     {
@@ -2264,6 +2443,46 @@ namespace LibSerial
 
     inline
     void
+    SerialPort::Implementation::Write(const char*        charBuffer,
+                                      const unsigned int numberOfBytes)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        // Nothing needs to be done if there is no data in the buffer.
+        if (numberOfBytes <= 0)
+        {
+            return;
+        }
+
+        // Write the data to the serial port. Keep retrying if EAGAIN
+        // error is received and EWOULDBLOCK is not received.
+        int num_of_bytes_written = -1;
+        
+        do
+        {
+            num_of_bytes_written = write(this->mFileDescriptor,
+                                         charBuffer,
+                                         numberOfBytes);
+        }
+        while (num_of_bytes_written <= 0 &&
+               errno == EAGAIN &&
+               errno != EWOULDBLOCK);
+
+        if (num_of_bytes_written < 0 ||
+            num_of_bytes_written < (int)numberOfBytes)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    void
     SerialPort::Implementation::Write(const unsigned char* charBuffer,
                                       const unsigned int   numberOfBytes)
     {
@@ -2332,6 +2551,22 @@ namespace LibSerial
 
         this->Write(reinterpret_cast<const unsigned char*>(dataString.c_str()),
                     dataString.length());
+        return;
+    }
+
+    inline
+    void
+    SerialPort::Implementation::WriteByte(const char charBuffer)
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        this->Write(&charBuffer,
+                    1);
+
         return;
     }
 
