@@ -266,6 +266,22 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
+        void Read(char&              charBuffer,
+                  const unsigned int numberOfBytes = 0,
+                  const unsigned int msTimeout  = 0);
+
+        /**
+         * @brief Reads the specified number of bytes from the serial port.
+         *        The method will timeout if no data is received in the specified
+         *        number of milliseconds (msTimeout). If msTimeout is 0, then
+         *        this method will block until all requested bytes are
+         *        received. If numberOfBytes is zero, the method will return
+         *        immediately. In all cases, received data remains available
+         *        in the charBuffer on return from this method.
+         * @param charBuffer The character array buffer to place serial data into.
+         * @param numberOfBytes The number of bytes to read before returning.
+         * @param msTimeout The timeout period in milliseconds.
+         */
         void Read(unsigned char&     charBuffer,
                   const unsigned int numberOfBytes = 0,
                   const unsigned int msTimeout  = 0);
@@ -313,6 +329,18 @@ namespace LibSerial
          * @param charbuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
+        void ReadByte(char&              charBuffer,
+                      const unsigned int msTimeout = 0);
+
+        /**
+         * @brief Reads a single byte from the serial port.
+         *        If no data is available within the specified number
+         *        of milliseconds (msTimeout), then this method will
+         *        throw a ReadTimeout exception. If msTimeout is 0,
+         *        then this method will block until data is available.
+         * @param charbuffer The character read from the serial port.
+         * @param msTimeout The timeout period in milliseconds.
+         */
         void ReadByte(unsigned char&     charBuffer,
                       const unsigned int msTimeout = 0);
 
@@ -339,6 +367,14 @@ namespace LibSerial
          * @param charBuffer The character array to be written to the serial port.
          * @param numberOfBytes The number of bytes to write to the serial port.
          */
+        void Write(const char*        charBuffer,
+                   const unsigned int numberOfBytes);
+
+        /**
+         * @brief Writes a character array buffer to the serial port.
+         * @param charBuffer The character array to be written to the serial port.
+         * @param numberOfBytes The number of bytes to write to the serial port.
+         */
         void Write(const unsigned char* charBuffer,
                    const unsigned int   numberOfBytes);
 
@@ -353,6 +389,12 @@ namespace LibSerial
          * @param dataString The data string to write to the serial port.
          */
         void Write(const std::string& dataString);
+
+        /**
+         * @brief Writes a single byte to the serial port.
+         * @param charbuffer The byte to write to the serial port.
+         */
+        void WriteByte(const char charbuffer);
 
         /**
          * @brief Writes a single byte to the serial port.

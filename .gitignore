@@ -105,9 +105,8 @@ sip/siplibserialstdvector1800.cpp
 sip/siplibserialstdvector1900.cpp
 sip/siplibserialstdvector2400.cpp
 
-# Boost unit test files
-src/unit_tests
-
 # Test files
 test/MakeFile
 test/MakeFile.in
+test/LibSerialUnitTests
+test/unit_tests

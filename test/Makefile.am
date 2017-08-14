@@ -8,4 +8,4 @@ unit_tests_SOURCES = unit_tests.cpp
 unit_tests_LDADD = ../src/libserial.la -lboost_unit_test_framework
 
 LibSerialUnitTests_SOURCES = LibSerialUnitTests.cpp
-LibSerialUnitTests_LDADD = ../src/libserial.la -lgtest
+LibSerialUnitTests_LDADD = ../src/libserial.la /usr/lib/libgtest.a /usr/lib/libgtest_main.a -lpthread
