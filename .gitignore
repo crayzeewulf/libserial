@@ -108,5 +108,5 @@ sip/siplibserialstdvector2400.cpp
 # Test files
 test/MakeFile
 test/MakeFile.in
-test/LibSerialUnitTests
+test/LibSerialTests
 test/unit_tests

@@ -1,8 +1,8 @@
-ADD_EXECUTABLE(LibSerialUnitTests
-  LibSerialUnitTests.cpp
+ADD_EXECUTABLE(LibSerialTests
+  LibSerialTests.cpp
   )
 
-TARGET_LINK_LIBRARIES(LibSerialUnitTests
+TARGET_LINK_LIBRARIES(LibSerialTests
   libSerial
   GTestMain
 )

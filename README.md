@@ -22,7 +22,7 @@ make install
 ```
 
 ----
-If you are a developer interested in utilizing the unit tests, ensure serial port names are appropriate for your hardware configuration in LibSerialTest.cpp:
+If you are a developer interested in utilizing the unit tests, ensure serial port names are appropriate for your hardware configuration in LibSerialTests.cpp:
 
 ```
 #define TEST_SERIAL_PORT_1 "/dev/ttyUSB0"
@@ -35,14 +35,14 @@ The unit tests will be built during the make step above and another convenient m
 ./compile.sh
 ```
 
-The unit tests built using make can be executed from the test directory:
+The unit tests built using make can be executed from the libserial/test/ directory:
 ```
-./test/LibSerialUnitTests
+./test/LibSerialTests
 ./unit_tests
 ```
-If cmake or the compile script was used to build the library, unit tests can be executed from the libserial/build/bin directory: 
+If cmake or the compile script was used to build the library, unit tests can be executed from the libserial/build/bin/ directory: 
 ```
-./build/bin/LibSerialUnitTests
+./build/bin/LibSerialTests
 ./build/bin/unit_tests
 ```
 
