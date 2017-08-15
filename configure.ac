@@ -1,7 +1,10 @@
-AC_REVISION($Revision: 1.14 $)
-
 dnl Indicate the package name and the version to automake
-AC_INIT([libserial], [0.7.0])
+AC_INIT([libserial], [1.0.0])
+
+dnl Indicate the configuration revision number
+AC_REVISION($Revision: 1.15 $)
+
+dnl Input and Output configuration information
 AC_CONFIG_SRCDIR([src/SerialStream.cc])
 AM_CONFIG_HEADER(config.h)
 AC_CONFIG_MACRO_DIR([m4])
