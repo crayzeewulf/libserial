@@ -1,18 +1,18 @@
-SUBDIRS=src doc examples
+SUBDIRS = src doc examples test
 
 if PYTHON
 SUBDIRS += sip
 endif
 
-ACLOCAL_AMFLAGS=-I m4
+ACLOCAL_AMFLAGS = -I m4
 
 EXTRA_DIST = doxygen.conf.in Makefile.dist libserial.spec libserial.pc
 
-docs: 
+docs:
 	make dox
 
 dox:
 	doxygen doxygen.conf
 
-pkgconfigdir   = $(libdir)/pkgconfig
+pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libserial.pc

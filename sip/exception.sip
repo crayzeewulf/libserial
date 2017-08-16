@@ -10,5 +10,5 @@ namespace std
         virtual ~exception() throw();
 
         virtual const char* what() const throw();
-    } ;
-} ;
+    };
+};

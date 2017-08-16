@@ -1,35 +1,35 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.10)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 PROJECT(LibSerial)
 
 INCLUDE(ExternalProject)
 
+ENABLE_TESTING()
+
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-FIND_PACKAGE(Threads)
+FIND_PACKAGE(Threads REQUIRED)
+#FIND_PACKAGE(SIP REQUIRED)
+FIND_PACKAGE(Boost COMPONENTS unit_test_framework REQUIRED)
+
 
 ADD_DEFINITIONS(
   -O3
-  -DAPL=0
-  -DIBM=0
-  -DLIN=1
   -DNDEBUG
-  -DXPLM200
-  -DXPLM210
 
   -Wall
+  -Warray-bounds
   -Wcast-align
   -Wchar-subscripts
   -Wdouble-promotion
   -Wextra
   -Wformat-security
   -Wlogical-op
-  -Wno-long-long  
+  -Wno-long-long
+  -Wno-parentheses
   -Wno-psabi
   -Wno-variadic-macros
-  #-Wnon-virtual-dtor
   -Wpointer-arith
-  #-Wundef
   -Wuninitialized
   -Wunused-local-typedefs
   -Wwrite-strings
@@ -45,11 +45,7 @@ ADD_DEFINITIONS(
   -pthread
   )
 
-# Uncomment the following lines to compile for 32 bit architectures
-#SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -fms-extensions -m32")
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -fms-extensions -m32")
-
-# Uncomment the following lines to compile for 64 bit architectures
+# Note: Add "-m32" to the compiler flags to compile for 32 bit architectures
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -fms-extensions")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -fms-extensions")
 
@@ -97,11 +93,12 @@ SET_TARGET_PROPERTIES(GTestMain PROPERTIES
 
 ADD_DEPENDENCIES(GTest GTestExternal)
 ADD_DEPENDENCIES(GTestMain GTestExternal)
-INCLUDE_DIRECTORIES(BEFORE ${GTEST_PREFIX}/src/GTestExternal/googletest/include)
 
 EXTERNALPROJECT_GET_PROPERTY(GTestExternal source_dir)
 
 INCLUDE_DIRECTORIES(
+  BEFORE ${GTEST_PREFIX}/src/GTestExternal/googletest/include
+  ${Boost_INCLUDE_DIRS}
   src
   )
 

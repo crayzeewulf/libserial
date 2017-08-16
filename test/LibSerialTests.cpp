@@ -730,7 +730,7 @@ protected:
         ASSERT_FALSE(serialPort2.IsDataAvailable());
 
         char writeByte = 'a';
-        unsigned char readByte = 'b';
+        char readByte = 'b';
 
         serialPort1.WriteByte(writeByte);
         tcdrain(serialPort1.GetFileDescriptor());
@@ -1046,13 +1046,13 @@ protected:
         bool timeOutTestPass = false;
 
         char writeBuffer1[] = "abc";
-        char writeBuffer2[] = "ABC";
+        unsigned char writeBuffer2[] = "ABC";
 
-        unsigned char readBuffer1[3] = {};
+        char readBuffer1[3] = {};
         unsigned char readBuffer2[3] = {};
 
-        serialPort1.Write(writeBuffer1);
-        serialPort2.Write(writeBuffer2);
+        serialPort1.Write(writeBuffer1, 3);
+        serialPort2.Write(writeBuffer2, 3);
 
         tcdrain(serialPort1.GetFileDescriptor());
         tcdrain(serialPort2.GetFileDescriptor());
@@ -1195,9 +1195,9 @@ protected:
         bool timeOutTestPass = false;
 
         char writeByte1 = 'a';
-        char writeByte2 = 'A';
+        unsigned char writeByte2 = 'A';
 
-        unsigned char readByte1  = 'b';
+        char readByte1  = 'b';
         unsigned char readByte2  = 'B';
 
         serialPort1.WriteByte(writeByte1);
@@ -1503,8 +1503,8 @@ protected:
         failureRate = 0;
         loopCount = 0;
 
-        std::thread serialStream1Thread(serialStream1ThreadLoop, this);
-        std::thread serialStream2Thread(serialStream2ThreadLoop, this);
+        std::thread serialStream1Thread(&LibSerialTest::serialStream1ThreadLoop, this);
+        std::thread serialStream2Thread(&LibSerialTest::serialStream2ThreadLoop, this);
 
         serialStream1Thread.join();
         serialStream2Thread.join();
@@ -1515,8 +1515,8 @@ protected:
         failureRate = 0;
         loopCount = 0;
         
-        std::thread serialPort1Thread(serialPort1ThreadLoop, this);
-        std::thread serialPort2Thread(serialPort2ThreadLoop, this);
+        std::thread serialPort1Thread(&LibSerialTest::serialPort1ThreadLoop, this);
+        std::thread serialPort2Thread(&LibSerialTest::serialPort2ThreadLoop, this);
 
         serialPort1Thread.join();
         serialPort2Thread.join();
@@ -1850,7 +1850,7 @@ TEST_F(LibSerialTest, testSerialPortGetFileDescriptor)
 
 TEST_F(LibSerialTest, testSerialPortReadCharBufferWriteCharBuffer)
 {
-    SCOPED_TRACE("Serial Port Read(unsigned char) and Write(unsigned char) Test");
+    SCOPED_TRACE("Serial Port Read(signed/unsigned char) and Write(signed/unsigned char) Test");
 
     for (size_t i = 0; i < numberOfTestIterations; i++)
     {
