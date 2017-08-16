@@ -7,7 +7,7 @@ using namespace LibSerial;
 
 int main()
 {
-    // Instantiate a SerialStream object then open the serial port.
+    // Instantiate a SerialStream object and open the serial port.
     SerialStream serial_stream;
 
     serial_stream.Open("/dev/ttyUSB0");

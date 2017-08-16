@@ -8,14 +8,14 @@
 
 BOOST_AUTO_TEST_CASE( SerialStreamBuf_Constructor_Test )
 {
-    using namespace LibSerial ;
-    SerialStreamBuf buf ;
-    BOOST_CHECK( false == buf.is_open() ) ;
+    using namespace LibSerial;
+    SerialStreamBuf buf;
+    BOOST_CHECK( false == buf.IsOpen() );
 }
 
 BOOST_AUTO_TEST_CASE( SerialStream_Constructor_Test )
 {
-    using namespace LibSerial ;
-    SerialStream serial_stream ;
-    BOOST_CHECK( false == serial_stream.IsOpen() ) ;
+    using namespace LibSerial;
+    SerialStream serial_stream;
+    BOOST_CHECK( false == serial_stream.IsOpen() );
 }

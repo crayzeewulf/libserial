@@ -16,29 +16,34 @@ make -f Makefile.dist
 You can skip this step if you are using a release package (which already contains the `configure` script). Once you have the `configure` script, run the following commands:
 
 ```
-    ./configure 
-    make
-    make install
+./configure 
+make
+make install
 ```
 
 ----
-If you are a developer, in order to run the unit tests, first ensure serial port names are appropriate for your hardware configuration in LibSerialTest.cpp:
+If you are a developer interested in utilizing the unit tests, ensure serial port names are appropriate for your hardware configuration in LibSerialTests.cpp:
 
 ```
 #define TEST_SERIAL_PORT_1 "/dev/ttyUSB0"
 #define TEST_SERIAL_PORT_2 "/dev/ttyUSB1"
 ```
 
-Next, compile the unit tests by running the compile script:
+The unit tests will be built during the make step above and another convenient method we've provided is by running the compile script which uses cmake:
 
 ```
-    ./compile.sh
+./compile.sh
 ```
 
-Finally, you can run the unit tests:
-
+The unit tests built using make can be executed from the libserial/test/ directory:
 ```
-./build/bin/unitTests
+./test/LibSerialTests
+./unit_tests
+```
+If cmake or the compile script was used to build the library, unit tests can be executed from the libserial/build/bin/ directory: 
+```
+./build/bin/LibSerialTests
+./build/bin/unit_tests
 ```
 
 ----

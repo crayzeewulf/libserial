@@ -1,5 +1,6 @@
 SIPFILES = \
 SerialPort.sip \
+SerialPortConstants.sip \
 exception.sip \
 libserial.sip \
 stdexcept.sip \
@@ -17,26 +18,32 @@ all: libserial.so
 libserial.so: Makefile.sip @top_srcdir@/src/libserial.la
 	make -f Makefile.sip
 
-Makefile.sip: configure.py $(SIPFILES) 
+Makefile.sip: configure.py $(SIPFILES)
 	python ./configure.py
 
 clean-local: Makefile.sip
 	make -f Makefile.sip clean
 
 CLEANFILES = \
-siplibserialcmodule.cpp \
+Makefile.sip \
+libserial.sbf \
+sipAPIlibserial.h \
+siplibserialLibSerial.cpp \
+siplibserialLibSerialBaudRate.cpp \
+siplibserialLibSerialCharacterSize.cpp \
+siplibserialLibSerialFlowControl.cpp \
+siplibserialLibSerialParity.cpp \
+siplibserialLibSerialStopBits.cpp \
 siplibserialSerialPort.cpp \
-siplibserialSerialPortNotOpen.cpp \
-siplibserialSerialPortAlreadyOpen.cpp \
-siplibserialSerialPortOpenFailed.cpp \
-siplibserialSerialPortReadTimeout.cpp \
+siplibserialcmodule.cpp \
 siplibserialstd.cpp \
 siplibserialstdexception.cpp \
 siplibserialstdinvalid_argument.cpp \
+siplibserialstdios_base \
 siplibserialstdlogic_error.cpp \
 siplibserialstdruntime_error.cpp \
 siplibserialstdstring.cpp \
-siplibserialstdvector.cpp \
-libserial.sbf \
-sipAPIlibserial.h \
-Makefile.sip 
+siplibserialstdvector1300.cpp \
+siplibserialstdvector1800.cpp \
+siplibserialstdvector1900.cpp \
+siplibserialstdvector2400.cpp
