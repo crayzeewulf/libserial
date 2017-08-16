@@ -4,10 +4,11 @@
  */
 
 #include <chrono>
+#include <gtest/gtest.h>
 #include <mutex>
 #include <thread>
+#include <unistd.h>
 
-#include <gtest/gtest.h>
 #include <SerialPort.h>
 #include <SerialStream.h>
 
@@ -28,12 +29,7 @@ protected:
 
     std::mutex mutex;
 
-    bool threadLoop1Active = false;
-    bool threadLoop2Active = false;
-
     size_t timeOutMilliseconds = 250;
-    size_t threadTimeOutMicroseconds = 1000000;
-
     size_t failureRate = 0;
     size_t loopCount = 0;
 
@@ -103,12 +99,12 @@ protected:
         stopBits[1] = StopBits::STOP_BITS_2;
     }
 
-    size_t getTimeInMicroSeconds()
+    size_t getTimeInMilliSeconds()
     {
         std::chrono::high_resolution_clock::duration timeNow = 
             std::chrono::high_resolution_clock::now().time_since_epoch();
 
-        return std::chrono::duration_cast<std::chrono::microseconds>(timeNow).count();
+        return std::chrono::duration_cast<std::chrono::milliseconds>(timeNow).count();
     }
     
     //---------------------- Serial Stream Unit Tests -----------------------//
@@ -1313,22 +1309,19 @@ protected:
         serialStream1.Open(TEST_SERIAL_PORT_1);
         serialStream1.SetBaudRate(BaudRate::BAUD_115200);
 
-        size_t threadLoopStartTimeMicroseconds = getTimeInMicroSeconds();
-        size_t timeElapsedMicroSeconds = 0;
+        size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
+        size_t timeElapsedMilliSeconds = 0;
 
-        mutex.lock();
-        threadLoop1Active = true;
-        mutex.unlock();
-
-        while (timeElapsedMicroSeconds < threadTimeOutMicroseconds)
+        while (timeElapsedMilliSeconds < timeOutMilliseconds)
         {
             serialStream1 << writeString1 << std::endl;
 
-            if (threadLoop2Active == true &&
-                serialStream1.IsDataAvailable())
+            if (serialStream1.IsDataAvailable())
             {
+                alarm(5);   // Set a system alarm in case getline() blocks longer than 5 seconds.
                 getline(serialStream1, readString2);
-
+                alarm(0);   // Deactivate the alarm.
+                
                 if(readString2 != writeString2)
                 {
                     mutex.lock();
@@ -1337,16 +1330,12 @@ protected:
                 }
             }
 
-            timeElapsedMicroSeconds = getTimeInMicroSeconds() - threadLoopStartTimeMicroseconds;
+            timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
 
             mutex.lock();
             loopCount++;
             mutex.unlock();
         }
-
-        mutex.lock();
-        threadLoop1Active = false;
-        mutex.unlock();
 
         serialStream1.Close();
         return;
@@ -1357,21 +1346,18 @@ protected:
         serialStream2.Open(TEST_SERIAL_PORT_2);
         serialStream2.SetBaudRate(BaudRate::BAUD_115200);
 
-        size_t threadLoopStartTimeMicroseconds = getTimeInMicroSeconds();
-        size_t timeElapsedMicroSeconds = 0;
+        size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
+        size_t timeElapsedMilliSeconds = 0;
 
-        mutex.lock();
-        threadLoop2Active = true;
-        mutex.unlock();
-
-        while (timeElapsedMicroSeconds < threadTimeOutMicroseconds)
+        while (timeElapsedMilliSeconds < timeOutMilliseconds)
         {
             serialStream2 << writeString2 << std::endl;
 
-            if (threadLoop1Active == true &&
-                serialStream2.IsDataAvailable())
+            if (serialStream2.IsDataAvailable())
             {
+                alarm(5);   // Set a system alarm in case getline() blocks longer than 5 seconds.
                 getline(serialStream2, readString1);
+                alarm(0);   // Deactivate the alarm.
 
                 if(readString1 != writeString1)
                 {
@@ -1381,16 +1367,12 @@ protected:
                 }
             }
             
-            timeElapsedMicroSeconds = getTimeInMicroSeconds() - threadLoopStartTimeMicroseconds;
+            timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
             
             mutex.lock();
             loopCount++;
             mutex.unlock();
         }
-
-        mutex.lock();
-        threadLoop2Active = false;
-        mutex.unlock();
 
         serialStream2.Close();
         return;
@@ -1402,21 +1384,16 @@ protected:
         serialPort1.SetBaudRate(BaudRate::BAUD_115200);
         tcflush(serialPort1.GetFileDescriptor(), TCIOFLUSH);
 
-        size_t threadLoopStartTimeMicroseconds = getTimeInMicroSeconds();
-        size_t timeElapsedMicroSeconds = 0;
+        size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
+        size_t timeElapsedMilliSeconds = 0;
 
-        mutex.lock();
-        threadLoop1Active = true;
-        mutex.unlock();
-
-        while (timeElapsedMicroSeconds < threadTimeOutMicroseconds)
+        while (timeElapsedMilliSeconds < timeOutMilliseconds)
         {
             try
             {
                 serialPort1.Write(writeString1 + '\n');
 
-                if (threadLoop2Active == true &&
-                    serialPort1.IsDataAvailable())
+                if (serialPort1.IsDataAvailable())
                 {
                     serialPort1.ReadLine(readString2, '\n', timeOutMilliseconds);
 
@@ -1432,16 +1409,12 @@ protected:
             {
             }
 
-            timeElapsedMicroSeconds = getTimeInMicroSeconds() - threadLoopStartTimeMicroseconds;
+            timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
 
             mutex.lock();
             loopCount++;
             mutex.unlock();
         }
-
-        mutex.lock();
-        threadLoop1Active = false;
-        mutex.unlock();
 
         serialPort1.Close();
         return;
@@ -1453,21 +1426,16 @@ protected:
         serialPort2.SetBaudRate(BaudRate::BAUD_115200);
         tcflush(serialPort1.GetFileDescriptor(), TCIOFLUSH);
 
-        size_t threadLoopStartTimeMicroseconds = getTimeInMicroSeconds();
-        size_t timeElapsedMicroSeconds = 0;
+        size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
+        size_t timeElapsedMilliSeconds = 0;
 
-        mutex.lock();
-        threadLoop2Active = true;
-        mutex.unlock();
-
-        while (timeElapsedMicroSeconds < threadTimeOutMicroseconds)
+        while (timeElapsedMilliSeconds < timeOutMilliseconds)
         {
             try
             {
                 serialPort2.Write(writeString2 + '\n');
                 
-                if (threadLoop1Active == true &&
-                    serialPort2.IsDataAvailable())
+                if (serialPort2.IsDataAvailable())
                 {
                     serialPort2.ReadLine(readString1, '\n', timeOutMilliseconds);
 
@@ -1483,16 +1451,12 @@ protected:
             {
             }
 
-            timeElapsedMicroSeconds = getTimeInMicroSeconds() - threadLoopStartTimeMicroseconds;
+            timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
 
             mutex.lock();
             loopCount++;
             mutex.unlock();
         }
-
-        mutex.lock();
-        threadLoop2Active = false;
-        mutex.unlock();
 
         serialPort2.Close();
         return;

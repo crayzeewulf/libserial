@@ -29,7 +29,7 @@ SerialStream::SerialStream()
     : std::iostream(0)
     , mIOBuffer(0)
 {
-    /* Empty */
+    this->flush();
 }
 
 SerialStream::SerialStream(const std::string& fileName,
@@ -38,6 +38,7 @@ SerialStream::SerialStream(const std::string& fileName,
     , mIOBuffer(0) 
 {
     this->Open(fileName, openMode);
+    this->flush();
     return;
 }
 
@@ -56,6 +57,7 @@ SerialStream::SerialStream(const std::string&   fileName,
     this->SetFlowControl(flowControlType);
     this->SetParity(parityType);
     this->SetNumberOfStopBits(stopBits);
+    this->flush();
     return;
 }
 

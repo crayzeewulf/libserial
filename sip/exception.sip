@@ -6,7 +6,8 @@ namespace std
 #include <exception>
 %End
     public:
-        exception() throw() ;
+        exception() throw();
+
         virtual ~exception() throw();
 
         virtual const char* what() const throw();
