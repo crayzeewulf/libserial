@@ -229,9 +229,15 @@ namespace LibSerial
          *        In the case of SerialStreamBuffer, we want to keep using
          *        unbuffered I/O. Hence, using this method has no effect at
          *        present.
+         *
+         *
+         * @param character Pointer to the character buffer to write to the serial port.
+         * @param numberOfBytes The number of characters to write to the serial port.
+         * @return Returns a pointer to this streambuf object.
+         *
          */
-        virtual std::streambuf* setbuf(char_type*, 
-                                       std::streamsize) override;
+        virtual std::streambuf* setbuf(char_type* character, 
+                                       std::streamsize numberOfBytes) override;
 
         /**
          * @brief Writes up to n characters from the character sequence at 
