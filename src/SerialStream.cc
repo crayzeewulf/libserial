@@ -1,20 +1,20 @@
 /******************************************************************************
  *   @file SerialStream.cc                                                    *
- *   @copyright (C) 2004 by Manish Pagey                                      *
+ *   @copyright (C) 2004 Manish Pagey                                         *
  *   crayzeewulf@users.sourceforge.net                                        *
  *                                                                            *
  *   This program is free software; you can redistribute it and/or modify     *
- *   it under the terms of the GNU General Public License as published by     *
- *   the Free Software Foundation; either version 2 of the License, or        *
- *   (at your option) any later version.                                      *
+ *   it under the terms of the GNU Lessser General Public License as          *
+ *   published by the Free Software Foundation; either version 2 of the       *
+ *   License, or (at your option) any later version.                          *
  *                                                                            *
  *   This program is distributed in the hope that it will be useful,          *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of           *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
- *   GNU General Public License for more details.                             *
+ *   GNU Lesser General Public License for more details.                      *
  *                                                                            *
- *   You should have received a copy of the GNU General Public License        *
- *   along with this program; if not, write to the                            *
+ *   You should have received a copy of the GNU Lesser General Public         *
+ *   License along with this program; if not, write to the                    *
  *   Free Software Foundation, Inc.,                                          *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
  *****************************************************************************/
@@ -601,5 +601,33 @@ SerialStream::GetFileDescriptor()
         // problem and we should stop all I/O using this stream.
         setstate(badbit);
         return -1;
+    }
+}
+
+std::vector<std::string>
+SerialStream::GetAvailableSerialPorts()
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+        
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {     
+        // Try to get the file descriptor.
+        return my_buffer->GetAvailableSerialPorts();
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer of
+        // class other than SerialStreamBuf. In either case, we have a
+        // problem and we should stop all I/O using this stream.
+        setstate(badbit);
+        
+        std::vector<std::string> empty_vector;
+        empty_vector.clear();
+
+        return empty_vector;
     }
 }

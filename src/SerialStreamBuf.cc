@@ -1,19 +1,20 @@
 /******************************************************************************
  *   @file SerialStreamBuf.cc                                                 *
- *   @copyright                                                               *
+ *   @copyright (C) 2004 Manish Pagey                                         *
+ *   crayzeewulf@users.sourceforge.net                                        *
  *                                                                            *
  *   This program is free software; you can redistribute it and/or modify     *
- *   it under the terms of the GNU General Public License as published by     *
- *   the Free Software Foundation; either version 2 of the License, or        *
- *   (at your option) any later version.                                      *
+ *   it under the terms of the GNU Lessser General Public License as          *
+ *   published by the Free Software Foundation; either version 2 of the       *
+ *   License, or (at your option) any later version.                          *
  *                                                                            *
  *   This program is distributed in the hope that it will be useful,          *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of           *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
- *   GNU General Public License for more details.                             *
+ *   GNU Lesser General Public License for more details.                      *
  *                                                                            *
- *   You should have received a copy of the GNU General Public License        *
- *   along with this program; if not, write to the                            *
+ *   You should have received a copy of the GNU Lesser General Public         *
+ *   License along with this program; if not, write to the                    *
  *   Free Software Foundation, Inc.,                                          *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
  *****************************************************************************/
@@ -22,6 +23,7 @@
 
 #include <cstring>
 #include <fcntl.h>
+#include <linux/serial.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
@@ -92,6 +94,7 @@ namespace LibSerial
 
         /**
          * @brief Determines if data is available at the serial port.
+         * @return Returns true iff data is available to read.
          */
         bool IsDataAvailable();
 
@@ -193,8 +196,16 @@ namespace LibSerial
 
         /**
          * @brief Gets the serial port file descriptor.
+         * @return Returns the serial port file descriptor.
          */
         int GetFileDescriptor();
+
+        /**
+         * @brief Gets a list of available serial ports.
+         * @return Returns a std::vector of std::strings with the name of
+         *         each available serial port. 
+         */
+        std::vector<std::string> GetAvailableSerialPorts();
 
         /**
          * @brief Writes up to n characters from the character sequence at 
@@ -511,6 +522,12 @@ namespace LibSerial
     SerialStreamBuf::GetFileDescriptor()
     {
         return mImpl->GetFileDescriptor();
+    }
+
+    std::vector<std::string>
+    SerialStreamBuf::GetAvailableSerialPorts()
+    {
+        return mImpl->GetAvailableSerialPorts();
     }
 
     std::streambuf*
@@ -1384,6 +1401,59 @@ namespace LibSerial
         }
 
         return this->mFileDescriptor;
+    }
+
+    inline
+    std::vector<std::string>
+    SerialStreamBuf::Implementation::GetAvailableSerialPorts()
+    {
+        const int array_size = 3;
+        int file_descriptor = -1;
+        int ioctl_result = -1;
+        
+        size_t max_port_number = 128;
+        
+        serial_struct serial_port_info;
+
+        std::string file_name;
+        file_name.clear();
+
+        std::vector<std::string> serial_port_names;
+        serial_port_names.clear();
+
+        std::string serial_ports[array_size] = {"/dev/ttyS",
+                                                "/dev/ttyACM",
+                                                "/dev/ttyUSB"};
+
+        for (size_t i = 0; i < array_size; i++)
+        {
+            for (size_t j = 0; j < max_port_number; j++)
+            {
+                file_name = serial_ports[i] + std::to_string(j);
+
+                // Try to open the serial port. 
+                file_descriptor = open(file_name.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
+
+                if (file_descriptor > 0)
+                {
+                    ioctl_result = ioctl(file_descriptor,
+                                         TIOCGSERIAL,
+                                         &serial_port_info);
+
+                    // Check for errors.
+                    if (ioctl_result  < 0)
+                    {
+                        throw std::runtime_error(strerror(errno));
+                    }
+
+                    serial_port_names.push_back(file_name);
+                    
+                    close(file_descriptor);
+                }
+            }
+        }
+
+        return serial_port_names;
     }
 
     inline

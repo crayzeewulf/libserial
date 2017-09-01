@@ -1,7 +1,23 @@
-/**
- * @file LibSerialTest.cpp
- * @copyright LibSerial
- */
+/******************************************************************************
+ *   @file LibSerialTest.cpp                                                  *
+ *   @copyright (C) 2016 LibSerial Development Team                           *
+ *                                                                            *
+ *   This program is free software; you can redistribute it and/or modify     *
+ *   it under the terms of the GNU Lessser General Public License as          *
+ *   published by the Free Software Foundation; either version 2 of the       *
+ *   License, or (at your option) any later version.                          *
+ *                                                                            *
+ *   This program is distributed in the hope that it will be useful,          *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of           *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
+ *   GNU Lesser General Public License for more details.                      *
+ *                                                                            *
+ *   You should have received a copy of the GNU Lesser General Public         *
+ *   License along with this program; if not, write to the                    *
+ *   Free Software Foundation, Inc.,                                          *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
+ *****************************************************************************/
+
 
 #include <chrono>
 #include <gtest/gtest.h>
@@ -486,6 +502,36 @@ protected:
 
         ASSERT_FALSE(serialStream1.IsOpen());
         ASSERT_FALSE(serialStream2.IsOpen());
+    }
+
+    void testSerialStreamGetFileDescriptor()
+    {
+        serialStream1.Open(TEST_SERIAL_PORT_1);
+        ASSERT_TRUE(serialStream1.IsOpen());
+
+        int fileDescriptor = serialStream1.GetFileDescriptor();
+        ASSERT_GT(fileDescriptor, 0);
+
+        serialStream1.Close();
+        ASSERT_FALSE(serialStream1.IsOpen());
+    }
+
+    void testSerialStreamGetAvailableSerialPorts()
+    {
+        serialStream1.Open(TEST_SERIAL_PORT_1);
+        ASSERT_TRUE(serialStream1.IsOpen());
+
+        std::vector<std::string> serialPorts;
+        serialPorts.clear();
+
+        serialPorts = serialStream1.GetAvailableSerialPorts();
+
+        int portCount = serialPorts.size();
+        
+        ASSERT_GE(portCount, 2);
+
+        serialStream1.Close();
+        ASSERT_FALSE(serialStream1.IsOpen());
     }
 
     void testSerialStreamReadWriteByte()
@@ -1026,6 +1072,24 @@ protected:
 
         int fileDescriptor = serialPort1.GetFileDescriptor();
         ASSERT_GT(fileDescriptor, 0);
+
+        serialPort1.Close();
+        ASSERT_FALSE(serialPort1.IsOpen());
+    }
+
+    void testSerialPortGetAvailableSerialPorts()
+    {
+        serialPort1.Open(TEST_SERIAL_PORT_1);
+        ASSERT_TRUE(serialPort1.IsOpen());
+
+        std::vector<std::string> serialPorts;
+        serialPorts.clear();
+
+        serialPorts = serialPort1.GetAvailableSerialPorts();
+
+        int portCount = serialPorts.size();
+        
+        ASSERT_GE(portCount, 2);
 
         serialPort1.Close();
         ASSERT_FALSE(serialPort1.IsOpen());
@@ -1609,6 +1673,26 @@ TEST_F(LibSerialTest, testSerialStreamSetGetVTime)
     }
 }
 
+TEST_F(LibSerialTest, testSerialStreamGetFileDescriptor)
+{
+    SCOPED_TRACE("Serial Stream GetFileDescriptor() Test");
+    
+    for (size_t i = 0; i < numberOfTestIterations; i++)
+    {
+        testSerialStreamGetFileDescriptor();
+    }
+}
+
+TEST_F(LibSerialTest, testSerialStreamGetAvailableSerialPorts)
+{
+    SCOPED_TRACE("Serial Stream GetAvailableSerialPorts() Test");
+    
+    for (size_t i = 0; i < numberOfTestIterations; i++)
+    {
+        testSerialStreamGetAvailableSerialPorts();
+    }
+}
+
 TEST_F(LibSerialTest, testSerialStreamReadWriteByte)
 {
     SCOPED_TRACE("Serial Stream Read() and WriteByte() Test");
@@ -1809,6 +1893,16 @@ TEST_F(LibSerialTest, testSerialPortGetFileDescriptor)
     for (size_t i = 0; i < numberOfTestIterations; i++)
     {
         testSerialPortGetFileDescriptor();
+    }
+}
+
+TEST_F(LibSerialTest, testSerialPortGetAvailableSerialPorts)
+{
+    SCOPED_TRACE("Serial Port GetAvailableSerialPorts() Test");
+    
+    for (size_t i = 0; i < numberOfTestIterations; i++)
+    {
+        testSerialPortGetAvailableSerialPorts();
     }
 }
 
