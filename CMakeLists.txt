@@ -23,8 +23,10 @@ ADD_DEFINITIONS(
   -Warray-bounds
   -Wcast-align
   -Wchar-subscripts
+  -Wconversion
   -Wdouble-promotion
   -Wextra
+  -Wfatal-errors
   -Wformat-security
   -Wlogical-op
   -Wno-long-long
@@ -107,6 +109,7 @@ INCLUDE_DIRECTORIES(
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+SET(CMAKE_INSTALL_PREFIX /usr/include)
 
 ADD_SUBDIRECTORY(examples)
 ADD_SUBDIRECTORY(sip)
