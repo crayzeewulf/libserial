@@ -526,7 +526,7 @@ protected:
 
         serialPorts = serialStream1.GetAvailableSerialPorts();
 
-        int portCount = serialPorts.size();
+        int portCount = (int)serialPorts.size();
         
         ASSERT_GE(portCount, 2);
 
@@ -1087,7 +1087,7 @@ protected:
 
         serialPorts = serialPort1.GetAvailableSerialPorts();
 
-        int portCount = serialPorts.size();
+        int portCount = (int)serialPorts.size();
         
         ASSERT_GE(portCount, 2);
 
@@ -1162,12 +1162,12 @@ protected:
         SerialPort::DataBuffer readDataBuffer2;
 
         // Test using ASCII characters.
-        for (size_t i = 48; i <= 122; i++)
+        for (unsigned char i = 48; i <= 122; i++)
         {
             writeDataBuffer1.push_back(i);
         }
 
-        for (size_t i = 122; i >= 48; i--)
+        for (unsigned char i = 122; i >= 48; i--)
         {
             writeDataBuffer2.push_back(i);
         }
@@ -1981,7 +1981,7 @@ TEST_F(LibSerialTest, testMultiThreadSerialStreamReadWrite)
         testMultiThreadSerialStreamReadWrite();
     }
 
-    double failRate = 100. * failureRate / loopCount;
+    double failRate = 100. * (double)failureRate / (double)loopCount;
     
     // If the serial communication fail rate is greater than 1.0% consider it a failed test.
     if (failRate > 1.0)
@@ -2000,7 +2000,7 @@ TEST_F(LibSerialTest, testMultiThreadSerialPortReadWrite)
         testMultiThreadSerialPortReadWrite();
     }
 
-    double failRate = 100. * failureRate / loopCount;
+    double failRate = 100. * (double)failureRate / (double)loopCount;
     
     // If the serial communication fail rate is greater than 1.0% consider it a failed test.
     if (failRate > 1.0)
