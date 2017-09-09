@@ -1,20 +1,20 @@
 /******************************************************************************
  *   @file SerialPort.h                                                       *
- *   @copyright (C) 2004 by Manish Pagey                                      *
+ *   @copyright (C) 2004 Manish Pagey                                         *
  *   crayzeewulf@users.sourceforge.net                                        *
  *                                                                            *
  *   This program is free software; you can redistribute it and/or modify     *
- *   it under the terms of the GNU General Public License as published by     *
- *   the Free Software Foundation; either version 2 of the License, or        *
- *   (at your option) any later version.                                      *
+ *   it under the terms of the GNU Lessser General Public License as          *
+ *   published by the Free Software Foundation; either version 2 of the       *
+ *   License, or (at your option) any later version.                          *
  *                                                                            *
  *   This program is distributed in the hope that it will be useful,          *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of           *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
- *   GNU General Public License for more details.                             *
+ *   GNU Lesser General Public License for more details.                      *
  *                                                                            *
- *   You should have received a copy of the GNU General Public License        *
- *   along with this program; if not, write to the                            *
+ *   You should have received a copy of the GNU Lesser General Public         *
+ *   License along with this program; if not, write to the                    *
  *   Free Software Foundation, Inc.,                                          *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
  *****************************************************************************/
@@ -154,7 +154,7 @@ namespace LibSerial
         void SetFlowControl(const FlowControl& flowControlType);
 
         /**
-         * @brief Get the current flow control setting.
+         * @brief Gets the current flow control setting.
          * @return Returns the flow control type of the serial port.
          */
         FlowControl GetFlowControl();
@@ -251,24 +251,16 @@ namespace LibSerial
 
         /**
          * @brief Gets the serial port file descriptor.
+         * @return Returns the serial port file descriptor.
          */
         int GetFileDescriptor();
 
         /**
-         * @brief Reads the specified number of bytes from the serial port.
-         *        The method will timeout if no data is received in the specified
-         *        number of milliseconds (msTimeout). If msTimeout is 0, then
-         *        this method will block until all requested bytes are
-         *        received. If numberOfBytes is zero, the method will return
-         *        immediately. In all cases, received data remains available
-         *        in the charBuffer on return from this method.
-         * @param charBuffer The character array buffer to place serial data into.
-         * @param numberOfBytes The number of bytes to read before returning.
-         * @param msTimeout The timeout period in milliseconds.
+         * @brief Gets a list of available serial ports.
+         * @return Returns a std::vector of std::strings with the name of
+         *         each available serial port. 
          */
-        void Read(char&              charBuffer,
-                  const unsigned int numberOfBytes = 0,
-                  const unsigned int msTimeout  = 0);
+        std::vector<std::string> GetAvailableSerialPorts();
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -282,9 +274,25 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void Read(unsigned char&     charBuffer,
-                  const unsigned int numberOfBytes = 0,
-                  const unsigned int msTimeout  = 0);
+        void Read(char&         charBuffer,
+                  const ssize_t numberOfBytes = 0,
+                  const ssize_t msTimeout  = 0);
+
+        /**
+         * @brief Reads the specified number of bytes from the serial port.
+         *        The method will timeout if no data is received in the specified
+         *        number of milliseconds (msTimeout). If msTimeout is 0, then
+         *        this method will block until all requested bytes are
+         *        received. If numberOfBytes is zero, the method will return
+         *        immediately. In all cases, received data remains available
+         *        in the charBuffer on return from this method.
+         * @param charBuffer The character array buffer to place serial data into.
+         * @param numberOfBytes The number of bytes to read before returning.
+         * @param msTimeout The timeout period in milliseconds.
+         */
+        void Read(unsigned char& charBuffer,
+                  const ssize_t  numberOfBytes = 0,
+                  const ssize_t  msTimeout  = 0);
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -299,9 +307,9 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void Read(DataBuffer&        dataBuffer,
-                  const unsigned int numberOfBytes = 0,
-                  const unsigned int msTimeout  = 0);
+        void Read(DataBuffer&   dataBuffer,
+                  const ssize_t numberOfBytes = 0,
+                  const ssize_t msTimeout  = 0);
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -316,9 +324,9 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void Read(std::string&       dataString,
-                  const unsigned int numberOfBytes = 0,
-                  const unsigned int msTimeout  = 0);
+        void Read(std::string&  dataString,
+                  const ssize_t numberOfBytes = 0,
+                  const ssize_t msTimeout  = 0);
 
         /**
          * @brief Reads a single byte from the serial port.
@@ -329,8 +337,8 @@ namespace LibSerial
          * @param charbuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void ReadByte(char&              charBuffer,
-                      const unsigned int msTimeout = 0);
+        void ReadByte(char&         charBuffer,
+                      const ssize_t msTimeout = 0);
 
         /**
          * @brief Reads a single byte from the serial port.
@@ -341,8 +349,8 @@ namespace LibSerial
          * @param charbuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void ReadByte(unsigned char&     charBuffer,
-                      const unsigned int msTimeout = 0);
+        void ReadByte(unsigned char& charBuffer,
+                      const ssize_t  msTimeout = 0);
 
         /**
          * @brief Reads a line of characters from the serial port.
@@ -358,17 +366,17 @@ namespace LibSerial
          * @param msTimeout The timeout value to return if a line termination
          *        character is not read.
          */
-        void ReadLine(std::string&       dataString,
-                      const char         lineTerminator = '\n',
-                      const unsigned int msTimeout = 0);
+        void ReadLine(std::string&   dataString,
+                      const char     lineTerminator = '\n',
+                      const ssize_t  msTimeout = 0);
 
         /**
          * @brief Writes a character array buffer to the serial port.
          * @param charBuffer The character array to be written to the serial port.
          * @param numberOfBytes The number of bytes to write to the serial port.
          */
-        void Write(const char*        charBuffer,
-                   const unsigned int numberOfBytes);
+        void Write(const char*   charBuffer,
+                   const ssize_t numberOfBytes);
 
         /**
          * @brief Writes a character array buffer to the serial port.
@@ -376,7 +384,7 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to write to the serial port.
          */
         void Write(const unsigned char* charBuffer,
-                   const unsigned int   numberOfBytes);
+                   const ssize_t        numberOfBytes);
 
         /**
          * @brief Writes a DataBuffer vector to the serial port.

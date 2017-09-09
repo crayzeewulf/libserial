@@ -29,18 +29,19 @@ If you are a developer interested in utilizing the unit tests, ensure serial por
 #define TEST_SERIAL_PORT_2 "/dev/ttyUSB1"
 ```
 
-The unit tests will be built during the make step above and another convenient method we've provided is by running the compile script which uses cmake:
+The unit tests will be built during the make step above or you can build them by simply by running the compile script (which uses cmake):
 
 ```
 ./compile.sh
 ```
 
-The unit tests built using make can be executed from the libserial/test/ directory:
+Unit test executables built using make can be run from the libserial/test/ directory:
 ```
 ./test/LibSerialTests
 ./unit_tests
 ```
-If cmake or the compile script was used to build the library, unit tests can be executed from the libserial/build/bin/ directory: 
+
+Alternatively, unit test executables built using the compile script can be run from the libserial/build/bin/ directory: 
 ```
 ./build/bin/LibSerialTests
 ./build/bin/unit_tests
@@ -48,3 +49,6 @@ If cmake or the compile script was used to build the library, unit tests can be 
 
 ----
 Complete documentation is available [here](http://libserial.readthedocs.io/en/latest/index.html).
+
+----
+(You can let people know that this Repository was useful to you by clicking the "Star" in the upper right of the repository home page!)

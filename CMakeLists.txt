@@ -1,6 +1,8 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 PROJECT(LibSerial)
+SET(LibSerial_VERSION_MAJOR 1)
+SET(LibSerial_VERSION_MINOR 0)
 
 INCLUDE(ExternalProject)
 
@@ -9,7 +11,7 @@ ENABLE_TESTING()
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 FIND_PACKAGE(Threads REQUIRED)
-#FIND_PACKAGE(SIP REQUIRED)
+FIND_PACKAGE(PythonLibs REQUIRED)
 FIND_PACKAGE(Boost COMPONENTS unit_test_framework REQUIRED)
 
 
@@ -21,8 +23,10 @@ ADD_DEFINITIONS(
   -Warray-bounds
   -Wcast-align
   -Wchar-subscripts
+  -Wconversion
   -Wdouble-promotion
   -Wextra
+  -Wfatal-errors
   -Wformat-security
   -Wlogical-op
   -Wno-long-long
@@ -105,6 +109,7 @@ INCLUDE_DIRECTORIES(
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+SET(CMAKE_INSTALL_PREFIX /usr/include)
 
 ADD_SUBDIRECTORY(examples)
 ADD_SUBDIRECTORY(sip)

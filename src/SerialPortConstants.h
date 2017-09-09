@@ -1,20 +1,20 @@
 /******************************************************************************
  *   @file SerialPortConstants.h                                              *
- *   @copyright (C) 2004 by Manish Pagey                                      *
+ *   @copyright (C) 2015 Manish Pagey                                         *
  *   crayzeewulf@users.sourceforge.net                                        *
  *                                                                            *
  *   This program is free software; you can redistribute it and/or modify     *
- *   it under the terms of the GNU General Public License as published by     *
- *   the Free Software Foundation; either version 2 of the License, or        *
- *   (at your option) any later version.                                      *
+ *   it under the terms of the GNU Lessser General Public License as          *
+ *   published by the Free Software Foundation; either version 2 of the       *
+ *   License, or (at your option) any later version.                          *
  *                                                                            *
  *   This program is distributed in the hope that it will be useful,          *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of           *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
- *   GNU General Public License for more details.                             *
+ *   GNU Lesser General Public License for more details.                      *
  *                                                                            *
- *   You should have received a copy of the GNU General Public License        *
- *   along with this program; if not, write to the                            *
+ *   You should have received a copy of the GNU Lesser General Public         *
+ *   License along with this program; if not, write to the                    *
  *   Free Software Foundation, Inc.,                                          *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
  *****************************************************************************/
@@ -166,12 +166,14 @@ namespace LibSerial
         BAUD_1000000 = B1000000, 
         BAUD_1152000 = B1152000, 
         BAUD_1500000 = B1500000,
+#if __MAX_BAUD > B2000000
         BAUD_2000000 = B2000000,
         BAUD_2500000 = B2500000,
         BAUD_3000000 = B3000000,
         BAUD_3500000 = B3500000,
         BAUD_4000000 = B4000000,
-#endif
+#endif /* __MAX_BAUD */
+#endif /* __linux__ */
         BAUD_DEFAULT = BAUD_115200,
         BAUD_INVALID = std::numeric_limits<speed_t>::max()
     };
