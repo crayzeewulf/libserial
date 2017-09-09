@@ -1,19 +1,20 @@
 /******************************************************************************
  *   @file SerialStreamBuf.h                                                  *
- *   @copyright                                                               *
+ *   @copyright (C) 2004 Manish Pagey                                         *
+ *   crayzeewulf@users.sourceforge.net                                        *
  *                                                                            *
  *   This program is free software; you can redistribute it and/or modify     *
- *   it under the terms of the GNU General Public License as published by     *
- *   the Free Software Foundation; either version 2 of the License, or        *
- *   (at your option) any later version.                                      *
+ *   it under the terms of the GNU Lessser General Public License as          *
+ *   published by the Free Software Foundation; either version 2 of the       *
+ *   License, or (at your option) any later version.                          *
  *                                                                            *
  *   This program is distributed in the hope that it will be useful,          *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of           *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
- *   GNU General Public License for more details.                             *
+ *   GNU Lesser General Public License for more details.                      *
  *                                                                            *
- *   You should have received a copy of the GNU General Public License        *
- *   along with this program; if not, write to the                            *
+ *   You should have received a copy of the GNU Lesser General Public         *
+ *   License along with this program; if not, write to the                    *
  *   Free Software Foundation, Inc.,                                          *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
  *****************************************************************************/
@@ -23,6 +24,7 @@
 
 #include "SerialPortConstants.h"
 #include <memory>
+#include <vector>
 
 namespace LibSerial
 {
@@ -153,7 +155,7 @@ namespace LibSerial
         void SetFlowControl(const FlowControl& flowControl);
 
         /**
-         * @brief Get the current flow control setting.
+         * @brief Gets the current flow control setting.
          * @return Returns the flow control type of the serial port.
          */
         FlowControl GetFlowControl();
@@ -210,8 +212,16 @@ namespace LibSerial
 
         /**
          * @brief Gets the serial port file descriptor.
+         * @return Returns the serial port file descriptor.
          */
         int GetFileDescriptor();
+
+        /**
+         * @brief Gets a list of available serial ports.
+         * @return Returns a std::vector of std::strings with the name of
+         *         each available serial port. 
+         */
+        std::vector<std::string> GetAvailableSerialPorts();
 
 
     protected:
@@ -229,9 +239,15 @@ namespace LibSerial
          *        In the case of SerialStreamBuffer, we want to keep using
          *        unbuffered I/O. Hence, using this method has no effect at
          *        present.
+         *
+         *
+         * @param character Pointer to the character buffer to write to the serial port.
+         * @param numberOfBytes The number of characters to write to the serial port.
+         * @return Returns a pointer to this streambuf object.
+         *
          */
-        virtual std::streambuf* setbuf(char_type*, 
-                                       std::streamsize) override;
+        virtual std::streambuf* setbuf(char_type* character, 
+                                       std::streamsize numberOfBytes) override;
 
         /**
          * @brief Writes up to n characters from the character sequence at 

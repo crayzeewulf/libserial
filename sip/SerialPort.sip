@@ -9,7 +9,7 @@ using namespace LibSerial;
 public:
     explicit SerialPort();
 
-    explicit SerialPort(const std::string&   fileName,
+    explicit SerialPort(const std::string&              fileName,
                         const LibSerial::BaudRate&      baudRate        = LibSerial::BaudRate::BAUD_DEFAULT,
                         const LibSerial::CharacterSize& characterSize   = LibSerial::CharacterSize::CHAR_SIZE_DEFAULT,
                         const LibSerial::FlowControl&   flowControlType = LibSerial::FlowControl::FLOW_CONTROL_DEFAULT,
@@ -106,13 +106,19 @@ public:
     int
     GetFileDescriptor();
 
+    typedef std::vector<unsigned char> DataBuffer;
+    
+    // NOTE: Python3 provides a mechanism for method overloading, however Python2 does not.
+    // void
+    // Read(char&              charBuffer,
+    //      const unsigned int numberOfBytes = 0,
+    //      const unsigned int msTimeout  = 0);
+
     void
     Read(unsigned char&     charBuffer,
          const unsigned int numberOfBytes = 0,
          const unsigned int msTimeout  = 0);
 
-    typedef std::vector<unsigned char> DataBuffer;
-    
     void
     Read(DataBuffer& dataBuffer,
          const unsigned int numOfBytes = 0,
@@ -127,11 +133,21 @@ public:
     ReadByte(unsigned char&     charBuffer,
              const unsigned int msTimeout = 0);
 
+    // NOTE: Python3 provides a mechanism for method overloading, however Python2 does not.
+    // void
+    // ReadByte(char&              charBuffer,
+    //          const unsigned int msTimeout = 0);
+
     void
     ReadLine(std::string&       dataString,
              const char         lineTerminator = 10, // Sip does not like '\n'
              const unsigned int msTimeout = 0);
 
+    // NOTE: Python3 provides a mechanism for method overloading, however Python2 does not.
+    // void
+    // Write(const char*        charBuffer,
+    //       const unsigned int numberOfBytes);
+    
     void
     Write(const unsigned char* charBuffer,
           const unsigned int   numberOfBytes);
@@ -141,6 +157,10 @@ public:
 
     void
     Write(const std::string& dataString);
+
+    // NOTE: Python3 provides a mechanism for method overloading, however Python2 does not.
+    // void
+    // WriteByte(const char charbuffer);
 
     void
     WriteByte(const unsigned char charbuffer);
