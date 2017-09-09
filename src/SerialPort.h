@@ -274,9 +274,9 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void Read(char&         charBuffer,
-                  const ssize_t numberOfBytes = 0,
-                  const ssize_t msTimeout  = 0);
+        void Read(char&        charBuffer,
+                  const size_t numberOfBytes = 0,
+                  const size_t msTimeout  = 0);
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -291,8 +291,8 @@ namespace LibSerial
          * @param msTimeout The timeout period in milliseconds.
          */
         void Read(unsigned char& charBuffer,
-                  const ssize_t  numberOfBytes = 0,
-                  const ssize_t  msTimeout  = 0);
+                  const size_t   numberOfBytes = 0,
+                  const size_t   msTimeout  = 0);
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -307,9 +307,9 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void Read(DataBuffer&   dataBuffer,
-                  const ssize_t numberOfBytes = 0,
-                  const ssize_t msTimeout  = 0);
+        void Read(DataBuffer&  dataBuffer,
+                  const size_t numberOfBytes = 0,
+                  const size_t msTimeout  = 0);
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -324,9 +324,9 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void Read(std::string&  dataString,
-                  const ssize_t numberOfBytes = 0,
-                  const ssize_t msTimeout  = 0);
+        void Read(std::string& dataString,
+                  const size_t numberOfBytes = 0,
+                  const size_t msTimeout  = 0);
 
         /**
          * @brief Reads a single byte from the serial port.
@@ -337,8 +337,8 @@ namespace LibSerial
          * @param charbuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void ReadByte(char&         charBuffer,
-                      const ssize_t msTimeout = 0);
+        void ReadByte(char&        charBuffer,
+                      const size_t msTimeout = 0);
 
         /**
          * @brief Reads a single byte from the serial port.
@@ -350,7 +350,7 @@ namespace LibSerial
          * @param msTimeout The timeout period in milliseconds.
          */
         void ReadByte(unsigned char& charBuffer,
-                      const ssize_t  msTimeout = 0);
+                      const size_t   msTimeout = 0);
 
         /**
          * @brief Reads a line of characters from the serial port.
@@ -366,17 +366,17 @@ namespace LibSerial
          * @param msTimeout The timeout value to return if a line termination
          *        character is not read.
          */
-        void ReadLine(std::string&   dataString,
-                      const char     lineTerminator = '\n',
-                      const ssize_t  msTimeout = 0);
+        void ReadLine(std::string&  dataString,
+                      const char    lineTerminator = '\n',
+                      const size_t  msTimeout = 0);
 
         /**
          * @brief Writes a character array buffer to the serial port.
          * @param charBuffer The character array to be written to the serial port.
          * @param numberOfBytes The number of bytes to write to the serial port.
          */
-        void Write(const char*   charBuffer,
-                   const ssize_t numberOfBytes);
+        void Write(const char*  charBuffer,
+                   const size_t numberOfBytes);
 
         /**
          * @brief Writes a character array buffer to the serial port.
@@ -384,7 +384,7 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to write to the serial port.
          */
         void Write(const unsigned char* charBuffer,
-                   const ssize_t        numberOfBytes);
+                   const size_t         numberOfBytes);
 
         /**
          * @brief Writes a DataBuffer vector to the serial port.
