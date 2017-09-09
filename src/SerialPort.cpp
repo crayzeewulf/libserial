@@ -2112,7 +2112,7 @@ namespace LibSerial
         }
 
         // Loop until the number of bytes requested have been read or the timeout has elapsed.
-        while (number_of_bytes_read < (int)numberOfBytes)
+        while (number_of_bytes_read < numberOfBytes)
         {
             read_result = read(this->mFileDescriptor,
                                &charBuffer + number_of_bytes_read,
@@ -2122,7 +2122,7 @@ namespace LibSerial
             {
                 number_of_bytes_read += read_result;
 
-                if (number_of_bytes_read == (int)numberOfBytes)
+                if (number_of_bytes_read == numberOfBytes)
                 {
                     break;
                 }
@@ -2195,7 +2195,7 @@ namespace LibSerial
         }
 
         // Loop until the number of bytes requested have been read or the timeout has elapsed.
-        while (number_of_bytes_read < (int)numberOfBytes)
+        while (number_of_bytes_read < numberOfBytes)
         {
             read_result = read(this->mFileDescriptor,
                                &charBuffer + number_of_bytes_read,
@@ -2205,7 +2205,7 @@ namespace LibSerial
             {
                 number_of_bytes_read += read_result;
 
-                if (number_of_bytes_read == (int)numberOfBytes)
+                if (number_of_bytes_read == numberOfBytes)
                 {
                     break;
                 }
@@ -2544,7 +2544,7 @@ namespace LibSerial
                errno != EWOULDBLOCK);
 
         if (num_of_bytes_written < 0 ||
-            num_of_bytes_written < (int)numberOfBytes)
+            num_of_bytes_written < numberOfBytes)
         {
             throw std::runtime_error(strerror(errno));
         }
@@ -2584,7 +2584,7 @@ namespace LibSerial
                errno != EWOULDBLOCK);
 
         if (num_of_bytes_written < 0 ||
-            num_of_bytes_written < (int)numberOfBytes)
+            num_of_bytes_written < numberOfBytes)
         {
             throw std::runtime_error(strerror(errno));
         }
