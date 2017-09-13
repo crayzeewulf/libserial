@@ -1444,7 +1444,7 @@ namespace LibSerial
                                          &serial_port_info);
 
                     // Check for errors.
-                    if (ioctl_result  < 0)
+                    if (ioctl_result < 0)
                     {
                         throw std::runtime_error(strerror(errno));
                     }
