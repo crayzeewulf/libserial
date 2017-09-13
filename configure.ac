@@ -50,8 +50,8 @@ AM_CONDITIONAL([PYTHON], [test "${with_python}" != "no"])
 AC_OUTPUT([Makefile
 doxygen.conf
 libserial.spec
-doc/UML/Makefile
-doc/Makefile
+docs/UML/Makefile
+docs/Makefile
 examples/Makefile
 sip/configure.py
 sip/Makefile

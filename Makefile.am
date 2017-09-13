@@ -1,4 +1,4 @@
-SUBDIRS = src doc examples test
+SUBDIRS = src docs examples test
 
 if PYTHON
 SUBDIRS += sip
