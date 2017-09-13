@@ -514,31 +514,53 @@ protected:
     void testSerialStreamGetFileDescriptor()
     {
         serialStream1.Open(TEST_SERIAL_PORT_1);
-        ASSERT_TRUE(serialStream1.IsOpen());
+        serialStream2.Open(TEST_SERIAL_PORT_2);
 
-        int fileDescriptor = serialStream1.GetFileDescriptor();
-        ASSERT_GT(fileDescriptor, 0);
+        ASSERT_TRUE(serialStream1.IsOpen());
+        ASSERT_TRUE(serialStream2.IsOpen());
+
+        int fileDescriptor1 = serialStream1.GetFileDescriptor();
+        int fileDescriptor2 = serialStream2.GetFileDescriptor();
+
+        ASSERT_GT(fileDescriptor1, 0);
+        ASSERT_GT(fileDescriptor2, 0);
 
         serialStream1.Close();
+        serialStream2.Close();
+
         ASSERT_FALSE(serialStream1.IsOpen());
+        ASSERT_FALSE(serialStream2.IsOpen());
     }
 
     void testSerialStreamGetAvailableSerialPorts()
     {
         serialStream1.Open(TEST_SERIAL_PORT_1);
+        serialStream2.Open(TEST_SERIAL_PORT_2);
+
         ASSERT_TRUE(serialStream1.IsOpen());
+        ASSERT_TRUE(serialStream2.IsOpen());
 
-        std::vector<std::string> serialPorts;
-        serialPorts.clear();
+        std::vector<std::string> serialPorts1;
+        std::vector<std::string> serialPorts2;
+ 
+        serialPorts1.clear();
+        serialPorts2.clear();
+ 
+        serialPorts1 = serialStream1.GetAvailableSerialPorts();
+        serialPorts2 = serialStream2.GetAvailableSerialPorts();
+ 
+        int portCount1 = (int)serialPorts1.size();
+        int portCount2 = (int)serialPorts2.size();
 
-        serialPorts = serialStream1.GetAvailableSerialPorts();
-
-        int portCount = (int)serialPorts.size();
-        
-        ASSERT_GE(portCount, 2);
+        ASSERT_GE(portCount1, 2);
+        ASSERT_GE(portCount2, 2);
+        ASSERT_EQ(portCount1, portCount2);
 
         serialStream1.Close();
+        serialStream2.Close();
+
         ASSERT_FALSE(serialStream1.IsOpen());
+        ASSERT_FALSE(serialStream2.IsOpen());
     }
 
     void testSerialStreamReadWriteByte()
@@ -1081,31 +1103,53 @@ protected:
     void testSerialPortGetFileDescriptor()
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
-        ASSERT_TRUE(serialPort1.IsOpen());
+        serialPort2.Open(TEST_SERIAL_PORT_2);
 
-        int fileDescriptor = serialPort1.GetFileDescriptor();
-        ASSERT_GT(fileDescriptor, 0);
+        ASSERT_TRUE(serialPort1.IsOpen());
+        ASSERT_TRUE(serialPort2.IsOpen());
+
+        int fileDescriptor1 = serialPort1.GetFileDescriptor();
+        int fileDescriptor2 = serialPort2.GetFileDescriptor();
+
+        ASSERT_GT(fileDescriptor1, 0);
+        ASSERT_GT(fileDescriptor2, 0);
 
         serialPort1.Close();
+        serialPort2.Close();
+
         ASSERT_FALSE(serialPort1.IsOpen());
+        ASSERT_FALSE(serialPort2.IsOpen());
     }
 
     void testSerialPortGetAvailableSerialPorts()
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
+        serialPort2.Open(TEST_SERIAL_PORT_2);
+
         ASSERT_TRUE(serialPort1.IsOpen());
+        ASSERT_TRUE(serialPort2.IsOpen());
 
-        std::vector<std::string> serialPorts;
-        serialPorts.clear();
+        std::vector<std::string> serialPorts1;
+        std::vector<std::string> serialPorts2;
+ 
+        serialPorts1.clear();
+        serialPorts2.clear();
+ 
+        serialPorts1 = serialPort1.GetAvailableSerialPorts();
+        serialPorts2 = serialPort2.GetAvailableSerialPorts();
+ 
+        int portCount1 = (int)serialPorts1.size();
+        int portCount2 = (int)serialPorts2.size();
 
-        serialPorts = serialPort1.GetAvailableSerialPorts();
-
-        int portCount = (int)serialPorts.size();
-        
-        ASSERT_GE(portCount, 2);
+        ASSERT_GE(portCount1, 2);
+        ASSERT_GE(portCount2, 2);
+        ASSERT_EQ(portCount1, portCount2);
 
         serialPort1.Close();
+        serialPort2.Close();
+
         ASSERT_FALSE(serialPort1.IsOpen());
+        ASSERT_FALSE(serialPort2.IsOpen());
     }
 
     void testSerialPortReadCharBufferWriteCharBuffer()
