@@ -25,6 +25,13 @@
 #include <thread>
 #include <unistd.h>
 
+
+#include <stdio.h>
+#include <sys/socket.h>
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/rfcomm.h>
+
+
 #include <SerialPort.h>
 #include <SerialStream.h>
 
@@ -641,10 +648,16 @@ protected:
     void testSerialPortOpenClose()
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
+        serialPort2.Open(TEST_SERIAL_PORT_2);
+
         ASSERT_TRUE(serialPort1.IsOpen());
+        ASSERT_TRUE(serialPort2.IsOpen());
 
         serialPort1.Close();
+        serialPort2.Close();
+
         ASSERT_FALSE(serialPort1.IsOpen());
+        ASSERT_FALSE(serialPort2.IsOpen());
     }
 
     void testSerialPortFlushInputBuffer()

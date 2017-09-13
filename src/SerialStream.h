@@ -128,8 +128,8 @@ namespace LibSerial
         virtual ~SerialStream(); 
 
         /**
-         * @brief Opens the serial port associated with the specified
-         *        fileName, and the specified mode, openMode.
+         * @brief Opens the serial stream associated with the specified
+         *        file name and the specified mode.
          * @param fileName The file name of the serial stream object.
          * @param openMode The communication mode status when the serial
          *        communication port is opened.
