@@ -33,7 +33,7 @@ SerialStream::SerialStream()
 }
 
 SerialStream::SerialStream(const std::string& fileName,
-                           ios_base::openmode openMode)
+                           std::ios_base::openmode openMode)
     : std::iostream(0)
     , mIOBuffer(0) 
 {

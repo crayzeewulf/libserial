@@ -93,36 +93,62 @@ namespace LibSerial
      *         bad_exception
      */
 
+    /**
+     * @brief Exception error thrown when the serial port is not open.
+     */
     class NotOpen : public std::logic_error
     {
     public:
+        /**
+         * @brief Exception error thrown when the serial port is not open.
+         */
         NotOpen(const std::string& whatArg)
             : logic_error(whatArg)
         {
         }
     };
 
+    /**
+     * @brief Exception error thrown when the serial port is already open.
+     */
     class AlreadyOpen : public std::logic_error
     {
     public:
+        /**
+         * @brief Exception error thrown when the serial port is already open.
+         */
         AlreadyOpen(const std::string& whatArg)
             : logic_error(whatArg)
         {
         }
     };
 
+    /**
+     * @brief Exception error thrown when the serial port could not be opened.
+     */
     class OpenFailed : public std::runtime_error
     {
     public:
+        /**
+         * @brief Exception error thrown when the serial port could not be opened.
+         */
         OpenFailed(const std::string& whatArg)
             : runtime_error(whatArg)
         {
         }
     };
 
+    /**
+     * @brief Exception error thrown when data could not be read from the
+     *        serial port before the timeout had been exceeded.
+     */
     class ReadTimeout : public std::runtime_error
     {
     public:
+        /**
+         * @brief Exception error thrown when data could not be read from the
+         *        serial port before the timeout had been exceeded.
+         */
         ReadTimeout(const std::string& whatArg)
             : runtime_error(whatArg)
         {

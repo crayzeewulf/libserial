@@ -69,7 +69,7 @@ namespace LibSerial
         explicit SerialStream();
   
         /**
-         * @brief Constructor that takes a filename and an openmode to
+         * @brief Constructor that takes a file name and an open mode to
          *        construct a SerialStream object. This results in a
          *        call to basic_fstream::open(s,mode). This is the only
          *        way to contruct an object of this class. We have to
@@ -90,8 +90,8 @@ namespace LibSerial
          *        stream is in a good state before using it for any further
          *        I/O operations.
          *
-         * @param fileName The filename of the serial port. 
-         * @param openMode The openmode for the serial port file. 
+         * @param fileName The file name of the serial port. 
+         * @param openMode The open mode for the serial port file. 
          *
          */
         explicit SerialStream(const std::string& fileName, 
@@ -105,13 +105,13 @@ namespace LibSerial
          *
          * @note See https://sourceforge.net/tracker/index.php?func=detail&aid=2137885&group_id=9432&atid=359432
          *
-         * @param fileName The file descriptor of the serial stream object.
+         * @param fileName The file name of the serial stream.
          * @param baudRate The communications baud rate.
          * @param characterSize The size of the character buffer for
          *        storing read/write streams.
-         * @param parityType The parity type for the serial stream object.
-         * @param numberOfStopBits The number of stop bits.
-         * @param flowControlType Flow control for the serial data stream.
+         * @param parityType The parity type for the serial stream.
+         * @param stopBits The number of stop bits for the serial stream.
+         * @param flowControlType The flow control type for the serial stream.
          */
         SerialStream(const std::string&   fileName,
                      const BaudRate&      baudRate        = BaudRate::BAUD_DEFAULT,
@@ -130,7 +130,7 @@ namespace LibSerial
         /**
          * @brief Opens the serial port associated with the specified
          *        fileName, and the specified mode, openMode.
-         * @param fileName The file descriptor of the serial stream object.
+         * @param fileName The file name of the serial stream object.
          * @param openMode The communication mode status when the serial
          *        communication port is opened.
          */
@@ -239,7 +239,7 @@ namespace LibSerial
 
         /**
          * @brief Sets the minimum number of characters for non-canonical reads.
-         * @param vMin the number of minimum characters to be set.
+         * @param vmin the number of minimum characters to be set.
          */
         void SetVMin(const short& vmin);
 
