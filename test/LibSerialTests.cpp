@@ -25,13 +25,6 @@
 #include <thread>
 #include <unistd.h>
 
-
-#include <stdio.h>
-#include <sys/socket.h>
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/rfcomm.h>
-
-
 #include <SerialPort.h>
 #include <SerialStream.h>
 
