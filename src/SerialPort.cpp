@@ -30,6 +30,9 @@
 
 namespace LibSerial 
 {
+    /**
+     * @brief The SerialPort Implementation Class.
+     */
     class SerialPort::Implementation
     {
     public:
@@ -39,16 +42,16 @@ namespace LibSerial
         Implementation();
 
         /**
-         * @brief Constructor that allows one to create a SerialPort
-         *        instance and also initialize the corresponding serial
+         * @brief Constructor that allows a SerialPort instance to be 
+         *        created and also initialize the corresponding serial
          *        port with the specified parameters.
-         * @param fileName The file descriptor of the serial stream object.
+         * @param fileName The file name of the serial port.
          * @param baudRate The communications baud rate.
          * @param characterSize The size of the character buffer for
          *        storing read/write streams.
-         * @param parityType The parity type for the serial stream object.
-         * @param numberOfStopBits The number of stop bits.
-         * @param flowControlType Flow control for the serial data stream.
+         * @param parityType The parity type for the serial port.
+         * @param stopBits The number of stop bits for the serial port.
+         * @param flowControlType The flow control type for the serial port.
          */
         Implementation(const std::string&   fileName,
                        const BaudRate&      baudRate,
@@ -65,11 +68,11 @@ namespace LibSerial
         /**
          * @brief Opens the serial port associated with the specified
          *        fileName, and the specified mode, openMode.
-         * @param fileName The file descriptor of the serial stream object.
+         * @param fileName The file name of the serial port.
          * @param openMode The communication mode status when the serial
          *        communication port is opened.
          */
-        void Open(const std::string& filename,
+        void Open(const std::string& fileName,
                   std::ios_base::openmode openMode);
 
         /**
@@ -137,7 +140,7 @@ namespace LibSerial
          * @brief Sets flow control for the serial port.
          * @param flowControlType The flow control type to be set.
          */
-        void SetFlowControl(const FlowControl& flowControl);
+        void SetFlowControl(const FlowControl& flowControlType);
 
         /**
          * @brief Get the current flow control setting.
@@ -208,7 +211,7 @@ namespace LibSerial
 
         /**
          * @brief Sets the serial port RTS line status.
-         * @param dtrState The state to set the RTS line
+         * @param rtsState The state to set the RTS line
          */
         void SetRTS(const bool rtsState);
 
@@ -317,6 +320,7 @@ namespace LibSerial
          *        of milliseconds (msTimeout), then this method will
          *        throw a ReadTimeout exception. If msTimeout is 0,
          *        then this method will block until data is available.
+         * @param charBuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
         void ReadByte(char&        charBuffer, 
@@ -328,6 +332,7 @@ namespace LibSerial
          *        of milliseconds (msTimeout), then this method will
          *        throw a ReadTimeout exception. If msTimeout is 0,
          *        then this method will block until data is available.
+         * @param charBuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
         void ReadByte(unsigned char& charBuffer, 
@@ -497,10 +502,10 @@ namespace LibSerial
     }
 
     void
-    SerialPort::Open(const std::string& filename,
+    SerialPort::Open(const std::string& fileName,
                      std::ios_base::openmode openMode)
     {
-        mImpl->Open(filename,
+        mImpl->Open(fileName,
                     openMode);
         return;
     }
@@ -579,9 +584,9 @@ namespace LibSerial
     }
 
     void
-    SerialPort::SetFlowControl(const FlowControl& flowControl)
+    SerialPort::SetFlowControl(const FlowControl& flowControlType)
     {
-        mImpl->SetFlowControl(flowControl);
+        mImpl->SetFlowControl(flowControlType);
         return;
     }
 
@@ -853,7 +858,7 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::Open(const std::string& filename,
+    SerialPort::Implementation::Open(const std::string& fileName,
                                      std::ios_base::openmode openMode)
     {
         // Throw an exception if the port is already open.
@@ -885,7 +890,7 @@ namespace LibSerial
         }
 
         // Try to open the serial port. 
-        mFileDescriptor = open(filename.c_str(), flags);
+        mFileDescriptor = open(fileName.c_str(), flags);
         
         if (this->mFileDescriptor < 0)
         {

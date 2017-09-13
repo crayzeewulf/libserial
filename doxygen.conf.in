@@ -45,7 +45,7 @@ PROJECT_NUMBER         = 1.0.0
 # quick idea about the purpose of the project. Keep the description short.
 
 PROJECT_BRIEF          = "LibSerial provides a convenient, object oriented \
-						  approach to accessing serial ports on POSIX systems."
+                          approach to accessing serial ports on POSIX systems."
 
 # With the PROJECT_LOGO tag one can specify a logo or an icon that is included
 # in the documentation. The maximum height of the logo should not exceed 55
@@ -875,7 +875,8 @@ RECURSIVE              = NO
 # run.
 
 EXCLUDE                = build \
-						 sip
+                         sip \
+                         test
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
