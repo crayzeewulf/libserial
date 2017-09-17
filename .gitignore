@@ -38,7 +38,7 @@ Makefile.in
 .libs
 
 # Docs
-docs
+docs/html
 
 # Files resulting from Make
 aclocal.m4

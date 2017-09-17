@@ -3,7 +3,7 @@ ADD_EXECUTABLE(LibSerialTests
   )
 
 TARGET_LINK_LIBRARIES(LibSerialTests
-  libSerial
+  libserial
   GTestMain
 )
 
@@ -12,6 +12,6 @@ ADD_EXECUTABLE(unit_tests
   )
 
 TARGET_LINK_LIBRARIES(unit_tests
-  libSerial
+  libserial
   ${Boost_LIBRARIES}
 )
