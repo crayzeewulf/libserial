@@ -1,5 +1,5 @@
 ADD_LIBRARY(libserial SHARED
-    SerialPort.sip
+   SerialPort.sip
 	SerialPortConstants.sip
 	exception.sip
 	libserial.sip
@@ -9,7 +9,7 @@ ADD_LIBRARY(libserial SHARED
 )
 
 TARGET_LINK_LIBRARIES(libserial
-	libSerial
+	libserial_static
 )
 
 SET_TARGET_PROPERTIES(libserial

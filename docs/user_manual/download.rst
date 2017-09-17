@@ -1,6 +1,6 @@
 Download
 ========
 
-The latest version of LibSerial is 0.6.0rc2. You can download the source code
-for LibSerial-0.6.0rc2 from `here <https://sourceforge.net/projects/libserial/files/?source=navbar>`_. 
-Older versions of LibSerial may also be downloaded from the above site.
+The latest version of LibSerial is 1.0.0rc1. You can find the source code
+for LibSerial-1.0.0rc1 `here <https://github.com/crayzeewulf/libserial>`_. 
+Older versions of LibSerial may also be found at the above site.

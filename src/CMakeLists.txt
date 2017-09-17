@@ -1,10 +1,10 @@
-ADD_LIBRARY(libSerial STATIC
+ADD_LIBRARY(libserial_static STATIC
     SerialPort.cpp
     SerialStream.cc
     SerialStreamBuf.cc
 )
 
-SET_TARGET_PROPERTIES(libSerial
+SET_TARGET_PROPERTIES(libserial_static
 	PROPERTIES
 	PREFIX ""
 	SUFFIX .la
