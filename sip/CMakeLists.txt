@@ -1,5 +1,5 @@
 ADD_LIBRARY(libserial SHARED
-   SerialPort.sip
+    SerialPort.sip
 	SerialPortConstants.sip
 	exception.sip
 	libserial.sip

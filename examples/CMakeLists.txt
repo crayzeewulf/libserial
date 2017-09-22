@@ -3,7 +3,7 @@ ADD_EXECUTABLE(SerialPortReadExample
 )
 
 TARGET_LINK_LIBRARIES(SerialPortReadExample
-  libserial
+  libserial_static
 )
 
 ADD_EXECUTABLE(SerialPortWriteExample
@@ -11,7 +11,7 @@ ADD_EXECUTABLE(SerialPortWriteExample
 )
 
 TARGET_LINK_LIBRARIES(SerialPortWriteExample
-  libserial
+  libserial_static
 )
 
 ADD_EXECUTABLE(SerialStreamReadExample
@@ -19,7 +19,7 @@ ADD_EXECUTABLE(SerialStreamReadExample
 )
 
 TARGET_LINK_LIBRARIES(SerialStreamReadExample
-  libserial
+  libserial_static
 )
 
 ADD_EXECUTABLE(SerialStreamWriteExample
@@ -27,5 +27,5 @@ ADD_EXECUTABLE(SerialStreamWriteExample
 )
 
 TARGET_LINK_LIBRARIES(SerialStreamWriteExample
-  libserial
+  libserial_static
 )
