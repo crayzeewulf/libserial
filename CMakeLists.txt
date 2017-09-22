@@ -112,7 +112,6 @@ EXTERNALPROJECT_GET_PROPERTY(GTestExternal source_dir)
 INCLUDE_DIRECTORIES(
   BEFORE ${GTEST_PREFIX}/src/GTestExternal/googletest/include
   ${Boost_INCLUDE_DIRS}
-  src
   )
 
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -126,10 +125,10 @@ ADD_SUBDIRECTORY(sip)
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(test)
 
-INSTALL(
-  FILES src/SerialPort.h src/SerialPortConstants.h src/SerialStream.h src/SerialStreamBuf.h
-  DESTINATION "${CMAKE_INSTALL_PREFIX}/include"
-  )
+#INSTALL(
+#  FILES src/SerialPort.h src/SerialPortConstants.h src/SerialStream.h src/SerialStreamBuf.h
+#  DESTINATION "${CMAKE_INSTALL_PREFIX}/include"
+#  )
 
 #INSTALL(
 #  TARGETS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libserial.so ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libserial_static.la
