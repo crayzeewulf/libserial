@@ -2026,6 +2026,9 @@ TEST_F(LibSerialTest, testMultiThreadSerialStreamReadWrite)
 {
     SCOPED_TRACE("Test Multi-Thread Serial Stream Communication.");
 
+    std::cout << "Note: This test calls getline() which can block indefinitely "
+              << "should a newline character fail to be recieved." << std::endl;
+
     for (size_t i = 0; i < numberOfTestIterations; i++)
     {
         testMultiThreadSerialStreamReadWrite();
