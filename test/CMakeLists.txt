@@ -3,7 +3,7 @@ ADD_EXECUTABLE(LibSerialTests
   )
 
 TARGET_LINK_LIBRARIES(LibSerialTests
-  libserial
+  libserial_static
   GTestMain
 )
 
