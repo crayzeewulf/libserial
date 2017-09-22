@@ -29,6 +29,9 @@
 
 namespace LibSerial
 {
+    /**
+     * @brief The SerialStreamBuf Implementation Class.
+     */
     class SerialStreamBuf::Implementation
     {
     public:
@@ -38,16 +41,16 @@ namespace LibSerial
         Implementation();
 
         /**
-         * @brief Constructor that allows one to create a SerialPort
-         *        instance and also initialize the corresponding serial
+         * @brief Constructor that allows a SerialPort instance to be 
+         *        created and also initialize the corresponding serial
          *        port with the specified parameters.
-         * @param fileName The file descriptor of the serial stream object.
+         * @param fileName The file name of the serial stream.
          * @param baudRate The communications baud rate.
          * @param characterSize The size of the character buffer for
          *        storing read/write streams.
-         * @param parityType The parity type for the serial stream object.
-         * @param numberOfStopBits The number of stop bits.
-         * @param flowControlType Flow control for the serial data stream.
+         * @param parityType The parity type for the serial stream.
+         * @param stopBits The number of stop bits for the serial stream.
+         * @param flowControlType The flow control type for the serial stream.
          */
         Implementation(const std::string&   fileName,
                        const BaudRate&      baudRate,
@@ -62,13 +65,13 @@ namespace LibSerial
         ~Implementation();
 
         /**
-         * @brief Opens the serial port associated with the specified
-         *        fileName, and the specified mode, openMode.
-         * @param fileName The file descriptor of the serial stream object.
+         * @brief Opens the serial stream associated with the specified
+         *        file name and the specified mode.
+         * @param fileName The file name of the serial stream object.
          * @param openMode The communication mode status when the serial
          *        communication port is opened.
          */
-        void Open(const std::string& filename,
+        void Open(const std::string& fileName,
                   std::ios_base::openmode openMode);
 
         /**
@@ -137,7 +140,7 @@ namespace LibSerial
          * @brief Sets flow control for the serial port.
          * @param flowControlType The flow control type to be set.
          */
-        void SetFlowControl(const FlowControl& flowControl);
+        void SetFlowControl(const FlowControl& flowControlType);
 
         /**
          * @brief Get the current flow control setting.
@@ -262,7 +265,7 @@ namespace LibSerial
          * @param character The character to putback.
          * @return Returns The character iff successful, otherwise eof to signal an error.
          */
-        std::streambuf::int_type pbackfail(const int_type c);
+        std::streambuf::int_type pbackfail(const int_type character);
 
         /**
          * @brief Checks whether input is available on the port.
@@ -372,10 +375,10 @@ namespace LibSerial
     }
 
     void
-    SerialStreamBuf::Open(const std::string& filename,
+    SerialStreamBuf::Open(const std::string& fileName,
                           std::ios_base::openmode openMode)
     {
-        mImpl->Open(filename,
+        mImpl->Open(fileName,
                     openMode);
         return;
     }
@@ -623,7 +626,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::Open(const std::string& filename,
+    SerialStreamBuf::Implementation::Open(const std::string& fileName,
                                           std::ios_base::openmode openMode)
     {
         // Throw an exception if the port is already open.
@@ -655,7 +658,7 @@ namespace LibSerial
         }
 
         // Try to open the serial port. 
-        mFileDescriptor = open(filename.c_str(), flags);
+        mFileDescriptor = open(fileName.c_str(), flags);
         
         if (this->mFileDescriptor < 0)
         {
@@ -1441,7 +1444,7 @@ namespace LibSerial
                                          &serial_port_info);
 
                     // Check for errors.
-                    if (ioctl_result  < 0)
+                    if (ioctl_result < 0)
                     {
                         throw std::runtime_error(strerror(errno));
                     }

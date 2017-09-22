@@ -30,13 +30,14 @@
 namespace LibSerial 
 {
     /**
-     * @TODO The current implementation does not check if another process
+     * @todo The current implementation does not check if another process
      *       has locked the serial port device and does not lock the serial port
      *       device after opening it. This has been observed to cause problems
      *       while using this library while other programs such as minicom are
      *       also accessing the same device.  It would be useful to lock the
      *       serial port device when it is being used by this class.
      */
+
     class SerialPort
     {
     public:
@@ -55,13 +56,13 @@ namespace LibSerial
          * @brief Constructor that allows a SerialPort instance to be 
          *        created and also initialize the corresponding serial
          *        port with the specified parameters.
-         * @param fileName The file descriptor of the serial stream object.
+         * @param fileName The file name of the serial port.
          * @param baudRate The communications baud rate.
          * @param characterSize The size of the character buffer for
          *        storing read/write streams.
-         * @param parityType The parity type for the serial stream object.
-         * @param numberOfStopBits The number of stop bits.
-         * @param flowControlType Flow control for the serial data stream.
+         * @param parityType The parity type for the serial port.
+         * @param stopBits The number of stop bits for the serial port.
+         * @param flowControlType The flow control type for the serial port.
          */
         explicit SerialPort(const std::string&   fileName,
                             const BaudRate&      baudRate        = BaudRate::BAUD_DEFAULT,
@@ -77,8 +78,8 @@ namespace LibSerial
 
         /**
          * @brief Opens the serial port associated with the specified
-         *        fileName, and the specified mode, openMode.
-         * @param fileName The file descriptor of the serial stream object.
+         *        file name and the specified mode.
+         * @param fileName The file name of the serial port object.
          * @param openMode The communication mode status when the serial
          *        communication port is opened.
          */
@@ -186,7 +187,7 @@ namespace LibSerial
         /**
          * @brief Sets the minimum number of characters for non-canonical reads.
          * @note See VMIN in man termios(3).
-         * @param vMin the number of minimum characters to be set.
+         * @param vmin the number of minimum characters to be set.
          */
         void SetVMin(const short vmin);
 
@@ -274,9 +275,9 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void Read(char&         charBuffer,
-                  const ssize_t numberOfBytes = 0,
-                  const ssize_t msTimeout  = 0);
+        void Read(char&        charBuffer,
+                  const size_t numberOfBytes = 0,
+                  const size_t msTimeout  = 0);
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -291,8 +292,8 @@ namespace LibSerial
          * @param msTimeout The timeout period in milliseconds.
          */
         void Read(unsigned char& charBuffer,
-                  const ssize_t  numberOfBytes = 0,
-                  const ssize_t  msTimeout  = 0);
+                  const size_t   numberOfBytes = 0,
+                  const size_t   msTimeout  = 0);
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -307,9 +308,9 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void Read(DataBuffer&   dataBuffer,
-                  const ssize_t numberOfBytes = 0,
-                  const ssize_t msTimeout  = 0);
+        void Read(DataBuffer&  dataBuffer,
+                  const size_t numberOfBytes = 0,
+                  const size_t msTimeout  = 0);
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -324,9 +325,9 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void Read(std::string&  dataString,
-                  const ssize_t numberOfBytes = 0,
-                  const ssize_t msTimeout  = 0);
+        void Read(std::string& dataString,
+                  const size_t numberOfBytes = 0,
+                  const size_t msTimeout  = 0);
 
         /**
          * @brief Reads a single byte from the serial port.
@@ -334,11 +335,11 @@ namespace LibSerial
          *        of milliseconds (msTimeout), then this method will
          *        throw a ReadTimeout exception. If msTimeout is 0,
          *        then this method will block until data is available.
-         * @param charbuffer The character read from the serial port.
+         * @param charBuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void ReadByte(char&         charBuffer,
-                      const ssize_t msTimeout = 0);
+        void ReadByte(char&        charBuffer,
+                      const size_t msTimeout = 0);
 
         /**
          * @brief Reads a single byte from the serial port.
@@ -346,11 +347,11 @@ namespace LibSerial
          *        of milliseconds (msTimeout), then this method will
          *        throw a ReadTimeout exception. If msTimeout is 0,
          *        then this method will block until data is available.
-         * @param charbuffer The character read from the serial port.
+         * @param charBuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
         void ReadByte(unsigned char& charBuffer,
-                      const ssize_t  msTimeout = 0);
+                      const size_t   msTimeout = 0);
 
         /**
          * @brief Reads a line of characters from the serial port.
@@ -366,17 +367,17 @@ namespace LibSerial
          * @param msTimeout The timeout value to return if a line termination
          *        character is not read.
          */
-        void ReadLine(std::string&   dataString,
-                      const char     lineTerminator = '\n',
-                      const ssize_t  msTimeout = 0);
+        void ReadLine(std::string&  dataString,
+                      const char    lineTerminator = '\n',
+                      const size_t  msTimeout = 0);
 
         /**
          * @brief Writes a character array buffer to the serial port.
          * @param charBuffer The character array to be written to the serial port.
          * @param numberOfBytes The number of bytes to write to the serial port.
          */
-        void Write(const char*   charBuffer,
-                   const ssize_t numberOfBytes);
+        void Write(const char*  charBuffer,
+                   const size_t numberOfBytes);
 
         /**
          * @brief Writes a character array buffer to the serial port.
@@ -384,7 +385,7 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to write to the serial port.
          */
         void Write(const unsigned char* charBuffer,
-                   const ssize_t        numberOfBytes);
+                   const size_t         numberOfBytes);
 
         /**
          * @brief Writes a DataBuffer vector to the serial port.

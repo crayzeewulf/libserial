@@ -56,13 +56,13 @@ namespace LibSerial
          * @brief Constructor that allows a SerialPort instance to be 
          *        created and also initialize the corresponding serial
          *        port with the specified parameters.
-         * @param fileName The file descriptor of the serial stream object.
+         * @param fileName The file name of the serial stream.
          * @param baudRate The communications baud rate.
          * @param characterSize The size of the character buffer for
          *        storing read/write streams.
-         * @param parityType The parity type for the serial stream object.
-         * @param numberOfStopBits The number of stop bits.
-         * @param flowControlType Flow control for the serial data stream.
+         * @param parityType The parity type for the serial stream.
+         * @param stopBits The number of stop bits for the serial stream.
+         * @param flowControlType The flow control type for the serial stream.
          */
         explicit SerialStreamBuf(const std::string&   fileName,
                                  const BaudRate&      baudRate        = BaudRate::BAUD_DEFAULT,
@@ -77,13 +77,13 @@ namespace LibSerial
         virtual ~SerialStreamBuf();
 
         /**
-         * @brief Opens the serial port associated with the specified
-         *        fileName, and the specified mode, openMode.
-         * @param fileName The file descriptor of the serial stream object.
+         * @brief Opens the serial stream associated with the specified
+         *        file name and the specified mode.
+         * @param fileName The file name of the serial stream object.
          * @param openMode The communication mode status when the serial
          *        communication port is opened.
          */
-        void Open(const std::string& filename,
+        void Open(const std::string& fileName,
                   std::ios_base::openmode openMode = std::ios_base::in | std::ios_base::out);
 
         /**
@@ -186,7 +186,7 @@ namespace LibSerial
 
         /**
          * @brief Sets the minimum number of characters for non-canonical reads.
-         * @param vMin the number of minimum characters to be set.
+         * @param vmin the number of minimum characters to be set.
          */
         void SetVMin(const short vmin);
 

@@ -30,6 +30,9 @@
 
 namespace LibSerial 
 {
+    /**
+     * @brief The SerialPort Implementation Class.
+     */
     class SerialPort::Implementation
     {
     public:
@@ -39,16 +42,16 @@ namespace LibSerial
         Implementation();
 
         /**
-         * @brief Constructor that allows one to create a SerialPort
-         *        instance and also initialize the corresponding serial
+         * @brief Constructor that allows a SerialPort instance to be 
+         *        created and also initialize the corresponding serial
          *        port with the specified parameters.
-         * @param fileName The file descriptor of the serial stream object.
+         * @param fileName The file name of the serial port.
          * @param baudRate The communications baud rate.
          * @param characterSize The size of the character buffer for
          *        storing read/write streams.
-         * @param parityType The parity type for the serial stream object.
-         * @param numberOfStopBits The number of stop bits.
-         * @param flowControlType Flow control for the serial data stream.
+         * @param parityType The parity type for the serial port.
+         * @param stopBits The number of stop bits for the serial port.
+         * @param flowControlType The flow control type for the serial port.
          */
         Implementation(const std::string&   fileName,
                        const BaudRate&      baudRate,
@@ -64,12 +67,12 @@ namespace LibSerial
 
         /**
          * @brief Opens the serial port associated with the specified
-         *        fileName, and the specified mode, openMode.
-         * @param fileName The file descriptor of the serial stream object.
+         *        file name and the specified mode.
+         * @param fileName The file name of the serial port object.
          * @param openMode The communication mode status when the serial
          *        communication port is opened.
          */
-        void Open(const std::string& filename,
+        void Open(const std::string& fileName,
                   std::ios_base::openmode openMode);
 
         /**
@@ -137,7 +140,7 @@ namespace LibSerial
          * @brief Sets flow control for the serial port.
          * @param flowControlType The flow control type to be set.
          */
-        void SetFlowControl(const FlowControl& flowControl);
+        void SetFlowControl(const FlowControl& flowControlType);
 
         /**
          * @brief Get the current flow control setting.
@@ -208,7 +211,7 @@ namespace LibSerial
 
         /**
          * @brief Sets the serial port RTS line status.
-         * @param dtrState The state to set the RTS line
+         * @param rtsState The state to set the RTS line
          */
         void SetRTS(const bool rtsState);
 
@@ -256,9 +259,9 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void Read(char&         charBuffer,
-                  const ssize_t numberOfBytes = 0,
-                  const ssize_t msTimeout = 0);
+        void Read(char&        charBuffer,
+                  const size_t numberOfBytes = 0,
+                  const size_t msTimeout = 0);
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -274,8 +277,8 @@ namespace LibSerial
          * @param msTimeout The timeout period in milliseconds.
          */
         void Read(unsigned char& charBuffer,
-                  const ssize_t  numberOfBytes = 0,
-                  const ssize_t  msTimeout = 0);
+                  const size_t   numberOfBytes = 0,
+                  const size_t   msTimeout = 0);
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -291,8 +294,8 @@ namespace LibSerial
          * @param msTimeout The timeout period in milliseconds.
          */
         void Read(SerialPort::DataBuffer& dataBuffer,
-                  const ssize_t           numberOfBytes = 0,
-                  const ssize_t           msTimeout = 0);
+                  const size_t            numberOfBytes = 0,
+                  const size_t            msTimeout = 0);
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -307,9 +310,9 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void Read(std::string&  dataString,
-                  const ssize_t numberOfBytes = 0,
-                  const ssize_t msTimeout  = 0);
+        void Read(std::string& dataString,
+                  const size_t numberOfBytes = 0,
+                  const size_t msTimeout  = 0);
 
         /**
          * @brief Reads a single byte from the serial port.
@@ -317,10 +320,11 @@ namespace LibSerial
          *        of milliseconds (msTimeout), then this method will
          *        throw a ReadTimeout exception. If msTimeout is 0,
          *        then this method will block until data is available.
+         * @param charBuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void ReadByte(char&         charBuffer, 
-                      const ssize_t msTimeout = 0);
+        void ReadByte(char&        charBuffer, 
+                      const size_t msTimeout = 0);
 
         /**
          * @brief Reads a single byte from the serial port.
@@ -328,10 +332,11 @@ namespace LibSerial
          *        of milliseconds (msTimeout), then this method will
          *        throw a ReadTimeout exception. If msTimeout is 0,
          *        then this method will block until data is available.
+         * @param charBuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
         void ReadByte(unsigned char& charBuffer, 
-                      const ssize_t  msTimeout = 0);
+                      const size_t   msTimeout = 0);
 
         /**
          * @brief Reads a line of characters from the serial port.
@@ -347,17 +352,17 @@ namespace LibSerial
          * @param msTimeout The timeout value to return if a line termination
          *        character is not read.
          */
-        void ReadLine(std::string&   dataString,
-                      const char     lineTerminator = '\n',
-                      const ssize_t  msTimeout = 0);
+        void ReadLine(std::string&  dataString,
+                      const char    lineTerminator = '\n',
+                      const size_t  msTimeout = 0);
 
          /**
          * @brief Writes a character array buffer to the serial port.
          * @param charBuffer The character array to be written to the serial port.
          * @param numberOfBytes The number of bytes to be written to the serial port.
          */
-        void Write(const char*   charBuffer,
-                   const ssize_t numberOfBytes);
+        void Write(const char*  charBuffer,
+                   const size_t numberOfBytes);
 
          /**
          * @brief Writes a character array buffer to the serial port.
@@ -365,7 +370,7 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to be written to the serial port.
          */
         void Write(const unsigned char* charBuffer,
-                   const ssize_t        numberOfBytes);
+                   const size_t         numberOfBytes);
 
         /**
          * @brief Writes a DataBuffer vector to the serial port.
@@ -497,10 +502,10 @@ namespace LibSerial
     }
 
     void
-    SerialPort::Open(const std::string& filename,
+    SerialPort::Open(const std::string& fileName,
                      std::ios_base::openmode openMode)
     {
-        mImpl->Open(filename,
+        mImpl->Open(fileName,
                     openMode);
         return;
     }
@@ -579,9 +584,9 @@ namespace LibSerial
     }
 
     void
-    SerialPort::SetFlowControl(const FlowControl& flowControl)
+    SerialPort::SetFlowControl(const FlowControl& flowControlType)
     {
-        mImpl->SetFlowControl(flowControl);
+        mImpl->SetFlowControl(flowControlType);
         return;
     }
 
@@ -694,9 +699,9 @@ namespace LibSerial
     }
 
     void
-    SerialPort::Read(char&         charBuffer,
-                     const ssize_t numberOfBytes,
-                     const ssize_t msTimeout)
+    SerialPort::Read(char&        charBuffer,
+                     const size_t numberOfBytes,
+                     const size_t msTimeout)
     {
         mImpl->Read(charBuffer,
                     numberOfBytes,
@@ -706,8 +711,8 @@ namespace LibSerial
 
     void
     SerialPort::Read(unsigned char& charBuffer,
-                     const ssize_t  numberOfBytes,
-                     const ssize_t  msTimeout)
+                     const size_t   numberOfBytes,
+                     const size_t   msTimeout)
     {
         mImpl->Read(charBuffer,
                     numberOfBytes,
@@ -717,8 +722,8 @@ namespace LibSerial
 
     void
     SerialPort::Read(SerialPort::DataBuffer& dataBuffer,
-                     const ssize_t           numberOfBytes,
-                     const ssize_t           msTimeout)
+                     const size_t            numberOfBytes,
+                     const size_t            msTimeout)
     {
         mImpl->Read(dataBuffer,
                     numberOfBytes,
@@ -727,9 +732,9 @@ namespace LibSerial
     }
 
     void
-    SerialPort::Read(std::string&  dataString,
-                     const ssize_t numberOfBytes,
-                     const ssize_t msTimeout)
+    SerialPort::Read(std::string& dataString,
+                     const size_t numberOfBytes,
+                     const size_t msTimeout)
     {
         mImpl->Read(dataString,
                     numberOfBytes,
@@ -738,8 +743,8 @@ namespace LibSerial
     }
 
     void
-    SerialPort::ReadByte(char&         charBuffer,
-                         const ssize_t msTimeout)
+    SerialPort::ReadByte(char&        charBuffer,
+                         const size_t msTimeout)
     {
         mImpl->ReadByte(charBuffer,
                         msTimeout);
@@ -748,7 +753,7 @@ namespace LibSerial
 
     void
     SerialPort::ReadByte(unsigned char& charBuffer,
-                         const ssize_t  msTimeout)
+                         const size_t   msTimeout)
     {
         mImpl->ReadByte(charBuffer,
                         msTimeout);
@@ -756,9 +761,9 @@ namespace LibSerial
     }
 
     void
-    SerialPort::ReadLine(std::string&  dataString,
-                         const char    lineTerminator,
-                         const ssize_t msTimeout)
+    SerialPort::ReadLine(std::string& dataString,
+                         const char   lineTerminator,
+                         const size_t msTimeout)
     {
         mImpl->ReadLine(dataString,
                         lineTerminator,
@@ -767,8 +772,8 @@ namespace LibSerial
     }
 
     void
-    SerialPort::Write(const char*   charBuffer,
-                      const ssize_t numberOfBytes)
+    SerialPort::Write(const char*  charBuffer,
+                      const size_t numberOfBytes)
     {
         mImpl->Write(charBuffer,
                      numberOfBytes);
@@ -777,7 +782,7 @@ namespace LibSerial
 
     void
     SerialPort::Write(const unsigned char* charBuffer,
-                      const ssize_t        numberOfBytes)
+                      const size_t         numberOfBytes)
     {
         mImpl->Write(charBuffer,
                      numberOfBytes);
@@ -853,7 +858,7 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::Open(const std::string& filename,
+    SerialPort::Implementation::Open(const std::string& fileName,
                                      std::ios_base::openmode openMode)
     {
         // Throw an exception if the port is already open.
@@ -885,7 +890,7 @@ namespace LibSerial
         }
 
         // Try to open the serial port. 
-        mFileDescriptor = open(filename.c_str(), flags);
+        mFileDescriptor = open(fileName.c_str(), flags);
         
         if (this->mFileDescriptor < 0)
         {
@@ -1750,7 +1755,7 @@ namespace LibSerial
                                          &serial_port_info);
 
                     // Check for errors.
-                    if (ioctl_result  < 0)
+                    if (ioctl_result < 0)
                     {
                         throw std::runtime_error(strerror(errno));
                     }
@@ -1810,7 +1815,7 @@ namespace LibSerial
         }
 
         // Check for errors.
-        if (ioctl_result  < 0)
+        if (ioctl_result < 0)
         {
             throw std::runtime_error(strerror(errno));
         }
@@ -2081,9 +2086,9 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::Read(char&         charBuffer,
-                                     const ssize_t numberOfBytes,
-                                     const ssize_t msTimeout)
+    SerialPort::Implementation::Read(char&        charBuffer,
+                                     const size_t numberOfBytes,
+                                     const size_t msTimeout)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2096,8 +2101,9 @@ namespace LibSerial
             return;
         }
 
-        ssize_t elapsed_ms = 0;
-        ssize_t number_of_bytes_read = 0;
+        size_t elapsed_ms = 0;
+        size_t number_of_bytes_read = 0;
+        
         ssize_t read_result = 0;
 
         timeval entry_time;
@@ -2165,8 +2171,8 @@ namespace LibSerial
     inline
     void
     SerialPort::Implementation::Read(unsigned char& charBuffer,
-                                     const ssize_t  numberOfBytes,
-                                     const ssize_t  msTimeout)
+                                     const size_t   numberOfBytes,
+                                     const size_t   msTimeout)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2179,8 +2185,9 @@ namespace LibSerial
             return;
         }
 
-        ssize_t elapsed_ms = 0;
-        ssize_t number_of_bytes_read = 0;
+        size_t elapsed_ms = 0;
+        size_t number_of_bytes_read = 0;
+        
         ssize_t read_result = 0;
 
         timeval entry_time;
@@ -2248,8 +2255,8 @@ namespace LibSerial
     inline
     void
     SerialPort::Implementation::Read(SerialPort::DataBuffer& dataBuffer,
-                                     const ssize_t           numberOfBytes,
-                                     const ssize_t           msTimeout)
+                                     const size_t            numberOfBytes,
+                                     const size_t            msTimeout)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2261,7 +2268,8 @@ namespace LibSerial
         dataBuffer.resize(0);
         unsigned char next_char = 0;
 
-        ssize_t elapsed_ms = 0;
+        size_t elapsed_ms = 0;
+        
         ssize_t remaining_ms = 0;
 
         timeval entry_time;
@@ -2331,9 +2339,9 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::Read(std::string&  dataString,
-                                     const ssize_t numberOfBytes,
-                                     const ssize_t msTimeout)
+    SerialPort::Implementation::Read(std::string& dataString,
+                                     const size_t numberOfBytes,
+                                     const size_t msTimeout)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2346,7 +2354,8 @@ namespace LibSerial
 
         unsigned char next_char = 0;
 
-        ssize_t elapsed_ms = 0;
+        size_t elapsed_ms = 0;
+        
         ssize_t remaining_ms = 0;
 
         timeval entry_time;
@@ -2413,8 +2422,8 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::ReadByte(char&         charBuffer,
-                                         const ssize_t msTimeout)
+    SerialPort::Implementation::ReadByte(char&        charBuffer,
+                                         const size_t msTimeout)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2431,7 +2440,7 @@ namespace LibSerial
     inline
     void
     SerialPort::Implementation::ReadByte(unsigned char& charBuffer,
-                                         const ssize_t  msTimeout)
+                                         const size_t   msTimeout)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2447,9 +2456,9 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::ReadLine(std::string&  dataString,
-                                         const char    lineTerminator,
-                                         const ssize_t msTimeout)
+    SerialPort::Implementation::ReadLine(std::string& dataString,
+                                         const char   lineTerminator,
+                                         const size_t msTimeout)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2462,7 +2471,8 @@ namespace LibSerial
 
         unsigned char next_char = 0;
 
-        ssize_t elapsed_ms = 0;
+        size_t elapsed_ms = 0;
+        
         ssize_t remaining_ms = 0;
 
         timeval entry_time;
@@ -2514,8 +2524,8 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::Write(const char*   charBuffer,
-                                      const ssize_t numberOfBytes)
+    SerialPort::Implementation::Write(const char*  charBuffer,
+                                      const size_t numberOfBytes)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2544,7 +2554,7 @@ namespace LibSerial
                errno != EWOULDBLOCK);
 
         if (num_of_bytes_written < 0 ||
-            num_of_bytes_written < numberOfBytes)
+            num_of_bytes_written < (ssize_t)numberOfBytes)
         {
             throw std::runtime_error(strerror(errno));
         }
@@ -2555,7 +2565,7 @@ namespace LibSerial
     inline
     void
     SerialPort::Implementation::Write(const unsigned char* charBuffer,
-                                      const ssize_t        numberOfBytes)
+                                      const size_t         numberOfBytes)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2584,7 +2594,7 @@ namespace LibSerial
                errno != EWOULDBLOCK);
 
         if (num_of_bytes_written < 0 ||
-            num_of_bytes_written < numberOfBytes)
+            num_of_bytes_written < (ssize_t)numberOfBytes)
         {
             throw std::runtime_error(strerror(errno));
         }
