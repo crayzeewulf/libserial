@@ -3,7 +3,7 @@ ADD_EXECUTABLE(readPortExample
 )
 
 TARGET_LINK_LIBRARIES(readPortExample
-  LibSerial
+  libserial_static
 )
 
 ADD_EXECUTABLE(writePortExample
@@ -11,5 +11,5 @@ ADD_EXECUTABLE(writePortExample
 )
 
 TARGET_LINK_LIBRARIES(writePortExample
-  LibSerial
+  libserial_static
 )
