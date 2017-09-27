@@ -63,8 +63,10 @@ stamp-h1
 
 #Examples
 examples/serial_port_read
+examples/serial_port_read_write
 examples/serial_port_write
 examples/serial_stream_read
+examples/serial_stream_read_write
 examples/serial_stream_write
 
 m4/libtool.m4
