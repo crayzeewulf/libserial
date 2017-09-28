@@ -4,6 +4,9 @@
 .\#*
 *.swp
 *.bak
+*.o
+*.lo
+*.la
 
 # build directories
 build
@@ -28,7 +31,88 @@ gtest
 cmake_install.cmake
 CMakeCache.txt
 CMakeFiles
-Makefile
+
+.deps
+.libs
 
 # Docs
-doc
+docs/html
+
+# Files resulting from make build
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
+compile
+config.guess
+config.h
+config.h.in
+config.log
+config.status
+config.sub
+configure
+depcomp
+doxygen.conf
+install-sh
+libserial.pc
+libserial.spec
+libtool
+ltmain.sh
+missing
+stamp-h1
+
+# Examples
+examples/read_port
+examples/read_port_01
+examples/write_port
+examples/serial_port_read
+examples/serial_port_read_write
+examples/serial_port_write
+examples/serial_stream_read
+examples/serial_stream_read_write
+examples/serial_stream_write
+
+m4/libtool.m4
+m4/ltoptions.m4
+m4/ltsugar.m4
+m4/ltversion.m4
+m4/lt~obsolete.m4
+
+# Python files
+sip/Makefile.sip
+sip/configure.py
+sip/libserial.exp
+sip/libserial.sbf
+sip/libserial.so
+sip/sipAPIlibserial.h
+sip/siplibserialcmodule.cpp
+sip/siplibserialLibSerial.cpp
+sip/siplibserialLibSerialBaudRate.cpp
+sip/siplibserialLibSerialCharacterSize.cpp
+sip/siplibserialLibSerialFlowControl.cpp
+sip/siplibserialLibSerialParity.cpp
+sip/siplibserialLibSerialStopBits.cpp
+sip/siplibserialSerialPort.cpp
+sip/siplibserialSerialPortAlreadyOpen.cpp
+sip/siplibserialSerialPortNotOpen.cpp
+sip/siplibserialSerialPortOpenFailed.cpp
+sip/siplibserialSerialPortReadTimeout.cpp
+sip/siplibserialSerialPortUnsupportedBaudRate.cpp
+sip/siplibserialstd.cpp
+sip/siplibserialstdexception.cpp
+sip/siplibserialstdinvalid_argument.cpp
+sip/siplibserialstdios_base.cpp
+sip/siplibserialstdios_baseopenmode.cpp
+sip/siplibserialstdlogic_error.cpp
+sip/siplibserialstdruntime_error.cpp
+sip/siplibserialstdstring.cpp
+sip/siplibserialstdvector1300.cpp
+sip/siplibserialstdvector1800.cpp
+sip/siplibserialstdvector1900.cpp
+sip/siplibserialstdvector2400.cpp
+
+# Test files
+test/MakeFile
+test/MakeFile.in
+test/LibSerialTests
+test/unit_tests

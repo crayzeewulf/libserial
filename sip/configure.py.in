@@ -75,4 +75,4 @@ if __name__ == "__main__":
         raise
     except:
         print("An internal error occured.  Please report all the output from the program, including the following traceback.")
-raise
+        raise

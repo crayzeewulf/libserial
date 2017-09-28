@@ -1,8 +1,8 @@
 AC_REVISION($Revision: 1.14 $)
-dnl
+
 dnl Indicate the package name and the version to automake
-dnl
 AC_INIT([libserial], [0.6.0rc3])
+
 AC_CONFIG_SRCDIR([src/SerialStream.cc])
 AM_CONFIG_HEADER(config.h)
 AC_CONFIG_MACRO_DIR([m4])
@@ -43,10 +43,11 @@ AM_CONDITIONAL([PYTHON], [test "${with_python}" != "no"])
 AC_OUTPUT([Makefile
 doxygen.conf
 libserial.spec
-doc/UML/Makefile
-doc/Makefile
+docs/UML/Makefile
+docs/Makefile
 examples/Makefile
-src/Makefile
 sip/configure.py
 sip/Makefile
+src/Makefile
+test/Makefile
 libserial.pc])
