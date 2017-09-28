@@ -40,13 +40,13 @@ The unit tests will be built during the make step above or you can build them by
 
 Unit test executables built using make can be run from the libserial/test/ directory:
 ```
-./test/LibSerialTests
+./test/UnitTests
 ./unit_tests
 ```
 
 Alternatively, unit test executables built using the compile script can be run from the libserial/build/bin/ directory: 
 ```
-./build/bin/LibSerialTests
+./build/bin/UnitTests
 ./build/bin/unit_tests
 ```
 
