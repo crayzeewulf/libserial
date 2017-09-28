@@ -25,7 +25,7 @@ make install
 ```
 
 ----
-If you are a developer interested in utilizing the unit tests, ensure serial port names are appropriate for your hardware configuration in LibSerialTests.cpp:
+If you are a developer interested in utilizing the unit tests, ensure serial port names are appropriate for your hardware configuration in the UnitTests.cpp file:
 
 ```
 #define TEST_SERIAL_PORT_1 "/dev/ttyUSB0"
