@@ -31,8 +31,6 @@ gtest
 cmake_install.cmake
 CMakeCache.txt
 CMakeFiles
-Makefile
-Makefile.in
 
 .deps
 .libs
@@ -40,7 +38,9 @@ Makefile.in
 # Docs
 docs/html
 
-# Files resulting from Make
+# Files resulting from make build
+Makefile
+Makefile.in
 aclocal.m4
 autom4te.cache
 compile
@@ -61,7 +61,7 @@ ltmain.sh
 missing
 stamp-h1
 
-#Examples
+# Examples
 examples/serial_port_read
 examples/serial_port_read_write
 examples/serial_port_write

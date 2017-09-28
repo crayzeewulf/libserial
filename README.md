@@ -6,7 +6,7 @@ LibSerial provides a convenient, object oriented approach to accessing serial po
 You will need a recent g++ release, (anything after gcc-3.2 should work), to compile libserial, and you will also need to install Google Test (gtest) and the boost unit test library.  For Debian users:
 
 ```
-sudo apt install libboost-dev libgtest-dev
+sudo apt install libgtest-dev libboost-dev
 ```
 ----
 If you get the source code from github and would like to install the library, you will need to generate the configure script first:
