@@ -1,5 +1,7 @@
 AM_CXXFLAGS = -Weffc++
 
+AM_CPPFLAGS = -I@top_srcdir@/src
+
 lib_LTLIBRARIES = libserial.la
 
 include_HEADERS = \
