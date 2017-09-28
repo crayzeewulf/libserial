@@ -19,13 +19,13 @@ To install LibSerial from source, first clone the repository at https://github.c
 
 Using https:
 
-.. code-block:: c++
+.. code-block:: bash
 
    git clone https://github.com/crayzeewulf/libserial.git
 
 Using ssh:
 
-.. code-block:: c++
+.. code-block:: bash
 
    git clone git@github.com:crayzeewulf/libserial.git
 

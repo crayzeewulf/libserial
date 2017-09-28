@@ -36,7 +36,8 @@ CMakeFiles
 .libs
 
 # Docs
-docs/html
+docs/html/
+docs/.doctrees/
 
 # Files resulting from make build
 Makefile
@@ -94,6 +95,7 @@ sip/siplibserialSerialPortAlreadyOpen.cpp
 sip/siplibserialSerialPortNotOpen.cpp
 sip/siplibserialSerialPortOpenFailed.cpp
 sip/siplibserialSerialPortReadTimeout.cpp
+sip/siplibserialSerialPortUnsupportedBaudRate.cpp
 sip/siplibserialstd.cpp
 sip/siplibserialstdexception.cpp
 sip/siplibserialstdinvalid_argument.cpp
