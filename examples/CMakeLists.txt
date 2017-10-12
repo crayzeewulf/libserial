@@ -1,3 +1,11 @@
+ADD_EXECUTABLE(MainPageExample
+  main_page_example.cpp
+)
+
+TARGET_LINK_LIBRARIES(MainPageExample
+  libserial_static
+)
+
 ADD_EXECUTABLE(SerialPortReadExample
   serial_port_read.cpp
 )

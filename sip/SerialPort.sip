@@ -106,6 +106,9 @@ public:
     int
     GetFileDescriptor();
 
+    // std::vector<std::string>
+    // GetAvailableSerialPorts();
+
     typedef std::vector<unsigned char> DataBuffer;
     
     // NOTE: Python3 provides a mechanism for method overloading, however Python2 does not.
