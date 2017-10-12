@@ -1,48 +1,65 @@
 Description
 ===========
 
-LibSerial provides a collection of C++ classes that allow one to access serial
-ports on POSIX systems like standard C++ iostream objects.
+LibSerial provides a collection of C++ classes that allow object oriented
+access to serial ports on POSIX systems.
 
-The SerialStream class represents the primary class that is expected to be used
-to access serial ports as iostream objects. 
+The SerialPort class is available to simplified access to serial port
+settings along with a set of convenient read/write methods.<br>
+This class is useful for embedded systems where a complete C++ STL
+may not be available.
 
-The SerialPort class is available to provide access to serial ports without
-using the standard C++ iostream interface. This is useful for embedded systems
-where a complete C++ STL may not be available.
+The SerialStream class allows access to serial ports in the same manner as
+standard C++ iostream objects.
 
-Member functions are provided in both classes for setting various parameters
-of the serial ports such as baud rate, character size, flow control and others.
-The idea is to simplify serial port programming on POSIX systems.
-For example, using libserial, you can do the following:
+Member functions are provided in both classes for setting serial port
+parameters such as baud rate, character size, flow control, etc.
+
+LibSerial exists to simplify serial port programming on POSIX systems.<br>
+Here is short example using libserial:
 
 .. code-block:: c++
 
    #include <SerialPort.h>
    #include <SerialStream.h>
 
-   using namespace Libserial
+   using namespace LibSerial;
 
-   // Open a Serial Port and a Serial Stream.
-   SerialPort serial_port( "/dev/ttyUSB0" );
-   SerialStream serial_stream( "/dev/ttyUSB1" );
+   int main()
+   {
+      // Instantiate a Serial Port and a Serial Stream object.
+      SerialPort serial_port;
+      SerialStream serial_stream;
 
-   // Set the baud rate.
-   serial_port.SetBaudRate( BAUD_115200 );
-   serial_stream.SetBaudRate( BAUD_115200 );
+      // Open the hardware serial ports.
+      serial_port.Open( "/dev/ttyUSB0" );
+      serial_stream.Open( "/dev/ttyUSB1" );
 
-   // Read a character.
-   char next_char;
-   serial_port.Read(next_char, 25);
-   serial_stream >> next_char;
+      // Set the baud rates.
+      serial_port.SetBaudRate( BaudRate::BAUD_115200 );
+      serial_stream.SetBaudRate( BaudRate::BAUD_115200 );
 
-   // Write a character.
-   serial_port.Write(next_char);
-   serial_stream << next_char;
+      char write_byte_1 = 'a';
+      char write_byte_2 = 'b';
 
-   // Close the Serial Port and Serial Stream
-   serial_port.Close();
-   serial_stream.Close();
+      char read_byte_1 = 'A';
+      char read_byte_2 = 'B';
+
+      // Write a character.
+      serial_port.Write(&write_byte_1, 1);
+      serial_stream << write_byte_2;
+
+      // Read a character.
+      serial_port.Read(read_byte_1, 1);
+      serial_stream >> read_byte_2;
+
+      std::cout << "serial_port read:   " << read_byte_1 << std::endl;
+      std::cout << "serial_stream read: " << read_byte_2 << std::endl;
+
+      // Close the Serial Port and Serial Stream.
+      serial_port.Close();
+      serial_stream.Close();
+   }
 
 In addition to the C++ programming languge, LibSerial releases after version
 0.6.0 also provide bindings to several scripting languages such as Python,
