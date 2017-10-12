@@ -1,15 +1,23 @@
 AM_CXXFLAGS = -Weffc++
 
-noinst_PROGRAMS = unit_tests
+AM_CPPFLAGS = -I@top_srcdir@/src
 
 lib_LTLIBRARIES = libserial.la
 
-include_HEADERS = SerialStreamBuf.h SerialStream.h SerialPort.h
+include_HEADERS = \
+	SerialPort.h \
+	SerialStream.h \
+	SerialStreamBuf.h
 
-libserial_la_SOURCES = SerialStreamBuf.cc SerialStreamBuf.h SerialStream.cc \
-		SerialStream.h SerialPort.cpp SerialPort.h PosixSignalDispatcher.cpp
+libserial_la_SOURCES = \
+	SerialPort.cpp \
+	SerialPort.h \
+	SerialStream.cc \
+	SerialStream.h \
+	SerialStreamBuf.cc \
+	SerialStreamBuf.h \
+	PosixSignalDispatcher.cpp
 
-unit_tests_SOURCES = unit_tests.cpp
-unit_tests_LDADD = libserial.la -lboost_unit_test_framework
-
-noinst_HEADERS = PosixSignalDispatcher.h PosixSignalHandler.h
+noinst_HEADERS = \
+	PosixSignalDispatcher.h \
+	PosixSignalHandler.h
