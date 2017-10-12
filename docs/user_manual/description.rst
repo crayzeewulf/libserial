@@ -18,20 +18,31 @@ For example, using libserial, you can do the following:
 
 .. code-block:: c++
 
+   #include <SerialPort.h>
    #include <SerialStream.h>
 
-   // Open the serial port.
-   SerialStream serial_port( "/dev/ttyS0" );
+   using namespace Libserial
 
-   // Set the baud rate of the serial port.
-   serial_port.SetBaudRate( SerialStreamBuf::BAUD_9600 );
+   // Open a Serial Port and a Serial Stream.
+   SerialPort serial_port( "/dev/ttyUSB0" );
+   SerialStream serial_stream( "/dev/ttyUSB1" );
 
-   // Read a character from the serial port.
+   // Set the baud rate.
+   serial_port.SetBaudRate( BAUD_115200 );
+   serial_stream.SetBaudRate( BAUD_115200 );
+
+   // Read a character.
    char next_char;
-   serial_port >> next_char;
+   serial_port.Read(next_char, 25);
+   serial_stream >> next_char;
 
-   // Write the character back to the serial port.
-   serial_port << next_char;
+   // Write a character.
+   serial_port.Write(next_char);
+   serial_stream << next_char;
+
+   // Close the Serial Port and Serial Stream
+   serial_port.Close();
+   serial_stream.Close();
 
 In addition to the C++ programming languge, LibSerial releases after version
 0.6.0 also provide bindings to several scripting languages such as Python,

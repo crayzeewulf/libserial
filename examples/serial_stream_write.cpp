@@ -1,107 +1,100 @@
+/******************************************************************************
+ *   @file serial_stream_write.cpp                                            *
+ *   @copyright (C) 2016 LibSerial Development Team                           *
+ *                                                                            *
+ *   This program is free software; you can redistribute it and/or modify     *
+ *   it under the terms of the GNU Lessser General Public License as          *
+ *   published by the Free Software Foundation; either version 2 of the       *
+ *   License, or (at your option) any later version.                          *
+ *                                                                            *
+ *   This program is distributed in the hope that it will be useful,          *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of           *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
+ *   GNU Lesser General Public License for more details.                      *
+ *                                                                            *
+ *   You should have received a copy of the GNU Lesser General Public         *
+ *   License along with this program; if not, write to the                    *
+ *   Free Software Foundation, Inc.,                                          *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
+ *****************************************************************************/
+
 #include <SerialStream.h>
+
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
 
 using namespace LibSerial;
 
-// This example reads the contents of a file and writes the entire 
-// file to the serial port one character at a time.
+/**
+ * @brief This example reads the contents of a file and writes the entire 
+ *        file to the serial port one character at a time. To use this
+ *        example, simply utilize TestFile.txt or another file of your
+ *        choosing as a command line argument.
+ */
 int main(int argc, char** argv)
 {
-    if (argc < 2) 
+    // Determine if an appropriate number of arguments has been provided.
+    if (argc < 2)
     {
+        // Error message to the user.
         std::cerr << "Usage: " << argv[0] << " <filename>" << std::endl;
+
+        // Exit the program if no input file argument has been given.
         return 1;
     }
-    // Instantiate a SerialStream object and open the serial port.
-    SerialStream serial_stream;
-
-    serial_stream.Open("/dev/ttyUSB1");
-    
-    // Check that the serial stream has opened correctly.
-    if (!serial_stream.good()) 
-    {
-        std::cerr << "[" << __FILE__ << ":" << __LINE__ << "] "
-                  << "Error: Could not open serial port." 
-                  << std::endl;
-        exit(1);
-    }
-
-    // Set the baud rate of the serial port.
-    serial_stream.SetBaudRate( BaudRate::BAUD_115200 );
-
-    if (!serial_stream.good()) 
-    {
-        std::cerr << "Error: Could not set the baud rate." << std::endl;
-        exit(1) ;
-    }
-
-    // Set the number of data bits.
-    serial_stream.SetCharacterSize( CharacterSize::CHAR_SIZE_8 );
-
-    if (!serial_stream.good()) 
-    {
-        std::cerr << "Error: Could not set the character size." << std::endl;
-        exit(1) ;
-    }
-
-    // Turn off hardware flow control.
-    serial_stream.SetFlowControl( FlowControl::FLOW_CONTROL_NONE );
-    
-    if (!serial_stream.good()) 
-    {
-        std::cerr << "Error: Could not use hardware flow control."
-                  << std::endl;
-        exit(1);
-    }
-
-    // Disable parity.
-    serial_stream.SetParity( Parity::PARITY_NONE );
-    
-    if (!serial_stream.good()) 
-    {
-        std::cerr << "Error: Could not disable the parity." << std::endl;
-        exit(1);
-    }
-
-    // Set the number of stop bits.
-    serial_stream.SetNumberOfStopBits( StopBits::STOP_BITS_1 );
-    
-    if (!serial_stream.good()) 
-    {
-        std::cerr << "Error: Could not set the number of stop bits."
-                  << std::endl;
-        exit(1);
-    }
-
-    // Do not skip whitespace characters while reading from the serial port.
-    // serial_stream.unsetf(std::ios_base::skipws);
 
     // Open the input file for reading. 
-    std::ifstream input_file( argv[1] );
-    
+    std::ifstream input_file(argv[1]);
+
+    // Determine if the input file argument is valid to read data from.
     if (!input_file.good()) 
     {
         std::cerr << "Error: Could not open file "
                   << argv[1] << " for reading." << std::endl;
-        return 1 ;
+        return 1;
     }
 
-    // Read characters from the input file and dump them to the serial port. 
-    std::cerr << "Dumping file to serial port." << std::endl;
+    // Instantiate a SerialStream object.
+    SerialStream serial_stream;
+
+    // Open the Serial Port at the desired hardware port.
+    serial_stream.Open("/dev/ttyUSB1");
+
+    // Set the baud rate of the serial port.
+    serial_stream.SetBaudRate(BaudRate::BAUD_115200);
+
+    // Set the number of data bits.
+    serial_stream.SetCharacterSize(CharacterSize::CHAR_SIZE_8);
+
+    // Turn off hardware flow control.
+    serial_stream.SetFlowControl(FlowControl::FLOW_CONTROL_NONE);
+
+    // Disable parity.
+    serial_stream.SetParity(Parity::PARITY_NONE);
+
+    // Set the number of stop bits.
+    serial_stream.SetNumberOfStopBits(StopBits::STOP_BITS_1);
+
+    // Read characters from the input file and write them to the serial port. 
+    std::cout << "Writing input file contents to the serial port." << std::endl;
     
-    while ( input_file ) 
-    {
-        char nextByte;
-        input_file.read( &nextByte, 1 );
-        serial_stream.write( &nextByte, 1 );
+    // Create a variable to store data from the input file and write to the serial port.
+    char data_byte = 0;
 
-        // Print a '.' for every character read from the input file. 
-        std::cerr << ".";
+    while (input_file) 
+    {
+        // Read data from the input file.
+        input_file.read(&data_byte, 1);
+
+        // Write the data to the serial port.
+        serial_stream.write(&data_byte, 1);
+
+        // Print to the terminal what is being written to the serial port.
+        std::cout << data_byte;
     }
 
-    std::cerr << std::endl;
-    std::cerr << "Done." << std::endl;
+    // Successful program completion.
+    std::cout << std::endl << "Done." << std::endl;
     return EXIT_SUCCESS;
 }

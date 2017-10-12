@@ -31,16 +31,17 @@ gtest
 cmake_install.cmake
 CMakeCache.txt
 CMakeFiles
-Makefile
-Makefile.in
 
 .deps
 .libs
 
 # Docs
-docs/html
+docs/html/
+docs/.doctrees/
 
-# Files resulting from Make
+# Files resulting from make build
+Makefile
+Makefile.in
 aclocal.m4
 autom4te.cache
 compile
@@ -61,10 +62,12 @@ ltmain.sh
 missing
 stamp-h1
 
-#Examples
+# Examples
 examples/serial_port_read
+examples/serial_port_read_write
 examples/serial_port_write
 examples/serial_stream_read
+examples/serial_stream_read_write
 examples/serial_stream_write
 
 m4/libtool.m4
@@ -92,6 +95,7 @@ sip/siplibserialSerialPortAlreadyOpen.cpp
 sip/siplibserialSerialPortNotOpen.cpp
 sip/siplibserialSerialPortOpenFailed.cpp
 sip/siplibserialSerialPortReadTimeout.cpp
+sip/siplibserialSerialPortUnsupportedBaudRate.cpp
 sip/siplibserialstd.cpp
 sip/siplibserialstdexception.cpp
 sip/siplibserialstdinvalid_argument.cpp
@@ -108,5 +112,5 @@ sip/siplibserialstdvector2400.cpp
 # Test files
 test/MakeFile
 test/MakeFile.in
-test/LibSerialTests
+test/UnitTests
 test/unit_tests

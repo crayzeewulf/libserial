@@ -14,6 +14,14 @@ TARGET_LINK_LIBRARIES(SerialPortWriteExample
   libserial_static
 )
 
+ADD_EXECUTABLE(SerialPortReadWriteExample
+  serial_port_read_write.cpp
+)
+
+TARGET_LINK_LIBRARIES(SerialPortReadWriteExample
+  libserial_static
+)
+
 ADD_EXECUTABLE(SerialStreamReadExample
   serial_stream_read.cpp
 )
@@ -27,5 +35,13 @@ ADD_EXECUTABLE(SerialStreamWriteExample
 )
 
 TARGET_LINK_LIBRARIES(SerialStreamWriteExample
+  libserial_static
+)
+
+ADD_EXECUTABLE(SerialStreamReadWriteExample
+  serial_stream_read_write.cpp
+)
+
+TARGET_LINK_LIBRARIES(SerialStreamReadWriteExample
   libserial_static
 )
