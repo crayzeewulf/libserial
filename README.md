@@ -6,7 +6,7 @@ LibSerial provides a convenient, object oriented approach to accessing serial po
 You will need a recent g++ release, (anything after gcc-3.2 should work), to compile libserial, and you will also need to install Google Test (gtest) and the boost unit test library.  For Debian users:
 
 ```
-sudo apt install libboost-dev libgtest-dev
+sudo apt install libgtest-dev libboost-dev
 ```
 ----
 If you get the source code from github and would like to install the library, you will need to generate the configure script first:
@@ -25,7 +25,7 @@ make install
 ```
 
 ----
-If you are a developer interested in utilizing the unit tests, ensure serial port names are appropriate for your hardware configuration in LibSerialTests.cpp:
+If you are a developer interested in utilizing the unit tests, ensure serial port names are appropriate for your hardware configuration in the UnitTests.cpp file:
 
 ```
 #define TEST_SERIAL_PORT_1 "/dev/ttyUSB0"
@@ -40,13 +40,13 @@ The unit tests will be built during the make step above or you can build them by
 
 Unit test executables built using make can be run from the libserial/test/ directory:
 ```
-./test/LibSerialTests
+./test/UnitTests
 ./unit_tests
 ```
 
 Alternatively, unit test executables built using the compile script can be run from the libserial/build/bin/ directory: 
 ```
-./build/bin/LibSerialTests
+./build/bin/UnitTests
 ./build/bin/unit_tests
 ```
 

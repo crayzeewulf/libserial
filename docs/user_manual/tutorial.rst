@@ -4,17 +4,20 @@ Tutorial
 Opening a Serial Port I/O Stream
 --------------------------------
 
-A serial port I/O stream, SerialStream, instance can be created and opened by
-providing the name of the serial port device to the constructor:
+A serial port instance, SerialPort, or an I/O stream instance,
+SerialStream, can be created and opened by providing the name of the
+serial port device to the constructor:
 
 .. code-block:: c++ 
 
+   #include <SerialPort.h>
    #include <SerialStream.h>
 
    using namespace LibSerial ;
 
-   // Create and open the serial port for communication. 
-   SerialStream my_serial_stream( "/dev/ttyS0" ) ;
+   // Create and open the serial port for communication.
+   SerialPort   my_serial_port( "/dev/ttyS0" );
+   SerialStream my_serial_stream( "/dev/ttyUSB0" ) ;
 
 In certain applications, the name of the serial port device may not be known
 when the SerialStream instance is created. In such cases, the same effect as
@@ -22,15 +25,18 @@ above can be achieved as follows:
 
 .. code-block:: c++
 
-   #include <SerialStream.h>
+   // Create a object instance.
+   SerialPort   my_serial_port;
+   SerialStream my_serial_stream;
 
-   using namespace LibSerial ;
-
-   // Create a SerialStream instance.
-   SerialStream my_serial_stream ;
+   // Obtain the serial port name from user input.
+   std::cout << "Please enter the name of the serial device, (e.g. /dev/ttyUSB0): " << std::flush;
+   std::string serial_port_name;
+   std::cin >> serial_port_name;
 
    // Open the serial port for communication.
-   my_serial_stream.Open( "/dev/ttyS0" ) ;
+   my_serial_port.Open( serial_port_name );
+   my_serial_stream.Open( serial_port_name );
 
 Setting the Baud Rate
 ---------------------
@@ -41,8 +47,10 @@ SerialStream::SetBaudRate() member function.
 .. code-block:: c++
 
    // Set the desired baud rate using a SetBaudRate() method call.
-   // Available baud rate values are defined in SerialStreamConstants.h. 
-   my_serial_stream.SetBaudRate( LibSerial::BAUD_115200 );
+   // Available baud rate values are defined in SerialStreamConstants.h.
+
+   my_serial_port.SetBaudRate( BAUD_115200 );
+   my_serial_stream.SetBaudRate( BAUD_115200 );
 
 Setting the Character Size
 --------------------------
@@ -50,17 +58,19 @@ Setting the Character Size
 .. code-block:: c++
 
    // Set the desired character size using a SetCharacterSize() method call.
-   // Available character size values are defined in SerialStreamConstants.h. 
-   my_serial_port.SetCharacterSize( LibSerial::CHAR_SIZE_8 );
+   // Available character size values are defined in SerialStreamConstants.h.
+   my_serial_port.SetCharacterSize( CHAR_SIZE_8 );
+   my_serial_stream.SetCharacterSize( CHAR_SIZE_8 );
 
 Setting the Flow-Control Type
 -----------------------------
 
 .. code-block:: c++ 
 
-   // Set the desired flow control type using a SetClowControl() method call.
-   // Available flow control types are defined in SerialStreamConstants.h. 
-   my_serial_port.SetFlowControl( LibSerial::FLOW_CONTROL_HARD );
+   // Set the desired flow control type using a SetFlowControl() method call.
+   // Available flow control types are defined in SerialStreamConstants.h.
+   my_serial_port.SetFlowControl( FLOW_CONTROL_HARD );
+   my_serial_stream.SetFlowControl( FLOW_CONTROL_HARD );
 
 
 Setting the Parity Type
@@ -69,8 +79,9 @@ Setting the Parity Type
 .. code-block:: c++
 
    // Set the desired parity type using a SetParity() method call.
-   // Available parity types are defined in SerialStreamConstants.h. 
-   my_serial_port.SetParity( LibSerial::PARITY_ODD );
+   // Available parity types are defined in SerialStreamConstants.h.
+   my_serial_port.SetParity( PARITY_ODD );
+   my_serial_stream.SetParity( PARITY_ODD );
 
 
 Setting the Number of Stop Bits
@@ -78,19 +89,31 @@ Setting the Number of Stop Bits
 
 .. code-block:: c++
 
-   // Set the number of stop bits using a SetNumberOfStopBits() method call.
-   // Available stop bit values are defined in SerialStreamConstants.h. 
-   my_serial_port.SetNumberOfStopBits(1) ;
+   // Set the number of stop bits using a SetNumOfStopBits() method call.
+   // Available stop bit values are defined in SerialStreamConstants.h.
+   my_serial_port.SetNumOfStopBits( STOP_BITS_1 ) ;
+   my_serial_stream.SetNumOfStopBits( STOP_BITS_1 ) ;
 
 
 Reading Characters
 ------------------
 
-Characters can be read from the serial port using standard iostream ">>"
-operator. For example:
+Characters can be read from serial port instances using Read(), ReadByte(),
+and Readline() methods. For example:
 
 .. code-block:: c++ 
 
+   // Read one character from the serial port within the timeout allowed.
+   int timeout_ms = 25; // timeout value in milliseconds
+   char next_char;      // variable to store the read result
+
+   my_serial_port.ReadByte( next_char, timeout_ms );
+   my_serial_stream.read( next_char );
+
+
+Characters can be read from serial streams using standard iostream operators. For example:
+
+.. code-block:: c++ 
 
    // Read one character from the serial port. 
    char next_char;
@@ -100,8 +123,8 @@ operator. For example:
    int data_size;
    my_serial_stream >> data_size;
 
-All other methods of standard C++ iostream objects are available too. For
-example, one can read characters from the serial port using the get() method:
+Other methods of standard C++ iostream objects could be used as well.
+For example, one can read characters from the serial stream using the get() method:
 
 .. code-block:: c++
 
@@ -114,16 +137,21 @@ Writing Characters
 
 .. code-block:: c++ 
 
-   // Write a single character to the serial port. 
+   // Write a single character to the serial port.
+   my_serial_port.WriteByte( 'U' );
    my_serial_stream << 'U' ;
 
-   // You can write a whole string. 
-   my_serial_stream << "Hello, Serial Port." << std::endl ;
+   // You can easily write strings.
+   std::string my_string = "Hello, Serial Port." 
 
-   // In fact, you can pretty much write any type of object that 
-   // is supported by a "<<" operator. 
+   my_serial_port.Write( my_string );
+   my_serial_stream << my_string << std::endl ;
+
+   // And, with serial stream objects, you can easily write any type
+   // of object that is supported by a "<<" operator.
    double radius = 2.0 ;
    double area = M_PI * 2.0 * 2.0 ;
+
    my_serial_stream << area << std::endl ;
 
 Reading Blocks of Data
@@ -135,8 +163,8 @@ Reading Blocks of Data
    const int BUFFER_SIZE = 256;
    char input_buffer[BUFFER_SIZE];
 
-   my_serial_stream.read( input_buffer, 
-                          BUFFER_SIZE );
+   my_serial_port.Read( input_buffer, BUFFER_SIZE );
+   my_serial_stream.read( input_buffer, BUFFER_SIZE );
 
 Writing Blocks of Data
 ----------------------
@@ -147,168 +175,18 @@ Writing Blocks of Data
    const int BUFFER_SIZE = 256;
    char output_buffer[BUFFER_SIZE];
 
-   for(int i=0; i<BUFFER_SIZE; ++i) 
+   for( int i=0; i<BUFFER_SIZE; ++i ) 
    {
        output_buffer[i] = i;
    }
 
-   my_serial_stream.write( output_buffer, 
-                           BUFFER_SIZE );
+   my_serial_port.Write( output_buffer, BUFFER_SIZE );
+   my_serial_stream.write( output_buffer, BUFFER_SIZE );
 
 Closing the Serial Port
 -----------------------
 
 .. code-block:: c++ 
 
-   my_serial_port.Close() ;
-
-Complete Example Programs:
-Reading from a SerialPort:
--------------------------
-
-.. code-block:: c++
-
-   #include <SerialPort.h>
-   #include <iostream>
-   #include <unistd.h>
-   #include <cstdlib>
-
-   using namespace LibSerial;
-
-   int main()
-   {
-       // Instantiate a SerialPort object and open the serial port.
-       SerialPort serial_port;
-
-       serial_port.Open("/dev/ttyUSB0");
-
-       // Check that the serial stream has opened correctly.
-       if (!serial_port.IsOpen()) 
-       {
-           std::cerr << "[" << __FILE__ << ":" << __LINE__ << "] "
-                     << "Error: Could not open serial port." 
-                     << std::endl;
-           exit(1);
-       }
-
-       // Set the baud rate of the serial port.
-       serial_port.SetBaudRate( BaudRate::BAUD_115200 );
-
-       // Set the number of data bits.
-       serial_port.SetCharacterSize( CharacterSize::CHAR_SIZE_8 );
-
-       // Turn off hardware flow control.
-       serial_port.SetFlowControl( FlowControl::FLOW_CONTROL_NONE );
-
-       // Disable parity.
-       serial_port.SetParity( Parity::PARITY_NONE );
-       
-       // Set the number of stop bits.
-       serial_port.SetNumberOfStopBits( StopBits::STOP_BITS_1 );
-       
-       // Wait for some data to be available at the serial port.
-       while(!serial_port.IsDataAvailable()) 
-       {
-           usleep(100);
-       }
-
-       // Keep reading data from serial port and print it to the screen.
-       while(serial_port.IsDataAvailable()) 
-       {
-           unsigned char nextByte;
-           unsigned int msTimeout = 50;
-
-           serial_port.ReadByte(nextByte, msTimeout);
-           std::cerr << std::hex << static_cast<int>(nextByte) << " ";
-           usleep(100);
-       }
-
-       std::cerr << std::endl;
-       return EXIT_SUCCESS;
-   }
-
-
-Complete Example Programs:
-Writing to a SerialPort:
--------------------------
-
-.. code-block:: c++
-
-   #include <SerialPort.h>
-   #include <iostream>
-   #include <fstream>
-   #include <cstdlib>
-
-   using namespace LibSerial;
-
-   // This example reads the contents of a file and writes the entire 
-   // file to the serial port one character at a time.
-   int main(int argc, char** argv)
-   {
-       if (argc < 2) 
-       {
-           std::cerr << "Usage: " << argv[0] << " <filename>" << std::endl;
-           return 1;
-       }
-       
-       // Instantiate a SerialPort object and open the serial port.
-       SerialPort serial_port;
-
-       serial_port.Open("/dev/ttyUSB1");
-
-       // Check that the serial stream has opened correctly.
-       if (!serial_port.IsOpen()) 
-       {
-           std::cerr << "[" << __FILE__ << ":" << __LINE__ << "] "
-                     << "Error: Could not open serial port." 
-                     << std::endl;
-           exit(1);
-       }
-
-       // Set the baud rate of the serial port.
-       serial_port.SetBaudRate( BaudRate::BAUD_115200 );
-
-       // Set the number of data bits.
-       serial_port.SetCharacterSize( CharacterSize::CHAR_SIZE_8 );
-
-       // Turn off hardware flow control.
-       serial_port.SetFlowControl( FlowControl::FLOW_CONTROL_NONE );
-
-       // Disable parity.
-       serial_port.SetParity( Parity::PARITY_NONE );
-       
-       // Set the number of stop bits.
-       serial_port.SetNumberOfStopBits( StopBits::STOP_BITS_1 );
-
-       // Open the input file for reading. 
-       std::ifstream input_file( argv[1] );
-       
-       if (!input_file.good()) 
-       {
-           std::cerr << "Error: Could not open file "
-                     << argv[1] << " for reading." << std::endl;
-           return 1 ;
-       }
-
-       // Read characters from the input file and dump them to the serial port. 
-       std::cerr << "Dumping file to serial port." << std::endl;
-       
-       while ( input_file ) 
-       {
-           char readByte;
-           unsigned char writeByte;
-
-           input_file.read( &readByte, 1 );
-
-           writeByte = readByte;
-
-           serial_port.WriteByte( writeByte );
-
-           // Print a '.' for every character read from the input file. 
-           std::cerr << ".";
-       }
-
-       std::cerr << std::endl;
-       std::cerr << "Done." << std::endl;
-       return EXIT_SUCCESS;
-   }
+   my_serial_port.Close();
+   my_serial_stream.Close();
