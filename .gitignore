@@ -63,6 +63,7 @@ missing
 stamp-h1
 
 # Examples
+examples/main_page_example
 examples/serial_port_read
 examples/serial_port_read_write
 examples/serial_port_write

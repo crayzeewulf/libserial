@@ -43,6 +43,12 @@ To install the build to your /usr/local/ directory your may simply:
 
    sudo make install
 
+To install to another directory, simply use the *prefix* argument in the configure step above:
+
+.. code-block:: c++
+
+   ./configure --prefix=<DIRECTORY_NAME>
+
 The code is also easily built using cmake via a bash script:
 
 .. code-block:: c++
