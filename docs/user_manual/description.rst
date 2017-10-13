@@ -5,7 +5,7 @@ LibSerial provides a collection of C++ classes that allow object oriented
 access to serial ports on POSIX systems.
 
 The SerialPort class is available to simplified access to serial port
-settings along with a set of convenient read/write methods.<br>
+settings along with a set of convenient read/write methods.
 This class is useful for embedded systems where a complete C++ STL
 may not be available.
 
@@ -15,7 +15,7 @@ standard C++ iostream objects.
 Member functions are provided in both classes for setting serial port
 parameters such as baud rate, character size, flow control, etc.
 
-LibSerial exists to simplify serial port programming on POSIX systems.<br>
+LibSerial exists to simplify serial port programming on POSIX systems.
 Here is short example using libserial:
 
 .. code-block:: c++
