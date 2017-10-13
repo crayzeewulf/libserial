@@ -24,26 +24,34 @@ Use Doxygen style comments (with @ commands) for every:
 
 Allman (BSD) indentation style
 
+
+Classes/Namespace/Structure/Enumeration names: CamelCase
+Class methods: CamelCase
+Class members: mCamelCase
+
+Arguments to methods/functions: camelCase (lower case first word)
+
+
 Naming Convention:
 ------------------
-Use CamelCase for everything, (classes, variables, filenames), with the exception of local variables within a functions, in which case use underscores.
+Use CamelCase for Files, Classes, Namespace, Structures, Enumerations, Functions, Procedures, and Member Variables.
 
-Classes start with a capitalized letter and are nouns.
+Filenames are the name of the class or namespace within - one class per file.
 
-Variables start with a lowercase letter and are nouns.
+Classes, Namespaces, Structures, Enumerations, and Functions start with a capitalized letter and are nouns: (e.g. SerialPort, SerialStream, etc.).
+Inhertied functions are may be exceptions.
 
-Typically, functions start with a lowercase letter and begin with verbs, however, to retain recognizable meaning while avoiding termios functions of the same name, most LibSerial methods begin with an uppercase letter and begin with verbs.  Exceptions to this are inherited/overloaded functions.
+Function names are a description of the return value, and Procedure names are a strong verb followed by an object. (See Code Complete 2 §7.6 for the difference between a function and a procedure verb.)
 
-To name a function, use a description of the return value. 
-To name a procedure, use a strong verb followed by an object. (See Code Complete 2 §7.6 for the difference between a function and a procedure verb.)
+Argument variables start with a lowercase letter and are nouns; (e.g. numberOfBytes, etc.)
 
-Filenames are the name of the class or namespace within.  One class per file.
+Member Variables start with a lowercase letter "m" and are nouns; (e.g. mFileDescriptor, etc.).
 
-Constants are named identically to variables.
+Use underscores for non-member functions and local variables, lower case with an underscore to separate words; (e.g. lower_case, short_names). 
 
-Globals are named identically to variables.
+Constants and Globals are named identically to variables.
 
-Member variables are named identically to variables.
+Do not use abbreviations, and be as precise and descriptive with naming as possible.
 
 Indentation:
 ------------
@@ -68,6 +76,7 @@ If the constructor initializers don't fit on a single line, put constructor init
    Class::Class()
        : var1(1)
        , var2(2)
+       , var3(3)
    {
    ...
    }
