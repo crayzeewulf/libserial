@@ -6,8 +6,8 @@ LibSerial's Coding standards
 
 Try to utilize these guidelines if you are contributing the LibSerial as a developer.  Although we attempt to maintain these standards wherever practical, on occasion you might still discover a few deviations.
 
-ISO standard C++ only
-C++11
+ISO standard C++, C++11
+
 Use Doxygen style comments (with @ commands) for every:
 
    * Class
@@ -20,6 +20,7 @@ Use Doxygen style comments (with @ commands) for every:
 
    * File
 
+     * @file command, (except @example files)
      * @copyright command
 
 Allman (BSD) indentation style
@@ -36,14 +37,14 @@ Naming Convention:
 ------------------
 Use CamelCase for Files, Classes, Namespace, Structures, Enumerations, Functions, Procedures, and Member Variables.
 
-Filenames are the name of the class or namespace within - one class per file.
+Filenames are the name of the class or namespace within -- one class per file.
 
 Classes, Namespaces, Structures, Enumerations, and Functions start with a capitalized letter and are nouns: (e.g. SerialPort, SerialStream, etc.).
-Inhertied functions are may be exceptions.
+Inhertied functions may be exceptions.
 
 Function names are a description of the return value, and Procedure names are a strong verb followed by an object. (See Code Complete 2 §7.6 for the difference between a function and a procedure verb.)
 
-Argument variables start with a lowercase letter and are nouns; (e.g. numberOfBytes, etc.)
+Function arguments start with a lowercase letter and are nouns; (e.g. numberOfBytes, etc.)
 
 Member Variables start with a lowercase letter "m" and are nouns; (e.g. mFileDescriptor, etc.).
 
@@ -51,7 +52,7 @@ Use underscores for non-member functions and local variables, lower case with an
 
 Constants and Globals are named identically to variables.
 
-Do not use abbreviations, and be as precise and descriptive with naming as possible.
+Do not use abbreviations and be as precise and descriptive with naming as possible.
 
 Indentation:
 ------------
@@ -65,7 +66,7 @@ Case statements are NOT indented.
 
 Class visibility statements are NOT indented (public, protected, private).
 
-One statement per line.  This includes variable declarations.
+One statement per line -- this includes variable declarations.
 
 Do not put short if() ...; statements on one line.
 
@@ -81,7 +82,7 @@ If the constructor initializers don't fit on a single line, put constructor init
    ...
    }
 
-The purpose of this indentation policy, which can feel "incorrect" at times is to ensure that changes are isolated to the minimum number of lines.  Our tools: compilers, editors, diff viewers, and source code repository (git), all operate on a line-by-line basis.  When someone makes a change that affects a portion anywhere in the line, the tools consider the entire line changed.  This can lead to nasty issues like complex merge conflicts, or worse obscure the developer activity.
+The purpose of this indentation policy, which can feel "incorrect" at times is to ensure that changes are isolated to the minimum number of lines.  Our tools, (compilers, editors, diff viewers, and source code repository), all operate on a line-by-line basis.  When someone makes a change that affects a portion anywhere in the line, the tools consider the entire line changed.  This can lead to nasty issues like complex merge conflicts, or, worse, obscure the developer activity.
 
 Include Headers
 ---------------
