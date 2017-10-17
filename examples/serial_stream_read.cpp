@@ -35,7 +35,7 @@ int main()
     serial_stream.SetParity(Parity::PARITY_NONE);
 
     // Set the number of stop bits.
-    serial_stream.SetNumberOfStopBits(StopBits::STOP_BITS_1);
+    serial_stream.SetStopBits(StopBits::STOP_BITS_1);
 
     // Wait for data to be available at the serial port.
     while(serial_stream.rdbuf()->in_avail() == 0) 

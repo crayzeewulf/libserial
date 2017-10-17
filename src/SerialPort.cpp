@@ -21,11 +21,11 @@
 
 #include "SerialPort.h"
 
+#include <chrono>
 #include <cstring>
 #include <fcntl.h>
 #include <linux/serial.h>
 #include <sys/ioctl.h>
-#include <sys/time.h>
 #include <unistd.h>
 
 namespace LibSerial 
@@ -43,8 +43,8 @@ namespace LibSerial
 
         /**
          * @brief Constructor that allows a SerialPort instance to be 
-         *        created and also initialize the corresponding serial
-         *        port with the specified parameters.
+         *        created and opened, initializing the corresponding
+         *        serial port with the specified parameters.
          * @param fileName The file name of the serial port.
          * @param baudRate The communications baud rate.
          * @param characterSize The size of the character buffer for
@@ -73,7 +73,7 @@ namespace LibSerial
          *        communication port is opened.
          */
         void Open(const std::string& fileName,
-                  std::ios_base::openmode openMode);
+                  const std::ios_base::openmode& openMode);
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
@@ -162,15 +162,15 @@ namespace LibSerial
 
         /**
          * @brief Sets the number of stop bits to be used with the serial port.
-         * @param numberOfStopBits The number of stop bits to set.
+         * @param stopBits The number of stop bits to set.
          */
-        void SetNumberOfStopBits(const StopBits& numberOfStopBits);
+        void SetStopBits(const StopBits& stopBits);
 
         /**
          * @brief Gets the number of stop bits currently being used by the serial
          * @return Returns the number of stop bits.
          */
-        StopBits GetNumberOfStopBits();
+        StopBits GetStopBits();
 
         /**
          * @brief Sets the minimum number of characters for non-canonical reads.
@@ -293,9 +293,9 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void Read(SerialPort::DataBuffer& dataBuffer,
-                  const size_t            numberOfBytes = 0,
-                  const size_t            msTimeout = 0);
+        void Read(DataBuffer&  dataBuffer,
+                  const size_t numberOfBytes = 0,
+                  const size_t msTimeout = 0);
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -376,7 +376,7 @@ namespace LibSerial
          * @brief Writes a DataBuffer vector to the serial port.
          * @param dataBuffer The DataBuffer vector to be written to the serial port.
          */
-        void Write(const SerialPort::DataBuffer& dataBuffer);
+        void Write(const DataBuffer& dataBuffer);
 
         /**
          * @brief Writes a std::string to the serial port.
@@ -503,7 +503,7 @@ namespace LibSerial
 
     void
     SerialPort::Open(const std::string& fileName,
-                     std::ios_base::openmode openMode)
+                     const std::ios_base::openmode& openMode)
     {
         mImpl->Open(fileName,
                     openMode);
@@ -610,16 +610,16 @@ namespace LibSerial
     }
 
     void
-    SerialPort::SetNumberOfStopBits(const StopBits& numberOfStopBits)
+    SerialPort::SetStopBits(const StopBits& stopBits)
     {
-        mImpl->SetNumberOfStopBits(numberOfStopBits);
+        mImpl->SetStopBits(stopBits);
         return;
     }
 
     StopBits
-    SerialPort::GetNumberOfStopBits()
+    SerialPort::GetStopBits()
     {
-        return mImpl->GetNumberOfStopBits();
+        return mImpl->GetStopBits();
     }
 
     void
@@ -721,9 +721,9 @@ namespace LibSerial
     }
 
     void
-    SerialPort::Read(SerialPort::DataBuffer& dataBuffer,
-                     const size_t            numberOfBytes,
-                     const size_t            msTimeout)
+    SerialPort::Read(DataBuffer& dataBuffer,
+                     const size_t numberOfBytes,
+                     const size_t msTimeout)
     {
         mImpl->Read(dataBuffer,
                     numberOfBytes,
@@ -840,7 +840,7 @@ namespace LibSerial
         this->SetCharacterSize(characterSize);
         this->SetFlowControl(flowControlType);
         this->SetParity(parityType);
-        this->SetNumberOfStopBits(stopBits);
+        this->SetStopBits(stopBits);
         return;
     }
 
@@ -859,7 +859,7 @@ namespace LibSerial
     inline
     void
     SerialPort::Implementation::Open(const std::string& fileName,
-                                     std::ios_base::openmode openMode)
+                                     const std::ios_base::openmode& openMode)
     {
         // Throw an exception if the port is already open.
         if (this->IsOpen())
@@ -1055,7 +1055,7 @@ namespace LibSerial
         SetCharacterSize(CharacterSize::CHAR_SIZE_DEFAULT);
         SetFlowControl(FlowControl::FLOW_CONTROL_DEFAULT);
         SetParity(Parity::PARITY_DEFAULT);
-        SetNumberOfStopBits(StopBits::STOP_BITS_DEFAULT);
+        SetStopBits(StopBits::STOP_BITS_DEFAULT);
         SetVMin(VMIN_DEFAULT);
         SetVTime(VTIME_DEFAULT);
 
@@ -1424,7 +1424,7 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::SetNumberOfStopBits(const StopBits& numberOfStopBits)
+    SerialPort::Implementation::SetStopBits(const StopBits& stopBits)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1443,7 +1443,7 @@ namespace LibSerial
         }
 
         // Set the number of stop bits.
-        switch(numberOfStopBits)
+        switch(stopBits)
         {
         case StopBits::STOP_BITS_1:
             port_settings.c_cflag &= ~CSTOPB;
@@ -1469,7 +1469,7 @@ namespace LibSerial
 
     inline
     StopBits
-    SerialPort::Implementation::GetNumberOfStopBits()
+    SerialPort::Implementation::GetStopBits()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2106,16 +2106,12 @@ namespace LibSerial
         
         ssize_t read_result = 0;
 
-        timeval entry_time;
-        timeval current_time;
-        timeval elapsed_time;
-        
-        // Throw an exception if we are unable to read the current time.
-        if (gettimeofday(&entry_time,
-                         NULL) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
+        std::chrono::high_resolution_clock::duration entry_time;
+        std::chrono::high_resolution_clock::duration current_time;
+        std::chrono::high_resolution_clock::duration elapsed_time;
+
+        // Obtain the entry time.
+        entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
         // Loop until the number of bytes requested have been read or the timeout has elapsed.
         while (number_of_bytes_read < numberOfBytes)
@@ -2138,20 +2134,14 @@ namespace LibSerial
             {
                 throw std::runtime_error(strerror(errno));
             }
-            
-            // Throw an exception if we are unable to read the current time.
-            if (gettimeofday(&current_time,
-                             NULL) < 0)
-            {
-                throw std::runtime_error(strerror(errno));
-            }
 
-            // Obtain the total elapsed time.
-            timersub(&current_time, &entry_time, &elapsed_time);
+            // Obtain the current time.
+            current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
+
+            elapsed_time = current_time - entry_time;
 
             // Calculate the elapsed number of milliseconds.
-            elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
-                          elapsed_time.tv_usec / MICROSECONDS_PER_MS);
+            elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
 
             // Throw a ReadTimeout exception if more than msTimeout milliseconds
             // have elapsed while waiting for data.
@@ -2190,16 +2180,12 @@ namespace LibSerial
         
         ssize_t read_result = 0;
 
-        timeval entry_time;
-        timeval current_time;
-        timeval elapsed_time;
-        
-        // Throw an exception if we are unable to read the current time.
-        if (gettimeofday(&entry_time,
-                         NULL) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
+        std::chrono::high_resolution_clock::duration entry_time;
+        std::chrono::high_resolution_clock::duration current_time;
+        std::chrono::high_resolution_clock::duration elapsed_time;
+
+        // Obtain the entry time.
+        entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
         // Loop until the number of bytes requested have been read or the timeout has elapsed.
         while (number_of_bytes_read < numberOfBytes)
@@ -2223,19 +2209,13 @@ namespace LibSerial
                 throw std::runtime_error(strerror(errno));
             }
             
-            // Throw an exception if we are unable to read the current time.
-            if (gettimeofday(&current_time,
-                             NULL) < 0)
-            {
-                throw std::runtime_error(strerror(errno));
-            }
+            // Obtain the current time.
+            current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
-            // Obtain the total elapsed time.
-            timersub(&current_time, &entry_time, &elapsed_time);
+            elapsed_time = current_time - entry_time;
 
             // Calculate the elapsed number of milliseconds.
-            elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
-                          elapsed_time.tv_usec / MICROSECONDS_PER_MS);
+            elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
 
             // Throw a ReadTimeout exception if more than msTimeout milliseconds
             // have elapsed while waiting for data.
@@ -2254,9 +2234,9 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::Read(SerialPort::DataBuffer& dataBuffer,
-                                     const size_t            numberOfBytes,
-                                     const size_t            msTimeout)
+    SerialPort::Implementation::Read(DataBuffer&  dataBuffer,
+                                     const size_t numberOfBytes,
+                                     const size_t msTimeout)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2272,16 +2252,12 @@ namespace LibSerial
         
         ssize_t remaining_ms = 0;
 
-        timeval entry_time;
-        timeval current_time;
-        timeval elapsed_time;
-        
-        // Throw an exception if we are unable to read the current time.
-        if (gettimeofday(&entry_time,
-                         NULL) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
+        std::chrono::high_resolution_clock::duration entry_time;
+        std::chrono::high_resolution_clock::duration current_time;
+        std::chrono::high_resolution_clock::duration elapsed_time;
+
+        // Obtain the entry time.
+        entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
         if (numberOfBytes == 0)
         {
@@ -2302,19 +2278,13 @@ namespace LibSerial
 
             for (unsigned int i=0; i<numberOfBytes; ++i)
             {
-                // Throw an exception if we are unable to read the current time.
-                if (gettimeofday(&current_time,
-                                 NULL) < 0)
-                {
-                    throw std::runtime_error(strerror(errno));
-                }
+                // Obtain the current time.
+                current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
-                // Obtain the elapsed time.
-                timersub(&current_time, &entry_time, &elapsed_time);
+                elapsed_time = current_time - entry_time;
 
                 // Calculate the elapsed number of milliseconds.
-                elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
-                              elapsed_time.tv_usec / MICROSECONDS_PER_MS);
+                elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
 
                 // If more than msTimeout milliseconds have elapsed while
                 // waiting for data, then we throw a ReadTimeout exception.
@@ -2358,16 +2328,12 @@ namespace LibSerial
         
         ssize_t remaining_ms = 0;
 
-        timeval entry_time;
-        timeval current_time;
-        timeval elapsed_time;
-        
-        // Throw an exception if we are unable to read the current time.
-        if (gettimeofday(&entry_time,
-                         NULL) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
+        std::chrono::high_resolution_clock::duration entry_time;
+        std::chrono::high_resolution_clock::duration current_time;
+        std::chrono::high_resolution_clock::duration elapsed_time;
+
+        // Obtain the entry time.
+        entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
         if (numberOfBytes == 0)
         {
@@ -2385,19 +2351,13 @@ namespace LibSerial
         {
             for (unsigned int i=0; i<numberOfBytes; ++i)
             {
-                // Throw an exception if we are unable to read the current time.
-                if (gettimeofday(&current_time,
-                                 NULL) < 0)
-                {
-                    throw std::runtime_error(strerror(errno));
-                }
+                // Obtain the current time.
+                current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
-                // Obtain the elapsed time.
-                timersub(&current_time, &entry_time, &elapsed_time);
+                elapsed_time = current_time - entry_time;
 
                 // Calculate the elapsed number of milliseconds.
-                elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
-                              elapsed_time.tv_usec / MICROSECONDS_PER_MS);
+                elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
 
                 // If more than msTimeout milliseconds have elapsed while
                 // waiting for data, then we throw a ReadTimeout exception.
@@ -2475,32 +2435,22 @@ namespace LibSerial
         
         ssize_t remaining_ms = 0;
 
-        timeval entry_time;
-        timeval current_time;
-        timeval elapsed_time;
-        
-        // Throw an exception if we are unable to read the current time.
-        if (gettimeofday(&entry_time,
-                         NULL) < 0)
-        {
-            throw std::runtime_error(strerror(errno));
-        }
+        std::chrono::high_resolution_clock::duration entry_time;
+        std::chrono::high_resolution_clock::duration current_time;
+        std::chrono::high_resolution_clock::duration elapsed_time;
+
+        // Obtain the entry time.
+        entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
         while (next_char != lineTerminator)
         {
-            // Throw an exception if we are unable to read the current time.
-            if (gettimeofday(&current_time,
-                             NULL) < 0)
-            {
-                throw std::runtime_error(strerror(errno));
-            }
+            // Obtain the current time.
+            current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
-            // Obtain the elapsed time.
-            timersub(&current_time, &entry_time, &elapsed_time);
+            elapsed_time = current_time - entry_time;
 
             // Calculate the elapsed number of milliseconds.
-            elapsed_ms = (elapsed_time.tv_sec  * MILLISECONDS_PER_SEC +
-                          elapsed_time.tv_usec / MICROSECONDS_PER_MS);
+            elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
 
             // If more than msTimeout milliseconds have elapsed while
             // waiting for data, then we throw a ReadTimeout exception.
@@ -2604,7 +2554,7 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::Write(const SerialPort::DataBuffer& dataBuffer)
+    SerialPort::Implementation::Write(const DataBuffer& dataBuffer)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())

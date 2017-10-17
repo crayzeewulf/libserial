@@ -1,7 +1,7 @@
 ADD_LIBRARY(libserial_static STATIC
     SerialPort.cpp
-    SerialStream.cc
-    SerialStreamBuf.cc
+    SerialStream.cpp
+    SerialStreamBuf.cpp
 )
 
 SET_TARGET_PROPERTIES(libserial_static

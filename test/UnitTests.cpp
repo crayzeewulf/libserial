@@ -125,6 +125,32 @@ protected:
     
     //---------------------- Serial Stream Unit Tests -----------------------//
 
+    void testSerialStreamConstructors()
+    {
+        SerialStream serialStream3(TEST_SERIAL_PORT_1);
+        SerialStream serialStream4(TEST_SERIAL_PORT_2,
+                                   BaudRate::BAUD_9600,
+                                   CharacterSize::CHAR_SIZE_7,
+                                   FlowControl::FLOW_CONTROL_HARDWARE,
+                                   Parity::PARITY_EVEN,
+                                   StopBits::STOP_BITS_2);
+
+        ASSERT_TRUE(serialStream3.IsOpen());
+        ASSERT_TRUE(serialStream4.IsOpen());
+        
+        ASSERT_EQ(serialStream4.GetBaudRate(),      BaudRate::BAUD_9600);
+        ASSERT_EQ(serialStream4.GetCharacterSize(), CharacterSize::CHAR_SIZE_7);
+        ASSERT_EQ(serialStream4.GetFlowControl(),   FlowControl::FLOW_CONTROL_HARDWARE);
+        ASSERT_EQ(serialStream4.GetParity(),        Parity::PARITY_EVEN);
+        ASSERT_EQ(serialStream4.GetStopBits(),      StopBits::STOP_BITS_2);
+        
+        serialStream3.Close();
+        serialStream4.Close();
+
+        ASSERT_FALSE(serialStream3.IsOpen());
+        ASSERT_FALSE(serialStream4.IsOpen());
+    }
+
     void testSerialStreamOpenClose()
     {
         serialStream1.Open(TEST_SERIAL_PORT_1);
@@ -427,11 +453,11 @@ protected:
 
         for (size_t i = 0; i < 2; i++)
         {
-            serialStream1.SetNumberOfStopBits(stopBits[i]);
-            serialStream2.SetNumberOfStopBits(stopBits[i]);
+            serialStream1.SetStopBits(stopBits[i]);
+            serialStream2.SetStopBits(stopBits[i]);
 
-            numberOfStopBits1 = serialStream1.GetNumberOfStopBits();
-            numberOfStopBits2 = serialStream2.GetNumberOfStopBits();
+            numberOfStopBits1 = serialStream1.GetStopBits();
+            numberOfStopBits2 = serialStream2.GetStopBits();
 
             ASSERT_EQ(numberOfStopBits1, stopBits[i]);
             ASSERT_EQ(numberOfStopBits2, stopBits[i]);
@@ -659,6 +685,32 @@ protected:
     }
 
     //----------------------- Serial Port Unit Tests ------------------------//
+
+    void testSerialPortConstructors()
+    {
+        SerialPort serialPort3(TEST_SERIAL_PORT_1);
+        SerialPort serialPort4(TEST_SERIAL_PORT_2,
+                               BaudRate::BAUD_9600,
+                               CharacterSize::CHAR_SIZE_7,
+                               FlowControl::FLOW_CONTROL_HARDWARE,
+                               Parity::PARITY_EVEN,
+                               StopBits::STOP_BITS_2);
+
+        ASSERT_TRUE(serialPort3.IsOpen());
+        ASSERT_TRUE(serialPort4.IsOpen());
+        
+        ASSERT_EQ(serialPort4.GetBaudRate(),      BaudRate::BAUD_9600);
+        ASSERT_EQ(serialPort4.GetCharacterSize(), CharacterSize::CHAR_SIZE_7);
+        ASSERT_EQ(serialPort4.GetFlowControl(),   FlowControl::FLOW_CONTROL_HARDWARE);
+        ASSERT_EQ(serialPort4.GetParity(),        Parity::PARITY_EVEN);
+        ASSERT_EQ(serialPort4.GetStopBits(),      StopBits::STOP_BITS_2);
+        
+        serialPort3.Close();
+        serialPort4.Close();
+
+        ASSERT_FALSE(serialPort3.IsOpen());
+        ASSERT_FALSE(serialPort4.IsOpen());
+    }
 
     void testSerialPortOpenClose()
     {
@@ -962,19 +1014,19 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
-        StopBits numberOfStopBits1;
-        StopBits numberOfStopBits2;
+        StopBits stopBits1;
+        StopBits stopBits2;
 
         for (size_t i = 0; i < 2; i++)
         {
-            serialPort1.SetNumberOfStopBits(stopBits[i]);
-            serialPort2.SetNumberOfStopBits(stopBits[i]);
+            serialPort1.SetStopBits(stopBits[i]);
+            serialPort2.SetStopBits(stopBits[i]);
 
-            numberOfStopBits1 = serialPort1.GetNumberOfStopBits();
-            numberOfStopBits2 = serialPort2.GetNumberOfStopBits();
+            stopBits1 = serialPort1.GetStopBits();
+            stopBits2 = serialPort2.GetStopBits();
 
-            ASSERT_EQ(numberOfStopBits1, stopBits[i]);
-            ASSERT_EQ(numberOfStopBits2, stopBits[i]);
+            ASSERT_EQ(stopBits1, stopBits[i]);
+            ASSERT_EQ(stopBits2, stopBits[i]);
         }
 
         serialPort1.Close();
@@ -1272,11 +1324,11 @@ protected:
 
         bool timeOutTestPass = false;
 
-        SerialPort::DataBuffer writeDataBuffer1;
-        SerialPort::DataBuffer writeDataBuffer2;
+        DataBuffer writeDataBuffer1;
+        DataBuffer writeDataBuffer2;
 
-        SerialPort::DataBuffer readDataBuffer1;
-        SerialPort::DataBuffer readDataBuffer2;
+        DataBuffer readDataBuffer1;
+        DataBuffer readDataBuffer2;
 
         // Test using ASCII characters.
         for (unsigned char i = 48; i <= 122; i++)
@@ -1671,6 +1723,16 @@ protected:
 
 //------------------------ Serial Stream Unit Tests -------------------------//
 
+TEST_F(LibSerialTest, testSerialStreamConstructors)
+{
+    SCOPED_TRACE("Serial Stream Constructor Tests");
+    
+    for (size_t i = 0; i < numberOfTestIterations; i++)
+    {
+        testSerialStreamConstructors();
+    }  
+}
+
 TEST_F(LibSerialTest, testSerialStreamOpenClose)
 {
     SCOPED_TRACE("Serial Stream Open() and Close() Test");
@@ -1842,7 +1904,17 @@ TEST_F(LibSerialTest, testSerialStreamGetWriteByte)
 }
 
 
-// //------------------------- Serial Port Unit Tests --------------------------//
+//-------------------------- Serial Port Unit Tests -------------------------//
+
+TEST_F(LibSerialTest, testSerialPortConstructors)
+{
+    SCOPED_TRACE("Serial Port Constructors Tests");
+    
+    for (size_t i = 0; i < numberOfTestIterations; i++)
+    {
+        testSerialPortConstructors();
+    }  
+}
 
 TEST_F(LibSerialTest, testSerialPortOpenClose)
 {
