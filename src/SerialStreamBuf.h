@@ -23,6 +23,7 @@
 #define _SerialStreamBuf_h_
 
 #include "SerialPortConstants.h"
+
 #include <memory>
 #include <vector>
 
@@ -53,9 +54,9 @@ namespace LibSerial
         explicit SerialStreamBuf();
 
         /**
-         * @brief Constructor that allows a SerialPort instance to be 
-         *        created and also initialize the corresponding serial
-         *        port with the specified parameters.
+         * @brief Constructor that allows a SerialStreamBuf instance to be 
+         *        created and opened, initializing the corresponding
+         *        serial port with the specified parameters.
          * @param fileName The file name of the serial stream.
          * @param baudRate The communications baud rate.
          * @param characterSize The size of the character buffer for
@@ -84,7 +85,7 @@ namespace LibSerial
          *        communication port is opened.
          */
         void Open(const std::string& fileName,
-                  std::ios_base::openmode openMode = std::ios_base::in | std::ios_base::out);
+                  const std::ios_base::openmode& openMode = std::ios_base::in | std::ios_base::out);
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
@@ -174,15 +175,15 @@ namespace LibSerial
 
         /**
          * @brief Sets the number of stop bits to be used with the serial port.
-         * @param numberOfStopBits The number of stop bits to set.
+         * @param stopBits The number of stop bits to set.
          */
-        void SetNumberOfStopBits(const StopBits& numberOfStopBits);
+        void SetStopBits(const StopBits& stopBits);
 
         /**
          * @brief Gets the number of stop bits currently being used by the serial
          * @return Returns the number of stop bits.
          */
-        StopBits GetNumberOfStopBits();
+        StopBits GetStopBits();
 
         /**
          * @brief Sets the minimum number of characters for non-canonical reads.

@@ -67,43 +67,13 @@ namespace LibSerial
          *        the object to communicate with the serial port.
          */
         explicit SerialStream();
-  
-        /**
-         * @brief Constructor that takes a file name and an open mode to
-         *        construct a SerialStream object. This results in a
-         *        call to basic_fstream::open(s,mode). This is the only
-         *        way to contruct an object of this class. We have to
-         *        enforce this instead of providing a default
-         *        constructor because we want to get a file descriptor
-         *        whenever the basic_fstream::open() function is
-         *        called. However, this function is not made virtual in
-         *        the STL hence it is probably not very safe to overload
-         *        it. We may decide to overload it later but the users
-         *        of this class will have to make sure that this class
-         *        is not used as an fstream class. The SerialStream will
-         *        be in the "open" state (same state as after calling
-         *        the Open() method) after calling this constructor.
-         *
-         *        If the constructor has problems opening the serial port or
-         *        getting the file-descriptor for the port, it will set the
-         *        failbit for the stream. So, one must make sure that the
-         *        stream is in a good state before using it for any further
-         *        I/O operations.
-         *
-         * @param fileName The file name of the serial port. 
-         * @param openMode The open mode for the serial port file. 
-         *
-         */
-        explicit SerialStream(const std::string& fileName, 
-                              std::ios_base::openmode openMode = std::ios::in | std::ios::out);
 
         /**
-         * @brief Constructor that allows one to create a SerialStream
-         *        instance and also initialize the corresponding serial
-         *        port with the specified parameters. This was suggested
-         *        by Witek Adamus (wit3k). 
-         *
-         * @note See https://sourceforge.net/tracker/index.php?func=detail&aid=2137885&group_id=9432&atid=359432
+         * @brief Constructor that allows a SerialStream instance to be 
+         *        created and opened, initializing the corresponding
+         *        serial port with the specified parameters.
+         *        Suggested by Witek Adamus (wit3k):
+         *        https://sourceforge.net/tracker/index.php?func=detail&aid=2137885&group_id=9432&atid=359432
          *
          * @param fileName The file name of the serial stream.
          * @param baudRate The communications baud rate.
@@ -113,12 +83,12 @@ namespace LibSerial
          * @param stopBits The number of stop bits for the serial stream.
          * @param flowControlType The flow control type for the serial stream.
          */
-        SerialStream(const std::string&   fileName,
-                     const BaudRate&      baudRate        = BaudRate::BAUD_DEFAULT,
-                     const CharacterSize& characterSize   = CharacterSize::CHAR_SIZE_DEFAULT,
-                     const FlowControl&   flowControlType = FlowControl::FLOW_CONTROL_DEFAULT,
-                     const Parity&        parityType      = Parity::PARITY_DEFAULT,
-                     const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT);
+        explicit SerialStream(const std::string&   fileName,
+                              const BaudRate&      baudRate        = BaudRate::BAUD_DEFAULT,
+                              const CharacterSize& characterSize   = CharacterSize::CHAR_SIZE_DEFAULT,
+                              const FlowControl&   flowControlType = FlowControl::FLOW_CONTROL_DEFAULT,
+                              const Parity&        parityType      = Parity::PARITY_DEFAULT,
+                              const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT);
 
         /**
          * @brief Default Destructor.
@@ -135,7 +105,7 @@ namespace LibSerial
          *        communication port is opened.
          */
         void Open(const std::string& fileName, 
-                  std::ios_base::openmode openMode = std::ios_base::in | std::ios_base::out);
+                  const std::ios_base::openmode& openMode = std::ios_base::in | std::ios_base::out);
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
@@ -227,21 +197,21 @@ namespace LibSerial
 
         /**
          * @brief Sets the number of stop bits to be used with the serial port.
-         * @param numberOfStopBits The number of stop bits to set. 
+         * @param stopBits The number of stop bits to set. 
          */
-        void SetNumberOfStopBits(const StopBits& numberOfStopBits);
+        void SetStopBits(const StopBits& stopBits);
 
         /**
          * @brief Gets the number of stop bits being used during serial communication.
          * @return Returns the number of stop bits.
          */
-        StopBits GetNumberOfStopBits(); 
+        StopBits GetStopBits(); 
 
         /**
          * @brief Sets the minimum number of characters for non-canonical reads.
          * @param vmin the number of minimum characters to be set.
          */
-        void SetVMin(const short& vmin);
+        void SetVMin(const short vmin);
 
         /**
          * @brief Gets the VMIN value for the device, which represents the
@@ -255,7 +225,7 @@ namespace LibSerial
          * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
          * @param vtime The timeout value in deciseconds to be set.
          */
-        void SetVTime(const short& vtime);
+        void SetVTime(const short vtime);
 
         /** 
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.

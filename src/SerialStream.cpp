@@ -32,16 +32,6 @@ SerialStream::SerialStream()
     this->flush();
 }
 
-SerialStream::SerialStream(const std::string& fileName,
-                           std::ios_base::openmode openMode)
-    : std::iostream(0)
-    , mIOBuffer(0) 
-{
-    this->Open(fileName, openMode);
-    this->flush();
-    return;
-}
-
 SerialStream::SerialStream(const std::string&   fileName,
                            const BaudRate&      baudRate,
                            const CharacterSize& characterSize,
@@ -56,7 +46,7 @@ SerialStream::SerialStream(const std::string&   fileName,
     this->SetCharacterSize(characterSize);
     this->SetFlowControl(flowControlType);
     this->SetParity(parityType);
-    this->SetNumberOfStopBits(stopBits);
+    this->SetStopBits(stopBits);
     this->flush();
     return;
 }
@@ -74,7 +64,7 @@ SerialStream::~SerialStream()
 
 void
 SerialStream::Open(const std::string& fileName,
-                   std::ios_base::openmode openMode)
+                   const std::ios_base::openmode& openMode)
 {
     // Create a new SerialStreamBuf if one does not exist. 
     if (!mIOBuffer)
@@ -430,7 +420,7 @@ SerialStream::GetParity()
 }
 
 void
-SerialStream::SetNumberOfStopBits(const StopBits& numberOfStopBits)
+SerialStream::SetStopBits(const StopBits& stopBits)
 {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
 
@@ -442,7 +432,7 @@ SerialStream::SetNumberOfStopBits(const StopBits& numberOfStopBits)
         // Try to set the number of stop bits. If the corresponding function of the
         // SerialStreamBuf class returns STOP_BITS_INVALID, then we have a
         // problem and the stream is no longer valid for I/O.
-        my_buffer->SetNumberOfStopBits(numberOfStopBits);
+        my_buffer->SetStopBits(stopBits);
     }
     else
     {
@@ -457,7 +447,7 @@ SerialStream::SetNumberOfStopBits(const StopBits& numberOfStopBits)
 }
 
 StopBits
-SerialStream::GetNumberOfStopBits()
+SerialStream::GetStopBits()
 {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
 
@@ -469,7 +459,7 @@ SerialStream::GetNumberOfStopBits()
         // Try to get the number of stop bits. If the corresponding function of the
         // SerialStreamBuf class returns STOP_BITS_INVALID, then we have a
         // problem and the stream is no longer valid for I/O.
-        return my_buffer->GetNumberOfStopBits();
+        return my_buffer->GetStopBits();
     }
     else
     {
@@ -483,7 +473,7 @@ SerialStream::GetNumberOfStopBits()
 }
 
 void
-SerialStream::SetVMin(const short& vmin)
+SerialStream::SetVMin(const short vmin)
 {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
 
@@ -532,7 +522,7 @@ SerialStream::GetVMin()
 }
 
 void
-SerialStream::SetVTime(const short& vtime)
+SerialStream::SetVTime(const short vtime)
 {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
 

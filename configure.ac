@@ -6,7 +6,7 @@ AC_REVISION($Revision: 1.15 $)
 
 dnl Input and Output configuration information
 
-AC_CONFIG_SRCDIR([src/SerialStream.cc])
+AC_CONFIG_SRCDIR([src/SerialStream.cpp])
 AM_CONFIG_HEADER(config.h)
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE

@@ -41,9 +41,9 @@ namespace LibSerial
         Implementation();
 
         /**
-         * @brief Constructor that allows a SerialPort instance to be 
-         *        created and also initialize the corresponding serial
-         *        port with the specified parameters.
+         * @brief Constructor that allows a SerialStreamBuf instance to be 
+         *        created and opened, initializing the corresponding
+         *        serial port with the specified parameters.
          * @param fileName The file name of the serial stream.
          * @param baudRate The communications baud rate.
          * @param characterSize The size of the character buffer for
@@ -72,7 +72,7 @@ namespace LibSerial
          *        communication port is opened.
          */
         void Open(const std::string& fileName,
-                  std::ios_base::openmode openMode);
+                  const std::ios_base::openmode& openMode);
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
@@ -162,15 +162,15 @@ namespace LibSerial
 
         /**
          * @brief Sets the number of stop bits to be used with the serial port.
-         * @param numberOfStopBits The number of stop bits to set.
+         * @param stopBits The number of stop bits to set.
          */
-        void SetNumberOfStopBits(const StopBits& numberOfStopBits);
+        void SetStopBits(const StopBits& stopBits);
 
         /**
          * @brief Gets the number of stop bits currently being used by the serial
          * @return Returns the number of stop bits.
          */
-        StopBits GetNumberOfStopBits();
+        StopBits GetStopBits();
 
         /**
          * @brief Sets the minimum number of characters for non-canonical reads.
@@ -376,7 +376,7 @@ namespace LibSerial
 
     void
     SerialStreamBuf::Open(const std::string& fileName,
-                          std::ios_base::openmode openMode)
+                          const std::ios_base::openmode& openMode)
     {
         mImpl->Open(fileName,
                     openMode);
@@ -483,16 +483,16 @@ namespace LibSerial
     }
 
     void
-    SerialStreamBuf::SetNumberOfStopBits(const StopBits& numberOfStopBits)
+    SerialStreamBuf::SetStopBits(const StopBits& stopBits)
     {
-        mImpl->SetNumberOfStopBits(numberOfStopBits);
+        mImpl->SetStopBits(stopBits);
         return;
     }
 
     StopBits
-    SerialStreamBuf::GetNumberOfStopBits()
+    SerialStreamBuf::GetStopBits()
     {
-        return mImpl->GetNumberOfStopBits();
+        return mImpl->GetStopBits();
     }
 
     void 
@@ -608,7 +608,7 @@ namespace LibSerial
         this->SetCharacterSize(characterSize);
         this->SetFlowControl(flowControlType);
         this->SetParity(parityType);
-        this->SetNumberOfStopBits(stopBits);
+        this->SetStopBits(stopBits);
         return;
     }
 
@@ -627,7 +627,7 @@ namespace LibSerial
     inline
     void
     SerialStreamBuf::Implementation::Open(const std::string& fileName,
-                                          std::ios_base::openmode openMode)
+                                          const std::ios_base::openmode& openMode)
     {
         // Throw an exception if the port is already open.
         if (this->IsOpen())
@@ -827,7 +827,7 @@ namespace LibSerial
         SetCharacterSize(CharacterSize::CHAR_SIZE_DEFAULT);
         SetFlowControl(FlowControl::FLOW_CONTROL_DEFAULT);
         SetParity(Parity::PARITY_DEFAULT);
-        SetNumberOfStopBits(StopBits::STOP_BITS_DEFAULT);
+        SetStopBits(StopBits::STOP_BITS_DEFAULT);
         SetVMin(VMIN_DEFAULT);
         SetVTime(VTIME_DEFAULT);
 
@@ -1196,7 +1196,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetNumberOfStopBits(const StopBits& numberOfStopBits)
+    SerialStreamBuf::Implementation::SetStopBits(const StopBits& stopBits)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1215,7 +1215,7 @@ namespace LibSerial
         }
 
         // Set the number of stop bits.
-        switch(numberOfStopBits)
+        switch(stopBits)
         {
         case StopBits::STOP_BITS_1:
             port_settings.c_cflag &= ~CSTOPB;
@@ -1241,7 +1241,7 @@ namespace LibSerial
 
     inline
     StopBits 
-    SerialStreamBuf::Implementation::GetNumberOfStopBits()
+    SerialStreamBuf::Implementation::GetStopBits()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
