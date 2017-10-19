@@ -570,6 +570,153 @@ SerialStream::GetVTime()
     }
 }
 
+void
+SerialStream::SetDTR(const bool dtrState)
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to set the dtr line state.
+        my_buffer->SetDTR(dtrState);
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer of
+        // class other than SerialStreamBuf. In either case, we have a
+        // problem and we should stop all I/O using this stream.
+        setstate(badbit);
+    }
+
+    return;
+}
+
+bool
+SerialStream::GetDTR()
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to get the vTime duration in deciseconds.
+        return my_buffer->GetDTR();
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer of
+        // class other than SerialStreamBuf. In either case, we have a
+        // problem and we should stop all I/O using this stream.
+        setstate(badbit);
+        return -1;
+    }
+}
+
+void
+SerialStream::SetRTS(const bool rtsState)
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to set the RTS line state.
+        my_buffer->SetRTS(rtsState);
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer of
+        // class other than SerialStreamBuf. In either case, we have a
+        // problem and we should stop all I/O using this stream.
+        setstate(badbit);
+    }
+
+    return;
+}
+
+bool
+SerialStream::GetRTS()
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to get the RTS line state.
+        return my_buffer->GetRTS();
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer of
+        // class other than SerialStreamBuf. In either case, we have a
+        // problem and we should stop all I/O using this stream.
+        setstate(badbit);
+        return -1;
+    }
+}
+
+bool
+SerialStream::GetCTS()
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to get the CTS line state.
+        return my_buffer->GetCTS();
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer of
+        // class other than SerialStreamBuf. In either case, we have a
+        // problem and we should stop all I/O using this stream.
+        setstate(badbit);
+        return -1;
+    }
+}
+
+bool
+SerialStream::GetDSR()
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to get the DSR line state.
+        return my_buffer->GetDSR();
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer of
+        // class other than SerialStreamBuf. In either case, we have a
+        // problem and we should stop all I/O using this stream.
+        setstate(badbit);
+        return -1;
+    }
+}
+
+
 int
 SerialStream::GetFileDescriptor()
 {

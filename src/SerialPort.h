@@ -28,15 +28,6 @@
 
 namespace LibSerial 
 {
-    /**
-     * @todo The current implementation does not check if another process
-     *       has locked the serial port device and does not lock the serial port
-     *       device after opening it. This has been observed to cause problems
-     *       while using this library while other programs such as minicom are
-     *       also accessing the same device.  It would be useful to lock the
-     *       serial port device when it is being used by this class.
-     */
-
     class SerialPort
     {
     public:
@@ -405,7 +396,11 @@ namespace LibSerial
          */
         void WriteByte(const unsigned char charbuffer);
 
+
+    protected:
+
     private:
+
         /**
          * @brief Prevents copying of objects of this class by declaring the copy
          *        constructor private. This method is never defined.
