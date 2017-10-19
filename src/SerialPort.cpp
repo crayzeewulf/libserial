@@ -422,13 +422,13 @@ namespace LibSerial
          * @param blockingStatus The serial port blocking status to be set,
          *        true if to be set blocking, false if to be set non-blocking.
          */
-        void SetPortBlockingStatus(const bool blockingStatus);
+        void SetSerialPortBlockingStatus(const bool blockingStatus);
 
         /**
          * @brief Gets the current state of the serial port blocking status.
          * @return True if port is blocking, false if port non-blocking.
          */
-        bool GetPortBlockingStatus();
+        bool GetSerialPortBlockingStatus();
 
         /**
          * @brief Sets the default Linux specific line discipline modes.
@@ -870,21 +870,21 @@ namespace LibSerial
         // We only allow three different combinations of ios_base::openmode so we can
         // use a switch here to construct the flags to be used with the open() system call.
         // Since we are dealing with the serial port we need to use the O_NOCTTY option.
-        int flags = 0;
-        
+        int flags = (O_NOCTTY | O_NONBLOCK);
+
         if (openMode == (std::ios_base::in | std::ios_base::out))
         {
-            flags = (O_RDWR | O_NOCTTY | O_NONBLOCK);
+            flags |= O_RDWR;
         } 
         else if (openMode == std::ios_base::in)
         {
-            flags = (O_RDONLY | O_NOCTTY | O_NONBLOCK);
+            flags |= O_RDONLY;
         } 
         else if (openMode == std::ios_base::out)
         {
-            flags = (O_WRONLY | O_NOCTTY | O_NONBLOCK);
-        } 
-        else 
+            flags |= O_WRONLY;
+        }
+        else
         {
             return;
         }
@@ -896,6 +896,13 @@ namespace LibSerial
         {
             close(this->mFileDescriptor);
             throw OpenFailed(strerror(errno));
+        }
+
+        // Set the serial port to exclusive access to this process.
+        if (ioctl(this->mFileDescriptor,
+                  TIOCEXCL) == -1)
+        {
+            throw std::runtime_error(strerror(errno));
         }
 
         // Save the current settings of the serial port so they can be
@@ -1003,7 +1010,7 @@ namespace LibSerial
     bool
     SerialPort::Implementation::IsOpen()
     {
-        return (-1 != this->mFileDescriptor);
+        return (this->mFileDescriptor != -1);
     }
 
     inline
@@ -1083,8 +1090,7 @@ namespace LibSerial
         }
 
         // Set the baud rate for both input and output.
-        if (cfsetspeed(&port_settings, (speed_t)baudRate) < 0 ||
-            cfsetospeed(&port_settings, (speed_t)baudRate) < 0)
+        if (cfsetspeed(&port_settings, (speed_t)baudRate))
         {
             // If applying the baud rate settings fail, throw an exception.
             throw std::runtime_error(ERR_MSG_INVALID_BAUD_RATE);
@@ -1701,7 +1707,7 @@ namespace LibSerial
         }
 
         return this->GetModemControlLine(TIOCM_DSR);
-    }    
+    }
 
     inline
     int
@@ -1721,10 +1727,7 @@ namespace LibSerial
     SerialPort::Implementation::GetAvailableSerialPorts()
     {
         const int array_size = 3;
-        
         int file_descriptor = -1;
-        int ioctl_result = -1;
-        
         size_t max_port_number = 128;
         
         serial_struct serial_port_info;
@@ -1747,15 +1750,12 @@ namespace LibSerial
 
                 // Try to open the serial port. 
                 file_descriptor = open(file_name.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
-                
+
                 if (file_descriptor > 0)
                 {
-                    ioctl_result = ioctl(file_descriptor,
-                                         TIOCGSERIAL,
-                                         &serial_port_info);
-
-                    // Check for errors.
-                    if (ioctl_result < 0)
+                    if (ioctl(file_descriptor,
+                              TIOCGSERIAL,
+                              &serial_port_info) == -1)
                     {
                         throw std::runtime_error(strerror(errno));
                     }
@@ -1863,7 +1863,7 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::SetPortBlockingStatus(const bool blockingStatus)
+    SerialPort::Implementation::SetSerialPortBlockingStatus(const bool blockingStatus)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1895,7 +1895,7 @@ namespace LibSerial
 
     inline
     bool
-    SerialPort::Implementation::GetPortBlockingStatus()
+    SerialPort::Implementation::GetSerialPortBlockingStatus()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1907,7 +1907,11 @@ namespace LibSerial
 
         int flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
         
-        if (flags == (flags | O_NONBLOCK))
+        if (flags == -1)
+        {
+            throw std::runtime_error(strerror(errno));
+        }
+        else if (flags == (flags | O_NONBLOCK))
         {
             blocking_status = true;
         }

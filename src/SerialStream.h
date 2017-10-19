@@ -98,13 +98,13 @@ namespace LibSerial
         virtual ~SerialStream(); 
 
         /**
-         * @brief Opens the serial stream associated with the specified
+         * @brief Opens the serial port associated with the specified
          *        file name and the specified mode.
-         * @param fileName The file name of the serial stream object.
+         * @param fileName The file name of the serial port object.
          * @param openMode The communication mode status when the serial
          *        communication port is opened.
          */
-        void Open(const std::string& fileName, 
+        void Open(const std::string& fileName,
                   const std::ios_base::openmode& openMode = std::ios_base::in | std::ios_base::out);
 
         /**
@@ -140,22 +140,20 @@ namespace LibSerial
          */
         bool IsOpen();
 
-        /** 
-         * @brief Sets the input and output baud ratesfor the
-         *        Serial Stream object. 
+        /**
+         * @brief Sets all serial port paramters to their default values.
+         */
+        void SetDefaultSerialPortParameters();
+
+        /**
+         * @brief Sets the baud rate for the serial port to the specified value
+         * @param baudRate The baud rate to be set for the serial port.
          */
         void SetBaudRate(const BaudRate& baudRate);
 
         /**
-         * @brief Gets the current baud rate being used for serial
-         *        communication. This routine queries the serial port for
-         *        its current settings and returns the baud rate that is
-         *        being used by the serial port.
-         * @note This is not a constant function because it checks to see
-         *       that it is dealing with a SerialStream with a non-null
-         *       buffer. If the buffer is null, it attempts to set the
-         *       state of the stream accordingly.
-         * @return Returns the current baud rate for the serial port.
+         * @brief Gets the current baud rate for the serial port.
+         * @return Returns the baud rate.
          */
         BaudRate GetBaudRate();
 
@@ -179,7 +177,7 @@ namespace LibSerial
 
         /**
          * @brief Gets the current flow control setting.
-         * @return Returns the current flow control setting.
+         * @return Returns the flow control type of the serial port.
          */
         FlowControl GetFlowControl();
 
@@ -190,25 +188,26 @@ namespace LibSerial
         void SetParity(const Parity& parityType);
 
         /**
-         * @brief Gets the current parity setting for the serial port. 
-         * @return Returns the parity setting for the serial port. 
+         * @brief Gets the parity type for the serial port.
+         * @return Returns the parity type.
          */
         Parity GetParity();
 
         /**
          * @brief Sets the number of stop bits to be used with the serial port.
-         * @param stopBits The number of stop bits to set. 
+         * @param stopBits The number of stop bits to set.
          */
         void SetStopBits(const StopBits& stopBits);
 
         /**
-         * @brief Gets the number of stop bits being used during serial communication.
+         * @brief Gets the number of stop bits currently being used by the serial
          * @return Returns the number of stop bits.
          */
-        StopBits GetStopBits(); 
+        StopBits GetStopBits();
 
         /**
          * @brief Sets the minimum number of characters for non-canonical reads.
+         * @note See VMIN in man termios(3).
          * @param vmin the number of minimum characters to be set.
          */
         void SetVMin(const short vmin);
@@ -224,6 +223,7 @@ namespace LibSerial
         /** 
          * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
          * @param vtime The timeout value in deciseconds to be set.
+         * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
          */
         void SetVTime(const short vtime);
 
@@ -234,11 +234,49 @@ namespace LibSerial
         short GetVTime();
 
         /**
+         * @brief Sets the DTR line to the specified value.
+         * @param dtrState The line voltage state to be set,
+         *        (true = high, false = low).
+         */
+        void SetDTR(const bool dtrState = true);
+
+        /**
+         * @brief Gets the status of the DTR line.
+         * @return Returns true iff the status of the DTR line is high.
+         */
+        bool GetDTR();
+
+        /**
+         * @brief Set the RTS line to the specified value.
+         * @param rtsState The line voltage state to be set,
+         *        (true = high, false = low).
+         */
+        void SetRTS(const bool rtsState = true);
+
+        /**
+         * @brief Get the status of the RTS line.
+         * @return Returns true iff the status of the RTS line is high.
+         */
+        bool GetRTS();
+
+        /**
+         * @brief Get the status of the CTS line.
+         * @return Returns true iff the status of the CTS line is high.
+         */
+        bool GetCTS();
+
+        /**
+         * @brief Get the status of the DSR line.
+         * @return Returns true iff the status of the DSR line is high.
+         */
+        bool GetDSR();
+
+        /**
          * @brief Gets the serial port file descriptor.
          * @return Returns the serial port file descriptor.
          */
         int GetFileDescriptor();
-        
+
         /**
          * @brief Gets a list of available serial ports.
          * @return Returns a std::vector of std::strings with the name of

@@ -159,6 +159,26 @@ protected:
         ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());
 
+        SerialStream serialStream3;
+        SerialStream serialStream4;
+
+        ASSERT_FALSE(serialStream3.IsOpen());
+        ASSERT_FALSE(serialStream4.IsOpen());
+
+        bool exclusiveUseTestPass = false;
+
+        try
+        {
+            serialStream3.Open(TEST_SERIAL_PORT_1);
+            serialStream4.Open(TEST_SERIAL_PORT_2);
+        }
+        catch (...)
+        {
+            exclusiveUseTestPass = true;
+        }
+
+        ASSERT_TRUE(exclusiveUseTestPass);
+
         serialStream1.Close();
         serialStream2.Close();
 
@@ -171,8 +191,8 @@ protected:
         serialStream1.Open(TEST_SERIAL_PORT_1);
         serialStream2.Open(TEST_SERIAL_PORT_2);
 
-        ASSERT_TRUE(serialPort1.IsOpen());
-        ASSERT_TRUE(serialPort2.IsOpen());
+        ASSERT_TRUE(serialStream1.IsOpen());
+        ASSERT_TRUE(serialStream2.IsOpen());
 
         serialStream1.FlushInputBuffer();
         serialStream2.FlushInputBuffer();
@@ -317,6 +337,24 @@ protected:
         serialStream1.Close();
         serialStream2.Close();
         
+        ASSERT_FALSE(serialStream1.IsOpen());
+        ASSERT_FALSE(serialStream2.IsOpen());
+    }
+
+    void testSerialStreamIsOpenTest()
+    {
+        ASSERT_FALSE(serialStream1.IsOpen());
+        ASSERT_FALSE(serialStream2.IsOpen());
+
+        serialStream1.Open(TEST_SERIAL_PORT_1);
+        serialStream2.Open(TEST_SERIAL_PORT_2);
+
+        ASSERT_TRUE(serialStream1.IsOpen());
+        ASSERT_TRUE(serialStream2.IsOpen());
+
+        serialStream1.Close();
+        serialStream2.Close();
+
         ASSERT_FALSE(serialStream1.IsOpen());
         ASSERT_FALSE(serialStream2.IsOpen());
     }
@@ -530,6 +568,152 @@ protected:
         ASSERT_FALSE(serialStream2.IsOpen());
     }
 
+
+    void testSerialStreamSetGetDTR()
+    {
+        serialStream1.Open(TEST_SERIAL_PORT_1);
+        serialStream2.Open(TEST_SERIAL_PORT_2);
+
+        ASSERT_TRUE(serialStream1.IsOpen());
+        ASSERT_TRUE(serialStream2.IsOpen());
+
+        bool dtrLine1 = false;
+        bool dtrLine2 = false;
+
+        serialStream1.SetDTR(true);
+        serialStream2.SetDTR(true);
+
+        dtrLine1 = serialStream1.GetDTR();
+        dtrLine2 = serialStream2.GetDTR();
+
+        ASSERT_TRUE(dtrLine1);
+        ASSERT_TRUE(dtrLine2);
+
+        serialStream1.SetDTR(false);
+        serialStream2.SetDTR(false);
+
+        dtrLine1 = serialStream1.GetDTR();
+        dtrLine2 = serialStream2.GetDTR();
+
+        ASSERT_FALSE(dtrLine1);
+        ASSERT_FALSE(dtrLine2);
+
+        serialStream1.Close();
+        serialStream2.Close();
+
+        ASSERT_FALSE(serialStream1.IsOpen());
+        ASSERT_FALSE(serialStream2.IsOpen());
+    }
+
+    void testSerialStreamSetGetRTS()
+    {
+        serialStream1.Open(TEST_SERIAL_PORT_1);
+        serialStream2.Open(TEST_SERIAL_PORT_2);
+
+        ASSERT_TRUE(serialStream1.IsOpen());
+        ASSERT_TRUE(serialStream2.IsOpen());
+
+        bool rtsLine1 = false;
+        bool rtsLine2 = false;
+
+        serialStream1.SetRTS(true);
+        serialStream2.SetRTS(true);
+
+        rtsLine1 = serialStream1.GetRTS();
+        rtsLine2 = serialStream2.GetRTS();
+
+        ASSERT_TRUE(rtsLine1);
+        ASSERT_TRUE(rtsLine2);
+
+        serialStream1.SetRTS(false);
+        serialStream2.SetRTS(false);
+        
+        rtsLine1 = serialStream1.GetRTS();
+        rtsLine2 = serialStream2.GetRTS();
+        
+        ASSERT_FALSE(rtsLine1);
+        ASSERT_FALSE(rtsLine2);
+
+        serialStream1.Close();
+        serialStream2.Close();
+
+        ASSERT_FALSE(serialStream1.IsOpen());
+        ASSERT_FALSE(serialStream2.IsOpen());
+    }
+
+    void testSerialStreamSetRTSGetCTS()
+    {
+        serialStream1.Open(TEST_SERIAL_PORT_1);
+        serialStream2.Open(TEST_SERIAL_PORT_2);
+
+        ASSERT_TRUE(serialStream1.IsOpen());
+        ASSERT_TRUE(serialStream2.IsOpen());
+
+        bool ctsLine1 = false;
+        bool ctsLine2 = false;
+
+        serialStream1.SetRTS(true);
+        serialStream2.SetRTS(true);
+
+        ctsLine1 = serialStream1.GetCTS();
+        ctsLine2 = serialStream2.GetCTS();
+
+        ASSERT_TRUE(ctsLine1);
+        ASSERT_TRUE(ctsLine2);
+
+        serialStream1.SetRTS(false);
+        serialStream2.SetRTS(false);
+
+        ctsLine1 = serialStream1.GetCTS();
+        ctsLine2 = serialStream2.GetCTS();
+
+        ASSERT_FALSE(ctsLine1);
+        ASSERT_FALSE(ctsLine2);
+
+        serialStream1.Close();
+        serialStream2.Close();
+
+        ASSERT_FALSE(serialStream1.IsOpen());
+        ASSERT_FALSE(serialStream2.IsOpen());
+    }
+
+    void testSerialStreamSetDTRGetDSR()
+    {
+        serialStream1.Open(TEST_SERIAL_PORT_1);
+        serialStream2.Open(TEST_SERIAL_PORT_2);
+
+        ASSERT_TRUE(serialStream1.IsOpen());
+        ASSERT_TRUE(serialStream2.IsOpen());
+
+        bool dsrStatus1 = false;
+        bool dsrStatus2 = false;
+
+        serialStream1.SetDTR(true);
+        serialStream2.SetDTR(true);
+
+        dsrStatus1 = serialStream1.GetDSR();
+        dsrStatus2 = serialStream2.GetDSR();
+
+        ASSERT_TRUE(dsrStatus1);
+        ASSERT_TRUE(dsrStatus2);
+
+        serialStream1.SetDTR(false);
+        serialStream2.SetDTR(false);
+
+        dsrStatus1 = serialStream1.GetDSR();
+        dsrStatus2 = serialStream1.GetDSR();
+
+        ASSERT_FALSE(dsrStatus1);
+        ASSERT_FALSE(dsrStatus2);
+
+        serialStream1.Close();
+        serialStream2.Close();
+
+        ASSERT_FALSE(serialStream1.IsOpen());
+        ASSERT_FALSE(serialStream2.IsOpen());
+    }
+
+
     void testSerialStreamGetFileDescriptor()
     {
         serialStream1.Open(TEST_SERIAL_PORT_1);
@@ -720,6 +904,26 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
+        SerialPort serialPort3;
+        SerialPort serialPort4;
+
+        ASSERT_FALSE(serialPort3.IsOpen());
+        ASSERT_FALSE(serialPort4.IsOpen());
+
+        bool exclusiveUseTestPass = false;
+
+        try
+        {
+            serialPort3.Open(TEST_SERIAL_PORT_1);
+            serialPort4.Open(TEST_SERIAL_PORT_2);
+        }
+        catch (...)
+        {
+            exclusiveUseTestPass = true;
+        }
+
+        ASSERT_TRUE(exclusiveUseTestPass);
+
         serialPort1.Close();
         serialPort2.Close();
 
@@ -874,6 +1078,24 @@ protected:
 
         ASSERT_FALSE(serialPort1.IsDataAvailable());
         ASSERT_FALSE(serialPort2.IsDataAvailable());
+
+        serialPort1.Close();
+        serialPort2.Close();
+
+        ASSERT_FALSE(serialPort1.IsOpen());
+        ASSERT_FALSE(serialPort2.IsOpen());
+    }
+
+    void testSerialPortIsOpenTest()
+    {
+        ASSERT_FALSE(serialPort1.IsOpen());
+        ASSERT_FALSE(serialPort2.IsOpen());
+
+        serialPort1.Open(TEST_SERIAL_PORT_1);
+        serialPort2.Open(TEST_SERIAL_PORT_2);
+
+        ASSERT_TRUE(serialPort1.IsOpen());
+        ASSERT_TRUE(serialPort2.IsOpen());
 
         serialPort1.Close();
         serialPort2.Close();
@@ -1191,7 +1413,7 @@ protected:
         serialPort2.SetDTR(true);
 
         dsrStatus1 = serialPort1.GetDSR();
-        dsrStatus2 = serialPort1.GetDSR();
+        dsrStatus2 = serialPort2.GetDSR();
 
         ASSERT_TRUE(dsrStatus1);
         ASSERT_TRUE(dsrStatus2);
@@ -1745,41 +1967,51 @@ TEST_F(LibSerialTest, testSerialStreamOpenClose)
 
 TEST_F(LibSerialTest, testSerialStreamFlushInputBuffer)
 {
-    SCOPED_TRACE("Serial Port FlushInputBuffer() Test");
+    SCOPED_TRACE("Serial Stream FlushInputBuffer() Test");
 
     for (size_t i = 0; i < numberOfTestIterations; i++)
     {
-        testSerialPortFlushInputBuffer();
+        testSerialStreamFlushInputBuffer();
     }
 }
 
 TEST_F(LibSerialTest, testSerialStreamFlushOutputBuffer)
 {
-    SCOPED_TRACE("Serial Port FlushOutputBuffer() Test");
+    SCOPED_TRACE("Serial Stream FlushOutputBuffer() Test");
 
     for (size_t i = 0; i < numberOfTestIterations; i++)
     {
-        testSerialPortFlushOutputBuffer();
+        testSerialStreamFlushOutputBuffer();
     }
 }
 
 TEST_F(LibSerialTest, testSerialStreamFlushIOBuffers)
 {
-    SCOPED_TRACE("Serial Port FlushIOBuffers() Test");
+    SCOPED_TRACE("Serial Stream FlushIOBuffers() Test");
 
     for (size_t i = 0; i < numberOfTestIterations; i++)
     {
-        testSerialPortFlushIOBuffers();
+        testSerialStreamFlushIOBuffers();
     }
 }
 
 TEST_F(LibSerialTest, testSerialStreamIsDataAvailableTest)
 {
-    SCOPED_TRACE("Serial Port IsDataAvailable() Test");
+    SCOPED_TRACE("Serial Stream IsDataAvailable() Test");
     
     for (size_t i = 0; i < numberOfTestIterations; i++)
     {
-        testSerialPortIsDataAvailableTest();
+        testSerialStreamIsDataAvailableTest();
+    }
+}
+
+TEST_F(LibSerialTest, testSerialStreamIsOpenTest)
+{
+    SCOPED_TRACE("Serial Stream IsOpen() Test");
+    
+    for (size_t i = 0; i < numberOfTestIterations; i++)
+    {
+        testSerialStreamIsOpenTest();
     }
 }
 
@@ -1835,7 +2067,7 @@ TEST_F(LibSerialTest, testSerialStreamSetGetStopBits)
 
 TEST_F(LibSerialTest, testSerialStreamSetGetVMin)
 {
-    SCOPED_TRACE("Serial Port SetVMin() and GetVMin() Test");
+    SCOPED_TRACE("Serial Stream SetVMin() and GetVMin() Test");
     
     for (size_t i = 0; i < numberOfTestIterations; i++)
     {
@@ -1845,11 +2077,51 @@ TEST_F(LibSerialTest, testSerialStreamSetGetVMin)
 
 TEST_F(LibSerialTest, testSerialStreamSetGetVTime)
 {
-    SCOPED_TRACE("Serial Port SetVTime() and GetVTime() Test");
+    SCOPED_TRACE("Serial Stream SetVTime() and GetVTime() Test");
     
     for (size_t i = 0; i < numberOfTestIterations; i++)
     {
         testSerialStreamSetGetVTime();
+    }
+}
+
+TEST_F(LibSerialTest, testSerialStreamSetGetDTR)
+{
+    SCOPED_TRACE("Serial Stream SetDTR() and GetDTR() Test");
+    
+    for (size_t i = 0; i < numberOfTestIterations; i++)
+    {
+        testSerialStreamSetGetDTR();
+    }
+}
+
+TEST_F(LibSerialTest, testSerialStreamSetGetRTS)
+{
+    SCOPED_TRACE("Serial Stream SetRTS() and GetRTS() Test");
+    
+    for (size_t i = 0; i < numberOfTestIterations; i++)
+    {
+        testSerialStreamSetGetRTS();
+    }
+}
+
+TEST_F(LibSerialTest, testSerialStreamSetRTSGetCTS)
+{
+    SCOPED_TRACE("Serial Stream SetRTS() and GetCTS() Test");
+    
+    for (size_t i = 0; i < numberOfTestIterations; i++)
+    {
+        testSerialStreamSetRTSGetCTS();
+    }
+}
+
+TEST_F(LibSerialTest, testSerialStreamSetDTRGetDSR)
+{
+    SCOPED_TRACE("Serial Stream SetDTR() and GetDSR() Test");
+    
+    for (size_t i = 0; i < numberOfTestIterations; i++)
+    {
+        testSerialStreamSetDTRGetDSR();
     }
 }
 
@@ -1963,6 +2235,16 @@ TEST_F(LibSerialTest, testSerialPortIsDataAvailableTest)
     for (size_t i = 0; i < numberOfTestIterations; i++)
     {
         testSerialPortIsDataAvailableTest();
+    }
+}
+
+TEST_F(LibSerialTest, testSerialPortIsOpenTest)
+{
+    SCOPED_TRACE("Serial Port IsOpen() Test");
+    
+    for (size_t i = 0; i < numberOfTestIterations; i++)
+    {
+        testSerialPortIsOpenTest();
     }
 }
 
