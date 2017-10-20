@@ -22,8 +22,8 @@
 #ifndef _SerialStream_h_
 #define _SerialStream_h_
 
-#include "SerialStreamBuf.h"
 #include "SerialPortConstants.h"
+#include "SerialStreamBuf.h"
 
 namespace LibSerial 
 {
@@ -56,7 +56,7 @@ namespace LibSerial
      *        http://www.UNIX-systems.org/</a>. We will refer to this
      *        document as SUS-2.
      */
-    class SerialStream : public std::iostream 
+    class SerialStream : public std::iostream
     {
     public:
 

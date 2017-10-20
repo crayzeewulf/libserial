@@ -868,6 +868,7 @@ protected:
         ASSERT_FALSE(serialStream2.IsOpen());
     }
 
+
     //----------------------- Serial Port Unit Tests ------------------------//
 
     void testSerialPortConstructors()
@@ -2174,7 +2175,6 @@ TEST_F(LibSerialTest, testSerialStreamGetWriteByte)
         testSerialStreamGetWriteByte();
     }
 }
-
 
 //-------------------------- Serial Port Unit Tests -------------------------//
 
