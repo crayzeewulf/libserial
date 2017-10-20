@@ -68,10 +68,10 @@ public:
     GetParity();
 
     void
-    SetNumberOfStopBits(const LibSerial::StopBits numOfStopBits);
+    SetStopBits(const LibSerial::StopBits stopBits);
 
     LibSerial::StopBits
-    GetNumberOfStopBits();
+    GetStopBits();
 
     void
     SetVMin(const short vmin);
