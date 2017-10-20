@@ -33,7 +33,7 @@ namespace LibSerial
     public:
 
         /**
-         * @brief Default Constructor for a serial port object.
+         * @brief Default Constructor.
          */
         explicit SerialPort();
 
@@ -435,7 +435,7 @@ namespace LibSerial
         std::unique_ptr<Implementation> mImpl;
 
     }; // class SerialPort
-    
+
 } // namespace LibSerial
 
 #endif // #ifndef _SerialPort_h_

@@ -421,10 +421,12 @@ namespace LibSerial
 
     SerialStreamBuf::~SerialStreamBuf()
     {
-        if (mImpl->IsOpen()) 
+        // Close the serial port if it is open.
+        if (mImpl->IsOpen())
         {
             mImpl->Close();
         }
+
         return;
     }
 
@@ -438,7 +440,7 @@ namespace LibSerial
     }
 
     void
-    SerialStreamBuf::Close() 
+    SerialStreamBuf::Close()
     {
         mImpl->Close();
         return;
@@ -505,7 +507,7 @@ namespace LibSerial
     }
 
     CharacterSize
-    SerialStreamBuf::GetCharacterSize() 
+    SerialStreamBuf::GetCharacterSize()
     {
         return mImpl->GetCharacterSize();
     }
@@ -549,7 +551,7 @@ namespace LibSerial
         return mImpl->GetStopBits();
     }
 
-    void 
+    void
     SerialStreamBuf::SetVMin(const short vmin)
     {
         mImpl->SetVMin(vmin);
@@ -624,6 +626,7 @@ namespace LibSerial
     {
         return mImpl->GetAvailableSerialPorts();
     }
+
 
     std::streambuf*
     SerialStreamBuf::setbuf(char_type* character, std::streamsize numberOfBytes)
@@ -1624,7 +1627,7 @@ namespace LibSerial
                     }
 
                     serial_port_names.push_back(file_name);
-                    
+
                     close(file_descriptor);
                 }
             }

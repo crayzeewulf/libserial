@@ -47,7 +47,6 @@ SerialStream::SerialStream(const std::string&   fileName,
     this->SetFlowControl(flowControlType);
     this->SetParity(parityType);
     this->SetStopBits(stopBits);
-    this->flush();
     return;
 }
 

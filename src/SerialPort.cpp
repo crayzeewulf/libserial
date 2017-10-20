@@ -493,9 +493,9 @@ namespace LibSerial
     SerialPort::~SerialPort()
     {
         // Close the serial port if it is open.
-        if (this->IsOpen())
+        if (mImpl->IsOpen())
         {
-            this->Close();
+            mImpl->Close();
         }
 
         return;
@@ -1761,7 +1761,7 @@ namespace LibSerial
                     }
 
                     serial_port_names.push_back(file_name);
-                    
+
                     close(file_descriptor);
                 }
             }
