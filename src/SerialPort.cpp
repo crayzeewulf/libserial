@@ -644,7 +644,7 @@ SerialPort::SerialPortImpl::Open()
                             O_RDWR | O_NOCTTY | O_NONBLOCK ) ;
     if ( mFileDescriptor < 0 )
     {
-        throw SerialPort::OpenFailed( strerror(errno) )  ;
+        throw SerialPort::OpenFailed( std::strerror(errno) )  ;
     }
 
 
@@ -660,7 +660,7 @@ SerialPort::SerialPortImpl::Open()
                 F_SETOWN,
                 getpid() ) < 0 )
     {
-        throw SerialPort::OpenFailed( strerror(errno) ) ;
+        throw SerialPort::OpenFailed( std::strerror(errno) ) ;
     }
 
     /*
@@ -670,7 +670,7 @@ SerialPort::SerialPortImpl::Open()
                 F_SETFL,
                 FASYNC ) < 0 )
     {
-        throw SerialPort::OpenFailed( strerror(errno) ) ;
+        throw SerialPort::OpenFailed( std::strerror(errno) ) ;
     }
 
     /*
@@ -680,7 +680,7 @@ SerialPort::SerialPortImpl::Open()
     if ( tcgetattr( mFileDescriptor,
                     &mOldPortSettings ) < 0 )
     {
-        throw SerialPort::OpenFailed( strerror(errno) ) ;
+        throw SerialPort::OpenFailed( std::strerror(errno) ) ;
     }
 
     //
@@ -712,7 +712,7 @@ SerialPort::SerialPortImpl::Open()
     if ( tcflush( mFileDescriptor,
                   TCIFLUSH ) < 0 )
     {
-        throw SerialPort::OpenFailed( strerror(errno) ) ;
+        throw SerialPort::OpenFailed( std::strerror(errno) ) ;
     }
     /*
      * Write the new settings to the port.
@@ -721,7 +721,7 @@ SerialPort::SerialPortImpl::Open()
                     TCSANOW,
                     &port_settings ) < 0 )
     {
-        throw SerialPort::OpenFailed( strerror(errno) ) ;
+        throw SerialPort::OpenFailed( std::strerror(errno) ) ;
     }
 
     /*
@@ -819,7 +819,7 @@ SerialPort::SerialPortImpl::SetBaudRate( const SerialPort::BaudRate baudRate )
     if ( tcgetattr( mFileDescriptor,
                     &port_settings ) < 0 )
     {
-        throw std::runtime_error( strerror(errno) ) ;
+        throw std::runtime_error( std::strerror(errno) ) ;
     }
     //
     // Set the baud rate for both input and output.
@@ -841,7 +841,7 @@ SerialPort::SerialPortImpl::SetBaudRate( const SerialPort::BaudRate baudRate )
                     TCSANOW,
                     &port_settings ) < 0 )
     {
-        throw SerialPort::UnsupportedBaudRate( strerror(errno) ) ;
+        throw SerialPort::UnsupportedBaudRate( std::strerror(errno) ) ;
     }
     return ;
 }
@@ -866,7 +866,7 @@ SerialPort::SerialPortImpl::GetBaudRate() const
     if ( tcgetattr( mFileDescriptor,
                     &port_settings ) < 0 )
     {
-        throw std::runtime_error( strerror(errno) ) ;
+        throw std::runtime_error( std::strerror(errno) ) ;
     }
     //
     // Obtain the input baud rate from the current settings.
@@ -895,7 +895,7 @@ SerialPort::SerialPortImpl::SetCharSize( const SerialPort::CharacterSize charSiz
     if ( tcgetattr( mFileDescriptor,
                     &port_settings ) < 0 )
     {
-        throw std::runtime_error( strerror(errno) ) ;
+        throw std::runtime_error( std::strerror(errno) ) ;
     }
     //
     // Set the character size.
@@ -909,7 +909,7 @@ SerialPort::SerialPortImpl::SetCharSize( const SerialPort::CharacterSize charSiz
                     TCSANOW,
                     &port_settings ) < 0 )
     {
-        throw std::invalid_argument( strerror(errno) ) ;
+        throw std::invalid_argument( std::strerror(errno) ) ;
     }
     return ;
 }
@@ -934,7 +934,7 @@ SerialPort::SerialPortImpl::GetCharSize() const
     if ( tcgetattr( mFileDescriptor,
                     &port_settings ) < 0 )
     {
-        throw std::runtime_error( strerror(errno) ) ;
+        throw std::runtime_error( std::strerror(errno) ) ;
     }
     //
     // Read the character size from the setttings.
@@ -962,7 +962,7 @@ SerialPort::SerialPortImpl::SetFlowControl( const SerialPort::FlowControl   flow
     if ( tcgetattr( mFileDescriptor,
                     &port_settings ) < 0 )
     {
-        throw std::runtime_error( strerror(errno) ) ;
+        throw std::runtime_error( std::strerror(errno) ) ;
     }
     //
     // Set the flow control.
@@ -986,7 +986,7 @@ SerialPort::SerialPortImpl::SetFlowControl( const SerialPort::FlowControl   flow
                     TCSANOW,
                     &port_settings ) < 0 )
     {
-        throw std::invalid_argument( strerror(errno) ) ;
+        throw std::invalid_argument( std::strerror(errno) ) ;
     }
     return ;
 }
@@ -1010,7 +1010,7 @@ SerialPort::SerialPortImpl::GetFlowControl() const
     if ( tcgetattr( mFileDescriptor,
                     &port_settings ) < 0 )
     {
-        throw std::runtime_error( strerror(errno) ) ;
+        throw std::runtime_error( std::strerror(errno) ) ;
     }
     //
     // If CRTSCTS is set then we are using hardware flow
@@ -1044,7 +1044,7 @@ SerialPort::SerialPortImpl::SetParity( const SerialPort::Parity parityType )
     if ( tcgetattr( mFileDescriptor,
                     &port_settings ) < 0 )
     {
-        throw std::runtime_error( strerror(errno) ) ;
+        throw std::runtime_error( std::strerror(errno) ) ;
     }
     //
     // Set the parity type depending on the specified parameter.
@@ -1075,7 +1075,7 @@ SerialPort::SerialPortImpl::SetParity( const SerialPort::Parity parityType )
                     TCSANOW,
                     &port_settings ) < 0 )
     {
-        throw std::invalid_argument( strerror(errno) ) ;
+        throw std::invalid_argument( std::strerror(errno) ) ;
     }
     return ;
 }
@@ -1099,7 +1099,7 @@ SerialPort::SerialPortImpl::GetParity() const
     if ( tcgetattr( mFileDescriptor,
                     &port_settings ) < 0 )
     {
-        throw std::runtime_error( strerror(errno) ) ;
+        throw std::runtime_error( std::strerror(errno) ) ;
     }
     //
     // Get the parity type from the current settings.
@@ -1144,7 +1144,7 @@ SerialPort::SerialPortImpl::SetNumOfStopBits( const SerialPort::StopBits numOfSt
     if ( tcgetattr( mFileDescriptor,
                     &port_settings ) < 0 )
     {
-        throw std::runtime_error( strerror(errno) ) ;
+        throw std::runtime_error( std::strerror(errno) ) ;
     }
     //
     // Set the number of stop bits.
@@ -1168,7 +1168,7 @@ SerialPort::SerialPortImpl::SetNumOfStopBits( const SerialPort::StopBits numOfSt
                     TCSANOW,
                     &port_settings ) < 0 )
     {
-        throw std::invalid_argument( strerror(errno) ) ;
+        throw std::invalid_argument( std::strerror(errno) ) ;
     }
     return ;
 }
@@ -1192,7 +1192,7 @@ SerialPort::SerialPortImpl::GetNumOfStopBits() const
     if ( tcgetattr( mFileDescriptor,
                     &port_settings ) < 0 )
     {
-        throw std::runtime_error( strerror(errno) ) ;
+        throw std::runtime_error( std::strerror(errno) ) ;
     }
     //
     // If CSTOPB is set then we are using two stop bits, otherwise we
@@ -1305,7 +1305,7 @@ SerialPort::SerialPortImpl::SetModemControlLine( const int  modemLine,
     //
     if ( -1 == ioctl_result )
     {
-        throw std::runtime_error( strerror(errno) ) ;
+        throw std::runtime_error( std::strerror(errno) ) ;
     }
     return ;
 }
@@ -1331,7 +1331,7 @@ SerialPort::SerialPortImpl::GetModemControlLine( const int modemLine ) const
                       TIOCMGET,
                       &serial_port_state ) )
     {
-        throw std::runtime_error( strerror(errno) ) ;
+        throw std::runtime_error( std::strerror(errno) ) ;
     }
     //
     // :TODO: Verify that modemLine is a valid value.
@@ -1364,7 +1364,7 @@ SerialPort::SerialPortImpl::ReadByte(const unsigned int msTimeout)
     if ( gettimeofday( &entry_time,
                        NULL ) < 0 )
     {
-        throw std::runtime_error( strerror(errno) ) ;
+        throw std::runtime_error( std::strerror(errno) ) ;
     }
     //
     // Wait for data to be available.
@@ -1381,7 +1381,7 @@ SerialPort::SerialPortImpl::ReadByte(const unsigned int msTimeout)
         if ( gettimeofday( &curr_time,
                            NULL ) < 0 )
         {
-            throw std::runtime_error( strerror(errno) ) ;
+            throw std::runtime_error( std::strerror(errno) ) ;
         }
         //
         // Obtain the elapsed time.
@@ -1604,7 +1604,7 @@ SerialPort::SerialPortImpl::Write( const unsigned char* dataBuffer,
     //
     if ( num_of_bytes_written < 0 )
     {
-        throw std::runtime_error( strerror(errno) ) ;
+        throw std::runtime_error( std::strerror(errno) ) ;
     }
     //
     // :FIXME: What happens if num_of_bytes_written < bufferSize ?
