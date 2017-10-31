@@ -68,10 +68,10 @@ public:
     GetParity();
 
     void
-    SetNumberOfStopBits(const LibSerial::StopBits numOfStopBits);
+    SetStopBits(const LibSerial::StopBits stopBits);
 
     LibSerial::StopBits
-    GetNumberOfStopBits();
+    GetStopBits();
 
     void
     SetVMin(const short vmin);
@@ -109,8 +109,6 @@ public:
     // std::vector<std::string>
     // GetAvailableSerialPorts();
 
-    typedef std::vector<unsigned char> DataBuffer;
-    
     // NOTE: Python3 provides a mechanism for method overloading, however Python2 does not.
     // void
     // Read(char&              charBuffer,
@@ -123,9 +121,9 @@ public:
          const unsigned int msTimeout  = 0);
 
     void
-    Read(DataBuffer& dataBuffer,
-         const unsigned int numOfBytes = 0,
-         const unsigned int msTimeout  = 0);
+    Read(LibSerial::DataBuffer& dataBuffer,
+         const unsigned int     numOfBytes = 0,
+         const unsigned int     msTimeout  = 0);
 
     void
     Read(std::string&       dataString,
@@ -156,7 +154,7 @@ public:
           const unsigned int   numberOfBytes);
     
     void
-    Write(const DataBuffer& dataBuffer);
+    Write(const LibSerial::DataBuffer& dataBuffer);
 
     void
     Write(const std::string& dataString);

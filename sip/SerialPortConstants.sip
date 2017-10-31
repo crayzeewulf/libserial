@@ -5,6 +5,8 @@ namespace LibSerial
 #include <SerialPortConstants.h>
 %End
     
+    typedef std::vector<unsigned char> DataBuffer;
+    
     namespace BaudRate 
     {
         enum

@@ -25,37 +25,22 @@
 #include "SerialPortConstants.h"
 
 #include <memory>
-#include <vector>
 
 namespace LibSerial 
 {
-    /**
-     * @todo The current implementation does not check if another process
-     *       has locked the serial port device and does not lock the serial port
-     *       device after opening it. This has been observed to cause problems
-     *       while using this library while other programs such as minicom are
-     *       also accessing the same device.  It would be useful to lock the
-     *       serial port device when it is being used by this class.
-     */
-
     class SerialPort
     {
     public:
 
         /**
-         * @brief Type used to receive and return raw data to/from methods.
-         */
-        using DataBuffer = std::vector<uint8_t>;
-
-        /**
-         * @brief Default Constructor for a serial port object.
+         * @brief Default Constructor.
          */
         explicit SerialPort();
 
         /**
          * @brief Constructor that allows a SerialPort instance to be 
-         *        created and also initialize the corresponding serial
-         *        port with the specified parameters.
+         *        created and opened, initializing the corresponding
+         *        serial port with the specified parameters.
          * @param fileName The file name of the serial port.
          * @param baudRate The communications baud rate.
          * @param characterSize The size of the character buffer for
@@ -84,7 +69,7 @@ namespace LibSerial
          *        communication port is opened.
          */
         void Open(const std::string& fileName,
-                  std::ios_base::openmode openMode = std::ios_base::in | std::ios_base::out);
+                  const std::ios_base::openmode& openMode = std::ios_base::in | std::ios_base::out);
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
@@ -174,15 +159,15 @@ namespace LibSerial
 
         /**
          * @brief Sets the number of stop bits to be used with the serial port.
-         * @param numberOfStopBits The number of stop bits to set.
+         * @param stopBits The number of stop bits to set.
          */
-        void SetNumberOfStopBits(const StopBits& numberOfStopBits);
+        void SetStopBits(const StopBits& stopBits);
 
         /**
          * @brief Gets the number of stop bits currently being used by the serial
          * @return Returns the number of stop bits.
          */
-        StopBits GetNumberOfStopBits();
+        StopBits GetStopBits();
 
         /**
          * @brief Sets the minimum number of characters for non-canonical reads.
@@ -391,7 +376,7 @@ namespace LibSerial
          * @brief Writes a DataBuffer vector to the serial port.
          * @param dataBuffer The DataBuffer vector to write to the serial port.
          */
-        void Write(const SerialPort::DataBuffer& dataBuffer);
+        void Write(const DataBuffer& dataBuffer);
 
         /**
          * @brief Writes a std::string to the serial port.
@@ -411,7 +396,11 @@ namespace LibSerial
          */
         void WriteByte(const unsigned char charbuffer);
 
+
+    protected:
+
     private:
+
         /**
          * @brief Prevents copying of objects of this class by declaring the copy
          *        constructor private. This method is never defined.
@@ -446,7 +435,7 @@ namespace LibSerial
         std::unique_ptr<Implementation> mImpl;
 
     }; // class SerialPort
-    
+
 } // namespace LibSerial
 
 #endif // #ifndef _SerialPort_h_

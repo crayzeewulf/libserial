@@ -51,8 +51,8 @@ int main()
     serial_stream_2.SetParity(Parity::PARITY_NONE);
     
     // Set the number of stop bits.
-    serial_stream_1.SetNumberOfStopBits(StopBits::STOP_BITS_1);
-    serial_stream_2.SetNumberOfStopBits(StopBits::STOP_BITS_1);
+    serial_stream_1.SetStopBits(StopBits::STOP_BITS_1);
+    serial_stream_2.SetStopBits(StopBits::STOP_BITS_1);
 
     // Variables to store outgoing and incoming data.
     std::string write_string_1 = "\"Do what you can, with what you have, where you are.\" - Theodore Roosevelt";

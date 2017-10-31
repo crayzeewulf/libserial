@@ -50,8 +50,8 @@ int main()
     serial_port_2.SetParity(Parity::PARITY_NONE);
     
     // Set the number of stop bits.
-    serial_port_1.SetNumberOfStopBits(StopBits::STOP_BITS_1);
-    serial_port_2.SetNumberOfStopBits(StopBits::STOP_BITS_1);
+    serial_port_1.SetStopBits(StopBits::STOP_BITS_1);
+    serial_port_2.SetStopBits(StopBits::STOP_BITS_1);
 
     // Setup variables to store outgoing and incoming data.
     char write_byte_1 = 'a';

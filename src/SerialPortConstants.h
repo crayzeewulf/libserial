@@ -25,6 +25,7 @@
 #include <iostream>
 #include <limits>
 #include <termios.h>
+#include <vector>
 
 namespace LibSerial
 {
@@ -69,6 +70,12 @@ namespace LibSerial
      */
     static constexpr char CTRL_S = 0x13;
     
+    /**
+     * @brief Type used to receive and return raw data to/from methods.
+     */
+    typedef std::vector<unsigned char> DataBuffer;
+    
+
     /**
      * @note - For reference, below is a list of std::exception types:
      *         logic_error 

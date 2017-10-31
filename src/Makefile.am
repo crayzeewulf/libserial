@@ -14,7 +14,7 @@ libserial_la_SOURCES = \
 	SerialPort.cpp \
 	SerialPort.h \
 	SerialPortConstants.h \
-	SerialStream.cc \
+	SerialStream.cpp \
 	SerialStream.h \
-	SerialStreamBuf.cc \
+	SerialStreamBuf.cpp \
 	SerialStreamBuf.h

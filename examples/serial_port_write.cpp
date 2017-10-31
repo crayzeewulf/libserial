@@ -58,7 +58,7 @@ int main(int argc, char** argv)
     serial_port.SetParity(Parity::PARITY_NONE);
     
     // Set the number of stop bits.
-    serial_port.SetNumberOfStopBits(StopBits::STOP_BITS_1);
+    serial_port.SetStopBits(StopBits::STOP_BITS_1);
 
     // Read characters from the input file and write them to the serial port. 
     std::cout << "Writing input file contents to the serial port." << std::endl;
