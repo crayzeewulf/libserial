@@ -23,6 +23,7 @@
 #define _SerialStreamBuf_h_
 
 #include "SerialPortConstants.h"
+
 #include <memory>
 #include <vector>
 
@@ -53,9 +54,9 @@ namespace LibSerial
         explicit SerialStreamBuf();
 
         /**
-         * @brief Constructor that allows a SerialPort instance to be 
-         *        created and also initialize the corresponding serial
-         *        port with the specified parameters.
+         * @brief Constructor that allows a SerialStreamBuf instance to be 
+         *        created and opened, initializing the corresponding
+         *        serial port with the specified parameters.
          * @param fileName The file name of the serial stream.
          * @param baudRate The communications baud rate.
          * @param characterSize The size of the character buffer for
@@ -77,14 +78,14 @@ namespace LibSerial
         virtual ~SerialStreamBuf();
 
         /**
-         * @brief Opens the serial stream associated with the specified
+         * @brief Opens the serial port associated with the specified
          *        file name and the specified mode.
-         * @param fileName The file name of the serial stream object.
+         * @param fileName The file name of the serial port object.
          * @param openMode The communication mode status when the serial
          *        communication port is opened.
          */
         void Open(const std::string& fileName,
-                  std::ios_base::openmode openMode = std::ios_base::in | std::ios_base::out);
+                  const std::ios_base::openmode& openMode = std::ios_base::in | std::ios_base::out);
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
@@ -139,7 +140,7 @@ namespace LibSerial
         /**
          * @brief Sets the character size for the serial port.
          * @param characterSize The character size to be set.
-         */ 
+         */
         void SetCharacterSize(const CharacterSize& characterSize);
 
         /**
@@ -150,9 +151,9 @@ namespace LibSerial
 
         /**
          * @brief Sets flow control for the serial port.
-         * @param flowControl The flow control type to be set.
+         * @param flowControlType The flow control type to be set.
          */
-        void SetFlowControl(const FlowControl& flowControl);
+        void SetFlowControl(const FlowControl& flowControlType);
 
         /**
          * @brief Gets the current flow control setting.
@@ -174,18 +175,19 @@ namespace LibSerial
 
         /**
          * @brief Sets the number of stop bits to be used with the serial port.
-         * @param numberOfStopBits The number of stop bits to set.
+         * @param stopBits The number of stop bits to set.
          */
-        void SetNumberOfStopBits(const StopBits& numberOfStopBits);
+        void SetStopBits(const StopBits& stopBits);
 
         /**
          * @brief Gets the number of stop bits currently being used by the serial
          * @return Returns the number of stop bits.
          */
-        StopBits GetNumberOfStopBits();
+        StopBits GetStopBits();
 
         /**
          * @brief Sets the minimum number of characters for non-canonical reads.
+         * @note See VMIN in man termios(3).
          * @param vmin the number of minimum characters to be set.
          */
         void SetVMin(const short vmin);
@@ -201,14 +203,53 @@ namespace LibSerial
         /** 
          * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
          * @param vtime The timeout value in deciseconds to be set.
+         * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
          */
         void SetVTime(const short vtime);
 
         /** 
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
-         * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
+         * @return Returns the character buffer timeout for non-canonical reads in deciseconds. 
          */
         short GetVTime();
+
+        /**
+         * @brief Sets the DTR line to the specified value.
+         * @param dtrState The line voltage state to be set,
+         *        (true = high, false = low).
+         */
+        void SetDTR(const bool dtrState = true);
+
+        /**
+         * @brief Gets the status of the DTR line.
+         * @return Returns true iff the status of the DTR line is high.
+         */
+        bool GetDTR();
+
+        /**
+         * @brief Set the RTS line to the specified value.
+         * @param rtsState The line voltage state to be set,
+         *        (true = high, false = low).
+         */
+        void SetRTS(const bool rtsState = true);
+
+        /**
+         * @brief Get the status of the RTS line.
+         * @return Returns true iff the status of the RTS line is high.
+         */
+        bool GetRTS();
+
+        /**
+         * @brief Get the status of the CTS line.
+         * @return Returns true iff the status of the CTS line is high.
+         */
+        bool GetCTS();
+
+        /**
+         * @brief Get the status of the DSR line.
+         * @return Returns true iff the status of the DSR line is high.
+         */
+        bool GetDSR();
 
         /**
          * @brief Gets the serial port file descriptor.

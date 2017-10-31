@@ -32,16 +32,6 @@ SerialStream::SerialStream()
     this->flush();
 }
 
-SerialStream::SerialStream(const std::string& fileName,
-                           std::ios_base::openmode openMode)
-    : std::iostream(0)
-    , mIOBuffer(0) 
-{
-    this->Open(fileName, openMode);
-    this->flush();
-    return;
-}
-
 SerialStream::SerialStream(const std::string&   fileName,
                            const BaudRate&      baudRate,
                            const CharacterSize& characterSize,
@@ -56,8 +46,7 @@ SerialStream::SerialStream(const std::string&   fileName,
     this->SetCharacterSize(characterSize);
     this->SetFlowControl(flowControlType);
     this->SetParity(parityType);
-    this->SetNumberOfStopBits(stopBits);
-    this->flush();
+    this->SetStopBits(stopBits);
     return;
 }
 
@@ -74,7 +63,7 @@ SerialStream::~SerialStream()
 
 void
 SerialStream::Open(const std::string& fileName,
-                   std::ios_base::openmode openMode)
+                   const std::ios_base::openmode& openMode)
 {
     // Create a new SerialStreamBuf if one does not exist. 
     if (!mIOBuffer)
@@ -430,7 +419,7 @@ SerialStream::GetParity()
 }
 
 void
-SerialStream::SetNumberOfStopBits(const StopBits& numberOfStopBits)
+SerialStream::SetStopBits(const StopBits& stopBits)
 {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
 
@@ -442,7 +431,7 @@ SerialStream::SetNumberOfStopBits(const StopBits& numberOfStopBits)
         // Try to set the number of stop bits. If the corresponding function of the
         // SerialStreamBuf class returns STOP_BITS_INVALID, then we have a
         // problem and the stream is no longer valid for I/O.
-        my_buffer->SetNumberOfStopBits(numberOfStopBits);
+        my_buffer->SetStopBits(stopBits);
     }
     else
     {
@@ -457,7 +446,7 @@ SerialStream::SetNumberOfStopBits(const StopBits& numberOfStopBits)
 }
 
 StopBits
-SerialStream::GetNumberOfStopBits()
+SerialStream::GetStopBits()
 {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
 
@@ -469,7 +458,7 @@ SerialStream::GetNumberOfStopBits()
         // Try to get the number of stop bits. If the corresponding function of the
         // SerialStreamBuf class returns STOP_BITS_INVALID, then we have a
         // problem and the stream is no longer valid for I/O.
-        return my_buffer->GetNumberOfStopBits();
+        return my_buffer->GetStopBits();
     }
     else
     {
@@ -483,7 +472,7 @@ SerialStream::GetNumberOfStopBits()
 }
 
 void
-SerialStream::SetVMin(const short& vmin)
+SerialStream::SetVMin(const short vmin)
 {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
 
@@ -532,7 +521,7 @@ SerialStream::GetVMin()
 }
 
 void
-SerialStream::SetVTime(const short& vtime)
+SerialStream::SetVTime(const short vtime)
 {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
 
@@ -579,6 +568,153 @@ SerialStream::GetVTime()
         return -1;
     }
 }
+
+void
+SerialStream::SetDTR(const bool dtrState)
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to set the dtr line state.
+        my_buffer->SetDTR(dtrState);
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer of
+        // class other than SerialStreamBuf. In either case, we have a
+        // problem and we should stop all I/O using this stream.
+        setstate(badbit);
+    }
+
+    return;
+}
+
+bool
+SerialStream::GetDTR()
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to get the vTime duration in deciseconds.
+        return my_buffer->GetDTR();
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer of
+        // class other than SerialStreamBuf. In either case, we have a
+        // problem and we should stop all I/O using this stream.
+        setstate(badbit);
+        return -1;
+    }
+}
+
+void
+SerialStream::SetRTS(const bool rtsState)
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to set the RTS line state.
+        my_buffer->SetRTS(rtsState);
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer of
+        // class other than SerialStreamBuf. In either case, we have a
+        // problem and we should stop all I/O using this stream.
+        setstate(badbit);
+    }
+
+    return;
+}
+
+bool
+SerialStream::GetRTS()
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to get the RTS line state.
+        return my_buffer->GetRTS();
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer of
+        // class other than SerialStreamBuf. In either case, we have a
+        // problem and we should stop all I/O using this stream.
+        setstate(badbit);
+        return -1;
+    }
+}
+
+bool
+SerialStream::GetCTS()
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to get the CTS line state.
+        return my_buffer->GetCTS();
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer of
+        // class other than SerialStreamBuf. In either case, we have a
+        // problem and we should stop all I/O using this stream.
+        setstate(badbit);
+        return -1;
+    }
+}
+
+bool
+SerialStream::GetDSR()
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to get the DSR line state.
+        return my_buffer->GetDSR();
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer of
+        // class other than SerialStreamBuf. In either case, we have a
+        // problem and we should stop all I/O using this stream.
+        setstate(badbit);
+        return -1;
+    }
+}
+
 
 int
 SerialStream::GetFileDescriptor()
