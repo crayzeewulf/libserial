@@ -895,14 +895,14 @@ namespace LibSerial
         if (this->mFileDescriptor < 0)
         {
             close(this->mFileDescriptor);
-            throw OpenFailed(strerror(errno));
+            throw OpenFailed(std::strerror(errno));
         }
 
         // Set the serial port to exclusive access to this process.
         if (ioctl(this->mFileDescriptor,
                   TIOCEXCL) == -1)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         // Save the current settings of the serial port so they can be
@@ -910,7 +910,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &mOldPortSettings) < 0)
         {
-            throw OpenFailed(strerror(errno));
+            throw OpenFailed(std::strerror(errno));
         }
 
         // Set up the default configuration for the serial port.
@@ -937,14 +937,14 @@ namespace LibSerial
                       TCSANOW,
                       &mOldPortSettings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         // Otherwise, close the serial port and set the file descriptor
         // to an invalid value.
         if (close(this->mFileDescriptor) < 0) 
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         } 
 
         // Set the file descriptor to an invalid value, -1. 
@@ -964,7 +964,7 @@ namespace LibSerial
 
         if (tcflush(this->mFileDescriptor, TCIFLUSH) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         return;
@@ -982,7 +982,7 @@ namespace LibSerial
 
         if (tcflush(this->mFileDescriptor, TCOFLUSH) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         return;
@@ -1000,7 +1000,7 @@ namespace LibSerial
 
         if (tcflush(this->mFileDescriptor, TCIOFLUSH) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         return;
@@ -1086,7 +1086,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         // Set the baud rate for both input and output.
@@ -1102,7 +1102,7 @@ namespace LibSerial
                       &port_settings) < 0)
         {
             // If applying the settings fails, throw an exception.
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         return;
@@ -1125,7 +1125,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         // Read the input and output baud rates.
@@ -1190,7 +1190,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         return;
@@ -1213,7 +1213,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         // Read the character size from the setttings.
@@ -1234,7 +1234,7 @@ namespace LibSerial
         if (tcflush(this->mFileDescriptor,
                     TCIOFLUSH) < 0)
         {
-            throw OpenFailed(strerror(errno));
+            throw OpenFailed(std::strerror(errno));
         }
 
         // Get the current serial port settings.
@@ -1278,7 +1278,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         return;
@@ -1301,7 +1301,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         // Check if IXON and IXOFF are set in c_iflag. If both are set and
@@ -1351,7 +1351,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         // Set the parity type
@@ -1381,7 +1381,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         return;
@@ -1404,7 +1404,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         // Get the parity setting from the termios structure. 
@@ -1445,7 +1445,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         // Set the number of stop bits.
@@ -1467,7 +1467,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         return;
@@ -1490,7 +1490,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         // If CSTOPB is set then we are using two stop bits, otherwise we
@@ -1517,7 +1517,7 @@ namespace LibSerial
 
         if (vmin < 0 || vmin > 255)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::invalid_argument(std::strerror(errno));
         }
 
         // Get the current serial port settings.
@@ -1527,7 +1527,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         port_settings.c_cc[VMIN] = (cc_t)vmin;
@@ -1537,7 +1537,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         return;
@@ -1560,7 +1560,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         return port_settings.c_cc[VMIN];
@@ -1578,7 +1578,7 @@ namespace LibSerial
 
         if (vtime < 0 || vtime > 255)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::invalid_argument(std::strerror(errno));
         }
 
         // Get the current serial port settings.
@@ -1588,7 +1588,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         port_settings.c_cc[VTIME] = (cc_t)vtime;
@@ -1598,7 +1598,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         return;
@@ -1621,7 +1621,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         return port_settings.c_cc[VTIME];
@@ -1757,7 +1757,7 @@ namespace LibSerial
                               TIOCGSERIAL,
                               &serial_port_info) == -1)
                     {
-                        throw std::runtime_error(strerror(errno));
+                        throw std::runtime_error(std::strerror(errno));
                     }
 
                     serial_port_names.push_back(file_name);
@@ -1793,7 +1793,7 @@ namespace LibSerial
             modemLine != TIOCM_RI  &&
             modemLine != TIOCM_DSR)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::invalid_argument(std::strerror(errno));
         }
 
         // Set or unset the specified bit according to the value of lineState.
@@ -1817,7 +1817,7 @@ namespace LibSerial
         // Check for errors.
         if (ioctl_result < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         return;
@@ -1845,7 +1845,7 @@ namespace LibSerial
             modemLine != TIOCM_RI  &&
             modemLine != TIOCM_DSR)
         {
-            throw std::invalid_argument(strerror(errno));
+            throw std::invalid_argument(std::strerror(errno));
         }
         
         // Use an ioctl() call to get the state of the line.
@@ -1855,7 +1855,7 @@ namespace LibSerial
                   TIOCMGET,
                   &serial_port_state) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         return (serial_port_state & modemLine);
@@ -1879,7 +1879,7 @@ namespace LibSerial
                       F_SETFL, 
                       flags &~ O_NONBLOCK) < 0)
             {
-                throw std::runtime_error(strerror(errno));
+                throw std::runtime_error(std::strerror(errno));
             }
         }
         else
@@ -1888,7 +1888,7 @@ namespace LibSerial
                       F_SETFL, 
                       flags | O_NONBLOCK) < 0)
             {
-                throw std::runtime_error(strerror(errno));
+                throw std::runtime_error(std::strerror(errno));
             }
         }
     }
@@ -1909,7 +1909,7 @@ namespace LibSerial
         
         if (flags == -1)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
         else if (flags == (flags | O_NONBLOCK))
         {
@@ -1936,7 +1936,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         // @NOTE - termios.c_line is not a standard element of the termios
@@ -1948,7 +1948,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw OpenFailed(strerror(errno));
+            throw OpenFailed(std::strerror(errno));
         }
 
         return;
@@ -1971,7 +1971,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         // Ignore Break conditions on input.
@@ -1982,7 +1982,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw OpenFailed(strerror(errno));
+            throw OpenFailed(std::strerror(errno));
         }
 
         return;
@@ -2005,7 +2005,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         port_settings.c_oflag = 0;
@@ -2015,7 +2015,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw OpenFailed(strerror(errno));
+            throw OpenFailed(std::strerror(errno));
         }
 
         return;
@@ -2038,7 +2038,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         // Enable the receiver (CREAD) and ignore modem control lines (CLOCAL).
@@ -2049,7 +2049,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw OpenFailed(strerror(errno));
+            throw OpenFailed(std::strerror(errno));
         }
 
         return;
@@ -2072,7 +2072,7 @@ namespace LibSerial
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         port_settings.c_lflag = 0;
@@ -2082,7 +2082,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw OpenFailed(strerror(errno));
+            throw OpenFailed(std::strerror(errno));
         }
 
         return;
@@ -2136,7 +2136,7 @@ namespace LibSerial
             else if (read_result <= 0 &&
                      errno != EWOULDBLOCK)
             {
-                throw std::runtime_error(strerror(errno));
+                throw std::runtime_error(std::strerror(errno));
             }
 
             // Obtain the current time.
@@ -2210,7 +2210,7 @@ namespace LibSerial
             else if (read_result <= 0 &&
                      errno != EWOULDBLOCK)
             {
-                throw std::runtime_error(strerror(errno));
+                throw std::runtime_error(std::strerror(errno));
             }
             
             // Obtain the current time.
@@ -2510,7 +2510,7 @@ namespace LibSerial
         if (num_of_bytes_written < 0 ||
             num_of_bytes_written < (ssize_t)numberOfBytes)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         return;
@@ -2550,7 +2550,7 @@ namespace LibSerial
         if (num_of_bytes_written < 0 ||
             num_of_bytes_written < (ssize_t)numberOfBytes)
         {
-            throw std::runtime_error(strerror(errno));
+            throw std::runtime_error(std::strerror(errno));
         }
 
         return;
