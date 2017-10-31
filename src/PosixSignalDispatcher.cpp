@@ -186,7 +186,7 @@ namespace
                         &sigaction_info,
                         &old_action ) < 0 )
         {
-            throw PosixSignalDispatcher::CannotAttachHandler( strerror(errno) ) ;
+            throw PosixSignalDispatcher::CannotAttachHandler( std::strerror(errno) ) ;
         }
         /*
          * Save a copy of the old handler if it is not PosixSignalDispatcher::SignalHandler.
@@ -269,7 +269,7 @@ namespace
                                 &original_sigaction->second,
                                 NULL ) < 0 )
                 {
-                    throw PosixSignalDispatcher::CannotDetachHandler( strerror(errno) ) ;
+                    throw PosixSignalDispatcher::CannotDetachHandler( std::strerror(errno) ) ;
                 }
             }
         }
