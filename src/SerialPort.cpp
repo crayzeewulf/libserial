@@ -25,13 +25,14 @@
 #include <cstring>
 #include <fcntl.h>
 #include <linux/serial.h>
+#include <stdlib.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
 namespace LibSerial 
 {
     /**
-     * @brief The SerialPort Implementation Class.
+     * @brief SerialPort::Implementation is the SerialPort implementation class.
      */
     class SerialPort::Implementation
     {
@@ -1081,7 +1082,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1120,7 +1121,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1156,7 +1157,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1208,7 +1209,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1239,7 +1240,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1296,7 +1297,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1346,7 +1347,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1399,7 +1400,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1440,7 +1441,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1485,7 +1486,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1522,7 +1523,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1555,7 +1556,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1583,7 +1584,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1616,7 +1617,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1931,7 +1932,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1966,7 +1967,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -2000,7 +2001,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -2033,7 +2034,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -2067,7 +2068,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -2142,6 +2143,7 @@ namespace LibSerial
             // Obtain the current time.
             current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
+            // Calculate the time delta.
             elapsed_time = current_time - entry_time;
 
             // Calculate the elapsed number of milliseconds.
@@ -2216,6 +2218,7 @@ namespace LibSerial
             // Obtain the current time.
             current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
+            // Calculate the time delta.
             elapsed_time = current_time - entry_time;
 
             // Calculate the elapsed number of milliseconds.
@@ -2285,6 +2288,7 @@ namespace LibSerial
                 // Obtain the current time.
                 current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
+                // Calculate the time delta.
                 elapsed_time = current_time - entry_time;
 
                 // Calculate the elapsed number of milliseconds.
@@ -2358,6 +2362,7 @@ namespace LibSerial
                 // Obtain the current time.
                 current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
+                // Calculate the time delta.
                 elapsed_time = current_time - entry_time;
 
                 // Calculate the elapsed number of milliseconds.
@@ -2451,6 +2456,7 @@ namespace LibSerial
             // Obtain the current time.
             current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
+            // Calculate the time delta.
             elapsed_time = current_time - entry_time;
 
             // Calculate the elapsed number of milliseconds.
