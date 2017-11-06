@@ -23,11 +23,13 @@
 #include "PosixSignalDispatcher.h"
 #include "PosixSignalHandler.h"
 
+#include <cerrno>
 #include <cstring>
 #include <iostream>
 #include <fcntl.h>
 #include <queue>
 #include <signal.h>
+#include <stdlib.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <unistd.h>

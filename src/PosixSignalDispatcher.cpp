@@ -20,6 +20,7 @@
 #include "PosixSignalDispatcher.h"
 #include "PosixSignalHandler.h"
 
+#include <cerrno>
 #include <cstring>
 #include <map>
 #include <sstream>
