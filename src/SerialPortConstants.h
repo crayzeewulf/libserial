@@ -22,6 +22,7 @@
 #ifndef SERIALPORTCONSTANTS_H
 #define SERIALPORTCONSTANTS_H
 
+#include <cerrno>
 #include <iostream>
 #include <limits>
 #include <termios.h>

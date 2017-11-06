@@ -30,7 +30,7 @@
 namespace LibSerial
 {
     /**
-     * @brief The SerialStreamBuf Implementation Class.
+     * @brief SerialStreamBuf::Implementation is the SerialStreamBuf implementation class.
      */
     class SerialStreamBuf::Implementation
     {
@@ -947,7 +947,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -986,7 +986,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1022,7 +1022,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1074,7 +1074,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1105,7 +1105,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1162,7 +1162,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1212,7 +1212,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1265,7 +1265,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1306,7 +1306,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1351,7 +1351,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1388,7 +1388,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1421,7 +1421,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1449,7 +1449,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1482,7 +1482,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1797,7 +1797,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1832,7 +1832,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1866,7 +1866,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1899,7 +1899,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
@@ -1933,7 +1933,7 @@ namespace LibSerial
 
         // Get the current serial port settings.
         termios port_settings;
-        memset(&port_settings, 0, sizeof(port_settings));
+        std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
                       &port_settings) < 0)
