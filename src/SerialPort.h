@@ -28,6 +28,15 @@
 
 namespace LibSerial 
 {
+    /**
+     * @brief SerialPort allows an object oriented approach to serial port
+     *        communication.  A serial port object can be created to
+     *        allow opening the port with specified modes and settings.
+     *        The SerialPort class also provides Get/Set methods to
+     *        access the most commonly utilized parameters associated
+     *        with serial port communication.
+     *
+     */
     class SerialPort
     {
     public:
