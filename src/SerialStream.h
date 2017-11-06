@@ -28,10 +28,10 @@
 namespace LibSerial 
 {
     /**
-     * @brief A stream class for accessing serial ports on POSIX operating
-     *        systems. A lot of the functionality of this class has been
-     *        obtained by looking at the code of libserial package by Linas
-     *        Vepstas, (linas@linas.org) and the excellent document on
+     * @brief SerialStream is a stream class for accessing serial ports on
+     *        POSIX operating systems. A lot of the functionality of this class
+     *        has been obtained by looking at the code of libserial package by
+     *        Linas Vepstas, (linas@linas.org) and the excellent document on
      *        serial programming by Michael R. Sweet. This document can be
      *        found at
      *        <ahref="http://www.easysw.com/~mike/serial/serial.html">

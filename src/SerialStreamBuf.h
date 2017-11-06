@@ -30,16 +30,15 @@
 namespace LibSerial
 {
     /**
-     * @brief This is the streambuf subclass used by SerialStream. This
-     *        subclass takes care of opening the serial port file in the
-     *        required modes and providing the corresponding file
-     *        descriptor to SerialStream so that various parameters
-     *        associated with the serial port can be set. Several
-     *        features of this streambuf class resemble those of
-     *        std::filebuf, however this class it not made a subclass of
-     *        filebuf because we need access to the file descriptor
-     *        associated with the serial port and the standard filebuf
-     *        does not provide access to it.
+     * @brief SerialStreamBuf is the streambuf subclass used by SerialStream.
+     *        This subclass takes care of opening the serial port file in the
+     *        required modes and providing the corresponding file descriptor
+     *        to SerialStream so that various parameters associated with the
+     *        serial port can be set. Several features of this streambuf class
+     *        resemble those of std::filebuf, however this class it not made a
+     *        subclass of filebuf because we need access to the file descriptor
+     *        associated with the serial port and the standard filebuf does not
+     *        provide access to it.
      *
      *        At present, this class uses unbuffered I/O and all calls
      *        to setbuf() will be ignored.
