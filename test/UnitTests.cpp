@@ -24,6 +24,7 @@
 #include <mutex>
 #include <thread>
 #include <unistd.h>
+#include <vector>
 
 #include <SerialPort.h>
 #include <SerialStream.h>
@@ -49,11 +50,11 @@ protected:
     size_t failureRate = 0;
     size_t loopCount = 0;
 
-    BaudRate        baudRates[25];
-    CharacterSize   characterSizes[4];
-    FlowControl     flowControlTypes[3];
-    Parity          parityTypes[3];
-    StopBits        stopBits[2];
+    std::vector<BaudRate>        baudRates;
+    std::vector<CharacterSize>   characterSizes ;
+    std::vector<FlowControl>     flowControlTypes ;
+    std::vector<Parity>          parityTypes ;
+    std::vector<StopBits>        stopBits ;
 
     SerialStream serialStream1;
     SerialStream serialStream2;
@@ -72,47 +73,58 @@ protected:
         writeString1 = "Quidquid latine dictum sit, altum sonatur. (Whatever is said in Latin sounds profound.)";
         writeString2 = "The secret of the man who is universally interesting is that he is universally interested. - William Dean Howells";
 
-        baudRates[0]   =  BaudRate::BAUD_50;
-        baudRates[1]   =  BaudRate::BAUD_75;
-        baudRates[2]   =  BaudRate::BAUD_110;
-        baudRates[3]   =  BaudRate::BAUD_134;
-        baudRates[4]   =  BaudRate::BAUD_150;
-        baudRates[5]   =  BaudRate::BAUD_200;
-        baudRates[6]   =  BaudRate::BAUD_300;
-        baudRates[7]   =  BaudRate::BAUD_600;
-        baudRates[8]   =  BaudRate::BAUD_1200;
-        baudRates[9]   =  BaudRate::BAUD_1800;
-        baudRates[10]  =  BaudRate::BAUD_2400;
-        baudRates[11]  =  BaudRate::BAUD_4800;
-        baudRates[12]  =  BaudRate::BAUD_9600;
-        baudRates[13]  =  BaudRate::BAUD_19200;
-        baudRates[14]  =  BaudRate::BAUD_38400;
-        baudRates[15]  =  BaudRate::BAUD_57600;
-        baudRates[16]  =  BaudRate::BAUD_115200;
-        baudRates[17]  =  BaudRate::BAUD_230400;
-        baudRates[18]  =  BaudRate::BAUD_460800;
-        baudRates[19]  =  BaudRate::BAUD_921600;
-        baudRates[20]  =  BaudRate::BAUD_1000000;
-        baudRates[21]  =  BaudRate::BAUD_1500000;
-        baudRates[22]  =  BaudRate::BAUD_2000000;
-        baudRates[23]  =  BaudRate::BAUD_2500000;
-        baudRates[24]  =  BaudRate::BAUD_3000000;
+        baudRates = {
+            BaudRate::BAUD_50,
+            BaudRate::BAUD_75,
+            BaudRate::BAUD_110,
+            BaudRate::BAUD_134,
+            BaudRate::BAUD_150,
+            BaudRate::BAUD_200,
+            BaudRate::BAUD_300,
+            BaudRate::BAUD_600,
+            BaudRate::BAUD_1200,
+            BaudRate::BAUD_1800,
+            BaudRate::BAUD_2400,
+            BaudRate::BAUD_4800,
+            BaudRate::BAUD_9600,
+            BaudRate::BAUD_19200,
+            BaudRate::BAUD_38400,
+            BaudRate::BAUD_57600,
+            BaudRate::BAUD_115200,
+            BaudRate::BAUD_230400,
+            BaudRate::BAUD_460800,
+            BaudRate::BAUD_921600,
+            BaudRate::BAUD_1000000,
+            BaudRate::BAUD_1500000,
+            BaudRate::BAUD_2000000,
+            BaudRate::BAUD_2500000,
+            BaudRate::BAUD_3000000
+        };
 
-        characterSizes[0] = CharacterSize::CHAR_SIZE_5;
-        characterSizes[1] = CharacterSize::CHAR_SIZE_6;
-        characterSizes[2] = CharacterSize::CHAR_SIZE_7;
-        characterSizes[3] = CharacterSize::CHAR_SIZE_8;
+        characterSizes = {
+            CharacterSize::CHAR_SIZE_5,
+            CharacterSize::CHAR_SIZE_5,
+            CharacterSize::CHAR_SIZE_6,
+            CharacterSize::CHAR_SIZE_7,
+            CharacterSize::CHAR_SIZE_8
+        };
 
-        flowControlTypes[0] = FlowControl::FLOW_CONTROL_NONE;
-        flowControlTypes[1] = FlowControl::FLOW_CONTROL_HARDWARE;
-        flowControlTypes[2] = FlowControl::FLOW_CONTROL_SOFTWARE;
+        flowControlTypes = {
+            FlowControl::FLOW_CONTROL_NONE,
+            FlowControl::FLOW_CONTROL_HARDWARE,
+            FlowControl::FLOW_CONTROL_SOFTWARE
+        };
 
-        parityTypes[0] = Parity::PARITY_EVEN;
-        parityTypes[1] = Parity::PARITY_ODD;
-        parityTypes[2] = Parity::PARITY_NONE;
+        parityTypes = {
+            Parity::PARITY_EVEN,
+            Parity::PARITY_ODD,
+            Parity::PARITY_NONE
+        };
 
-        stopBits[0] = StopBits::STOP_BITS_1;
-        stopBits[1] = StopBits::STOP_BITS_2;
+        stopBits = {
+            StopBits::STOP_BITS_1,
+            StopBits::STOP_BITS_2
+        };
     }
 
     size_t getTimeInMilliSeconds()
@@ -367,18 +379,16 @@ protected:
         ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());
 
-        size_t maxBaudIndex = 25;
-
-        for (size_t i = 0; i < maxBaudIndex; i++)
+        for(const auto baud_rate: baudRates)
         {
-            serialStream1.SetBaudRate(baudRates[i]);
-            serialStream2.SetBaudRate(baudRates[i]);
+            serialStream1.SetBaudRate(baud_rate);
+            serialStream2.SetBaudRate(baud_rate);
 
             BaudRate baudRate1 = serialStream1.GetBaudRate();
             BaudRate baudRate2 = serialStream2.GetBaudRate();
 
-            ASSERT_EQ(baudRate1, baudRates[i]);
-            ASSERT_EQ(baudRate2, baudRates[i]);
+            ASSERT_EQ(baudRate1, baud_rate);
+            ASSERT_EQ(baudRate2, baud_rate);
         }
 
         serialStream1.Close();
@@ -396,17 +406,20 @@ protected:
         ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());
 
-        // @NOTE - Smaller Character Size values do not work in Linux.
-        for (size_t i = 2; i < 4; i++)
+        for(const auto char_size: characterSizes)
         {
-            serialStream1.SetCharacterSize(characterSizes[i]);
-            serialStream2.SetCharacterSize(characterSizes[i]);
+            // @NOTE - Smaller Character Size values do not work in Linux.
+            if (char_size < CharacterSize::CHAR_SIZE_6)
+                continue ;
+            
+            serialStream1.SetCharacterSize(char_size);
+            serialStream2.SetCharacterSize(char_size);
 
             CharacterSize characterSize1 = serialStream1.GetCharacterSize();
             CharacterSize characterSize2 = serialStream2.GetCharacterSize();
 
-            ASSERT_EQ(characterSize1, characterSizes[i]);
-            ASSERT_EQ(characterSize2, characterSizes[i]);
+            ASSERT_EQ(characterSize1, char_size);
+            ASSERT_EQ(characterSize2, char_size);
 
             usleep(10);
         }
@@ -429,16 +442,16 @@ protected:
         FlowControl flowControl1 = FlowControl::FLOW_CONTROL_DEFAULT;
         FlowControl flowControl2 = FlowControl::FLOW_CONTROL_DEFAULT;
 
-        for (size_t i = 0; i < 3; i++)
+        for(const auto flow_control: flowControlTypes)
         {
-            serialStream1.SetFlowControl(flowControlTypes[i]);
-            serialStream1.SetFlowControl(flowControlTypes[i]);
+            serialStream1.SetFlowControl(flow_control);
+            serialStream1.SetFlowControl(flow_control);
 
             flowControl1 = serialStream1.GetFlowControl();
             flowControl2 = serialStream1.GetFlowControl();
 
-            ASSERT_EQ(flowControl1, flowControlTypes[i]);
-            ASSERT_EQ(flowControl2, flowControlTypes[i]);
+            ASSERT_EQ(flowControl1, flow_control);
+            ASSERT_EQ(flowControl2, flow_control);
         }
 
         serialStream1.Close();
@@ -459,16 +472,16 @@ protected:
         Parity parity1 = Parity::PARITY_DEFAULT;
         Parity parity2 = Parity::PARITY_DEFAULT;
 
-        for (size_t i = 0; i < 3; i++)
+        for(const auto parity: parityTypes)
         {
-            serialStream1.SetParity(parityTypes[i]);
-            serialStream2.SetParity(parityTypes[i]);
+            serialStream1.SetParity(parity);
+            serialStream2.SetParity(parity);
 
             parity1 = serialStream1.GetParity();
             parity2 = serialStream2.GetParity();
 
-            ASSERT_EQ(parity1, parityTypes[i]);
-            ASSERT_EQ(parity2, parityTypes[i]);
+            ASSERT_EQ(parity1, parity);
+            ASSERT_EQ(parity2, parity);
         }
 
         serialStream1.Close();
@@ -489,16 +502,16 @@ protected:
         StopBits numberOfStopBits1 = StopBits::STOP_BITS_DEFAULT;
         StopBits numberOfStopBits2 = StopBits::STOP_BITS_DEFAULT;
 
-        for (size_t i = 0; i < 2; i++)
+        for(const auto stop_bits: stopBits)
         {
-            serialStream1.SetStopBits(stopBits[i]);
-            serialStream2.SetStopBits(stopBits[i]);
+            serialStream1.SetStopBits(stop_bits);
+            serialStream2.SetStopBits(stop_bits);
 
             numberOfStopBits1 = serialStream1.GetStopBits();
             numberOfStopBits2 = serialStream2.GetStopBits();
 
-            ASSERT_EQ(numberOfStopBits1, stopBits[i]);
-            ASSERT_EQ(numberOfStopBits2, stopBits[i]);
+            ASSERT_EQ(numberOfStopBits1, stop_bits);
+            ASSERT_EQ(numberOfStopBits2, stop_bits);
         }
 
         serialStream1.Close();
@@ -1113,21 +1126,16 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
-        size_t maxBaudIndex = 25;
-
-        BaudRate baudRate1;
-        BaudRate baudRate2;
-
-        for (size_t i = 0; i < maxBaudIndex; i++)
+        for(const auto baud_rate: baudRates)
         {
-            serialPort1.SetBaudRate(baudRates[i]);
-            serialPort2.SetBaudRate(baudRates[i]);
+            serialPort1.SetBaudRate(baud_rate);
+            serialPort2.SetBaudRate(baud_rate);
 
-            baudRate1 = serialPort1.GetBaudRate();
-            baudRate2 = serialPort1.GetBaudRate();
+            const auto baudRate1 = serialPort1.GetBaudRate();
+            const auto baudRate2 = serialPort1.GetBaudRate();
 
-            ASSERT_EQ(baudRate1, baudRates[i]);
-            ASSERT_EQ(baudRate2, baudRates[i]);
+            ASSERT_EQ(baudRate1, baud_rate);
+            ASSERT_EQ(baudRate2, baud_rate);
         }
 
         serialPort1.Close();
@@ -1145,20 +1153,20 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
-        CharacterSize characterSize1;
-        CharacterSize characterSize2;
-
-        // @NOTE - Smaller CharSize values appear to be invalid on x86 Linux.
-        for (size_t i = 2; i < 4; i++)
+        for(const auto char_size: characterSizes)
         {
-            serialPort1.SetCharacterSize(characterSizes[i]);
-            serialPort2.SetCharacterSize(characterSizes[i]);
+            // @NOTE - Smaller CharSize values appear to be invalid on x86 Linux.
+            if (char_size < CharacterSize::CHAR_SIZE_6)
+                continue ;
 
-            characterSize1 = serialPort1.GetCharacterSize();
-            characterSize2 = serialPort2.GetCharacterSize();
+            serialPort1.SetCharacterSize(char_size);
+            serialPort2.SetCharacterSize(char_size);
 
-            ASSERT_EQ(characterSize1, characterSizes[i]);
-            ASSERT_EQ(characterSize2, characterSizes[i]);
+            const auto characterSize1 = serialPort1.GetCharacterSize();
+            const auto characterSize2 = serialPort2.GetCharacterSize();
+
+            ASSERT_EQ(characterSize1, char_size);
+            ASSERT_EQ(characterSize2, char_size);
         }
 
         serialPort1.Close();
@@ -1176,20 +1184,20 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
-        FlowControl flowControl1;
-        FlowControl flowControl2;
-
-        // @NOTE - FLOW_CONTROL_SOFT flow control appears to be invalid on x86 Linux.
-        for (size_t i = 0; i < 2; i++)
+        for(const auto flow_control: flowControlTypes)
         {
-            serialPort1.SetFlowControl(flowControlTypes[i]);
-            serialPort2.SetFlowControl(flowControlTypes[i]);
+            // @NOTE - FLOW_CONTROL_SOFT flow control appears to be invalid on x86 Linux.
+            if (flow_control == FlowControl::FLOW_CONTROL_SOFTWARE)
+                continue ;
 
-            flowControl1 = serialPort1.GetFlowControl();
-            flowControl2 = serialPort2.GetFlowControl();
+            serialPort1.SetFlowControl(flow_control);
+            serialPort2.SetFlowControl(flow_control);
 
-            ASSERT_EQ(flowControl1, flowControlTypes[i]);
-            ASSERT_EQ(flowControl2, flowControlTypes[i]);
+            const auto flowControl1 = serialPort1.GetFlowControl();
+            const auto flowControl2 = serialPort2.GetFlowControl();
+
+            ASSERT_EQ(flowControl1, flow_control);
+            ASSERT_EQ(flowControl2, flow_control);
         }
 
         serialPort1.Close();
@@ -1207,19 +1215,16 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
-        Parity parity1;
-        Parity parity2;
-
-        for (size_t i = 0; i < 3; i++)
+        for(const auto parity: parityTypes)
         {
-            serialPort1.SetParity(parityTypes[i]);
-            serialPort2.SetParity(parityTypes[i]);
+            serialPort1.SetParity(parity);
+            serialPort2.SetParity(parity);
 
-            parity1 = serialPort1.GetParity();
-            parity2 = serialPort2.GetParity();
+            const auto parity1 = serialPort1.GetParity();
+            const auto parity2 = serialPort2.GetParity();
 
-            ASSERT_EQ(parity1, parityTypes[i]);
-            ASSERT_EQ(parity2, parityTypes[i]);
+            ASSERT_EQ(parity1, parity);
+            ASSERT_EQ(parity2, parity);
         }
 
         serialPort1.Close();
@@ -1237,19 +1242,16 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
-        StopBits stopBits1;
-        StopBits stopBits2;
-
-        for (size_t i = 0; i < 2; i++)
+        for(const auto stop_bits: stopBits)
         {
-            serialPort1.SetStopBits(stopBits[i]);
-            serialPort2.SetStopBits(stopBits[i]);
+            serialPort1.SetStopBits(stop_bits);
+            serialPort2.SetStopBits(stop_bits);
 
-            stopBits1 = serialPort1.GetStopBits();
-            stopBits2 = serialPort2.GetStopBits();
+            const auto stopBits1 = serialPort1.GetStopBits();
+            const auto stopBits2 = serialPort2.GetStopBits();
 
-            ASSERT_EQ(stopBits1, stopBits[i]);
-            ASSERT_EQ(stopBits2, stopBits[i]);
+            ASSERT_EQ(stopBits1, stop_bits);
+            ASSERT_EQ(stopBits2, stop_bits);
         }
 
         serialPort1.Close();
@@ -1732,14 +1734,15 @@ protected:
         serialStream1.Open(TEST_SERIAL_PORT_2);
         ASSERT_TRUE(serialStream1.IsOpen());
 
-        serialPort1.SetBaudRate(baudRates[16]);
-        serialStream1.SetBaudRate(baudRates[16]);
+        const auto baud_rate = BaudRate::BAUD_115200 ;
+        serialPort1.SetBaudRate(baud_rate);
+        serialStream1.SetBaudRate(baud_rate);
 
         BaudRate baudRate1 = serialPort1.GetBaudRate();
         BaudRate baudRate2 = serialStream1.GetBaudRate();
 
-        ASSERT_EQ(baudRate1, baudRates[16]);
-        ASSERT_EQ(baudRate2, baudRates[16]);
+        ASSERT_EQ(baudRate1, baud_rate);
+        ASSERT_EQ(baudRate2, baud_rate);
 
         serialStream1 << writeString1 << std::endl;
         serialPort1.ReadLine(readString1, '\n', timeOutMilliseconds);
