@@ -259,13 +259,16 @@ namespace LibSerial
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
-         *        The method will timeout if no data is received in the specified
-         *        number of milliseconds (msTimeout). If msTimeout is 0, then
-         *        this method will block until all requested bytes are
-         *        received. If numberOfBytes is zero, the method will return
-         *        immediately. In all cases, received data remains available
-         *        in the charBuffer on return from this method.
-         * @param charBuffer The character array buffer to place serial data into.
+         *        The method will timeout if no data is received in the
+         *        specified number of milliseconds (msTimeout). If msTimeout
+         *        is zero, then the method will block until all requested bytes
+         *        are received. If numberOfBytes is zero and msTimeout is
+         *        non-zero,  the method will continue receiving data for the
+         *        specified of milliseconds. If numberOfBytes is zero and
+         *        msTimeout is zero, the method will return immediately. In all
+         *        cases, any data received remains available in the charBuffer
+         *        on return from this method.
+         * @param charBuffer The character array buffer to place data into.
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
@@ -275,13 +278,16 @@ namespace LibSerial
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
-         *        The method will timeout if no data is received in the specified
-         *        number of milliseconds (msTimeout). If msTimeout is 0, then
-         *        this method will block until all requested bytes are
-         *        received. If numberOfBytes is zero, the method will return
-         *        immediately. In all cases, received data remains available
-         *        in the charBuffer on return from this method.
-         * @param charBuffer The character array buffer to place serial data into.
+         *        The method will timeout if no data is received in the
+         *        specified number of milliseconds (msTimeout). If msTimeout
+         *        is zero, then the method will block until all requested bytes
+         *        are received. If numberOfBytes is zero and msTimeout is
+         *        non-zero,  the method will continue receiving data for the
+         *        specified of milliseconds. If numberOfBytes is zero and
+         *        msTimeout is zero, the method will return immediately. In all
+         *        cases, any data received remains available in the charBuffer
+         *        on return from this method.
+         * @param charBuffer The character array buffer to place data into.
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
@@ -291,14 +297,16 @@ namespace LibSerial
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
-         *        The method will timeout if no data is received in the specified
-         *        number of milliseconds (msTimeout). If msTimeout is 0, then
-         *        this method will block until all requested bytes are
-         *        received. If numberOfBytes is zero, then this method will keep
-         *        reading data till no more data is available at the serial port.
-         *        In all cases, received data is available in dataBuffer on
-         *        return from this method.
-         * @param dataBuffer The data buffer to place serial data into.
+         *        The method will timeout if no data is received in the
+         *        specified number of milliseconds (msTimeout). If msTimeout
+         *        is zero, then the method will block until all requested bytes
+         *        are received. If numberOfBytes is zero and msTimeout is
+         *        non-zero,  the method will continue receiving data for the
+         *        specified of milliseconds. If numberOfBytes is zero and
+         *        msTimeout is zero, the method will return immediately. In all
+         *        cases, any data received remains available in the dataBuffer
+         *        on return from this method.
+         * @param dataBuffer The data buffer to place data into.
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
@@ -308,14 +316,16 @@ namespace LibSerial
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
-         *        The method will timeout if no data is received in the specified
-         *        number of milliseconds (msTimeout). If msTimeout is 0, then
-         *        this method will block until all requested bytes are
-         *        received. If numberOfBytes is zero, then this method will keep
-         *        reading data till no more data is available at the serial port.
-         *        In all cases, received data is available in dataBuffer on
-         *        return from this method.
-         * @param dataString The data string read from the serial port.
+         *        The method will timeout if no data is received in the
+         *        specified number of milliseconds (msTimeout). If msTimeout
+         *        is zero, then the method will block until all requested bytes
+         *        are received. If numberOfBytes is zero and msTimeout is
+         *        non-zero,  the method will continue receiving data for the
+         *        specified of milliseconds. If numberOfBytes is zero and
+         *        msTimeout is zero, the method will return immediately. In all
+         *        cases, any data received remains available in the dataString
+         *        on return from this method.
+         * @param dataString The string to place data into.
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
@@ -324,11 +334,11 @@ namespace LibSerial
                   const size_t msTimeout  = 0);
 
         /**
-         * @brief Reads a single byte from the serial port.
-         *        If no data is available within the specified number
-         *        of milliseconds (msTimeout), then this method will
-         *        throw a ReadTimeout exception. If msTimeout is 0,
-         *        then this method will block until data is available.
+         * @brief Reads a single byte from the serial port. If no data is 
+         *        available within the specified number of milliseconds,
+         *        (msTimeout), then this method will throw a ReadTimeout
+         *        exception. If msTimeout is zero, then this method will
+         *        block until data becomes available.
          * @param charBuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
@@ -336,11 +346,11 @@ namespace LibSerial
                       const size_t msTimeout = 0);
 
         /**
-         * @brief Reads a single byte from the serial port.
-         *        If no data is available within the specified number
-         *        of milliseconds (msTimeout), then this method will
-         *        throw a ReadTimeout exception. If msTimeout is 0,
-         *        then this method will block until data is available.
+         * @brief Reads a single byte from the serial port. If no data is 
+         *        available within the specified number of milliseconds,
+         *        (msTimeout), then this method will throw a ReadTimeout
+         *        exception. If msTimeout is zero, then this method will
+         *        block until data becomes available.
          * @param charBuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
@@ -349,12 +359,11 @@ namespace LibSerial
 
         /**
          * @brief Reads a line of characters from the serial port.
-         *        The method will timeout if no data is received in the specified
-         *        number of milliseconds (msTimeout). If msTimeout is 0, then
-         *        this method will block until a line terminator is received.
-         *        If a line terminator is read, a string will be returned,
-         *        however, if the timeout is reached, an exception will be thrown
-         *        and all previously read data will be lost.
+         *        The method will timeout if no data is received in the
+         *        specified number of milliseconds (msTimeout).
+         *        If msTimeout is 0, then this method will block until a line
+         *        terminator is received. In all cases, any data received
+         *        remains available in the string on return from this method.
          * @param dataString The data string read from the serial port.
          * @param lineTerminator The line termination character to specify the
          *        end of a line.

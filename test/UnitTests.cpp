@@ -379,7 +379,7 @@ protected:
         ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());
 
-        for(const auto baud_rate: baudRates)
+        for (const auto baud_rate: baudRates)
         {
             serialStream1.SetBaudRate(baud_rate);
             serialStream2.SetBaudRate(baud_rate);
@@ -406,11 +406,13 @@ protected:
         ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());
 
-        for(const auto char_size: characterSizes)
+        for (const auto char_size: characterSizes)
         {
             // @NOTE - Smaller Character Size values do not work in Linux.
-            if (char_size < CharacterSize::CHAR_SIZE_6)
-                continue ;
+            if (char_size < CharacterSize::CHAR_SIZE_7)
+            {
+                continue;
+            }
             
             serialStream1.SetCharacterSize(char_size);
             serialStream2.SetCharacterSize(char_size);
@@ -442,7 +444,7 @@ protected:
         FlowControl flowControl1 = FlowControl::FLOW_CONTROL_DEFAULT;
         FlowControl flowControl2 = FlowControl::FLOW_CONTROL_DEFAULT;
 
-        for(const auto flow_control: flowControlTypes)
+        for (const auto flow_control: flowControlTypes)
         {
             serialStream1.SetFlowControl(flow_control);
             serialStream1.SetFlowControl(flow_control);
@@ -472,7 +474,7 @@ protected:
         Parity parity1 = Parity::PARITY_DEFAULT;
         Parity parity2 = Parity::PARITY_DEFAULT;
 
-        for(const auto parity: parityTypes)
+        for (const auto parity: parityTypes)
         {
             serialStream1.SetParity(parity);
             serialStream2.SetParity(parity);
@@ -502,7 +504,7 @@ protected:
         StopBits numberOfStopBits1 = StopBits::STOP_BITS_DEFAULT;
         StopBits numberOfStopBits2 = StopBits::STOP_BITS_DEFAULT;
 
-        for(const auto stop_bits: stopBits)
+        for (const auto stop_bits: stopBits)
         {
             serialStream1.SetStopBits(stop_bits);
             serialStream2.SetStopBits(stop_bits);
@@ -1156,8 +1158,10 @@ protected:
         for(const auto char_size: characterSizes)
         {
             // @NOTE - Smaller CharSize values appear to be invalid on x86 Linux.
-            if (char_size < CharacterSize::CHAR_SIZE_6)
-                continue ;
+            if (char_size < CharacterSize::CHAR_SIZE_7)
+            {
+                continue;
+            }
 
             serialPort1.SetCharacterSize(char_size);
             serialPort2.SetCharacterSize(char_size);
@@ -1184,11 +1188,13 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
-        for(const auto flow_control: flowControlTypes)
+        for (const auto flow_control: flowControlTypes)
         {
             // @NOTE - FLOW_CONTROL_SOFT flow control appears to be invalid on x86 Linux.
             if (flow_control == FlowControl::FLOW_CONTROL_SOFTWARE)
-                continue ;
+            {
+                continue;
+            }
 
             serialPort1.SetFlowControl(flow_control);
             serialPort2.SetFlowControl(flow_control);
@@ -1215,7 +1221,7 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
-        for(const auto parity: parityTypes)
+        for (const auto parity: parityTypes)
         {
             serialPort1.SetParity(parity);
             serialPort2.SetParity(parity);
@@ -1242,7 +1248,7 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
-        for(const auto stop_bits: stopBits)
+        for (const auto stop_bits: stopBits)
         {
             serialPort1.SetStopBits(stop_bits);
             serialPort2.SetStopBits(stop_bits);
@@ -1532,6 +1538,20 @@ protected:
 
         ASSERT_TRUE(timeOutTestPass);
 
+        timeOutTestPass = false;
+
+        try
+        {
+            serialPort1.Read(*readBuffer1, 0, 5);
+            serialPort2.Read(*readBuffer2, 0, 5);
+        }
+        catch(...)
+        {
+            timeOutTestPass = true;
+        }
+
+        ASSERT_TRUE(timeOutTestPass);
+
         serialPort1.Close();
         serialPort2.Close();
 
@@ -1589,6 +1609,20 @@ protected:
         }
         
         ASSERT_TRUE(timeOutTestPass);
+        
+        timeOutTestPass = false;
+
+        try
+        {
+            serialPort1.Read(readDataBuffer1, 0, 5);
+            serialPort2.Read(readDataBuffer2, 0, 5);
+        }
+        catch(...)
+        {
+            timeOutTestPass = true;
+        }
+
+        ASSERT_TRUE(timeOutTestPass);
 
         serialPort1.Close();
         serialPort2.Close();
@@ -1629,6 +1663,20 @@ protected:
             timeOutTestPass = true;
         }
         
+        ASSERT_TRUE(timeOutTestPass);
+        
+        timeOutTestPass = false;
+
+        try
+        {
+            serialPort1.Read(readString1, 0, 5);
+            serialPort2.Read(readString2, 0, 5);
+        }
+        catch(...)
+        {
+            timeOutTestPass = true;
+        }
+
         ASSERT_TRUE(timeOutTestPass);
 
         serialPort1.Close();
