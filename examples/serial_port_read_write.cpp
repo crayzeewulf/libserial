@@ -108,13 +108,13 @@ int main()
 
     try
     {
-    // Read the appropriate number of bytes from each serial port.
-    serial_port_1.Read(read_string_1, write_string_2.size(), timeout_milliseconds);
-    serial_port_2.Read(read_string_2, write_string_1.size(), timeout_milliseconds);
+        // Read the appropriate number of bytes from each serial port.
+        serial_port_1.Read(read_string_1, write_string_2.size(), timeout_milliseconds);
+        serial_port_2.Read(read_string_2, write_string_1.size(), timeout_milliseconds);
     }
     catch (ReadTimeout)
     {
-        std::cerr << "The ReadByte() call has timed out." << std::endl;
+        std::cerr << "The Read() call has timed out." << std::endl;
     }
 
     // Print to the terminal what was sent and what was received.
