@@ -39,7 +39,7 @@ int main()
    }
    catch (ReadTimeout)
    {
-     std::cerr << "The ReadByte() call has timed out." << std::endl;
+     std::cerr << "The Read() call has timed out." << std::endl;
    }
 
    std::cout << "serial_port read:   " << read_byte_1 << std::endl;
