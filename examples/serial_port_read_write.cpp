@@ -78,9 +78,16 @@ int main()
     // Specify a read timeout value in milliseconds.
     size_t timeout_milliseconds = 25;
 
-    // Read a single byte of data from the serial ports.
-    serial_port_1.ReadByte(read_byte_1, timeout_milliseconds);
-    serial_port_2.ReadByte(read_byte_2, timeout_milliseconds);
+    try
+    {
+        // Read a single byte of data from the serial ports.
+        serial_port_1.ReadByte(read_byte_1, timeout_milliseconds);
+        serial_port_2.ReadByte(read_byte_2, timeout_milliseconds);
+    }
+    catch (ReadTimeout)
+    {
+        std::cerr << "The ReadByte() call has timed out." << std::endl;
+    }
 
     // Print to the terminal what was sent and what was received.
     std::cout << "\tSerial Port 1 sent:\t"     << write_byte_1 << std::endl
@@ -99,9 +106,16 @@ int main()
     serial_port_1.Write(write_string_1);
     serial_port_2.Write(write_string_2);
 
+    try
+    {
     // Read the appropriate number of bytes from each serial port.
     serial_port_1.Read(read_string_1, write_string_2.size(), timeout_milliseconds);
     serial_port_2.Read(read_string_2, write_string_1.size(), timeout_milliseconds);
+    }
+    catch (ReadTimeout)
+    {
+        std::cerr << "The ReadByte() call has timed out." << std::endl;
+    }
 
     // Print to the terminal what was sent and what was received.
     std::cout << "\tSerial Port 1 sent:\t"     << write_string_1 << std::endl
