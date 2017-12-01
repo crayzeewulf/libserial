@@ -2101,13 +2101,15 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        if (numberOfBytes == 0)
+        if (numberOfBytes == 0 &&
+            msTimeout == 0)
         {
             return;
         }
 
         size_t elapsed_ms = 0;
         size_t number_of_bytes_read = 0;
+        size_t number_of_bytes_remaining = 1;
         
         ssize_t read_result = 0;
 
@@ -2119,17 +2121,23 @@ namespace LibSerial
         entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
         // Loop until the number of bytes requested have been read or the timeout has elapsed.
-        while (number_of_bytes_read < numberOfBytes)
+        while (number_of_bytes_remaining > 0)
         {
+            if (numberOfBytes != 0)
+            {
+                number_of_bytes_remaining = numberOfBytes - number_of_bytes_read;
+            }
+
             read_result = read(this->mFileDescriptor,
                                &charBuffer + number_of_bytes_read,
-                               numberOfBytes - number_of_bytes_read);
+                               number_of_bytes_remaining);
             
             if (read_result > 0)
             {
                 number_of_bytes_read += read_result;
 
-                if (number_of_bytes_read == numberOfBytes)
+                if (numberOfBytes == number_of_bytes_read &&
+                    numberOfBytes != 0)
                 {
                     break;
                 }
@@ -2176,13 +2184,15 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        if (numberOfBytes == 0)
+        if (numberOfBytes == 0 &&
+            msTimeout == 0)
         {
             return;
         }
 
         size_t elapsed_ms = 0;
         size_t number_of_bytes_read = 0;
+        size_t number_of_bytes_remaining = 1;
         
         ssize_t read_result = 0;
 
@@ -2194,17 +2204,23 @@ namespace LibSerial
         entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
         // Loop until the number of bytes requested have been read or the timeout has elapsed.
-        while (number_of_bytes_read < numberOfBytes)
+        while (number_of_bytes_remaining > 0)
         {
+            if (numberOfBytes != 0)
+            {
+                number_of_bytes_remaining = numberOfBytes - number_of_bytes_read;
+            }
+
             read_result = read(this->mFileDescriptor,
                                &charBuffer + number_of_bytes_read,
-                               numberOfBytes - number_of_bytes_read);
+                               number_of_bytes_remaining);
             
             if (read_result > 0)
             {
                 number_of_bytes_read += read_result;
 
-                if (number_of_bytes_read == numberOfBytes)
+                if (numberOfBytes == number_of_bytes_read &&
+                    numberOfBytes != 0)
                 {
                     break;
                 }
@@ -2214,7 +2230,7 @@ namespace LibSerial
             {
                 throw std::runtime_error(std::strerror(errno));
             }
-            
+
             // Obtain the current time.
             current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
@@ -2251,13 +2267,24 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        // Clear the data buffer.
+        if (numberOfBytes == 0 &&
+            msTimeout == 0)
+        {
+            return;
+        }
+        
+        // Clear the data buffer and reserve enough space in the buffer to store the incoming data.
         dataBuffer.resize(0);
+        dataBuffer.reserve(numberOfBytes);
+
         unsigned char next_char = 0;
 
         size_t elapsed_ms = 0;
-        
-        ssize_t remaining_ms = 0;
+        size_t remaining_ms = msTimeout;
+
+        size_t number_of_bytes_read = 0;
+        size_t number_of_bytes_remaining = 1;
+        size_t maximum_number_of_bytes = dataBuffer.max_size();
 
         std::chrono::high_resolution_clock::duration entry_time;
         std::chrono::high_resolution_clock::duration current_time;
@@ -2266,49 +2293,43 @@ namespace LibSerial
         // Obtain the entry time.
         entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
-        if (numberOfBytes == 0)
+        while (number_of_bytes_remaining > 0 &&
+               number_of_bytes_read < maximum_number_of_bytes)
         {
-            // Read all available data if numberOfBytes is zero.
-            while(this->IsDataAvailable())
+            if (numberOfBytes != 0)
             {
-                this->Read(next_char,
-                           1,
-                           remaining_ms);
-
-                dataBuffer.push_back(next_char);
+                number_of_bytes_remaining = numberOfBytes - number_of_bytes_read;
             }
-        }
-        else
-        {
-            // Reserve enough space in the buffer to store the incoming data.
-            dataBuffer.reserve(numberOfBytes);
 
-            for (unsigned int i=0; i<numberOfBytes; ++i)
+            for (size_t i = 0; i < number_of_bytes_remaining; i++)
             {
-                // Obtain the current time.
-                current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
-
-                // Calculate the time delta.
-                elapsed_time = current_time - entry_time;
-
-                // Calculate the elapsed number of milliseconds.
-                elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
-
-                // If more than msTimeout milliseconds have elapsed while
-                // waiting for data, then we throw a ReadTimeout exception.
-                if (msTimeout > 0 &&
-                    elapsed_ms > msTimeout)
-                {
-                    throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
-                }
-                
-                remaining_ms = msTimeout - elapsed_ms;
-
                 this->Read(next_char,
                            1,
                            remaining_ms);
 
                 dataBuffer.push_back(next_char);
+
+                number_of_bytes_read++;
+            }
+
+            // Obtain the current time.
+            current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
+
+            // Calculate the time delta.
+            elapsed_time = current_time - entry_time;
+
+            // Calculate the elapsed number of milliseconds.
+            elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
+
+            // Calculate the remaining number of milliseconds available.
+            remaining_ms = msTimeout - elapsed_ms;
+
+            // If more than msTimeout milliseconds have elapsed while
+            // waiting for data, then we throw a ReadTimeout exception.
+            if (msTimeout > 0 &&
+                elapsed_ms > msTimeout)
+            {
+                throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
             }
         }
 
@@ -2327,14 +2348,23 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
+        if (numberOfBytes == 0 &&
+            msTimeout == 0)
+        {
+            return;
+        }
+
         // Clear the data string.
         dataString.clear();
 
         unsigned char next_char = 0;
 
         size_t elapsed_ms = 0;
-        
-        ssize_t remaining_ms = 0;
+        size_t remaining_ms = msTimeout;
+
+        size_t number_of_bytes_read = 0;
+        size_t number_of_bytes_remaining = 1;
+        size_t maximum_number_of_bytes = dataString.max_size();
 
         std::chrono::high_resolution_clock::duration entry_time;
         std::chrono::high_resolution_clock::duration current_time;
@@ -2342,50 +2372,47 @@ namespace LibSerial
 
         // Obtain the entry time.
         entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
-
-        if (numberOfBytes == 0)
-        {
-            // Read all available data if numberOfBytes is zero.
-            while(this->IsDataAvailable())
-            {
-                this->Read(next_char,
-                           1,
-                           remaining_ms);
-
-                dataString += next_char;
-            }
-        }
-        else
-        {
-            for (unsigned int i=0; i<numberOfBytes; ++i)
-            {
-                // Obtain the current time.
-                current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
-
-                // Calculate the time delta.
-                elapsed_time = current_time - entry_time;
-
-                // Calculate the elapsed number of milliseconds.
-                elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
-
-                // If more than msTimeout milliseconds have elapsed while
-                // waiting for data, then we throw a ReadTimeout exception.
-                if (msTimeout > 0 &&
-                    elapsed_ms > msTimeout)
-                {
-                    throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
-                }
-
-                remaining_ms = msTimeout - elapsed_ms;
-
-                this->Read(next_char,
-                           1,
-                           remaining_ms);
-
-                dataString += next_char;
-            }
-        }
         
+        while (number_of_bytes_remaining > 0 &&
+               number_of_bytes_read < maximum_number_of_bytes)
+        {
+            if (numberOfBytes != 0)
+            {
+                number_of_bytes_remaining = numberOfBytes - number_of_bytes_read;
+            }
+
+            for (size_t i = 0; i < number_of_bytes_remaining; i++)
+            {
+                this->Read(next_char,
+                           1,
+                           remaining_ms);
+
+                dataString += next_char;
+
+                number_of_bytes_read++;
+            }
+
+            // Obtain the current time.
+            current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
+
+            // Calculate the time delta.
+            elapsed_time = current_time - entry_time;
+
+            // Calculate the elapsed number of milliseconds.
+            elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
+
+            // Calculate the remaining number of milliseconds available.
+            remaining_ms = msTimeout - elapsed_ms;
+
+            // If more than msTimeout milliseconds have elapsed while
+            // waiting for data, then we throw a ReadTimeout exception.
+            if (msTimeout > 0 &&
+                elapsed_ms > msTimeout)
+            {
+                throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
+            }
+        }
+
         return;
     }
 
