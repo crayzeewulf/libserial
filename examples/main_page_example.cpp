@@ -31,9 +31,16 @@ int main()
    serial_port.Write(&write_byte_1, 1);
    serial_stream << write_byte_2;
 
-   // Read a character.
-   serial_port.Read(read_byte_1, 1);
-   serial_stream >> read_byte_2;
+   try
+   {
+      // Read a character.
+      serial_port.Read(read_byte_1, 1);
+      serial_stream >> read_byte_2;
+   }
+   catch (ReadTimeout)
+   {
+     std::cerr << "The ReadByte() call has timed out." << std::endl;
+   }
 
    std::cout << "serial_port read:   " << read_byte_1 << std::endl;
    std::cout << "serial_stream read: " << read_byte_2 << std::endl;
