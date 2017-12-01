@@ -52,11 +52,18 @@ int main()
     // Keep reading data from serial port and print it to the screen.
     while(serial_port.IsDataAvailable()) 
     {
-        // Read a single byte of data from the serial port.
-        serial_port.ReadByte(data_byte, ms_timeout);
+        try
+        {
+            // Read a single byte of data from the serial port.
+            serial_port.ReadByte(data_byte, ms_timeout);
 
-        // Show the user what is being read from the serial port.
-        std::cout << data_byte;
+            // Show the user what is being read from the serial port.
+            std::cout << data_byte;
+        }
+        catch (ReadTimeout)
+        {
+            std::cerr << "The ReadByte() call has timed out." << std::endl;
+        }
 
         // Wait a brief period for more data to arrive.
         usleep(1000);
