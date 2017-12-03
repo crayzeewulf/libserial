@@ -91,8 +91,9 @@ namespace LibSerial
                               const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT);
 
         /**
-         * @brief Default Destructor.
-         *        Closes the stream associated with mFileDescriptor.
+         * @brief Default Destructor for a SerialStream object
+         *        Closes the stream associated with mFileDescriptor, and
+         *        also closes the serial port if open.
          *        Remaining actions are accomplished by the fstream destructor.
          */
         virtual ~SerialStream(); 

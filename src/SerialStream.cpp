@@ -171,19 +171,6 @@ SerialStream::FlushIOBuffers()
 }
 
 bool
-SerialStream::IsOpen()
-{
-    // Checks to see if mIOBuffer is a null buffer, if not, calls
-    // the IsOpen() function on this stream's SerialStreamBuf mIOBuffer
-    if (!mIOBuffer)
-    {
-        return false;
-    }
-
-    return mIOBuffer->IsOpen();
-}
-
-bool
 SerialStream::IsDataAvailable()
 {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
@@ -206,6 +193,19 @@ SerialStream::IsDataAvailable()
         setstate(badbit);
         return false;
     }
+}
+
+bool
+SerialStream::IsOpen()
+{
+    // Checks to see if mIOBuffer is a null buffer, if not, calls
+    // the IsOpen() function on this stream's SerialStreamBuf mIOBuffer
+    if (!mIOBuffer)
+    {
+        return false;
+    }
+
+    return mIOBuffer->IsOpen();
 }
 
 void 
@@ -287,7 +287,7 @@ SerialStream::SetCharacterSize(const CharacterSize& characterSize)
 }
 
 CharacterSize
-SerialStream::GetCharacterSize() 
+SerialStream::GetCharacterSize()
 {
     SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
 

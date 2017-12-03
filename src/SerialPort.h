@@ -66,7 +66,8 @@ namespace LibSerial
                             const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT);
 
         /**
-         * @brief Default Destructor for a serial port object.
+         * @brief Default Destructor for a SerialPort object. Closes the
+         *        serial port associated with mFileDescriptor if open.
          */
         virtual ~SerialPort() noexcept;
 
@@ -89,101 +90,101 @@ namespace LibSerial
         /**
          * @brief Flushes the serial port input buffer.
          */
-        void FlushInputBuffer();
+        void FlushInputBuffer() const;
 
         /**
          * @brief Flushes the serial port output buffer.
          */
-        void FlushOutputBuffer();
+        void FlushOutputBuffer() const;
 
         /**
          * @brief Flushes the serial port input and output buffers.
          */
-        void FlushIOBuffers();
+        void FlushIOBuffers() const;
 
         /**
          * @brief Checks if data is available at the input of the serial port.
          * @return Returns true iff data is available to read.
          */
-        bool IsDataAvailable();
+        bool IsDataAvailable() const;
 
         /**
          * @brief Determines if the serial port is open for I/O.
          * @return Returns true iff the serial port is open.
          */
-        bool IsOpen();
+        bool IsOpen() const;
 
         /**
          * @brief Sets all serial port paramters to their default values.
          */
-        void SetDefaultSerialPortParameters();
+        void SetDefaultSerialPortParameters() const;
 
         /**
          * @brief Sets the baud rate for the serial port to the specified value
          * @param baudRate The baud rate to be set for the serial port.
          */
-        void SetBaudRate(const BaudRate& baudRate);
+        void SetBaudRate(const BaudRate& baudRate) const;
 
         /**
          * @brief Gets the current baud rate for the serial port.
          * @return Returns the baud rate.
          */
-        BaudRate GetBaudRate();
+        BaudRate GetBaudRate() const;
 
         /**
          * @brief Sets the character size for the serial port.
          * @param characterSize The character size to be set.
          */
-        void SetCharacterSize(const CharacterSize& characterSize);
+        void SetCharacterSize(const CharacterSize& characterSize) const;
 
         /**
          * @brief Gets the character size being used for serial communication.
          * @return Returns the current character size. 
          */
-        CharacterSize GetCharacterSize();
+        CharacterSize GetCharacterSize() const;
 
         /**
          * @brief Sets flow control for the serial port.
          * @param flowControlType The flow control type to be set.
          */
-        void SetFlowControl(const FlowControl& flowControlType);
+        void SetFlowControl(const FlowControl& flowControlType) const;
 
         /**
          * @brief Gets the current flow control setting.
          * @return Returns the flow control type of the serial port.
          */
-        FlowControl GetFlowControl();
+        FlowControl GetFlowControl() const;
 
         /**
          * @brief Sets the parity type for the serial port.
          * @param parityType The parity type to be set.
          */
-        void SetParity(const Parity& parityType);
+        void SetParity(const Parity& parityType) const;
 
         /**
          * @brief Gets the parity type for the serial port.
          * @return Returns the parity type.
          */
-        Parity GetParity();
+        Parity GetParity() const;
 
         /**
          * @brief Sets the number of stop bits to be used with the serial port.
          * @param stopBits The number of stop bits to set.
          */
-        void SetStopBits(const StopBits& stopBits);
+        void SetStopBits(const StopBits& stopBits) const;
 
         /**
          * @brief Gets the number of stop bits currently being used by the serial
          * @return Returns the number of stop bits.
          */
-        StopBits GetStopBits();
+        StopBits GetStopBits() const;
 
         /**
          * @brief Sets the minimum number of characters for non-canonical reads.
          * @note See VMIN in man termios(3).
          * @param vmin the number of minimum characters to be set.
          */
-        void SetVMin(const short vmin);
+        void SetVMin(const short vmin) const;
 
         /**
          * @brief Gets the VMIN value for the device, which represents the
@@ -191,71 +192,71 @@ namespace LibSerial
          * @return Returns the minimum number of characters for
          *         non-canonical reads.
          */
-        short GetVMin();
+        short GetVMin() const;
 
         /** 
          * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
          * @param vtime The timeout value in deciseconds to be set.
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
          */
-        void SetVTime(const short vtime);
+        void SetVTime(const short vtime) const;
 
         /** 
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds. 
          */
-        short GetVTime();
+        short GetVTime() const;
 
         /**
          * @brief Sets the DTR line to the specified value.
          * @param dtrState The line voltage state to be set,
          *        (true = high, false = low).
          */
-        void SetDTR(const bool dtrState = true);
+        void SetDTR(const bool dtrState = true) const;
 
         /**
          * @brief Gets the status of the DTR line.
          * @return Returns true iff the status of the DTR line is high.
          */
-        bool GetDTR();
+        bool GetDTR() const;
 
         /**
          * @brief Set the RTS line to the specified value.
          * @param rtsState The line voltage state to be set,
          *        (true = high, false = low).
          */
-        void SetRTS(const bool rtsState = true);
+        void SetRTS(const bool rtsState = true) const;
 
         /**
          * @brief Get the status of the RTS line.
          * @return Returns true iff the status of the RTS line is high.
          */
-        bool GetRTS();
+        bool GetRTS() const;
 
         /**
          * @brief Get the status of the CTS line.
          * @return Returns true iff the status of the CTS line is high.
          */
-        bool GetCTS();
+        bool GetCTS() const;
 
         /**
          * @brief Get the status of the DSR line.
          * @return Returns true iff the status of the DSR line is high.
          */
-        bool GetDSR();
+        bool GetDSR() const;
 
         /**
          * @brief Gets the serial port file descriptor.
          * @return Returns the serial port file descriptor.
          */
-        int GetFileDescriptor();
+        int GetFileDescriptor() const;
 
         /**
          * @brief Gets a list of available serial ports.
          * @return Returns a std::vector of std::strings with the name of
          *         each available serial port. 
          */
-        std::vector<std::string> GetAvailableSerialPorts();
+        std::vector<std::string> GetAvailableSerialPorts() const;
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
