@@ -84,167 +84,167 @@ namespace LibSerial
         /**
          * @brief Flushes the serial port input buffer.
          */
-        void FlushInputBuffer() const;
+        void FlushInputBuffer();
 
         /**
          * @brief Flushes the serial port output buffer.
          */
-        void FlushOutputBuffer() const;
+        void FlushOutputBuffer();
 
         /**
          * @brief Flushes the serial port input and output buffers.
          */
-        void FlushIOBuffers() const;
+        void FlushIOBuffers();
 
         /**
          * @brief Determines if data is available at the serial port.
          */
-        bool IsDataAvailable() const;
+        bool IsDataAvailable();
 
         /**
          * @brief Determines if the serial port is open for I/O.
          * @return Returns true iff the serial port is open.
          */
-        bool IsOpen() const;
+        bool IsOpen();
 
         /**
          * @brief Sets all serial port paramters to their default values.
          */
-        void SetDefaultSerialPortParameters() const;
+        void SetDefaultSerialPortParameters();
 
         /**
          * @brief Sets the baud rate for the serial port to the specified value
          * @param baudRate The baud rate to be set for the serial port.
          */
-        void SetBaudRate(const BaudRate& baudRate) const;
+        void SetBaudRate(const BaudRate& baudRate);
 
         /**
          * @brief Gets the current baud rate for the serial port.
          * @return Returns the baud rate.
          */
-        BaudRate GetBaudRate() const;
+        BaudRate GetBaudRate();
 
         /**
          * @brief Sets the character size for the serial port.
          * @param characterSize The character size to be set.
          */
-        void SetCharacterSize(const CharacterSize& characterSize) const;
+        void SetCharacterSize(const CharacterSize& characterSize);
 
         /**
          * @brief Gets the character size being used for serial communication.
          * @return Returns the current character size. 
          */
-        CharacterSize GetCharacterSize() const;
+        CharacterSize GetCharacterSize();
 
         /**
          * @brief Sets flow control for the serial port.
          * @param flowControlType The flow control type to be set.
          */
-        void SetFlowControl(const FlowControl& flowControlType) const;
+        void SetFlowControl(const FlowControl& flowControlType);
 
         /**
          * @brief Get the current flow control setting.
          * @return Returns the flow control type of the serial port.
          */
-        FlowControl GetFlowControl() const;
+        FlowControl GetFlowControl();
 
         /**
          * @brief Sets the parity type for the serial port.
          * @param parityType The parity type to be set.
          */
-        void SetParity(const Parity& parityType) const;
+        void SetParity(const Parity& parityType);
 
         /**
          * @brief Gets the parity type for the serial port.
          * @return Returns the parity type.
          */
-        Parity GetParity() const;
+        Parity GetParity();
 
         /**
          * @brief Sets the number of stop bits to be used with the serial port.
          * @param stopBits The number of stop bits to set.
          */
-        void SetStopBits(const StopBits& stopBits) const;
+        void SetStopBits(const StopBits& stopBits);
 
         /**
          * @brief Gets the number of stop bits currently being used by the serial
          * @return Returns the number of stop bits.
          */
-        StopBits GetStopBits() const;
+        StopBits GetStopBits();
 
         /**
          * @brief Sets the minimum number of characters for non-canonical reads.
          * @param vmin the number of minimum characters to be set.
          */
-        void SetVMin(const short vmin) const;
+        void SetVMin(const short vmin);
 
         /**
          * @brief Gets the VMIN value for the device, which represents the
          *        minimum number of characters for non-canonical reads.
          * @return Returns the minimum number of characters for non-canonical reads.
          */
-        short GetVMin() const;
+        short GetVMin();
 
         /** 
          * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
          * @param vtime The timeout value in deciseconds to be set.
          */
-        void SetVTime(const short vtime) const;
+        void SetVTime(const short vtime);
 
         /** 
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds. 
          */
-        short GetVTime() const;
+        short GetVTime();
 
         /**
          * @brief Sets the serial port DTR line status.
          * @param dtrState The state to set the DTR line
          */
-        void SetDTR(const bool dtrState) const;
+        void SetDTR(const bool dtrState);
 
         /**
          * @brief Gets the serial port DTR line status.
          * @return Returns true iff the status of the DTR line is high.
          */
-        bool GetDTR() const;
+        bool GetDTR();
 
         /**
          * @brief Sets the serial port RTS line status.
          * @param rtsState The state to set the RTS line
          */
-        void SetRTS(const bool rtsState) const;
+        void SetRTS(const bool rtsState);
 
         /**
          * @brief Gets the serial port RTS line status.
          * @return Returns true iff the status of the RTS line is high.
          */
-        bool GetRTS() const;
+        bool GetRTS();
 
         /**
          * @brief Gets the serial port CTS line status.
          * @return Returns true iff the status of the CTS line is high.
          */
-        bool GetCTS() const;
+        bool GetCTS();
 
         /**
          * @brief Gets the serial port DSR line status.
          * @return Returns true iff the status of the DSR line is high.
          */
-        bool GetDSR() const;
+        bool GetDSR();
 
         /**
          * @brief Gets the serial port file descriptor.
          * @return Returns the serial port file descriptor.
          */
-        int GetFileDescriptor() const;
+        int GetFileDescriptor();
 
         /**
          * @brief Gets a list of available serial ports.
          * @return Returns a std::vector of std::strings with the name of
          *         each available serial port. 
          */
-        std::vector<std::string> GetAvailableSerialPorts() const;
+        std::vector<std::string> GetAvailableSerialPorts();
 
         /**
          * @brief Writes up to n characters from the character sequence at 
@@ -334,7 +334,7 @@ namespace LibSerial
          *        call to this method.
          */
         void SetModemControlLine(const int modemLine,
-                                 const bool lineState) const;
+                                 const bool lineState);
 
         /**
          * @brief Get the current state of the specified modem control line.
@@ -343,45 +343,45 @@ namespace LibSerial
          * @return True if the specified line is currently set and false
          *         otherwise.
          */
-        bool GetModemControlLine(const int modemLine) const;
+        bool GetModemControlLine(const int modemLine);
 
         /**
          * @brief Sets the current state of the serial port blocking status.
          * @param blockingStatus The serial port blocking status to be set,
          *        true if to be set blocking, false if to be set non-blocking.
          */
-        void SetSerialPortBlockingStatus(const bool blockingStatus) const;
+        void SetSerialPortBlockingStatus(const bool blockingStatus);
 
         /**
          * @brief Gets the current state of the serial port blocking status.
          * @return True if port is blocking, false if port non-blocking.
          */
-        bool GetSerialPortBlockingStatus() const;
+        bool GetSerialPortBlockingStatus();
 
         /**
          * @brief Sets the default Linux specific line discipline modes.
          */
-        void SetDefaultLinuxSpecificModes() const;
+        void SetDefaultLinuxSpecificModes();
 
         /**
          * @brief Sets the default serial port input modes.
          */
-        void SetDefaultInputModes() const;
+        void SetDefaultInputModes();
 
         /**
          * @brief Sets the default serial port output modes.
          */
-        void SetDefaultOutputModes() const;
+        void SetDefaultOutputModes();
 
         /**
          * @brief Sets the default serial port control modes.
          */
-        void SetDefaultControlModes() const;
+        void SetDefaultControlModes();
 
         /**
          * @brief Sets the default serial port local modes.
          */
-        void SetDefaultLocalModes() const;
+        void SetDefaultLocalModes();
 
 
         /**
@@ -449,182 +449,182 @@ namespace LibSerial
     }
 
     void
-    SerialStreamBuf::FlushInputBuffer() const
+    SerialStreamBuf::FlushInputBuffer()
     {
         mImpl->FlushInputBuffer();
         return;
     }
 
     void
-    SerialStreamBuf::FlushOutputBuffer() const
+    SerialStreamBuf::FlushOutputBuffer()
     {
         mImpl->FlushOutputBuffer();
         return;
     }
 
     void
-    SerialStreamBuf::FlushIOBuffers() const
+    SerialStreamBuf::FlushIOBuffers()
     {
         mImpl->FlushIOBuffers();
         return;
     }
 
     bool
-    SerialStreamBuf::IsDataAvailable() const
+    SerialStreamBuf::IsDataAvailable()
     {
         return mImpl->IsDataAvailable();
     }
 
     bool
-    SerialStreamBuf::IsOpen() const
+    SerialStreamBuf::IsOpen()
     {
         return mImpl->IsOpen();
     }
 
     void
-    SerialStreamBuf::SetDefaultSerialPortParameters() const
+    SerialStreamBuf::SetDefaultSerialPortParameters()
     {
         mImpl->SetDefaultSerialPortParameters();
         return;
     }
 
     void
-    SerialStreamBuf::SetBaudRate(const BaudRate& baudRate) const
+    SerialStreamBuf::SetBaudRate(const BaudRate& baudRate)
     {
         mImpl->SetBaudRate(baudRate);
         return;
     }
 
     BaudRate
-    SerialStreamBuf::GetBaudRate() const
+    SerialStreamBuf::GetBaudRate()
     {
         return mImpl->GetBaudRate();
     }
 
     void
-    SerialStreamBuf::SetCharacterSize(const CharacterSize& characterSize) const
+    SerialStreamBuf::SetCharacterSize(const CharacterSize& characterSize)
     {
         mImpl->SetCharacterSize(characterSize);
         return;
     }
 
     CharacterSize
-    SerialStreamBuf::GetCharacterSize() const
+    SerialStreamBuf::GetCharacterSize()
     {
         return mImpl->GetCharacterSize();
     }
 
     void
-    SerialStreamBuf::SetFlowControl(const FlowControl& flowControlType) const
+    SerialStreamBuf::SetFlowControl(const FlowControl& flowControlType)
     {
         mImpl->SetFlowControl(flowControlType);
         return;
     }
 
     FlowControl
-    SerialStreamBuf::GetFlowControl() const
+    SerialStreamBuf::GetFlowControl()
     {
         return mImpl->GetFlowControl();
     }
 
     void
-    SerialStreamBuf::SetParity(const Parity& parityType) const
+    SerialStreamBuf::SetParity(const Parity& parityType)
     {
         mImpl->SetParity(parityType);
         return;
     }
 
     Parity
-    SerialStreamBuf::GetParity() const
+    SerialStreamBuf::GetParity()
     {
         return mImpl->GetParity();
     }
 
     void
-    SerialStreamBuf::SetStopBits(const StopBits& stopBits) const
+    SerialStreamBuf::SetStopBits(const StopBits& stopBits)
     {
         mImpl->SetStopBits(stopBits);
         return;
     }
 
     StopBits
-    SerialStreamBuf::GetStopBits() const
+    SerialStreamBuf::GetStopBits()
     {
         return mImpl->GetStopBits();
     }
 
     void
-    SerialStreamBuf::SetVMin(const short vmin) const
+    SerialStreamBuf::SetVMin(const short vmin)
     {
         mImpl->SetVMin(vmin);
         return;
     }
 
     short
-    SerialStreamBuf::GetVMin() const
+    SerialStreamBuf::GetVMin()
     {
         return mImpl->GetVMin();
     }
 
     void
-    SerialStreamBuf::SetVTime(const short vtime) const
+    SerialStreamBuf::SetVTime(const short vtime)
     {
         mImpl->SetVTime(vtime);
         return;
     }
 
     short
-    SerialStreamBuf::GetVTime() const
+    SerialStreamBuf::GetVTime()
     {
         return mImpl->GetVTime();
     }
 
     void
-    SerialStreamBuf::SetDTR(const bool dtrState) const
+    SerialStreamBuf::SetDTR(const bool dtrState)
     {
         mImpl->SetDTR(dtrState);
         return;
     }
 
     bool
-    SerialStreamBuf::GetDTR() const
+    SerialStreamBuf::GetDTR()
     {
         return mImpl->GetDTR();
     }
 
     void
-    SerialStreamBuf::SetRTS(const bool rtsState) const
+    SerialStreamBuf::SetRTS(const bool rtsState)
     {
         mImpl->SetRTS(rtsState);
         return;
     }
 
     bool
-    SerialStreamBuf::GetRTS() const
+    SerialStreamBuf::GetRTS()
     {
         return mImpl->GetRTS();
     }
 
     bool
-    SerialStreamBuf::GetCTS() const
+    SerialStreamBuf::GetCTS()
     {
         return mImpl->GetCTS();
     }
 
     bool
-    SerialStreamBuf::GetDSR()  const
+    SerialStreamBuf::GetDSR()
     {
         return mImpl->GetDSR();
     }
 
     int
-    SerialStreamBuf::GetFileDescriptor() const
+    SerialStreamBuf::GetFileDescriptor()
     {
         return mImpl->GetFileDescriptor();
     }
 
     std::vector<std::string>
-    SerialStreamBuf::GetAvailableSerialPorts() const
+    SerialStreamBuf::GetAvailableSerialPorts()
     {
         return mImpl->GetAvailableSerialPorts();
     }
@@ -822,7 +822,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::FlushInputBuffer() const
+    SerialStreamBuf::Implementation::FlushInputBuffer()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -840,7 +840,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::FlushOutputBuffer() const
+    SerialStreamBuf::Implementation::FlushOutputBuffer()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -858,7 +858,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::FlushIOBuffers() const
+    SerialStreamBuf::Implementation::FlushIOBuffers()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -876,14 +876,14 @@ namespace LibSerial
 
     inline
     bool
-    SerialStreamBuf::Implementation::IsOpen() const
+    SerialStreamBuf::Implementation::IsOpen()
     {
         return (this->mFileDescriptor != -1);
     }
 
     inline
     bool
-    SerialStreamBuf::Implementation::IsDataAvailable() const
+    SerialStreamBuf::Implementation::IsDataAvailable()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -909,7 +909,7 @@ namespace LibSerial
 
     inline
     void 
-    SerialStreamBuf::Implementation::SetDefaultSerialPortParameters() const
+    SerialStreamBuf::Implementation::SetDefaultSerialPortParameters()
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())
@@ -939,7 +939,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetBaudRate(const BaudRate& baudRate) const
+    SerialStreamBuf::Implementation::SetBaudRate(const BaudRate& baudRate)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -978,7 +978,7 @@ namespace LibSerial
 
     inline
     BaudRate
-    SerialStreamBuf::Implementation::GetBaudRate() const
+    SerialStreamBuf::Implementation::GetBaudRate()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1014,7 +1014,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetCharacterSize(const CharacterSize& characterSize) const
+    SerialStreamBuf::Implementation::SetCharacterSize(const CharacterSize& characterSize)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1066,7 +1066,7 @@ namespace LibSerial
 
     inline
     CharacterSize
-    SerialStreamBuf::Implementation::GetCharacterSize() const
+    SerialStreamBuf::Implementation::GetCharacterSize()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1090,7 +1090,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetFlowControl(const FlowControl& flowControlType) const
+    SerialStreamBuf::Implementation::SetFlowControl(const FlowControl& flowControlType)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1154,7 +1154,7 @@ namespace LibSerial
 
     inline
     FlowControl
-    SerialStreamBuf::Implementation::GetFlowControl() const
+    SerialStreamBuf::Implementation::GetFlowControl()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1204,7 +1204,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetParity(const Parity& parityType) const
+    SerialStreamBuf::Implementation::SetParity(const Parity& parityType)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1257,7 +1257,7 @@ namespace LibSerial
 
     inline
     Parity
-    SerialStreamBuf::Implementation::GetParity() const
+    SerialStreamBuf::Implementation::GetParity()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1298,7 +1298,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetStopBits(const StopBits& stopBits) const
+    SerialStreamBuf::Implementation::SetStopBits(const StopBits& stopBits)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1343,7 +1343,7 @@ namespace LibSerial
 
     inline
     StopBits
-    SerialStreamBuf::Implementation::GetStopBits() const
+    SerialStreamBuf::Implementation::GetStopBits()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1375,7 +1375,7 @@ namespace LibSerial
 
     inline
     void 
-    SerialStreamBuf::Implementation::SetVMin(const short vmin) const
+    SerialStreamBuf::Implementation::SetVMin(const short vmin)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1413,7 +1413,7 @@ namespace LibSerial
 
     inline
     short 
-    SerialStreamBuf::Implementation::GetVMin() const
+    SerialStreamBuf::Implementation::GetVMin()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1436,7 +1436,7 @@ namespace LibSerial
 
     inline
     void 
-    SerialStreamBuf::Implementation::SetVTime(const short vtime) const
+    SerialStreamBuf::Implementation::SetVTime(const short vtime)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1474,7 +1474,7 @@ namespace LibSerial
 
     inline
     short 
-    SerialStreamBuf::Implementation::GetVTime() const
+    SerialStreamBuf::Implementation::GetVTime()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1497,7 +1497,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetDTR(const bool dtrState) const
+    SerialStreamBuf::Implementation::SetDTR(const bool dtrState)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1512,7 +1512,7 @@ namespace LibSerial
 
     inline
     bool
-    SerialStreamBuf::Implementation::GetDTR() const
+    SerialStreamBuf::Implementation::GetDTR()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1525,7 +1525,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetRTS(const bool rtsState) const
+    SerialStreamBuf::Implementation::SetRTS(const bool rtsState)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1540,7 +1540,7 @@ namespace LibSerial
 
     inline
     bool
-    SerialStreamBuf::Implementation::GetRTS() const
+    SerialStreamBuf::Implementation::GetRTS()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1553,7 +1553,7 @@ namespace LibSerial
 
     inline
     bool
-    SerialStreamBuf::Implementation::GetCTS() const
+    SerialStreamBuf::Implementation::GetCTS()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1566,7 +1566,7 @@ namespace LibSerial
 
     inline
     bool
-    SerialStreamBuf::Implementation::GetDSR() const
+    SerialStreamBuf::Implementation::GetDSR()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1579,7 +1579,7 @@ namespace LibSerial
 
     inline
     int
-    SerialStreamBuf::Implementation::GetFileDescriptor() const
+    SerialStreamBuf::Implementation::GetFileDescriptor()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1592,7 +1592,7 @@ namespace LibSerial
 
     inline
     std::vector<std::string>
-    SerialStreamBuf::Implementation::GetAvailableSerialPorts() const
+    SerialStreamBuf::Implementation::GetAvailableSerialPorts()
     {
         const int array_size = 3;
         int file_descriptor = -1;
@@ -1641,7 +1641,7 @@ namespace LibSerial
     inline
     void
     SerialStreamBuf::Implementation::SetModemControlLine(const int  modemLine,
-                                                         const bool lineState) const
+                                                         const bool lineState)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1693,7 +1693,7 @@ namespace LibSerial
 
     inline
     bool
-    SerialStreamBuf::Implementation::GetModemControlLine(const int modemLine) const
+    SerialStreamBuf::Implementation::GetModemControlLine(const int modemLine)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1731,7 +1731,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetSerialPortBlockingStatus(const bool blockingStatus) const
+    SerialStreamBuf::Implementation::SetSerialPortBlockingStatus(const bool blockingStatus)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1763,7 +1763,7 @@ namespace LibSerial
 
     inline
     bool
-    SerialStreamBuf::Implementation::GetSerialPortBlockingStatus() const
+    SerialStreamBuf::Implementation::GetSerialPortBlockingStatus()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1789,7 +1789,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetDefaultLinuxSpecificModes() const
+    SerialStreamBuf::Implementation::SetDefaultLinuxSpecificModes()
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())
@@ -1824,7 +1824,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetDefaultInputModes() const
+    SerialStreamBuf::Implementation::SetDefaultInputModes()
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())
@@ -1858,7 +1858,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetDefaultOutputModes() const
+    SerialStreamBuf::Implementation::SetDefaultOutputModes()
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())
@@ -1891,7 +1891,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetDefaultControlModes() const
+    SerialStreamBuf::Implementation::SetDefaultControlModes()
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())
@@ -1925,7 +1925,7 @@ namespace LibSerial
 
     inline
     void
-    SerialStreamBuf::Implementation::SetDefaultLocalModes() const
+    SerialStreamBuf::Implementation::SetDefaultLocalModes()
     {
         // Make sure that the serial port is open.
         if (!this->IsOpen())
