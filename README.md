@@ -3,10 +3,11 @@
 ----
 LibSerial provides a convenient, object oriented approach to accessing serial ports on POSIX systems.
 
-You will need a recent g++ release, (anything after gcc-3.2 should work), to compile libserial, and you will also need to install Google Test (gtest) and the boost unit test library.  For Debian users:
+You will likely need to install a few packages to build LibSerial: a recent g++ release, (anything after gcc-3.2 should work), the python sip library, the boost unit test library, and Google Test (gtest).  For Debian users:
 
 ```
-sudo apt install libgtest-dev libboost-dev
+sudo update
+sudo apt install build-essential libgtest-dev libboost-dev python-sip-dev
 ```
 ----
 If you get the source code from github and would like to install the library, you will need to generate the configure script first:
