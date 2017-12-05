@@ -273,7 +273,7 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void Read(char&        charBuffer,
+        void Read(char*        charBuffer,
                   const size_t numberOfBytes = 0,
                   const size_t msTimeout  = 0);
 
@@ -292,7 +292,7 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void Read(unsigned char& charBuffer,
+        void Read(unsigned char* charBuffer,
                   const size_t   numberOfBytes = 0,
                   const size_t   msTimeout  = 0);
 
