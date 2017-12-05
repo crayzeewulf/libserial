@@ -34,7 +34,7 @@ int main()
    try
    {
       // Read a character.
-      serial_port.Read(read_byte_1, 1);
+      serial_port.Read(&read_byte_1, 1);
       serial_stream >> read_byte_2;
    }
    catch (ReadTimeout)

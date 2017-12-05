@@ -261,7 +261,7 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void Read(char&        charBuffer,
+        void Read(char*        charBuffer,
                   const size_t numberOfBytes = 0,
                   const size_t msTimeout = 0);
 
@@ -278,7 +278,7 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void Read(unsigned char& charBuffer,
+        void Read(unsigned char* charBuffer,
                   const size_t   numberOfBytes = 0,
                   const size_t   msTimeout = 0);
 
@@ -701,7 +701,7 @@ namespace LibSerial
     }
 
     void
-    SerialPort::Read(char&        charBuffer,
+    SerialPort::Read(char*        charBuffer,
                      const size_t numberOfBytes,
                      const size_t msTimeout)
     {
@@ -712,7 +712,7 @@ namespace LibSerial
     }
 
     void
-    SerialPort::Read(unsigned char& charBuffer,
+    SerialPort::Read(unsigned char* charBuffer,
                      const size_t   numberOfBytes,
                      const size_t   msTimeout)
     {
@@ -2092,7 +2092,7 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::Read(char&        charBuffer,
+    SerialPort::Implementation::Read(char*        charBuffer,
                                      const size_t numberOfBytes,
                                      const size_t msTimeout)
     {
@@ -2130,7 +2130,7 @@ namespace LibSerial
             }
 
             read_result = read(this->mFileDescriptor,
-                               &charBuffer + number_of_bytes_read,
+                               charBuffer + number_of_bytes_read,
                                number_of_bytes_remaining);
             
             if (read_result > 0)
@@ -2175,7 +2175,7 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::Read(unsigned char& charBuffer,
+    SerialPort::Implementation::Read(unsigned char* charBuffer,
                                      const size_t   numberOfBytes,
                                      const size_t   msTimeout)
     {
@@ -2213,7 +2213,7 @@ namespace LibSerial
             }
 
             read_result = read(this->mFileDescriptor,
-                               &charBuffer + number_of_bytes_read,
+                               charBuffer + number_of_bytes_read,
                                number_of_bytes_remaining);
             
             if (read_result > 0)
@@ -2304,7 +2304,7 @@ namespace LibSerial
 
             for (size_t i = 0; i < number_of_bytes_remaining; i++)
             {
-                this->Read(next_char,
+                this->Read(&next_char,
                            1,
                            remaining_ms);
 
@@ -2384,7 +2384,7 @@ namespace LibSerial
 
             for (size_t i = 0; i < number_of_bytes_remaining; i++)
             {
-                this->Read(next_char,
+                this->Read(&next_char,
                            1,
                            remaining_ms);
 
@@ -2428,7 +2428,7 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        this->Read(charBuffer,
+        this->Read(&charBuffer,
                    1,
                    msTimeout);
         return;
@@ -2445,7 +2445,7 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        this->Read(charBuffer,
+        this->Read(&charBuffer,
                    1,
                    msTimeout);
         return;
@@ -2500,7 +2500,7 @@ namespace LibSerial
 
             remaining_ms = msTimeout - elapsed_ms;
 
-            this->Read(next_char,
+            this->Read(&next_char,
                        1,
                        remaining_ms);
 

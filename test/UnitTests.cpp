@@ -384,8 +384,8 @@ protected:
             serialStream1.SetBaudRate(baud_rate);
             serialStream2.SetBaudRate(baud_rate);
 
-            BaudRate baudRate1 = serialStream1.GetBaudRate();
-            BaudRate baudRate2 = serialStream2.GetBaudRate();
+            const auto baudRate1 = serialStream1.GetBaudRate();
+            const auto baudRate2 = serialStream2.GetBaudRate();
 
             ASSERT_EQ(baudRate1, baud_rate);
             ASSERT_EQ(baudRate2, baud_rate);
@@ -417,8 +417,8 @@ protected:
             serialStream1.SetCharacterSize(char_size);
             serialStream2.SetCharacterSize(char_size);
 
-            CharacterSize characterSize1 = serialStream1.GetCharacterSize();
-            CharacterSize characterSize2 = serialStream2.GetCharacterSize();
+            const auto characterSize1 = serialStream1.GetCharacterSize();
+            const auto characterSize2 = serialStream2.GetCharacterSize();
 
             ASSERT_EQ(characterSize1, char_size);
             ASSERT_EQ(characterSize2, char_size);
@@ -441,16 +441,13 @@ protected:
         ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());
 
-        FlowControl flowControl1 = FlowControl::FLOW_CONTROL_DEFAULT;
-        FlowControl flowControl2 = FlowControl::FLOW_CONTROL_DEFAULT;
-
         for (const auto flow_control: flowControlTypes)
         {
             serialStream1.SetFlowControl(flow_control);
             serialStream1.SetFlowControl(flow_control);
 
-            flowControl1 = serialStream1.GetFlowControl();
-            flowControl2 = serialStream1.GetFlowControl();
+            const auto flowControl1 = serialStream1.GetFlowControl();
+            const auto flowControl2 = serialStream1.GetFlowControl();
 
             ASSERT_EQ(flowControl1, flow_control);
             ASSERT_EQ(flowControl2, flow_control);
@@ -471,16 +468,13 @@ protected:
         ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());
 
-        Parity parity1 = Parity::PARITY_DEFAULT;
-        Parity parity2 = Parity::PARITY_DEFAULT;
-
         for (const auto parity: parityTypes)
         {
             serialStream1.SetParity(parity);
             serialStream2.SetParity(parity);
 
-            parity1 = serialStream1.GetParity();
-            parity2 = serialStream2.GetParity();
+            const auto parity1 = serialStream1.GetParity();
+            const auto parity2 = serialStream2.GetParity();
 
             ASSERT_EQ(parity1, parity);
             ASSERT_EQ(parity2, parity);
@@ -501,16 +495,13 @@ protected:
         ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());
 
-        StopBits numberOfStopBits1 = StopBits::STOP_BITS_DEFAULT;
-        StopBits numberOfStopBits2 = StopBits::STOP_BITS_DEFAULT;
-
         for (const auto stop_bits: stopBits)
         {
             serialStream1.SetStopBits(stop_bits);
             serialStream2.SetStopBits(stop_bits);
 
-            numberOfStopBits1 = serialStream1.GetStopBits();
-            numberOfStopBits2 = serialStream2.GetStopBits();
+            const auto numberOfStopBits1 = serialStream1.GetStopBits();
+            const auto numberOfStopBits2 = serialStream2.GetStopBits();
 
             ASSERT_EQ(numberOfStopBits1, stop_bits);
             ASSERT_EQ(numberOfStopBits2, stop_bits);
@@ -1508,8 +1499,8 @@ protected:
         char writeBuffer1[] = "abc";
         unsigned char writeBuffer2[] = "ABC";
 
-        char readBuffer1[3] = {};
-        unsigned char readBuffer2[3] = {};
+        char* readBuffer1 = new char[3];
+        unsigned char* readBuffer2 = new unsigned char[3];
 
         serialPort1.Write(writeBuffer1, 3);
         serialPort2.Write(writeBuffer2, 3);
@@ -1517,8 +1508,8 @@ protected:
         tcdrain(serialPort1.GetFileDescriptor());
         tcdrain(serialPort2.GetFileDescriptor());
 
-        serialPort1.Read(*readBuffer1, 3, timeOutMilliseconds);
-        serialPort2.Read(*readBuffer2, 3, timeOutMilliseconds);
+        serialPort1.Read(readBuffer1, 3, timeOutMilliseconds);
+        serialPort2.Read(readBuffer2, 3, timeOutMilliseconds);
 
         for (size_t i = 0; i < 3; i++)
         {
@@ -1528,8 +1519,8 @@ protected:
 
         try
         {
-            serialPort1.Read(*readBuffer1, 3, 1);
-            serialPort2.Read(*readBuffer2, 3, 1);
+            serialPort1.Read(readBuffer1, 3, 1);
+            serialPort2.Read(readBuffer2, 3, 1);
         }
         catch(...)
         {
@@ -1542,8 +1533,8 @@ protected:
 
         try
         {
-            serialPort1.Read(*readBuffer1, 0, 5);
-            serialPort2.Read(*readBuffer2, 0, 5);
+            serialPort1.Read(readBuffer1, 0, 5);
+            serialPort2.Read(readBuffer2, 0, 5);
         }
         catch(...)
         {
