@@ -17,10 +17,15 @@ make -f Makefile.dist
 ```
 
 ----
-You can skip this step if you are using a release package (which already contains the `configure` script). Once you have the `configure` script, run the following commands:
+You can skip the configure step if you are using a release package which already contains the `configure` script, otherwise:
 
 ```
 ./configure 
+```
+
+Once you have the `configure` script, run the following commands:
+
+```
 make
 make install
 ```
