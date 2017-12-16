@@ -130,9 +130,13 @@ int main()
     std::string user_input;
     user_input.clear();
     
+    // Print to the terminal what will take place next.
+    std::cout << "Using Write() and ReadLine() to write a string and "
+              << "read a line of data:" << std::endl << std::endl;
+
     // Prompt the user for input.
-    std::cout << "Type something you would like to send over serial,"
-              << " (enter \"Q\" or \"q\" to quit): " << std::flush;
+    std::cout << "Enter something you would like to send over "
+              << "serial, (enter \"Q\" or \"q\" to quit): " << std::flush;
     
     while(true)
     {
@@ -144,10 +148,6 @@ int main()
         {
             break;
         }
-
-        // Print to the terminal what will take place next.
-        std::cout << "Using Write() and ReadLine() to write a string and "
-                  << "read a line of data:" << std::endl;
 
         // Write the user input to the serial port.
         serial_port_1.Write(user_input + "\n");
