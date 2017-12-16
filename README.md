@@ -17,7 +17,7 @@ make -f Makefile.dist
 ```
 
 ----
-You can skip the configure step if you are using a release package which already contains the `configure` script, otherwise:
+Then run `configure`:
 
 ```
 ./configure 

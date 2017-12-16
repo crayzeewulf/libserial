@@ -4,9 +4,10 @@
 
 #include <SerialPort.h>
 
+#include <cstring>
+#include <cstdlib>
 #include <iostream>
 #include <unistd.h>
-#include <cstdlib>
 
 using namespace LibSerial;
 
@@ -44,54 +45,48 @@ int main()
     }
 
     // Timeout value in milliseconds to wait for data being read.
-    size_t ms_timeout = 25;
+    size_t ms_timeout = 250;
 
     // Char variable to store data coming from the serial port.
     char data_byte;
 
-    // Char array pointer to store data coming from the serial port.
-    char* readBuffer = new char[256];
-
-    // Read a single byte at a time from serial port and output to the terminal.
-    while(serial_port.IsDataAvailable()) 
+    // Read one byte from the serial port and print it to the terminal.
+    try
     {
-        try
-        {
-            // Read a single byte of data from the serial port.
-            serial_port.ReadByte(data_byte, ms_timeout);
+        // Read a single byte of data from the serial port.
+        serial_port.ReadByte(data_byte, ms_timeout);
 
-            // Show the user what is being read from the serial port.
-            std::cout << data_byte;
-        }
-        catch (ReadTimeout)
-        {
-            std::cerr << "The ReadByte() call has timed out." << std::endl;
-        }
-
-        // Wait a brief period for more data to arrive.
-        usleep(1000);
+        // Show the user what is being read from the serial port.
+        std::cout << data_byte << std::flush;
+    }
+    catch (ReadTimeout)
+    {
+        std::cerr << "\nThe ReadByte() call has timed out." << std::endl;
     }
 
-    // Read the remaining data until the time remaining expires.
-    while(serial_port.IsDataAvailable()) 
+    // Wait a brief period for more data to arrive.
+    usleep(1000);
+
+    // Size of the char array.
+    const size_t array_size = 128;
+
+    // Char array to store data coming from the serial port.
+    char read_buffer[array_size];
+
+    // Clear the array contents.
+    std::memset(read_buffer, 0, array_size);
+
+    try
     {
-        try
-        {
-            // Read as many bytes as are available during the timeout period.
-            serial_port.Read(readBuffer, 0, ms_timeout);
-
-        }
-        catch (ReadTimeout)
-        {
-            std::cerr << "The ReadByte() call has timed out waiting for more data." << std::endl;
-        }
-
-        // Show the user what was read from the serial port.
-        for (size_t i = 0; i < sizeof(readBuffer); i++)
-        {
-            std::cout << readBuffer + i;
-        }
+        // Read as many bytes as are available during the timeout period.
+        serial_port.Read(read_buffer, 0, ms_timeout);
     }
+    catch (ReadTimeout)
+    {
+        std::cerr << "\nThe Read() call has timed out waiting for more data." << std::endl;
+    }
+
+    std::cout << read_buffer << std::flush;
 
     // Successful program completion.
     std::cout << "Done." << std::endl;
