@@ -908,7 +908,7 @@ namespace LibSerial
     }
 
     inline
-    void 
+    void
     SerialStreamBuf::Implementation::SetDefaultSerialPortParameters()
     {
         // Make sure that the serial port is open.
@@ -1374,7 +1374,7 @@ namespace LibSerial
     }
 
     inline
-    void 
+    void
     SerialStreamBuf::Implementation::SetVMin(const short vmin)
     {
         // Throw an exception if the serial port is not open.
@@ -1412,7 +1412,7 @@ namespace LibSerial
     }
 
     inline
-    short 
+    short
     SerialStreamBuf::Implementation::GetVMin()
     {
         // Throw an exception if the serial port is not open.
@@ -1435,7 +1435,7 @@ namespace LibSerial
     }
 
     inline
-    void 
+    void
     SerialStreamBuf::Implementation::SetVTime(const short vtime)
     {
         // Throw an exception if the serial port is not open.
@@ -1473,7 +1473,7 @@ namespace LibSerial
     }
 
     inline
-    short 
+    short
     SerialStreamBuf::Implementation::GetVTime()
     {
         // Throw an exception if the serial port is not open.
