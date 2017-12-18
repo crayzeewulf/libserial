@@ -257,40 +257,6 @@ namespace LibSerial
          *        reading data till no more data is available at the serial port.
          *        In all cases, all read data is available in dataBuffer on
          *        return from this method.
-         * @param charBuffer The character buffer to place serial data into.
-         * @param numberOfBytes The number of bytes to read before returning.
-         * @param msTimeout The timeout period in milliseconds.
-         */
-        void Read(char*        charBuffer,
-                  const size_t numberOfBytes = 0,
-                  const size_t msTimeout = 0);
-
-        /**
-         * @brief Reads the specified number of bytes from the serial port.
-         *        The method will timeout if no data is received in the specified
-         *        number of milliseconds (msTimeout). If msTimeout is 0, then
-         *        this method will block until all requested bytes are
-         *        received. If numberOfBytes is zero, then this method will keep
-         *        reading data till no more data is available at the serial port.
-         *        In all cases, all read data is available in dataBuffer on
-         *        return from this method.
-         * @param charBuffer The character buffer to place serial data into.
-         * @param numberOfBytes The number of bytes to read before returning.
-         * @param msTimeout The timeout period in milliseconds.
-         */
-        void Read(unsigned char* charBuffer,
-                  const size_t   numberOfBytes = 0,
-                  const size_t   msTimeout = 0);
-
-        /**
-         * @brief Reads the specified number of bytes from the serial port.
-         *        The method will timeout if no data is received in the specified
-         *        number of milliseconds (msTimeout). If msTimeout is 0, then
-         *        this method will block until all requested bytes are
-         *        received. If numberOfBytes is zero, then this method will keep
-         *        reading data till no more data is available at the serial port.
-         *        In all cases, all read data is available in dataBuffer on
-         *        return from this method.
          * @param dataBuffer The data buffer to place serial data into.
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
@@ -357,22 +323,6 @@ namespace LibSerial
         void ReadLine(std::string&  dataString,
                       const char    lineTerminator = '\n',
                       const size_t  msTimeout = 0);
-
-         /**
-         * @brief Writes a character array buffer to the serial port.
-         * @param charBuffer The character array to be written to the serial port.
-         * @param numberOfBytes The number of bytes to be written to the serial port.
-         */
-        void Write(const char*  charBuffer,
-                   const size_t numberOfBytes);
-
-         /**
-         * @brief Writes a character array buffer to the serial port.
-         * @param charBuffer The character array to be written to the serial port.
-         * @param numberOfBytes The number of bytes to be written to the serial port.
-         */
-        void Write(const unsigned char* charBuffer,
-                   const size_t         numberOfBytes);
 
         /**
          * @brief Writes a DataBuffer vector to the serial port.
@@ -701,28 +651,6 @@ namespace LibSerial
     }
 
     void
-    SerialPort::Read(char*        charBuffer,
-                     const size_t numberOfBytes,
-                     const size_t msTimeout)
-    {
-        mImpl->Read(charBuffer,
-                    numberOfBytes,
-                    msTimeout);
-        return;
-    }
-
-    void
-    SerialPort::Read(unsigned char* charBuffer,
-                     const size_t   numberOfBytes,
-                     const size_t   msTimeout)
-    {
-        mImpl->Read(charBuffer,
-                    numberOfBytes,
-                    msTimeout);
-        return;
-    }
-
-    void
     SerialPort::Read(DataBuffer& dataBuffer,
                      const size_t numberOfBytes,
                      const size_t msTimeout)
@@ -770,24 +698,6 @@ namespace LibSerial
         mImpl->ReadLine(dataString,
                         lineTerminator,
                         msTimeout);
-        return;
-    }
-
-    void
-    SerialPort::Write(const char*  charBuffer,
-                      const size_t numberOfBytes)
-    {
-        mImpl->Write(charBuffer,
-                     numberOfBytes);
-        return;
-    }
-
-    void
-    SerialPort::Write(const unsigned char* charBuffer,
-                      const size_t         numberOfBytes)
-    {
-        mImpl->Write(charBuffer,
-                     numberOfBytes);
         return;
     }
 
@@ -2092,172 +2002,6 @@ namespace LibSerial
 
     inline
     void
-    SerialPort::Implementation::Read(char*        charBuffer,
-                                     const size_t numberOfBytes,
-                                     const size_t msTimeout)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        if (numberOfBytes == 0 &&
-            msTimeout == 0)
-        {
-            return;
-        }
-
-        size_t elapsed_ms = 0;
-        size_t number_of_bytes_read = 0;
-        size_t number_of_bytes_remaining = 1;
-        
-        ssize_t read_result = 0;
-
-        std::chrono::high_resolution_clock::duration entry_time;
-        std::chrono::high_resolution_clock::duration current_time;
-        std::chrono::high_resolution_clock::duration elapsed_time;
-
-        // Obtain the entry time.
-        entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
-
-        // Loop until the number of bytes requested have been read or the timeout has elapsed.
-        while (number_of_bytes_remaining > 0)
-        {
-            if (numberOfBytes != 0)
-            {
-                number_of_bytes_remaining = numberOfBytes - number_of_bytes_read;
-            }
-
-            read_result = read(this->mFileDescriptor,
-                               charBuffer + number_of_bytes_read,
-                               number_of_bytes_remaining);
-            
-            if (read_result > 0)
-            {
-                number_of_bytes_read += read_result;
-
-                if (numberOfBytes == number_of_bytes_read &&
-                    numberOfBytes != 0)
-                {
-                    break;
-                }
-            }
-            else if (read_result <= 0 &&
-                     errno != EWOULDBLOCK)
-            {
-                throw std::runtime_error(std::strerror(errno));
-            }
-
-            // Obtain the current time.
-            current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
-
-            // Calculate the time delta.
-            elapsed_time = current_time - entry_time;
-
-            // Calculate the elapsed number of milliseconds.
-            elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
-
-            // Throw a ReadTimeout exception if more than msTimeout milliseconds
-            // have elapsed while waiting for data.
-            if (msTimeout > 0 &&
-                elapsed_ms > msTimeout)
-            {
-                throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
-            }
-
-            // Sleep for 1ms (1000us) for data to arrive.
-            usleep(1000);
-        }
-
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::Read(unsigned char* charBuffer,
-                                     const size_t   numberOfBytes,
-                                     const size_t   msTimeout)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        if (numberOfBytes == 0 &&
-            msTimeout == 0)
-        {
-            return;
-        }
-
-        size_t elapsed_ms = 0;
-        size_t number_of_bytes_read = 0;
-        size_t number_of_bytes_remaining = 1;
-        
-        ssize_t read_result = 0;
-
-        std::chrono::high_resolution_clock::duration entry_time;
-        std::chrono::high_resolution_clock::duration current_time;
-        std::chrono::high_resolution_clock::duration elapsed_time;
-
-        // Obtain the entry time.
-        entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
-
-        // Loop until the number of bytes requested have been read or the timeout has elapsed.
-        while (number_of_bytes_remaining > 0)
-        {
-            if (numberOfBytes != 0)
-            {
-                number_of_bytes_remaining = numberOfBytes - number_of_bytes_read;
-            }
-
-            read_result = read(this->mFileDescriptor,
-                               charBuffer + number_of_bytes_read,
-                               number_of_bytes_remaining);
-            
-            if (read_result > 0)
-            {
-                number_of_bytes_read += read_result;
-
-                if (numberOfBytes == number_of_bytes_read &&
-                    numberOfBytes != 0)
-                {
-                    break;
-                }
-            }
-            else if (read_result <= 0 &&
-                     errno != EWOULDBLOCK)
-            {
-                throw std::runtime_error(std::strerror(errno));
-            }
-
-            // Obtain the current time.
-            current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
-
-            // Calculate the time delta.
-            elapsed_time = current_time - entry_time;
-
-            // Calculate the elapsed number of milliseconds.
-            elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
-
-            // Throw a ReadTimeout exception if more than msTimeout milliseconds
-            // have elapsed while waiting for data.
-            if (msTimeout > 0 &&
-                elapsed_ms > msTimeout)
-            {
-                throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
-            }
-
-            // Sleep for 1ms (1000us) for data to arrive.
-            usleep(1000);
-        }
-
-        return;
-    }
-
-    inline
-    void
     SerialPort::Implementation::Read(DataBuffer&  dataBuffer,
                                      const size_t numberOfBytes,
                                      const size_t msTimeout)
@@ -2273,19 +2017,25 @@ namespace LibSerial
         {
             return;
         }
-        
+
         // Clear the data buffer and reserve enough space in the buffer to store the incoming data.
         dataBuffer.resize(0);
         dataBuffer.reserve(numberOfBytes);
 
-        unsigned char next_char = 0;
-
         size_t elapsed_ms = 0;
-        size_t remaining_ms = msTimeout;
-
         size_t number_of_bytes_read = 0;
         size_t number_of_bytes_remaining = 1;
+        size_t number_of_bytes_allocated = std::max(numberOfBytes, number_of_bytes_remaining);
         size_t maximum_number_of_bytes = dataBuffer.max_size();
+        
+        ssize_t read_result = 0;
+
+        // Char array pointer for the read() call.
+        char* char_buffer = NULL;
+
+        // Allocate and clear sufficient memory for the requested number of bytes to be read.
+        char_buffer = new char[number_of_bytes_allocated];
+        std::memset(char_buffer, 0, number_of_bytes_allocated);
 
         std::chrono::high_resolution_clock::duration entry_time;
         std::chrono::high_resolution_clock::duration current_time;
@@ -2297,22 +2047,59 @@ namespace LibSerial
         while (number_of_bytes_remaining > 0 &&
                number_of_bytes_read < maximum_number_of_bytes)
         {
-            if (numberOfBytes != 0)
+            if (numberOfBytes == 0)
+            {
+                // Read one byte.
+                read_result = read(this->mFileDescriptor,
+                                   &char_buffer[0],
+                                   1);
+            }
+            else
             {
                 number_of_bytes_remaining = numberOfBytes - number_of_bytes_read;
-            }
 
-            for (size_t i = 0; i < number_of_bytes_remaining; i++)
+                read_result = read(this->mFileDescriptor,
+                                   &char_buffer[number_of_bytes_read],
+                                   number_of_bytes_remaining);
+            }
+            
+            if (read_result > 0)
             {
-                this->Read(&next_char,
-                           1,
-                           remaining_ms);
+                if (numberOfBytes == 0)
+                {
+                    dataBuffer.push_back(char_buffer[0]);
+                }
+                else
+                {
+                    for (ssize_t i = 0; i < read_result; i++)
+                    {
+                        dataBuffer.push_back(char_buffer[number_of_bytes_read + i]);
+                    }
+                }
 
-                dataBuffer.push_back(next_char);
+                number_of_bytes_read += read_result;
 
-                number_of_bytes_read++;
+            }
+            else if (read_result <= 0 &&
+                 errno != EWOULDBLOCK)
+            {
+                throw std::runtime_error(std::strerror(errno));
             }
 
+            // If the requested number of bytes to be read is complete, exit the loop and return.
+            if (numberOfBytes == number_of_bytes_read &&
+                numberOfBytes != 0)
+            {
+                break;
+            }
+
+            // If insufficient space remains in the buffer exit the loop and return.
+            if (number_of_bytes_read + number_of_bytes_remaining >= maximum_number_of_bytes)
+            {
+                // Exit the loop and return.
+                break;
+            }
+            
             // Obtain the current time.
             current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
@@ -2322,9 +2109,6 @@ namespace LibSerial
             // Calculate the elapsed number of milliseconds.
             elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
 
-            // Calculate the remaining number of milliseconds available.
-            remaining_ms = msTimeout - elapsed_ms;
-
             // If more than msTimeout milliseconds have elapsed while
             // waiting for data, then we throw a ReadTimeout exception.
             if (msTimeout > 0 &&
@@ -2333,6 +2117,10 @@ namespace LibSerial
                 throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
             }
         }
+        
+        // Free memory pointed to by the char_buffer and null the char_buffer pointer.
+        delete [] char_buffer;
+        char_buffer = NULL;
 
         return;
     }
@@ -2355,17 +2143,23 @@ namespace LibSerial
             return;
         }
 
-        // Clear the data string.
+        // Clear the string.
         dataString.clear();
 
-        unsigned char next_char = 0;
-
         size_t elapsed_ms = 0;
-        size_t remaining_ms = msTimeout;
-
         size_t number_of_bytes_read = 0;
         size_t number_of_bytes_remaining = 1;
+        size_t number_of_bytes_allocated = std::max(numberOfBytes, number_of_bytes_remaining);
         size_t maximum_number_of_bytes = dataString.max_size();
+        
+        ssize_t read_result = 0;
+
+        // Char array pointer for the read() call.
+        char* char_buffer = NULL;
+
+        // Allocate and clear sufficient memory for the requested number of bytes to be read.
+        char_buffer = new char[number_of_bytes_allocated];
+        std::memset(char_buffer, 0, number_of_bytes_allocated);
 
         std::chrono::high_resolution_clock::duration entry_time;
         std::chrono::high_resolution_clock::duration current_time;
@@ -2373,26 +2167,62 @@ namespace LibSerial
 
         // Obtain the entry time.
         entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
-        
-        while (number_of_bytes_remaining > 0 &&
-               number_of_bytes_read < maximum_number_of_bytes)
+
+        while (number_of_bytes_remaining > 0)
         {
-            if (numberOfBytes != 0)
+            if (numberOfBytes == 0)
+            {
+                // Read one byte.
+                read_result = read(this->mFileDescriptor,
+                                   &char_buffer[0],
+                                   1);
+            }
+            else
             {
                 number_of_bytes_remaining = numberOfBytes - number_of_bytes_read;
-            }
 
-            for (size_t i = 0; i < number_of_bytes_remaining; i++)
+                read_result = read(this->mFileDescriptor,
+                                   &char_buffer[number_of_bytes_read],
+                                   number_of_bytes_remaining);
+            }
+            
+            if (read_result > 0)
             {
-                this->Read(&next_char,
-                           1,
-                           remaining_ms);
+                if (numberOfBytes == 0)
+                {
+                    dataString += char_buffer[0];
+                }
+                else
+                {
+                    for (ssize_t i = 0; i < read_result; i++)
+                    {
+                        dataString += char_buffer[number_of_bytes_read + i];
+                    }
+                }
 
-                dataString += next_char;
+                number_of_bytes_read += read_result;
 
-                number_of_bytes_read++;
+            }
+            else if (read_result <= 0 &&
+                 errno != EWOULDBLOCK)
+            {
+                throw std::runtime_error(std::strerror(errno));
             }
 
+            // If the requested number of bytes to be read is complete, exit the loop and return.
+            if (numberOfBytes == number_of_bytes_read &&
+                numberOfBytes != 0)
+            {
+                break;
+            }
+
+            // If insufficient space remains in the buffer exit the loop and return.
+            if (number_of_bytes_read + number_of_bytes_remaining >= maximum_number_of_bytes)
+            {
+                // Exit the loop and return.
+                break;
+            }
+            
             // Obtain the current time.
             current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
@@ -2402,9 +2232,6 @@ namespace LibSerial
             // Calculate the elapsed number of milliseconds.
             elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
 
-            // Calculate the remaining number of milliseconds available.
-            remaining_ms = msTimeout - elapsed_ms;
-
             // If more than msTimeout milliseconds have elapsed while
             // waiting for data, then we throw a ReadTimeout exception.
             if (msTimeout > 0 &&
@@ -2413,6 +2240,10 @@ namespace LibSerial
                 throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
             }
         }
+
+        // Free memory pointed to by the char_buffer and null the char_buffer pointer.
+        delete [] char_buffer;
+        char_buffer = NULL;
 
         return;
     }
@@ -2428,9 +2259,60 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        this->Read(&charBuffer,
-                   1,
-                   msTimeout);
+        if (msTimeout == 0)
+        {
+            return;
+        }
+
+        size_t elapsed_ms = 0;
+        ssize_t read_result = 0;
+
+        std::chrono::high_resolution_clock::duration entry_time;
+        std::chrono::high_resolution_clock::duration current_time;
+        std::chrono::high_resolution_clock::duration elapsed_time;
+
+        // Obtain the entry time.
+        entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
+
+        // Loop until the number of bytes requested have been read or the timeout has elapsed.
+        while (read_result < 1)
+        {
+            read_result = read(this->mFileDescriptor,
+                               &charBuffer,
+                               1);
+            
+            // If the byte has been successfully read, exit the loop and return.
+            if (read_result == 1)
+            {
+                break;
+            }
+            else if (read_result <= 0 &&
+                     errno != EWOULDBLOCK)
+            {
+                throw std::runtime_error(std::strerror(errno));
+            }
+
+            // Obtain the current time.
+            current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
+
+            // Calculate the time delta.
+            elapsed_time = current_time - entry_time;
+
+            // Calculate the elapsed number of milliseconds.
+            elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
+
+            // Throw a ReadTimeout exception if more than msTimeout milliseconds
+            // have elapsed while waiting for data.
+            if (msTimeout > 0 &&
+                elapsed_ms > msTimeout)
+            {
+                throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
+            }
+
+            // Sleep for 1ms (1000us) for data to arrive.
+            usleep(1000);
+        }
+
         return;
     }
 
@@ -2445,9 +2327,60 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        this->Read(&charBuffer,
-                   1,
-                   msTimeout);
+        if (msTimeout == 0)
+        {
+            return;
+        }
+
+        size_t elapsed_ms = 0;
+        ssize_t read_result = 0;
+
+        std::chrono::high_resolution_clock::duration entry_time;
+        std::chrono::high_resolution_clock::duration current_time;
+        std::chrono::high_resolution_clock::duration elapsed_time;
+
+        // Obtain the entry time.
+        entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
+
+        // Loop until the number of bytes requested have been read or the timeout has elapsed.
+        while (read_result < 1)
+        {
+            read_result = read(this->mFileDescriptor,
+                               &charBuffer,
+                               1);
+            
+            // If the byte has been successfully read, exit the loop and return.
+            if (read_result == 1)
+            {
+                break;
+            }
+            else if (read_result <= 0 &&
+                     errno != EWOULDBLOCK)
+            {
+                throw std::runtime_error(std::strerror(errno));
+            }
+
+            // Obtain the current time.
+            current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
+
+            // Calculate the time delta.
+            elapsed_time = current_time - entry_time;
+
+            // Calculate the elapsed number of milliseconds.
+            elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
+
+            // Throw a ReadTimeout exception if more than msTimeout milliseconds
+            // have elapsed while waiting for data.
+            if (msTimeout > 0 &&
+                elapsed_ms > msTimeout)
+            {
+                throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
+            }
+
+            // Sleep for 1ms (1000us) for data to arrive.
+            usleep(1000);
+        }
+
         return;
     }
 
@@ -2462,7 +2395,7 @@ namespace LibSerial
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
-        
+
         // Clear the data string.
         dataString.clear();
 
@@ -2500,93 +2433,12 @@ namespace LibSerial
 
             remaining_ms = msTimeout - elapsed_ms;
 
-            this->Read(&next_char,
-                       1,
-                       remaining_ms);
+            this->ReadByte(next_char,
+                           remaining_ms);
 
             dataString += next_char;
         }
         
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::Write(const char*  charBuffer,
-                                      const size_t numberOfBytes)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Nothing needs to be done if there is no data in the buffer.
-        if (numberOfBytes <= 0)
-        {
-            return;
-        }
-
-        // Write the data to the serial port. Keep retrying if EAGAIN
-        // error is received and EWOULDBLOCK is not received.
-        ssize_t num_of_bytes_written = -1;
-        
-        do
-        {
-            num_of_bytes_written = write(this->mFileDescriptor,
-                                         charBuffer,
-                                         numberOfBytes);
-        }
-        while (num_of_bytes_written <= 0 &&
-               errno == EAGAIN &&
-               errno != EWOULDBLOCK);
-
-        if (num_of_bytes_written < 0 ||
-            num_of_bytes_written < (ssize_t)numberOfBytes)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        return;
-    }
-
-    inline
-    void
-    SerialPort::Implementation::Write(const unsigned char* charBuffer,
-                                      const size_t         numberOfBytes)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Nothing needs to be done if there is no data in the buffer.
-        if (numberOfBytes <= 0)
-        {
-            return;
-        }
-
-        // Write the data to the serial port. Keep retrying if EAGAIN
-        // error is received and EWOULDBLOCK is not received.
-        ssize_t num_of_bytes_written = -1;
-        
-        do
-        {
-            num_of_bytes_written = write(this->mFileDescriptor,
-                                         charBuffer,
-                                         numberOfBytes);
-        }
-        while (num_of_bytes_written <= 0 &&
-               errno == EAGAIN &&
-               errno != EWOULDBLOCK);
-
-        if (num_of_bytes_written < 0 ||
-            num_of_bytes_written < (ssize_t)numberOfBytes)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
         return;
     }
 
@@ -2600,12 +2452,44 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        std::string data_string(dataBuffer.begin(),
-                                dataBuffer.end());
+        size_t number_of_bytes = dataBuffer.size();
 
-        this->Write(data_string);
+        // Nothing needs to be done if there is no data in the string.
+        if (number_of_bytes <= 0)
+        {
+            return;
+        }
+
+        // Local variables.
+        size_t number_of_bytes_written = 0;
+        size_t number_of_bytes_remaining = number_of_bytes;
+
+        // Write the data to the serial port. Keep retrying if EAGAIN
+        // error is received and EWOULDBLOCK is not received.
+        ssize_t write_result = 0;
         
-        return;
+        while (number_of_bytes_remaining > 0)
+        {
+            write_result = write(this->mFileDescriptor,
+                                 &dataBuffer[number_of_bytes_written],
+                                 number_of_bytes_remaining);
+
+            if (write_result >= 0)
+            {
+                number_of_bytes_written += write_result;
+                number_of_bytes_remaining = number_of_bytes - number_of_bytes_written;
+
+                if (number_of_bytes_remaining == 0)
+                {
+                    break;
+                }
+            }
+            else if (write_result <= 0 &&
+                     errno != EWOULDBLOCK)
+            {
+                throw std::runtime_error(std::strerror(errno));
+            }
+        }
     }
 
     inline
@@ -2618,9 +2502,44 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        this->Write(reinterpret_cast<const unsigned char*>(dataString.c_str()),
-                    dataString.length());
-        return;
+        size_t number_of_bytes = dataString.size();
+
+        // Nothing needs to be done if there is no data in the string.
+        if (number_of_bytes <= 0)
+        {
+            return;
+        }
+
+        // Local variables.
+        size_t number_of_bytes_written = 0;
+        size_t number_of_bytes_remaining = number_of_bytes;
+
+        // Write the data to the serial port. Keep retrying if EAGAIN
+        // error is received and EWOULDBLOCK is not received.
+        ssize_t write_result = 0;
+        
+        while (number_of_bytes_remaining > 0)
+        {
+            write_result = write(this->mFileDescriptor,
+                                 &dataString[number_of_bytes_written],
+                                 number_of_bytes_remaining);
+
+            if (write_result >= 0)
+            {
+                number_of_bytes_written += write_result;
+                number_of_bytes_remaining = number_of_bytes - number_of_bytes_written;
+
+                if (number_of_bytes_remaining == 0)
+                {
+                    break;
+                }
+            }
+            else if (write_result <= 0 &&
+                     errno != EWOULDBLOCK)
+            {
+                throw std::runtime_error(std::strerror(errno));
+            }
+        }
     }
 
     inline
@@ -2633,8 +2552,26 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        this->Write(&charBuffer,
-                    1);
+        // Write the data to the serial port. Keep retrying if EAGAIN
+        // error is received and EWOULDBLOCK is not received.
+        ssize_t write_result = 0;
+        
+        while (write_result <= 0)
+        {
+            write_result = write(this->mFileDescriptor,
+                                 &charBuffer,
+                                 1);
+
+            if (write_result == 1)
+            {
+                break;
+            }
+            else if (write_result <= 0 &&
+                     errno != EWOULDBLOCK)
+            {
+                throw std::runtime_error(std::strerror(errno));
+            }
+        }
 
         return;
     }
@@ -2643,14 +2580,32 @@ namespace LibSerial
     void
     SerialPort::Implementation::WriteByte(const unsigned char charBuffer)
     {
-        // Throw an exception if the serial port is not open.
+                // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        this->Write(&charBuffer,
-                    1);
+        // Write the data to the serial port. Keep retrying if EAGAIN
+        // error is received and EWOULDBLOCK is not received.
+        ssize_t write_result = 0;
+        
+        while (write_result <= 0)
+        {
+            write_result = write(this->mFileDescriptor,
+                                 &charBuffer,
+                                 1);
+
+            if (write_result == 1)
+            {
+                break;
+            }
+            else if (write_result <= 0 &&
+                     errno != EWOULDBLOCK)
+            {
+                throw std::runtime_error(std::strerror(errno));
+            }
+        }
 
         return;
     }

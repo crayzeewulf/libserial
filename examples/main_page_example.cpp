@@ -28,13 +28,15 @@ int main()
    char read_byte_2 = 'B';
 
    // Write a character.
-   serial_port.Write(&write_byte_1, 1);
+   serial_port.WriteByte(write_byte_1);
    serial_stream << write_byte_2;
+
+   size_t timeout_milliseconds = 5;
 
    try
    {
       // Read a character.
-      serial_port.Read(&read_byte_1, 1);
+      serial_port.ReadByte(read_byte_1, timeout_milliseconds);
       serial_stream >> read_byte_2;
    }
    catch (ReadTimeout)

@@ -164,6 +164,7 @@ int main()
     serial_port_1.Close();
     serial_port_2.Close();
 
+    // Successful program completion.
     std::cout << "The example program successfully completed!" << std::endl;
     return EXIT_SUCCESS;
 }
