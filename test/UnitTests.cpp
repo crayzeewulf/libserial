@@ -1486,70 +1486,6 @@ protected:
         ASSERT_FALSE(serialPort2.IsOpen());
     }
 
-    void testSerialPortReadCharBufferWriteCharBuffer()
-    {
-        serialPort1.Open(TEST_SERIAL_PORT_1);
-        serialPort2.Open(TEST_SERIAL_PORT_2);
-
-        ASSERT_TRUE(serialPort1.IsOpen());
-        ASSERT_TRUE(serialPort2.IsOpen());
-
-        bool timeOutTestPass = false;
-
-        char writeBuffer1[] = "abc";
-        unsigned char writeBuffer2[] = "ABC";
-
-        char* readBuffer1 = new char[3];
-        unsigned char* readBuffer2 = new unsigned char[3];
-
-        serialPort1.Write(writeBuffer1, 3);
-        serialPort2.Write(writeBuffer2, 3);
-
-        tcdrain(serialPort1.GetFileDescriptor());
-        tcdrain(serialPort2.GetFileDescriptor());
-
-        serialPort1.Read(readBuffer1, 3, timeOutMilliseconds);
-        serialPort2.Read(readBuffer2, 3, timeOutMilliseconds);
-
-        for (size_t i = 0; i < 3; i++)
-        {
-            ASSERT_EQ(readBuffer1[i], writeBuffer2[i]);
-            ASSERT_EQ(readBuffer2[i], writeBuffer1[i]);
-        }
-
-        try
-        {
-            serialPort1.Read(readBuffer1, 3, 1);
-            serialPort2.Read(readBuffer2, 3, 1);
-        }
-        catch(...)
-        {
-            timeOutTestPass = true;
-        }
-
-        ASSERT_TRUE(timeOutTestPass);
-
-        timeOutTestPass = false;
-
-        try
-        {
-            serialPort1.Read(readBuffer1, 0, 5);
-            serialPort2.Read(readBuffer2, 0, 5);
-        }
-        catch(...)
-        {
-            timeOutTestPass = true;
-        }
-
-        ASSERT_TRUE(timeOutTestPass);
-
-        serialPort1.Close();
-        serialPort2.Close();
-
-        ASSERT_FALSE(serialPort1.IsOpen());
-        ASSERT_FALSE(serialPort2.IsOpen());
-    }
-
     void testSerialPortReadDataBufferWriteDataBuffer()
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
@@ -1558,41 +1494,39 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
+        const size_t array_size = 75;
+
         bool timeOutTestPass = false;
 
-        DataBuffer writeDataBuffer1;
-        DataBuffer writeDataBuffer2;
+        DataBuffer writeVector1;
+        DataBuffer writeVector2;
 
-        DataBuffer readDataBuffer1;
-        DataBuffer readDataBuffer2;
+        DataBuffer readVector1;
+        DataBuffer readVector2;
 
         // Test using ASCII characters.
-        for (unsigned char i = 48; i <= 122; i++)
+        for (unsigned char i = 0; i < array_size; i++)
         {
-            writeDataBuffer1.push_back(i);
+            writeVector1.push_back((char)(48 + i));
+            writeVector2.push_back((char)(122 - i));
         }
 
-        for (unsigned char i = 122; i >= 48; i--)
-        {
-            writeDataBuffer2.push_back(i);
-        }
-
-        serialPort1.Write(writeDataBuffer1);
-        serialPort2.Write(writeDataBuffer2);
+        serialPort1.Write(writeVector1);
+        serialPort2.Write(writeVector2);
 
         tcdrain(serialPort1.GetFileDescriptor());
         tcdrain(serialPort2.GetFileDescriptor());
 
-        serialPort1.Read(readDataBuffer2, 75, timeOutMilliseconds);
-        serialPort2.Read(readDataBuffer1, 75, timeOutMilliseconds);
+        serialPort1.Read(readVector2, array_size, timeOutMilliseconds);
+        serialPort2.Read(readVector1, array_size, timeOutMilliseconds);
 
-        ASSERT_EQ(readDataBuffer1, writeDataBuffer1);
-        ASSERT_EQ(readDataBuffer2, writeDataBuffer2);
+        ASSERT_EQ(readVector1, writeVector1);
+        ASSERT_EQ(readVector2, writeVector2);
 
         try
         {
-            serialPort1.Read(readDataBuffer1, 1, 1);
-            serialPort2.Read(readDataBuffer2, 1, 1);
+            serialPort1.Read(readVector1, 1, 1);
+            serialPort2.Read(readVector2, 1, 1);
         }
         catch(ReadTimeout)
         {
@@ -1605,8 +1539,8 @@ protected:
 
         try
         {
-            serialPort1.Read(readDataBuffer1, 0, 5);
-            serialPort2.Read(readDataBuffer2, 0, 5);
+            serialPort1.Read(readVector1, 0, 5);
+            serialPort2.Read(readVector2, 0, 5);
         }
         catch(...)
         {
@@ -2420,16 +2354,6 @@ TEST_F(LibSerialTest, testSerialPortGetAvailableSerialPorts)
     }
 }
 
-TEST_F(LibSerialTest, testSerialPortReadCharBufferWriteCharBuffer)
-{
-    SCOPED_TRACE("Serial Port Read(signed/unsigned char) and Write(signed/unsigned char) Test");
-
-    for (size_t i = 0; i < numberOfTestIterations; i++)
-    {
-        testSerialPortReadCharBufferWriteCharBuffer();
-    }
-}
-
 TEST_F(LibSerialTest, testSerialPortReadDataBufferWriteDataBuffer)
 {
     SCOPED_TRACE("Serial Port Read(DataBuffer) and Write(DataBuffer) Test");
@@ -2500,8 +2424,8 @@ TEST_F(LibSerialTest, testMultiThreadSerialStreamReadWrite)
 
     double failRate = 100. * (double)failureRate / (double)loopCount;
     
-    // If the serial communication fail rate is greater than 1.0% consider it a failed test.
-    if (failRate > 1.0)
+    // If the serial communication fail rate is greater than 2.0% consider it a failed test.
+    if (failRate > 2.0)
     {
         std::cout << "\t     SerialStream Failure Rate = " << failRate << "%" << std::endl;
         ADD_FAILURE();
@@ -2519,8 +2443,8 @@ TEST_F(LibSerialTest, testMultiThreadSerialPortReadWrite)
 
     double failRate = 100. * (double)failureRate / (double)loopCount;
     
-    // If the serial communication fail rate is greater than 1.0% consider it a failed test.
-    if (failRate > 1.0)
+    // If the serial communication fail rate is greater than 2.0% consider it a failed test.
+    if (failRate > 2.0)
     {
         std::cout << "\t     SerialPort Failure Rate = " << failRate << "%" << std::endl;
         ADD_FAILURE();

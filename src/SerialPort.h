@@ -267,44 +267,6 @@ namespace LibSerial
          *        non-zero,  the method will continue receiving data for the
          *        specified of milliseconds. If numberOfBytes is zero and
          *        msTimeout is zero, the method will return immediately. In all
-         *        cases, any data received remains available in the charBuffer
-         *        on return from this method.
-         * @param charBuffer The character array buffer to place data into.
-         * @param numberOfBytes The number of bytes to read before returning.
-         * @param msTimeout The timeout period in milliseconds.
-         */
-        void Read(char*        charBuffer,
-                  const size_t numberOfBytes = 0,
-                  const size_t msTimeout  = 0);
-
-        /**
-         * @brief Reads the specified number of bytes from the serial port.
-         *        The method will timeout if no data is received in the
-         *        specified number of milliseconds (msTimeout). If msTimeout
-         *        is zero, then the method will block until all requested bytes
-         *        are received. If numberOfBytes is zero and msTimeout is
-         *        non-zero,  the method will continue receiving data for the
-         *        specified of milliseconds. If numberOfBytes is zero and
-         *        msTimeout is zero, the method will return immediately. In all
-         *        cases, any data received remains available in the charBuffer
-         *        on return from this method.
-         * @param charBuffer The character array buffer to place data into.
-         * @param numberOfBytes The number of bytes to read before returning.
-         * @param msTimeout The timeout period in milliseconds.
-         */
-        void Read(unsigned char* charBuffer,
-                  const size_t   numberOfBytes = 0,
-                  const size_t   msTimeout  = 0);
-
-        /**
-         * @brief Reads the specified number of bytes from the serial port.
-         *        The method will timeout if no data is received in the
-         *        specified number of milliseconds (msTimeout). If msTimeout
-         *        is zero, then the method will block until all requested bytes
-         *        are received. If numberOfBytes is zero and msTimeout is
-         *        non-zero,  the method will continue receiving data for the
-         *        specified of milliseconds. If numberOfBytes is zero and
-         *        msTimeout is zero, the method will return immediately. In all
          *        cases, any data received remains available in the dataBuffer
          *        on return from this method.
          * @param dataBuffer The data buffer to place data into.
@@ -374,22 +336,6 @@ namespace LibSerial
         void ReadLine(std::string&  dataString,
                       const char    lineTerminator = '\n',
                       const size_t  msTimeout = 0);
-
-        /**
-         * @brief Writes a character array buffer to the serial port.
-         * @param charBuffer The character array to be written to the serial port.
-         * @param numberOfBytes The number of bytes to write to the serial port.
-         */
-        void Write(const char*  charBuffer,
-                   const size_t numberOfBytes);
-
-        /**
-         * @brief Writes a character array buffer to the serial port.
-         * @param charBuffer The character array to be written to the serial port.
-         * @param numberOfBytes The number of bytes to write to the serial port.
-         */
-        void Write(const unsigned char* charBuffer,
-                   const size_t         numberOfBytes);
 
         /**
          * @brief Writes a DataBuffer vector to the serial port.

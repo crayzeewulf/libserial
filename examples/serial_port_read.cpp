@@ -67,14 +67,7 @@ int main()
     // Wait a brief period for more data to arrive.
     usleep(1000);
 
-    // Size of the char array.
-    const size_t array_size = 128;
-
-    // Char array to store data coming from the serial port.
-    char read_buffer[array_size];
-
-    // Clear the array contents.
-    std::memset(read_buffer, 0, array_size);
+    DataBuffer read_buffer;
 
     try
     {
@@ -83,12 +76,15 @@ int main()
     }
     catch (ReadTimeout)
     {
-        std::cerr << "\nThe Read() call has timed out waiting for more data." << std::endl;
+        for (size_t i = 0; i < read_buffer.size(); i++)
+        {
+            std::cout << read_buffer.at(i) << std::flush;
+        }
+
+        std::cerr << "\nThe Read() call timed out waiting for additional data." << std::endl;
     }
 
-    std::cout << read_buffer << std::flush;
-
     // Successful program completion.
-    std::cout << "Done." << std::endl;
+    std::cout << "The example program successfully completed!" << std::endl;
     return EXIT_SUCCESS;
 }
