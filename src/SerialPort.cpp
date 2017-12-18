@@ -2114,6 +2114,10 @@ namespace LibSerial
             if (msTimeout > 0 &&
                 elapsed_ms > msTimeout)
             {
+                // Free memory pointed to by the char_buffer and null the char_buffer pointer.
+                delete [] char_buffer;
+                char_buffer = NULL;
+
                 throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
             }
         }
@@ -2237,6 +2241,10 @@ namespace LibSerial
             if (msTimeout > 0 &&
                 elapsed_ms > msTimeout)
             {
+                // Free memory pointed to by the char_buffer and null the char_buffer pointer.
+                delete [] char_buffer;
+                char_buffer = NULL;
+
                 throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
             }
         }
