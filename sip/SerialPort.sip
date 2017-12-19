@@ -106,19 +106,9 @@ public:
     int
     GetFileDescriptor();
 
+    // NOTE: There is not a Python equivalent to std::vector.
     // std::vector<std::string>
     // GetAvailableSerialPorts();
-
-    // NOTE: Python3 provides a mechanism for method overloading, however Python2 does not.
-    // void
-    // Read(char&              charBuffer,
-    //      const unsigned int numberOfBytes = 0,
-    //      const unsigned int msTimeout  = 0);
-
-    void
-    Read(unsigned char&     charBuffer,
-         const unsigned int numberOfBytes = 0,
-         const unsigned int msTimeout  = 0);
 
     void
     Read(LibSerial::DataBuffer& dataBuffer,
@@ -144,27 +134,18 @@ public:
              const char         lineTerminator = 10, // Sip does not like '\n'
              const unsigned int msTimeout = 0);
 
-    // NOTE: Python3 provides a mechanism for method overloading, however Python2 does not.
-    // void
-    // Write(const char*        charBuffer,
-    //       const unsigned int numberOfBytes);
-    
-    void
-    Write(const unsigned char* charBuffer,
-          const unsigned int   numberOfBytes);
-    
     void
     Write(const LibSerial::DataBuffer& dataBuffer);
 
     void
     Write(const std::string& dataString);
 
+    void
+    WriteByte(const char charbuffer);
+
     // NOTE: Python3 provides a mechanism for method overloading, however Python2 does not.
     // void
-    // WriteByte(const char charbuffer);
-
-    void
-    WriteByte(const unsigned char charbuffer);
+    // WriteByte(const unsigned char charbuffer);
 
 private:
     SerialPort(const SerialPort& otherSerialPort);
