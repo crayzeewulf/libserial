@@ -1529,12 +1529,9 @@ protected:
         try
         {
             serialPort1.Write(writeVector1);
-            serialPort2.Write(writeVector2);
 
             tcdrain(serialPort1.GetFileDescriptor());
-            tcdrain(serialPort2.GetFileDescriptor());
 
-            serialPort1.Read(readVector2, 0, 75);
             serialPort2.Read(readVector1, 0, 75);
         }
         catch(...)
@@ -1543,20 +1540,7 @@ protected:
         }
 
         ASSERT_TRUE(timeOutTestPass);
-
-        timeOutTestPass = false;
-
-        try
-        {
-            serialPort1.Read(readVector1, 1, 1);
-            serialPort2.Read(readVector2, 1, 1);
-        }
-        catch(ReadTimeout)
-        {
-            timeOutTestPass = true;
-        }
-        
-        ASSERT_TRUE(timeOutTestPass);
+        ASSERT_EQ(readVector1, writeVector1);
 
         serialPort1.Close();
         serialPort2.Close();
@@ -1587,18 +1571,6 @@ protected:
         ASSERT_EQ(readString1, writeString1);
         ASSERT_EQ(readString2, writeString2);
 
-        try
-        {
-            serialPort1.Read(readString1, writeString1.size(), 1);
-            serialPort2.Read(readString2, writeString2.size(), 1);
-        }
-        catch(ReadTimeout)
-        {
-            timeOutTestPass = true;
-        }
-        
-        ASSERT_TRUE(timeOutTestPass);
-        
         timeOutTestPass = false;
 
         readString1.clear();
@@ -1607,13 +1579,10 @@ protected:
         try
         {
             serialPort1.Write(writeString1);
-            serialPort2.Write(writeString2);
 
             tcdrain(serialPort1.GetFileDescriptor());
-            tcdrain(serialPort2.GetFileDescriptor());
 
             serialPort2.Read(readString1, 0, 75);
-            serialPort1.Read(readString2, 0, 75);
         }
         catch(...)
         {
@@ -1621,7 +1590,8 @@ protected:
         }
 
         ASSERT_TRUE(timeOutTestPass);
-
+        ASSERT_EQ(readString1, writeString1);
+        
         serialPort1.Close();
         serialPort2.Close();
         
