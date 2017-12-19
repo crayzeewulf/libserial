@@ -2048,7 +2048,7 @@ namespace LibSerial
             if (numberOfBytes == 0)
             {
                 // Add an additional element for the read() call.
-                dataBuffer.resize(number_of_bytes_read + number_of_bytes_remaining);
+                dataBuffer.resize(number_of_bytes_read + 1);
             }
 
             read_result = read(this->mFileDescriptor,
@@ -2089,13 +2089,14 @@ namespace LibSerial
             if (msTimeout > 0 &&
                 elapsed_ms > msTimeout)
             {
-                if (numberOfBytes == 0)
-                {
-                    dataBuffer.resize(number_of_bytes_read);
-                }
+                // Resize the data buffer.
+                dataBuffer.resize(number_of_bytes_read);
 
                 throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
             }
+            
+            // Allow 100us for additional data to arrive.
+            usleep(100);
         }
 
         return;
@@ -2149,7 +2150,7 @@ namespace LibSerial
             if (numberOfBytes == 0)
             {
                 // Add an additional element for the read() call.
-                dataString.resize(number_of_bytes_read + number_of_bytes_remaining);
+                dataString.resize(number_of_bytes_read + 1);
             }
 
             read_result = read(this->mFileDescriptor,
@@ -2190,13 +2191,14 @@ namespace LibSerial
             if (msTimeout > 0 &&
                 elapsed_ms > msTimeout)
             {
-                if (numberOfBytes == 0)
-                {
-                    dataString.resize(number_of_bytes_read);
-                }
+                // Resize the data string.
+                dataString.resize(number_of_bytes_read);
 
                 throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
             }
+
+            // Allow 100us for additional data to arrive.
+            usleep(100);
         }
 
         return;
@@ -2263,8 +2265,8 @@ namespace LibSerial
                 throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
             }
 
-            // Sleep for 1ms (1000us) for data to arrive.
-            usleep(1000);
+            // Allow 100us for additional data to arrive.
+            usleep(100);
         }
 
         return;
@@ -2331,8 +2333,8 @@ namespace LibSerial
                 throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
             }
 
-            // Sleep for 1ms (1000us) for data to arrive.
-            usleep(1000);
+            // Allow 100us for additional data to arrive.
+            usleep(100);
         }
 
         return;
