@@ -1494,7 +1494,7 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
-        const size_t array_size = 75;
+        const size_t data_count = 75;
 
         bool timeOutTestPass = false;
 
@@ -1505,7 +1505,7 @@ protected:
         DataBuffer readVector2;
 
         // Test using ASCII characters.
-        for (unsigned char i = 0; i < array_size; i++)
+        for (unsigned char i = 0; i < data_count; i++)
         {
             writeVector1.push_back((char)(48 + i));
             writeVector2.push_back((char)(122 - i));
@@ -1517,11 +1517,34 @@ protected:
         tcdrain(serialPort1.GetFileDescriptor());
         tcdrain(serialPort2.GetFileDescriptor());
 
-        serialPort1.Read(readVector2, array_size, timeOutMilliseconds);
-        serialPort2.Read(readVector1, array_size, timeOutMilliseconds);
+        serialPort1.Read(readVector2, data_count, timeOutMilliseconds);
+        serialPort2.Read(readVector1, data_count, timeOutMilliseconds);
 
         ASSERT_EQ(readVector1, writeVector1);
         ASSERT_EQ(readVector2, writeVector2);
+
+        readVector1.clear();
+        readVector2.clear();
+
+        try
+        {
+            serialPort1.Write(writeVector1);
+            serialPort2.Write(writeVector2);
+
+            tcdrain(serialPort1.GetFileDescriptor());
+            tcdrain(serialPort2.GetFileDescriptor());
+
+            serialPort1.Read(readVector2, 0, 75);
+            serialPort2.Read(readVector1, 0, 75);
+        }
+        catch(...)
+        {
+            timeOutTestPass = true;
+        }
+
+        ASSERT_TRUE(timeOutTestPass);
+
+        timeOutTestPass = false;
 
         try
         {
@@ -1533,20 +1556,6 @@ protected:
             timeOutTestPass = true;
         }
         
-        ASSERT_TRUE(timeOutTestPass);
-        
-        timeOutTestPass = false;
-
-        try
-        {
-            serialPort1.Read(readVector1, 0, 5);
-            serialPort2.Read(readVector2, 0, 5);
-        }
-        catch(...)
-        {
-            timeOutTestPass = true;
-        }
-
         ASSERT_TRUE(timeOutTestPass);
 
         serialPort1.Close();
@@ -1592,10 +1601,19 @@ protected:
         
         timeOutTestPass = false;
 
+        readString1.clear();
+        readString2.clear();
+
         try
         {
-            serialPort1.Read(readString1, 0, 5);
-            serialPort2.Read(readString2, 0, 5);
+            serialPort1.Write(writeString1);
+            serialPort2.Write(writeString2);
+
+            tcdrain(serialPort1.GetFileDescriptor());
+            tcdrain(serialPort2.GetFileDescriptor());
+
+            serialPort2.Read(readString1, 0, 75);
+            serialPort1.Read(readString2, 0, 75);
         }
         catch(...)
         {

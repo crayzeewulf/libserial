@@ -79,6 +79,6 @@ int main(int argc, char** argv)
     }
 
     // Successful program completion.
-    std::cout << std::endl << "Done." << std::endl;
+    std::cout << "The example program successfully completed!" << std::endl;
     return EXIT_SUCCESS;
 }

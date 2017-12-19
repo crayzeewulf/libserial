@@ -2018,24 +2018,17 @@ namespace LibSerial
             return;
         }
 
-        // Clear the data buffer and reserve enough space in the buffer to store the incoming data.
-        dataBuffer.resize(0);
-        dataBuffer.reserve(numberOfBytes);
-
+        // Local variables.
         size_t elapsed_ms = 0;
         size_t number_of_bytes_read = 0;
-        size_t number_of_bytes_remaining = 1;
-        size_t number_of_bytes_allocated = std::max(numberOfBytes, number_of_bytes_remaining);
+        size_t number_of_bytes_remaining = std::max((int)numberOfBytes, 1);
         size_t maximum_number_of_bytes = dataBuffer.max_size();
         
         ssize_t read_result = 0;
 
-        // Char array pointer for the read() call.
-        char* char_buffer = NULL;
-
-        // Allocate and clear sufficient memory for the requested number of bytes to be read.
-        char_buffer = new char[number_of_bytes_allocated];
-        std::memset(char_buffer, 0, number_of_bytes_allocated);
+        // Clear the data buffer and reserve enough space in the buffer to store the incoming data.
+        dataBuffer.clear();
+        dataBuffer.resize(number_of_bytes_remaining);
 
         std::chrono::high_resolution_clock::duration entry_time;
         std::chrono::high_resolution_clock::duration current_time;
@@ -2044,62 +2037,44 @@ namespace LibSerial
         // Obtain the entry time.
         entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
-        while (number_of_bytes_remaining > 0 &&
-               number_of_bytes_read < maximum_number_of_bytes)
+        while (number_of_bytes_remaining > 0)
         {
+            // If insufficient space remains in the buffer, exit the loop and return .
+            if (number_of_bytes_remaining >= maximum_number_of_bytes - number_of_bytes_read)
+            {
+                break;
+            }
+
             if (numberOfBytes == 0)
             {
-                // Read one byte.
-                read_result = read(this->mFileDescriptor,
-                                   &char_buffer[0],
-                                   1);
+                // Add an additional element for the read() call.
+                dataBuffer.resize(number_of_bytes_read + number_of_bytes_remaining);
             }
-            else
-            {
-                number_of_bytes_remaining = numberOfBytes - number_of_bytes_read;
 
-                read_result = read(this->mFileDescriptor,
-                                   &char_buffer[number_of_bytes_read],
-                                   number_of_bytes_remaining);
-            }
-            
-            if (read_result > 0)
-            {
-                if (numberOfBytes == 0)
-                {
-                    dataBuffer.push_back(char_buffer[0]);
-                }
-                else
-                {
-                    for (ssize_t i = 0; i < read_result; i++)
-                    {
-                        dataBuffer.push_back(char_buffer[number_of_bytes_read + i]);
-                    }
-                }
+            read_result = read(this->mFileDescriptor,
+                               &dataBuffer[number_of_bytes_read],
+                               number_of_bytes_remaining);
 
+            if (read_result >= 0)
+            {
                 number_of_bytes_read += read_result;
 
+                if (numberOfBytes != 0)
+                {
+                    number_of_bytes_remaining = numberOfBytes - number_of_bytes_read;
+
+                    if (number_of_bytes_remaining == 0)
+                    {
+                        break;
+                    }
+                }
             }
-            else if (read_result <= 0 &&
-                 errno != EWOULDBLOCK)
+            else if (read_result < 0 &&
+                     errno != EWOULDBLOCK)
             {
                 throw std::runtime_error(std::strerror(errno));
             }
 
-            // If the requested number of bytes to be read is complete, exit the loop and return.
-            if (numberOfBytes == number_of_bytes_read &&
-                numberOfBytes != 0)
-            {
-                break;
-            }
-
-            // If insufficient space remains in the buffer exit the loop and return.
-            if (number_of_bytes_read + number_of_bytes_remaining >= maximum_number_of_bytes)
-            {
-                // Exit the loop and return.
-                break;
-            }
-            
             // Obtain the current time.
             current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
@@ -2114,17 +2089,9 @@ namespace LibSerial
             if (msTimeout > 0 &&
                 elapsed_ms > msTimeout)
             {
-                // Free memory pointed to by the char_buffer and null the char_buffer pointer.
-                delete [] char_buffer;
-                char_buffer = NULL;
-
                 throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
             }
         }
-        
-        // Free memory pointed to by the char_buffer and null the char_buffer pointer.
-        delete [] char_buffer;
-        char_buffer = NULL;
 
         return;
     }
@@ -2147,23 +2114,17 @@ namespace LibSerial
             return;
         }
 
-        // Clear the string.
-        dataString.clear();
-
+        // Local variables.
         size_t elapsed_ms = 0;
         size_t number_of_bytes_read = 0;
-        size_t number_of_bytes_remaining = 1;
-        size_t number_of_bytes_allocated = std::max(numberOfBytes, number_of_bytes_remaining);
+        size_t number_of_bytes_remaining = std::max((int)numberOfBytes, 1);
         size_t maximum_number_of_bytes = dataString.max_size();
         
         ssize_t read_result = 0;
 
-        // Char array pointer for the read() call.
-        char* char_buffer = NULL;
-
-        // Allocate and clear sufficient memory for the requested number of bytes to be read.
-        char_buffer = new char[number_of_bytes_allocated];
-        std::memset(char_buffer, 0, number_of_bytes_allocated);
+        // Clear the data buffer and reserve enough space in the buffer to store the incoming data.
+        dataString.clear();
+        dataString.resize(number_of_bytes_remaining);
 
         std::chrono::high_resolution_clock::duration entry_time;
         std::chrono::high_resolution_clock::duration current_time;
@@ -2173,60 +2134,43 @@ namespace LibSerial
         entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
         while (number_of_bytes_remaining > 0)
-        {
+        { 
+            // If insufficient space remains in the buffer, exit the loop and return .
+            if (number_of_bytes_remaining >= maximum_number_of_bytes - number_of_bytes_read)
+            {
+                break;
+            }
+
             if (numberOfBytes == 0)
             {
-                // Read one byte.
-                read_result = read(this->mFileDescriptor,
-                                   &char_buffer[0],
-                                   1);
+                // Add an additional element for the read() call.
+                dataString.resize(number_of_bytes_read + number_of_bytes_remaining);
             }
-            else
-            {
-                number_of_bytes_remaining = numberOfBytes - number_of_bytes_read;
 
-                read_result = read(this->mFileDescriptor,
-                                   &char_buffer[number_of_bytes_read],
-                                   number_of_bytes_remaining);
-            }
-            
-            if (read_result > 0)
-            {
-                if (numberOfBytes == 0)
-                {
-                    dataString += char_buffer[0];
-                }
-                else
-                {
-                    for (ssize_t i = 0; i < read_result; i++)
-                    {
-                        dataString += char_buffer[number_of_bytes_read + i];
-                    }
-                }
+            read_result = read(this->mFileDescriptor,
+                               &dataString[number_of_bytes_read],
+                               number_of_bytes_remaining);
 
+            if (read_result >= 0)
+            {
                 number_of_bytes_read += read_result;
 
+                if (numberOfBytes != 0)
+                {
+                    number_of_bytes_remaining = numberOfBytes - number_of_bytes_read;
+
+                    if (number_of_bytes_remaining == 0)
+                    {
+                        break;
+                    }
+                }
             }
-            else if (read_result <= 0 &&
-                 errno != EWOULDBLOCK)
+            else if (read_result < 0 &&
+                     errno != EWOULDBLOCK)
             {
                 throw std::runtime_error(std::strerror(errno));
             }
 
-            // If the requested number of bytes to be read is complete, exit the loop and return.
-            if (numberOfBytes == number_of_bytes_read &&
-                numberOfBytes != 0)
-            {
-                break;
-            }
-
-            // If insufficient space remains in the buffer exit the loop and return.
-            if (number_of_bytes_read + number_of_bytes_remaining >= maximum_number_of_bytes)
-            {
-                // Exit the loop and return.
-                break;
-            }
-            
             // Obtain the current time.
             current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
@@ -2241,17 +2185,9 @@ namespace LibSerial
             if (msTimeout > 0 &&
                 elapsed_ms > msTimeout)
             {
-                // Free memory pointed to by the char_buffer and null the char_buffer pointer.
-                delete [] char_buffer;
-                char_buffer = NULL;
-
                 throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
             }
         }
-
-        // Free memory pointed to by the char_buffer and null the char_buffer pointer.
-        delete [] char_buffer;
-        char_buffer = NULL;
 
         return;
     }
