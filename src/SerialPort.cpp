@@ -2055,7 +2055,7 @@ namespace LibSerial
                                &dataBuffer[number_of_bytes_read],
                                number_of_bytes_remaining);
 
-            if (read_result >= 0)
+            if (read_result > 0)
             {
                 number_of_bytes_read += read_result;
 
@@ -2069,7 +2069,7 @@ namespace LibSerial
                     }
                 }
             }
-            else if (read_result < 0 &&
+            else if (read_result <= 0 &&
                      errno != EWOULDBLOCK)
             {
                 throw std::runtime_error(std::strerror(errno));
@@ -2089,6 +2089,11 @@ namespace LibSerial
             if (msTimeout > 0 &&
                 elapsed_ms > msTimeout)
             {
+                if (numberOfBytes == 0)
+                {
+                    dataBuffer.resize(number_of_bytes_read);
+                }
+
                 throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
             }
         }
@@ -2151,7 +2156,7 @@ namespace LibSerial
                                &dataString[number_of_bytes_read],
                                number_of_bytes_remaining);
 
-            if (read_result >= 0)
+            if (read_result > 0)
             {
                 number_of_bytes_read += read_result;
 
@@ -2165,7 +2170,7 @@ namespace LibSerial
                     }
                 }
             }
-            else if (read_result < 0 &&
+            else if (read_result <= 0 &&
                      errno != EWOULDBLOCK)
             {
                 throw std::runtime_error(std::strerror(errno));
@@ -2185,6 +2190,11 @@ namespace LibSerial
             if (msTimeout > 0 &&
                 elapsed_ms > msTimeout)
             {
+                if (numberOfBytes == 0)
+                {
+                    dataString.resize(number_of_bytes_read);
+                }
+
                 throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
             }
         }
