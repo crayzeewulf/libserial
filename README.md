@@ -23,7 +23,7 @@ Then run `configure`:
 ./configure 
 ```
 
-You can specify an installation directory different from the default, (/usr/local/), by adding the --prefix= command to the configure command.  For example:
+You can specify an installation directory different from the default, (/usr/local/), by adding `--prefix=/installation/directory/path/` to the configure command.  For example:
 ```
 ./configure --prefix=/usr/include/
 ```
