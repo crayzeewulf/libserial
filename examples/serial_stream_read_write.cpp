@@ -147,6 +147,7 @@ int main()
     serial_stream_1.Close();
     serial_stream_2.Close();
 
+    // Successful program completion.
     std::cout << "The example program successfully completed!" << std::endl;
     return EXIT_SUCCESS;
 }

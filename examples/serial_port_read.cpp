@@ -81,7 +81,7 @@ int main()
             std::cout << read_buffer.at(i) << std::flush;
         }
 
-        std::cerr << "\nThe Read() call timed out waiting for additional data." << std::endl;
+        std::cerr << "The Read() call timed out waiting for additional data." << std::endl;
     }
 
     // Successful program completion.
