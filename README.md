@@ -28,7 +28,7 @@ You can specify an installation directory different from the default, (/usr/loca
 ./configure --prefix=/usr/include/
 ```
 
-Once you have the `configure` script, run the following commands:
+Once you have the `configure` script, you can build the library with `make` and install with `make install`:
 
 ```
 make
