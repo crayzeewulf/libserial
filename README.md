@@ -23,11 +23,16 @@ Then run `configure`:
 ./configure 
 ```
 
+You can specify an installation directory different from the default, (/usr/local/), by adding the --prefix= command to the configure command.  For example:
+```
+./configure --prefix=/usr/include/
+```
+
 Once you have the `configure` script, run the following commands:
 
 ```
 make
-make install
+sudo make install
 ```
 
 ----
