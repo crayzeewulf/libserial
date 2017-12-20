@@ -1,9 +1,18 @@
 # Libserial
 
 ----
-LibSerial provides a convenient, object oriented approach to accessing serial ports on POSIX systems.
+Thanks for checking out LibSerial!  LibSerial provides a convenient, object oriented approach to accessing serial ports on POSIX systems.
 
-You will likely need to install a few packages to build LibSerial: a recent g++ release, (anything after gcc-3.2 should work), the python sip library, the boost unit test library, and Google Test (gtest).  For Debian users:
+After you get to know LibSerial a bit, if you find that you have ideas for improvement, please be sure to let us know!
+
+If you simply want to use LibSerial and you already utilize a Debian Linux distribution, use apt to install the current release package:
+
+```
+sudo apt install libserial-dev
+```
+
+Otherwise, if you are developing and would like to make use of the latest development, yhou will likely need to install a few packages to build LibSerial:
+	a recent g++ release, (anything after gcc-3.2 should work), the python sip library, the boost unit test library, and Google Test (gtest).  For Debian users:
 
 ```
 sudo update
