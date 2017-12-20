@@ -74,6 +74,9 @@ int main(int argc, char** argv)
         // Write the data to the serial port.
         serial_port.WriteByte(data_byte);
 
+        // Wait until the data has actually been transmitted.
+        serial_port.DrainWriteBuffer();
+
         // Print to the terminal what is being written to the serial port.
         std::cout << data_byte;
     }

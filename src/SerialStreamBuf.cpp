@@ -82,6 +82,11 @@ namespace LibSerial
         void Close();
 
         /**
+         * @brief Waits until the write buffer is drained and then returns.
+         */
+        void DrainWriteBuffer();
+
+        /**
          * @brief Flushes the serial port input buffer.
          */
         void FlushInputBuffer();
@@ -445,6 +450,13 @@ namespace LibSerial
     SerialStreamBuf::Close()
     {
         mImpl->Close();
+        return;
+    }
+
+    void
+    SerialStreamBuf::DrainWriteBuffer()
+    {
+        mImpl->DrainWriteBuffer();
         return;
     }
 
@@ -817,6 +829,24 @@ namespace LibSerial
 
         // Set the file descriptor to an invalid value, -1. 
         mFileDescriptor = -1;
+        return;
+    }
+
+    inline
+    void
+    SerialStreamBuf::Implementation::DrainWriteBuffer()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        if (tcdrain(this->mFileDescriptor) < 0)
+        {
+            throw std::runtime_error(std::strerror(errno));
+        }
+
         return;
     }
 
