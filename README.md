@@ -11,7 +11,7 @@ If you simply want to use LibSerial and you already utilize a Debian Linux distr
 sudo apt install libserial-dev
 ```
 
-Otherwise, if you are developing and would like to make use of the latest development, yhou will likely need to install a few packages to build LibSerial:
+Otherwise, if you are a developer and would like to make use of the latest code, you will need to have a few packages installed to build LibSerial:
 	a recent g++ release, (anything after gcc-3.2 should work), the python sip library, the boost unit test library, and Google Test (gtest).  For Debian users:
 
 ```
@@ -45,7 +45,7 @@ sudo make install
 ```
 
 ----
-If you are a developer interested in utilizing the unit tests, ensure serial port names are appropriate for your hardware configuration in the UnitTests.cpp file:
+If you are interested in running the unit tests, ensure serial port names are appropriate for your hardware configuration in the UnitTests.cpp file:
 
 ```
 #define TEST_SERIAL_PORT_1 "/dev/ttyUSB0"
@@ -74,4 +74,4 @@ Alternatively, unit test executables built using the compile script can be run f
 Complete documentation is available [here](http://libserial.readthedocs.io/en/latest/index.html).
 
 ----
-(You can let people know that this Repository was useful to you by clicking the "Star" in the upper right of the repository home page!)
+(You can let people know that this Repository was useful to you by clicking the "star" in the upper right of the repository home page!)
