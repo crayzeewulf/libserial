@@ -46,15 +46,21 @@ protected:
 
     std::mutex mutex;
 
-    size_t timeOutMilliseconds = 250;
+    size_t entryTime = 0;
+    size_t currentTime = 0;
+    size_t elapsedTime = 0;
+
     size_t failureRate = 0;
     size_t loopCount = 0;
+    size_t timeOutMilliseconds = 250;
+
+    unsigned int readBufferDelay = 20000; // 20ms delay
 
     std::vector<BaudRate>        baudRates;
-    std::vector<CharacterSize>   characterSizes ;
-    std::vector<FlowControl>     flowControlTypes ;
-    std::vector<Parity>          parityTypes ;
-    std::vector<StopBits>        stopBits ;
+    std::vector<CharacterSize>   characterSizes;
+    std::vector<FlowControl>     flowControlTypes;
+    std::vector<Parity>          parityTypes;
+    std::vector<StopBits>        stopBits;
 
     SerialStream serialStream1;
     SerialStream serialStream2;
@@ -63,68 +69,14 @@ protected:
     SerialPort serialPort2;
 
     std::string readString1  = "";
-    std::string writeString1 = "";
+    std::string writeString1 = "Quidquid latine dictum sit, altum sonatur. (Whatever is said in Latin sounds profound.)";
 
     std::string readString2  = "";
-    std::string writeString2 = "";
+    std::string writeString2 = "The secret of the man who is universally interesting is that he is universally interested. - William Dean Howells";
 
     virtual void SetUp()
     {
-        writeString1 = "Quidquid latine dictum sit, altum sonatur. (Whatever is said in Latin sounds profound.)";
-        writeString2 = "The secret of the man who is universally interesting is that he is universally interested. - William Dean Howells";
-
-        baudRates = {
-            BaudRate::BAUD_50,
-            BaudRate::BAUD_75,
-            BaudRate::BAUD_110,
-            BaudRate::BAUD_134,
-            BaudRate::BAUD_150,
-            BaudRate::BAUD_200,
-            BaudRate::BAUD_300,
-            BaudRate::BAUD_600,
-            BaudRate::BAUD_1200,
-            BaudRate::BAUD_1800,
-            BaudRate::BAUD_2400,
-            BaudRate::BAUD_4800,
-            BaudRate::BAUD_9600,
-            BaudRate::BAUD_19200,
-            BaudRate::BAUD_38400,
-            BaudRate::BAUD_57600,
-            BaudRate::BAUD_115200,
-            BaudRate::BAUD_230400,
-            BaudRate::BAUD_460800,
-            BaudRate::BAUD_921600,
-            BaudRate::BAUD_1000000,
-            BaudRate::BAUD_1500000,
-            BaudRate::BAUD_2000000,
-            BaudRate::BAUD_2500000,
-            BaudRate::BAUD_3000000
-        };
-
-        characterSizes = {
-            CharacterSize::CHAR_SIZE_5,
-            CharacterSize::CHAR_SIZE_5,
-            CharacterSize::CHAR_SIZE_6,
-            CharacterSize::CHAR_SIZE_7,
-            CharacterSize::CHAR_SIZE_8
-        };
-
-        flowControlTypes = {
-            FlowControl::FLOW_CONTROL_NONE,
-            FlowControl::FLOW_CONTROL_HARDWARE,
-            FlowControl::FLOW_CONTROL_SOFTWARE
-        };
-
-        parityTypes = {
-            Parity::PARITY_EVEN,
-            Parity::PARITY_ODD,
-            Parity::PARITY_NONE
-        };
-
-        stopBits = {
-            StopBits::STOP_BITS_1,
-            StopBits::STOP_BITS_2
-        };
+        // Any additional setup steps can be performed here.
     }
 
     size_t getTimeInMilliSeconds()
@@ -135,6 +87,15 @@ protected:
         return std::chrono::duration_cast<std::chrono::milliseconds>(timeNow).count();
     }
     
+    size_t getTimeInMicroSeconds()
+    {
+        std::chrono::high_resolution_clock::duration timeNow = 
+            std::chrono::high_resolution_clock::now().time_since_epoch();
+
+        return std::chrono::duration_cast<std::chrono::microseconds>(timeNow).count();
+    }
+
+
     //---------------------- Serial Stream Unit Tests -----------------------//
 
     void testSerialStreamConstructors()
@@ -198,6 +159,39 @@ protected:
         ASSERT_FALSE(serialStream2.IsOpen());
     }
 
+    void testSerialStreamDrainWriteBuffer()
+    {
+        serialStream1.Open(TEST_SERIAL_PORT_1);
+        serialStream2.Open(TEST_SERIAL_PORT_2);
+
+        ASSERT_TRUE(serialStream1.IsOpen());
+        ASSERT_TRUE(serialStream2.IsOpen());
+
+        serialStream1.FlushIOBuffers();
+        serialStream2.FlushIOBuffers();
+
+        serialStream1 << writeString1 << std::endl;
+        serialStream2 << writeString2 << std::endl;
+
+        serialStream1.DrainWriteBuffer();
+        serialStream2.DrainWriteBuffer();
+
+        // Allow time for the read buffers to show that data is available.
+        usleep(readBufferDelay);
+
+        ASSERT_TRUE(serialStream1.IsDataAvailable());
+        ASSERT_TRUE(serialStream2.IsDataAvailable());
+
+        serialStream1.FlushIOBuffers();
+        serialStream2.FlushIOBuffers();
+
+        serialStream1.Close();
+        serialStream2.Close();
+
+        ASSERT_FALSE(serialStream1.IsOpen());
+        ASSERT_FALSE(serialStream2.IsOpen());
+    }
+
     void testSerialStreamFlushInputBuffer()
     {
         serialStream1.Open(TEST_SERIAL_PORT_1);
@@ -217,10 +211,11 @@ protected:
         serialStream1.write(&writeByte, 1);
         serialStream2.write(&writeByte, 1);
 
-        tcdrain(serialStream1.GetFileDescriptor());
-        tcdrain(serialStream2.GetFileDescriptor());
+        serialStream1.DrainWriteBuffer();
+        serialStream2.DrainWriteBuffer();
 
-        usleep(25000);
+        // Allow time for the read buffers to show that data is available.
+        usleep(readBufferDelay);
 
         ASSERT_TRUE(serialStream1.IsDataAvailable());
         ASSERT_TRUE(serialStream2.IsDataAvailable());
@@ -293,7 +288,11 @@ protected:
         serialStream1.write(&writeByte, 1);
         serialStream2.write(&writeByte, 1);
 
-        usleep(25000);
+        serialStream1.DrainWriteBuffer();
+        serialStream2.DrainWriteBuffer();
+        
+        // Allow time for the read buffers to show that data is available.
+        usleep(readBufferDelay);
 
         ASSERT_TRUE(serialStream1.IsDataAvailable());
         ASSERT_TRUE(serialStream2.IsDataAvailable());
@@ -326,18 +325,22 @@ protected:
         char readByte = 'b';
 
         serialStream1.write(&writeByte, 1);
-        tcdrain(serialStream1.GetFileDescriptor());
+        serialStream1.DrainWriteBuffer();
 
-        usleep(25000);
+        // Allow time for the read buffer to show that data is available.
+        usleep(readBufferDelay);
+
         ASSERT_TRUE(serialStream2.IsDataAvailable());
 
         serialStream2.read(&readByte, 1);
         ASSERT_EQ(readByte, writeByte);
 
         serialStream2.write(&writeByte, 1);
-        tcdrain(serialStream2.GetFileDescriptor());
+        serialStream2.DrainWriteBuffer();
 
-        usleep(25000);
+        // Allow time for the read buffer to show that data is available.
+        usleep(readBufferDelay);
+
         ASSERT_TRUE(serialStream1.IsDataAvailable());
 
         serialStream1.read(&readByte, 1);
@@ -422,8 +425,6 @@ protected:
 
             ASSERT_EQ(characterSize1, char_size);
             ASSERT_EQ(characterSize2, char_size);
-
-            usleep(10);
         }
 
         serialStream1.Close();
@@ -938,6 +939,42 @@ protected:
         ASSERT_FALSE(serialPort2.IsOpen());
     }
 
+    void testSerialPortDrainWriteBuffer()
+    {
+        serialPort1.Open(TEST_SERIAL_PORT_1);
+        serialPort2.Open(TEST_SERIAL_PORT_2);
+
+        ASSERT_TRUE(serialPort1.IsOpen());
+        ASSERT_TRUE(serialPort2.IsOpen());
+
+        serialPort1.FlushIOBuffers();
+        serialPort2.FlushIOBuffers();
+
+        serialPort1.Write(writeString1);
+        serialPort2.Write(writeString2);
+
+        ASSERT_FALSE(serialPort1.IsDataAvailable());
+        ASSERT_FALSE(serialPort2.IsDataAvailable());
+
+        serialPort1.DrainWriteBuffer();
+        serialPort2.DrainWriteBuffer();
+
+        // Allow time for the read buffers to show that data is available.
+        usleep(readBufferDelay);
+
+        ASSERT_TRUE(serialPort1.IsDataAvailable());
+        ASSERT_TRUE(serialPort2.IsDataAvailable());
+
+        serialPort1.FlushIOBuffers();
+        serialPort2.FlushIOBuffers();
+
+        serialPort1.Close();
+        serialPort2.Close();
+
+        ASSERT_FALSE(serialPort1.IsOpen());
+        ASSERT_FALSE(serialPort2.IsOpen());
+    }
+
     void testSerialPortFlushInputBuffer()
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
@@ -957,10 +994,11 @@ protected:
         serialPort1.WriteByte(writeByte);
         serialPort2.WriteByte(writeByte);
 
-        tcdrain(serialPort1.GetFileDescriptor());
-        tcdrain(serialPort2.GetFileDescriptor());
+        serialPort1.DrainWriteBuffer();
+        serialPort2.DrainWriteBuffer();
 
-        usleep(25000);
+        // Allow time for the read buffers to show that data is available.
+        usleep(readBufferDelay);
 
         ASSERT_TRUE(serialPort1.IsDataAvailable());
         ASSERT_TRUE(serialPort2.IsDataAvailable());
@@ -1033,7 +1071,11 @@ protected:
         serialPort1.WriteByte(writeByte);
         serialPort2.WriteByte(writeByte);
 
-        usleep(25000);
+        serialPort1.DrainWriteBuffer();
+        serialPort2.DrainWriteBuffer();
+        
+        // Allow time for the read buffers to show that data is available.
+        usleep(readBufferDelay);
 
         ASSERT_TRUE(serialPort1.IsDataAvailable());
         ASSERT_TRUE(serialPort2.IsDataAvailable());
@@ -1066,18 +1108,22 @@ protected:
         char readByte = 'b';
 
         serialPort1.WriteByte(writeByte);
-        tcdrain(serialPort1.GetFileDescriptor());
+        serialPort1.DrainWriteBuffer();
 
-        usleep(25000);
+        // Allow time for the read buffer to show that data is available.
+        usleep(readBufferDelay);
+
         ASSERT_TRUE(serialPort2.IsDataAvailable());
 
         serialPort2.ReadByte(readByte, 1);
         ASSERT_EQ(readByte, writeByte);
 
         serialPort2.WriteByte(writeByte);
-        tcdrain(serialPort2.GetFileDescriptor());
+        serialPort2.DrainWriteBuffer();
 
-        usleep(25000);
+        // Allow time for the read buffer to show that data is available.
+        usleep(readBufferDelay);
+
         ASSERT_TRUE(serialPort1.IsDataAvailable());
 
         serialPort1.ReadByte(readByte, 1);
@@ -1514,8 +1560,8 @@ protected:
         serialPort1.Write(writeVector1);
         serialPort2.Write(writeVector2);
 
-        tcdrain(serialPort1.GetFileDescriptor());
-        tcdrain(serialPort2.GetFileDescriptor());
+        serialPort1.DrainWriteBuffer();
+        serialPort2.DrainWriteBuffer();
 
         serialPort1.Read(readVector2, data_count, timeOutMilliseconds);
         serialPort2.Read(readVector1, data_count, timeOutMilliseconds);
@@ -1530,7 +1576,7 @@ protected:
         {
             serialPort1.Write(writeVector1);
 
-            tcdrain(serialPort1.GetFileDescriptor());
+            serialPort1.DrainWriteBuffer();
 
             serialPort2.Read(readVector1, 0, 75);
         }
@@ -1562,8 +1608,8 @@ protected:
         serialPort1.Write(writeString1);
         serialPort2.Write(writeString2);
 
-        tcdrain(serialPort1.GetFileDescriptor());
-        tcdrain(serialPort2.GetFileDescriptor());
+        serialPort1.DrainWriteBuffer();
+        serialPort2.DrainWriteBuffer();
 
         serialPort1.Read(readString2, writeString2.size(), timeOutMilliseconds);
         serialPort2.Read(readString1, writeString1.size(), timeOutMilliseconds);
@@ -1580,7 +1626,7 @@ protected:
         {
             serialPort1.Write(writeString1);
 
-            tcdrain(serialPort1.GetFileDescriptor());
+            serialPort1.DrainWriteBuffer();
 
             serialPort2.Read(readString1, 0, 75);
         }
@@ -1618,8 +1664,8 @@ protected:
         serialPort1.WriteByte(writeByte1);
         serialPort2.WriteByte(writeByte2);
 
-        tcdrain(serialPort1.GetFileDescriptor());
-        tcdrain(serialPort2.GetFileDescriptor());
+        serialPort1.DrainWriteBuffer();
+        serialPort2.DrainWriteBuffer();
 
         serialPort1.ReadByte(readByte2, timeOutMilliseconds);
         serialPort2.ReadByte(readByte1, timeOutMilliseconds);
@@ -1659,8 +1705,8 @@ protected:
         serialPort1.Write(writeString1 + '\n');
         serialPort2.Write(writeString2 + '\n');
 
-        tcdrain(serialPort1.GetFileDescriptor());
-        tcdrain(serialPort2.GetFileDescriptor());
+        serialPort1.DrainWriteBuffer();
+        serialPort2.DrainWriteBuffer();
 
         serialPort1.ReadLine(readString2, '\n', timeOutMilliseconds);
         serialPort2.ReadLine(readString1, '\n', timeOutMilliseconds);
@@ -1712,7 +1758,7 @@ protected:
         ASSERT_EQ(readString1.size(), writeString1.size() + 1);
 
         serialPort1.Write(writeString2 + '\n');
-        tcdrain(serialPort1.GetFileDescriptor());
+        serialPort1.DrainWriteBuffer();
         getline(serialStream1, readString2);
 
         ASSERT_EQ(readString2, writeString2);
@@ -1735,6 +1781,13 @@ protected:
         while (timeElapsedMilliSeconds < timeOutMilliseconds)
         {
             serialStream1 << writeString1 << std::endl;
+            serialStream1.DrainWriteBuffer();
+
+            entryTime = getTimeInMicroSeconds();
+            usleep(500);
+            currentTime = getTimeInMicroSeconds();
+            elapsedTime = currentTime - entryTime;
+            ASSERT_GT(elapsedTime, (size_t)0);
 
             if (serialStream1.IsDataAvailable())
             {
@@ -1772,6 +1825,13 @@ protected:
         while (timeElapsedMilliSeconds < timeOutMilliseconds)
         {
             serialStream2 << writeString2 << std::endl;
+            serialStream2.DrainWriteBuffer();
+
+            entryTime = getTimeInMicroSeconds();
+            usleep(500);
+            currentTime = getTimeInMicroSeconds();
+            elapsedTime = currentTime - entryTime;
+            ASSERT_GT(elapsedTime, (size_t)0);
 
             if (serialStream2.IsDataAvailable())
             {
@@ -1809,11 +1869,19 @@ protected:
 
         while (timeElapsedMilliSeconds < timeOutMilliseconds)
         {
-            try
-            {
-                serialPort1.Write(writeString1 + '\n');
+           
+            serialPort1.Write(writeString1 + '\n');
+            serialPort1.DrainWriteBuffer();
 
-                if (serialPort1.IsDataAvailable())
+            entryTime = getTimeInMicroSeconds();
+            usleep(500);
+            currentTime = getTimeInMicroSeconds();
+            elapsedTime = currentTime - entryTime;
+            ASSERT_GT(elapsedTime, (size_t)0);
+
+            if (serialPort1.IsDataAvailable())
+            {
+                try
                 {
                     serialPort1.ReadLine(readString2, '\n', timeOutMilliseconds);
 
@@ -1824,9 +1892,9 @@ protected:
                         mutex.unlock();
                     }
                 }
-            }
-            catch(...)
-            {
+                catch(...)
+                {
+                }
             }
 
             timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
@@ -1851,11 +1919,18 @@ protected:
 
         while (timeElapsedMilliSeconds < timeOutMilliseconds)
         {
-            try
+            serialPort2.Write(writeString2 + '\n');
+            serialPort2.DrainWriteBuffer();
+
+            entryTime = getTimeInMicroSeconds();
+            usleep(500);
+            currentTime = getTimeInMicroSeconds();
+            elapsedTime = currentTime - entryTime;
+            ASSERT_GT(elapsedTime, (size_t)0);
+
+            if (serialPort2.IsDataAvailable())
             {
-                serialPort2.Write(writeString2 + '\n');
-                
-                if (serialPort2.IsDataAvailable())
+                try
                 {
                     serialPort2.ReadLine(readString1, '\n', timeOutMilliseconds);
 
@@ -1866,9 +1941,9 @@ protected:
                         mutex.unlock();
                     }
                 }
-            }
-            catch(...)
-            {
+                catch(...)
+                {
+                }
             }
 
             timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
@@ -1927,6 +2002,16 @@ TEST_F(LibSerialTest, testSerialStreamOpenClose)
     for (size_t i = 0; i < numberOfTestIterations; i++)
     {
         testSerialStreamOpenClose();
+    }
+}
+
+TEST_F(LibSerialTest, testSerialStreamDrainWriteBuffer)
+{
+    SCOPED_TRACE("Serial Stream DrainWriteBuffer() Test");
+
+    for (size_t i = 0; i < numberOfTestIterations; i++)
+    {
+        testSerialStreamDrainWriteBuffer();
     }
 }
 
@@ -2159,6 +2244,16 @@ TEST_F(LibSerialTest, testSerialPortOpenClose)
     for (size_t i = 0; i < numberOfTestIterations; i++)
     {
         testSerialPortOpenClose();
+    }
+}
+
+TEST_F(LibSerialTest, testSerialPortDrainWriteBuffer)
+{
+    SCOPED_TRACE("Serial Port DrainWriteBuffer() Test");
+
+    for (size_t i = 0; i < numberOfTestIterations; i++)
+    {
+        testSerialPortDrainWriteBuffer();
     }
 }
 

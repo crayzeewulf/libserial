@@ -61,8 +61,11 @@ int main()
     char read_byte_2  = ' ';
 
     // Variables to store outgoing and incoming data.
-    std::string write_string_1 = "\"Do what you can, with what you have, where you are.\" - Theodore Roosevelt";
-    std::string write_string_2 = "\"Simplicity is prerequisite for reliability.\" - Edsger W. Dijkstra";
+    std::string write_string_1 =
+        "\"Do what you can, with what you have, where you are.\" - Theodore Roosevelt";
+    
+    std::string write_string_2 =
+        "\"Simplicity is prerequisite for reliability.\" - Edsger W. Dijkstra";
 
     std::string read_string_1 = "";
     std::string read_string_2 = "";
@@ -74,6 +77,10 @@ int main()
     // Write a single byte of data to the serial ports.
     serial_port_1.WriteByte(write_byte_1);
     serial_port_2.WriteByte(write_byte_2);
+
+    // Wait until the data has actually been transmitted.
+    serial_port_1.DrainWriteBuffer();
+    serial_port_2.DrainWriteBuffer();
 
     // Specify a read timeout value in milliseconds.
     size_t timeout_milliseconds = 25;
@@ -105,6 +112,10 @@ int main()
     // Write a string to each serial port.
     serial_port_1.Write(write_string_1);
     serial_port_2.Write(write_string_2);
+
+    // Wait until the data has actually been transmitted.
+    serial_port_1.DrainWriteBuffer();
+    serial_port_2.DrainWriteBuffer();
 
     try
     {

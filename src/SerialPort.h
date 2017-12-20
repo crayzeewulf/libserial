@@ -88,6 +88,11 @@ namespace LibSerial
         void Close();
 
         /**
+         * @brief Waits until the write buffer is drained and then returns.
+         */
+        void DrainWriteBuffer();
+
+        /**
          * @brief Flushes the serial port input buffer.
          */
         void FlushInputBuffer();

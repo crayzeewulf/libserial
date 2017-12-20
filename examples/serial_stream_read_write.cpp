@@ -69,6 +69,10 @@ int main()
     serial_stream_1.write(write_string_1.c_str(), write_string_1.size());
     serial_stream_2.write(write_string_2.c_str(), write_string_2.size());
 
+    // Wait until the data has actually been transmitted.
+    serial_stream_1.DrainWriteBuffer();
+    serial_stream_2.DrainWriteBuffer();
+
     // Char arrays to store incoming data.
     char* read_array_1 = new char[write_string_2.size()];
     char* read_array_2 = new char[write_string_1.size()];
@@ -93,6 +97,10 @@ int main()
     // Write a line at each serial port.
     serial_stream_1 << write_string_1 << std::endl;
     serial_stream_2 << write_string_2 << std::endl;
+
+    // Wait until the data has actually been transmitted.
+    serial_stream_1.DrainWriteBuffer();
+    serial_stream_2.DrainWriteBuffer();
 
     // Read a line at each serial port.
     std::getline(serial_stream_1, read_string_1);
