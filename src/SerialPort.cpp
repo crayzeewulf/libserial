@@ -247,6 +247,12 @@ namespace LibSerial
         int GetFileDescriptor();
 
         /**
+         * @brief Gets the number of bytes available in the read buffer.
+         * @return Returns the number of bytes avilable in the read buffer.
+         */
+        int GetNumberOfBytesAvailable();
+
+        /**
          * @brief Gets a list of available serial ports.
          * @return Returns a std::vector of std::strings with the name of
          *         each available serial port. 
@@ -656,6 +662,12 @@ namespace LibSerial
         return mImpl->GetFileDescriptor();
     }
 
+    int
+    SerialPort::GetNumberOfBytesAvailable()
+    {
+        return mImpl->GetNumberOfBytesAvailable();
+    }
+
     std::vector<std::string>
     SerialPort::GetAvailableSerialPorts()
     {
@@ -968,11 +980,11 @@ namespace LibSerial
         int number_of_bytes_available = 0;
         bool dataAvailableStatus = false;
 
-        int result = ioctl(this->mFileDescriptor,
-                           FIONREAD,
-                           &number_of_bytes_available);
+        int ioctl_result = ioctl(this->mFileDescriptor,
+                                 FIONREAD,
+                                 &number_of_bytes_available);
         
-        if (result >= 0 &&
+        if (ioctl_result >= 0 &&
             number_of_bytes_available > 0)
         {
             dataAvailableStatus = true;
@@ -1662,6 +1674,28 @@ namespace LibSerial
         }
 
         return this->mFileDescriptor;
+    }
+
+    inline
+    int
+    SerialPort::Implementation::GetNumberOfBytesAvailable()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        int number_of_bytes_available = 0;
+
+        if (ioctl(this->mFileDescriptor,
+                  FIONREAD,
+                  &number_of_bytes_available) < 0)
+        {
+            throw std::runtime_error(std::strerror(errno));
+        }
+
+        return number_of_bytes_available;
     }
 
     inline
