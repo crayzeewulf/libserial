@@ -245,6 +245,12 @@ namespace LibSerial
         int GetFileDescriptor();
 
         /**
+         * @brief Gets the number of bytes available in the read buffer.
+         * @return Returns the number of bytes avilable in the read buffer.
+         */
+        int GetNumberOfBytesAvailable();
+
+        /**
          * @brief Gets a list of available serial ports.
          * @return Returns a std::vector of std::strings with the name of
          *         each available serial port. 
@@ -635,12 +641,17 @@ namespace LibSerial
         return mImpl->GetFileDescriptor();
     }
 
+    int
+    SerialStreamBuf::GetNumberOfBytesAvailable()
+    {
+        return mImpl->GetNumberOfBytesAvailable();
+    }
+
     std::vector<std::string>
     SerialStreamBuf::GetAvailableSerialPorts()
     {
         return mImpl->GetAvailableSerialPorts();
     }
-
 
     std::streambuf*
     SerialStreamBuf::setbuf(char_type* character, std::streamsize numberOfBytes)
@@ -1618,6 +1629,28 @@ namespace LibSerial
         }
 
         return this->mFileDescriptor;
+    }
+
+    inline
+    int
+    SerialStreamBuf::Implementation::GetNumberOfBytesAvailable()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        int number_of_bytes_available = 0;
+
+        if (ioctl(this->mFileDescriptor,
+                  FIONREAD,
+                  &number_of_bytes_available) < 0)
+        {
+            throw std::runtime_error(std::strerror(errno));
+        }
+
+        return number_of_bytes_available;
     }
 
     inline

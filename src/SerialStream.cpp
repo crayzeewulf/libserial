@@ -766,6 +766,31 @@ SerialStream::GetFileDescriptor()
     }
 }
 
+int
+SerialStream::GetNumberOfBytesAvailable()
+{
+    SerialStreamBuf* my_buffer = dynamic_cast<SerialStreamBuf *>(this->rdbuf());
+
+    // Make sure that we are dealing with a SerialStreamBuf before
+    // proceeding. This check also makes sure that we have a non-NULL
+    // buffer associated with this stream.
+    if (my_buffer)
+    {
+        // Try to determine if data is available with the correspoding
+        // function of the SerialStreamBuf class.
+        return my_buffer->GetNumberOfBytesAvailable();
+    }
+    else
+    {
+        // If the dynamic_cast above failed then we either have a NULL
+        // streambuf associated with this stream or we have a buffer
+        // of class other than SerialStreamBuf. In either case, we
+        // have a problem and we should stop all I/O using this stream.
+        setstate(badbit);
+        return false;
+    }
+}
+
 std::vector<std::string>
 SerialStream::GetAvailableSerialPorts()
 {

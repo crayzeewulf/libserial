@@ -20,6 +20,7 @@
 
 
 #include <chrono>
+#include <iostream>
 #include <gtest/gtest.h>
 #include <mutex>
 #include <thread>
@@ -734,6 +735,53 @@ protected:
 
         ASSERT_GT(fileDescriptor1, 0);
         ASSERT_GT(fileDescriptor2, 0);
+
+        serialStream1.Close();
+        serialStream2.Close();
+
+        ASSERT_FALSE(serialStream1.IsOpen());
+        ASSERT_FALSE(serialStream2.IsOpen());
+    }
+
+    void testSerialStreamGetNumberOfBytesAvailable()
+    {
+        serialStream1.Open(TEST_SERIAL_PORT_1);
+        serialStream2.Open(TEST_SERIAL_PORT_2);
+
+        ASSERT_TRUE(serialStream1.IsOpen());
+        ASSERT_TRUE(serialStream2.IsOpen());
+
+        char writeByte1 = 'a';
+        char writeByte2 = 'A';
+
+        char readByte1  = 'b';
+        char readByte2  = 'B';
+
+        int bytesAvailable1 = 0;
+        int bytesAvailable2 = 0;
+
+        serialStream1.write(&writeByte1, 1);
+        serialStream2.write(&writeByte2, 1);
+
+        serialStream1.DrainWriteBuffer();
+        serialStream2.DrainWriteBuffer();
+
+        usleep(readBufferDelay);
+
+        bytesAvailable1 = serialStream1.GetNumberOfBytesAvailable();
+        bytesAvailable2 = serialStream2.GetNumberOfBytesAvailable();
+
+        ASSERT_EQ(bytesAvailable1, 1);
+        ASSERT_EQ(bytesAvailable2, 1);
+
+        serialStream1.read(&readByte2, 1);
+        serialStream2.read(&readByte1, 1);
+
+        bytesAvailable1 = serialStream1.GetNumberOfBytesAvailable();
+        bytesAvailable2 = serialStream2.GetNumberOfBytesAvailable();
+
+        ASSERT_EQ(bytesAvailable1, 0);
+        ASSERT_EQ(bytesAvailable2, 0);
 
         serialStream1.Close();
         serialStream2.Close();
@@ -1501,6 +1549,56 @@ protected:
         ASSERT_FALSE(serialPort2.IsOpen());
     }
 
+    void testSerialPortGetNumberOfBytesAvailable()
+    {
+        serialPort1.Open(TEST_SERIAL_PORT_1);
+        serialPort2.Open(TEST_SERIAL_PORT_2);
+
+        ASSERT_TRUE(serialPort1.IsOpen());
+        ASSERT_TRUE(serialPort2.IsOpen());
+
+        char writeByte1 = 'a';
+        char writeByte2 = 'A';
+
+        char readByte1  = 'b';
+        char readByte2  = 'B';
+
+        int bytesAvailable1 = 0;
+        int bytesAvailable2 = 0;
+
+        bytesAvailable1 = serialPort1.GetNumberOfBytesAvailable();
+        bytesAvailable2 = serialPort2.GetNumberOfBytesAvailable();
+
+        serialPort1.WriteByte(writeByte1);
+        serialPort2.WriteByte(writeByte2);
+
+        serialPort1.DrainWriteBuffer();
+        serialPort2.DrainWriteBuffer();
+
+        usleep(readBufferDelay);
+
+        bytesAvailable1 = serialPort1.GetNumberOfBytesAvailable();
+        bytesAvailable2 = serialPort2.GetNumberOfBytesAvailable();
+
+        ASSERT_EQ(bytesAvailable1, 1);
+        ASSERT_EQ(bytesAvailable2, 1);
+
+        serialPort1.ReadByte(readByte2, 1);
+        serialPort2.ReadByte(readByte1, 1);
+
+        bytesAvailable1 = serialPort1.GetNumberOfBytesAvailable();
+        bytesAvailable2 = serialPort2.GetNumberOfBytesAvailable();
+
+        ASSERT_EQ(bytesAvailable1, 0);
+        ASSERT_EQ(bytesAvailable2, 0);
+
+        serialPort1.Close();
+        serialPort2.Close();
+
+        ASSERT_FALSE(serialPort1.IsOpen());
+        ASSERT_FALSE(serialPort2.IsOpen());
+    }
+
     void testSerialPortGetAvailableSerialPorts()
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
@@ -1783,11 +1881,12 @@ protected:
             serialStream1 << writeString1 << std::endl;
             serialStream1.DrainWriteBuffer();
 
-            entryTime = getTimeInMicroSeconds();
-            usleep(500);
-            currentTime = getTimeInMicroSeconds();
-            elapsedTime = currentTime - entryTime;
-            ASSERT_GT(elapsedTime, (size_t)0);
+            // entryTime = getTimeInMicroSeconds();
+            // std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            // // usleep(500);
+            // currentTime = getTimeInMicroSeconds();
+            // elapsedTime = currentTime - entryTime;
+            // ASSERT_GT(elapsedTime, (size_t)0);
 
             if (serialStream1.IsDataAvailable())
             {
@@ -1827,11 +1926,12 @@ protected:
             serialStream2 << writeString2 << std::endl;
             serialStream2.DrainWriteBuffer();
 
-            entryTime = getTimeInMicroSeconds();
-            usleep(500);
-            currentTime = getTimeInMicroSeconds();
-            elapsedTime = currentTime - entryTime;
-            ASSERT_GT(elapsedTime, (size_t)0);
+            // entryTime = getTimeInMicroSeconds();
+            // std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            // // usleep(500);
+            // currentTime = getTimeInMicroSeconds();
+            // elapsedTime = currentTime - entryTime;
+            // ASSERT_GT(elapsedTime, (size_t)0);
 
             if (serialStream2.IsDataAvailable())
             {
@@ -1873,11 +1973,12 @@ protected:
             serialPort1.Write(writeString1 + '\n');
             serialPort1.DrainWriteBuffer();
 
-            entryTime = getTimeInMicroSeconds();
-            usleep(500);
-            currentTime = getTimeInMicroSeconds();
-            elapsedTime = currentTime - entryTime;
-            ASSERT_GT(elapsedTime, (size_t)0);
+            // entryTime = getTimeInMicroSeconds();
+            // std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            // // usleep(500);
+            // currentTime = getTimeInMicroSeconds();
+            // elapsedTime = currentTime - entryTime;
+            // ASSERT_GT(elapsedTime, (size_t)0);
 
             if (serialPort1.IsDataAvailable())
             {
@@ -1922,11 +2023,12 @@ protected:
             serialPort2.Write(writeString2 + '\n');
             serialPort2.DrainWriteBuffer();
 
-            entryTime = getTimeInMicroSeconds();
-            usleep(500);
-            currentTime = getTimeInMicroSeconds();
-            elapsedTime = currentTime - entryTime;
-            ASSERT_GT(elapsedTime, (size_t)0);
+            // entryTime = getTimeInMicroSeconds();
+            // std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            // // usleep(500);
+            // currentTime = getTimeInMicroSeconds();
+            // elapsedTime = currentTime - entryTime;
+            // ASSERT_GT(elapsedTime, (size_t)0);
 
             if (serialPort2.IsDataAvailable())
             {
@@ -2185,6 +2287,16 @@ TEST_F(LibSerialTest, testSerialStreamGetFileDescriptor)
     }
 }
 
+TEST_F(LibSerialTest, testSerialStreamGetNumberOfBytesAvailable)
+{
+    SCOPED_TRACE("Serial Stream GetNumberOfBytesAvailable() Test");
+    
+    for (size_t i = 0; i < numberOfTestIterations; i++)
+    {
+        testSerialStreamGetNumberOfBytesAvailable();
+    }
+}
+
 TEST_F(LibSerialTest, testSerialStreamGetAvailableSerialPorts)
 {
     SCOPED_TRACE("Serial Stream GetAvailableSerialPorts() Test");
@@ -2424,6 +2536,16 @@ TEST_F(LibSerialTest, testSerialPortGetFileDescriptor)
     for (size_t i = 0; i < numberOfTestIterations; i++)
     {
         testSerialPortGetFileDescriptor();
+    }
+}
+
+TEST_F(LibSerialTest, testSerialPortGetNumberOfBytesAvailable)
+{
+    SCOPED_TRACE("Serial Port GetNumberOfBytesAvailable() Test");
+    
+    for (size_t i = 0; i < numberOfTestIterations; i++)
+    {
+        testSerialPortGetNumberOfBytesAvailable();
     }
 }
 

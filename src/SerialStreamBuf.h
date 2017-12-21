@@ -263,6 +263,12 @@ namespace LibSerial
         int GetFileDescriptor();
 
         /**
+         * @brief Gets the number of bytes available in the read buffer.
+         * @return Returns the number of bytes avilable in the read buffer.
+         */
+        int GetNumberOfBytesAvailable();
+
+        /**
          * @brief Gets a list of available serial ports.
          * @return Returns a std::vector of std::strings with the name of
          *         each available serial port. 
