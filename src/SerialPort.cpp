@@ -258,17 +258,18 @@ namespace LibSerial
          *         each available serial port. 
          */
         std::vector<std::string> GetAvailableSerialPorts();
-
         /**
          * @brief Reads the specified number of bytes from the serial port.
-         *        The method will timeout if no data is received in the specified
-         *        number of milliseconds (msTimeout). If msTimeout is 0, then
-         *        this method will block until all requested bytes are
-         *        received. If numberOfBytes is zero, then this method will keep
-         *        reading data till no more data is available at the serial port.
-         *        In all cases, all read data is available in dataBuffer on
-         *        return from this method.
-         * @param dataBuffer The data buffer to place serial data into.
+         *        The method will timeout if no data is received in the
+         *        specified number of milliseconds (msTimeout). If msTimeout
+         *        is zero, then the method will block until all requested bytes
+         *        are received. If numberOfBytes is zero and msTimeout is
+         *        non-zero,  the method will continue receiving data for the
+         *        specified of milliseconds. If numberOfBytes is zero and
+         *        msTimeout is zero, the method will return immediately. In all
+         *        cases, any data received remains available in the dataBuffer
+         *        on return from this method.
+         * @param dataBuffer The data buffer to place data into.
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
@@ -283,7 +284,7 @@ namespace LibSerial
          *        this method will block until all requested bytes are
          *        received. If numberOfBytes is zero, then this method will keep
          *        reading data till no more data is available at the serial port.
-         *        In all cases, all read data is available in dataBuffer on
+         *        In all cases, all read data is available in dataString on
          *        return from this method.
          * @param dataString The data string read from the serial port.
          * @param numberOfBytes The number of bytes to read before returning.
@@ -291,7 +292,7 @@ namespace LibSerial
          */
         void Read(std::string& dataString,
                   const size_t numberOfBytes = 0,
-                  const size_t msTimeout  = 0);
+                  const size_t msTimeout = 0);
 
         /**
          * @brief Reads a single byte from the serial port.
@@ -336,8 +337,8 @@ namespace LibSerial
                       const size_t  msTimeout = 0);
 
         /**
-         * @brief Writes a DataBuffer vector to the serial port.
-         * @param dataBuffer The DataBuffer vector to be written to the serial port.
+         * @brief Writes a DataBuffer to the serial port.
+         * @param dataBuffer The DataBuffer to write to the serial port.
          */
         void Write(const DataBuffer& dataBuffer);
 
@@ -349,15 +350,15 @@ namespace LibSerial
 
         /**
          * @brief Writes a single byte to the serial port.
-         * @param charbuffer The byte to be written to the serial port.
+         * @param charBuffer The byte to be written to the serial port.
          */
-        void WriteByte(const char charbuffer);
+        void WriteByte(const char charBuffer);
 
         /**
          * @brief Writes a single byte to the serial port.
-         * @param charbuffer The byte to be written to the serial port.
+         * @param charBuffer The byte to be written to the serial port.
          */
-        void WriteByte(const unsigned char charbuffer);
+        void WriteByte(const unsigned char charBuffer);
 
     private:
 
