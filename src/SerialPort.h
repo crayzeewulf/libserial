@@ -286,7 +286,7 @@ namespace LibSerial
          */
         void Read(DataBuffer&  dataBuffer,
                   const size_t numberOfBytes = 0,
-                  const size_t msTimeout  = 0);
+                  const size_t msTimeout = 0);
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -305,7 +305,7 @@ namespace LibSerial
          */
         void Read(std::string& dataString,
                   const size_t numberOfBytes = 0,
-                  const size_t msTimeout  = 0);
+                  const size_t msTimeout = 0);
 
         /**
          * @brief Reads a single byte from the serial port. If no data is 
@@ -349,8 +349,8 @@ namespace LibSerial
                       const size_t  msTimeout = 0);
 
         /**
-         * @brief Writes a DataBuffer vector to the serial port.
-         * @param dataBuffer The DataBuffer vector to write to the serial port.
+         * @brief Writes a DataBuffer to the serial port.
+         * @param dataBuffer The DataBuffer to write to the serial port.
          */
         void Write(const DataBuffer& dataBuffer);
 
