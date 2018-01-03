@@ -58,7 +58,7 @@ namespace LibSerial
      * @brief The default character buffer timing.
      */
     static constexpr short VTIME_DEFAULT = 0;
-    
+
     /**
      * @brief Character used to signal that I/O can start while using
      *        software flow control with the serial port.
@@ -70,12 +70,12 @@ namespace LibSerial
      *        software flow control with the serial port.
      */
     static constexpr char CTRL_S = 0x13;
-    
+
     /**
      * @brief Type used to receive and return raw data to/from methods.
      */
     typedef std::vector<unsigned char> DataBuffer;
-    
+
 
     /**
      * @note - For reference, below is a list of std::exception types:

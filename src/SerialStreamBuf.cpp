@@ -60,14 +60,15 @@ namespace LibSerial
                        const StopBits&      stopBits);
 
         /**
-         * @brief Default Destructor.
+         * @brief Default Destructor for a SerialStreamBuf object. Closes the
+         *        serial port associated with mFileDescriptor if open.
          */
         ~Implementation();
 
         /**
          * @brief Opens the serial port associated with the specified
          *        file name and the specified mode.
-         * @param fileName The file name of the serial port object.
+         * @param fileName The file name of the serial port.
          * @param openMode The communication mode status when the serial
          *        communication port is opened.
          */
@@ -79,6 +80,11 @@ namespace LibSerial
          *        lost and no more I/O can be performed on the serial port.
          */
         void Close();
+
+        /**
+         * @brief Waits until the write buffer is drained and then returns.
+         */
+        void DrainWriteBuffer();
 
         /**
          * @brief Flushes the serial port input buffer.
@@ -239,6 +245,12 @@ namespace LibSerial
         int GetFileDescriptor();
 
         /**
+         * @brief Gets the number of bytes available in the read buffer.
+         * @return Returns the number of bytes avilable in the read buffer.
+         */
+        int GetNumberOfBytesAvailable();
+
+        /**
          * @brief Gets a list of available serial ports.
          * @return Returns a std::vector of std::strings with the name of
          *         each available serial port. 
@@ -322,7 +334,7 @@ namespace LibSerial
         char mPutbackChar;
 
     protected:
-        
+
     private:
 
         /**
@@ -381,6 +393,7 @@ namespace LibSerial
          * @brief Sets the default serial port local modes.
          */
         void SetDefaultLocalModes();
+
 
         /**
          * @brief The file descriptor corresponding to the serial port.
@@ -443,6 +456,13 @@ namespace LibSerial
     SerialStreamBuf::Close()
     {
         mImpl->Close();
+        return;
+    }
+
+    void
+    SerialStreamBuf::DrainWriteBuffer()
+    {
+        mImpl->DrainWriteBuffer();
         return;
     }
 
@@ -610,7 +630,7 @@ namespace LibSerial
     }
 
     bool
-    SerialStreamBuf::GetDSR() 
+    SerialStreamBuf::GetDSR()
     {
         return mImpl->GetDSR();
     }
@@ -621,12 +641,17 @@ namespace LibSerial
         return mImpl->GetFileDescriptor();
     }
 
+    int
+    SerialStreamBuf::GetNumberOfBytesAvailable()
+    {
+        return mImpl->GetNumberOfBytesAvailable();
+    }
+
     std::vector<std::string>
     SerialStreamBuf::GetAvailableSerialPorts()
     {
         return mImpl->GetAvailableSerialPorts();
     }
-
 
     std::streambuf*
     SerialStreamBuf::setbuf(char_type* character, std::streamsize numberOfBytes)
@@ -820,6 +845,24 @@ namespace LibSerial
 
     inline
     void
+    SerialStreamBuf::Implementation::DrainWriteBuffer()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        if (tcdrain(this->mFileDescriptor) < 0)
+        {
+            throw std::runtime_error(std::strerror(errno));
+        }
+
+        return;
+    }
+
+    inline
+    void
     SerialStreamBuf::Implementation::FlushInputBuffer()
     {
         // Throw an exception if the serial port is not open.
@@ -906,7 +949,7 @@ namespace LibSerial
     }
 
     inline
-    void 
+    void
     SerialStreamBuf::Implementation::SetDefaultSerialPortParameters()
     {
         // Make sure that the serial port is open.
@@ -1372,7 +1415,7 @@ namespace LibSerial
     }
 
     inline
-    void 
+    void
     SerialStreamBuf::Implementation::SetVMin(const short vmin)
     {
         // Throw an exception if the serial port is not open.
@@ -1410,7 +1453,7 @@ namespace LibSerial
     }
 
     inline
-    short 
+    short
     SerialStreamBuf::Implementation::GetVMin()
     {
         // Throw an exception if the serial port is not open.
@@ -1433,7 +1476,7 @@ namespace LibSerial
     }
 
     inline
-    void 
+    void
     SerialStreamBuf::Implementation::SetVTime(const short vtime)
     {
         // Throw an exception if the serial port is not open.
@@ -1471,8 +1514,8 @@ namespace LibSerial
     }
 
     inline
-    short 
-    SerialStreamBuf::Implementation::GetVTime() 
+    short
+    SerialStreamBuf::Implementation::GetVTime()
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -1586,6 +1629,28 @@ namespace LibSerial
         }
 
         return this->mFileDescriptor;
+    }
+
+    inline
+    int
+    SerialStreamBuf::Implementation::GetNumberOfBytesAvailable()
+    {
+        // Throw an exception if the serial port is not open.
+        if (!this->IsOpen())
+        {
+            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
+        }
+
+        int number_of_bytes_available = 0;
+
+        if (ioctl(this->mFileDescriptor,
+                  FIONREAD,
+                  &number_of_bytes_available) < 0)
+        {
+            throw std::runtime_error(std::strerror(errno));
+        }
+
+        return number_of_bytes_available;
     }
 
     inline
@@ -1957,7 +2022,7 @@ namespace LibSerial
     inline
     std::streamsize
     SerialStreamBuf::Implementation::xsputn(const char_type* character,
-                                            std::streamsize numberOfBytes) 
+                                            std::streamsize numberOfBytes)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())
@@ -2156,7 +2221,7 @@ namespace LibSerial
 
     inline
     std::streambuf::int_type
-    SerialStreamBuf::Implementation::pbackfail(const int_type character) 
+    SerialStreamBuf::Implementation::pbackfail(const int_type character)
     {
         // Throw an exception if the serial port is not open.
         if (!this->IsOpen())

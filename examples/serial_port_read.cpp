@@ -4,9 +4,10 @@
 
 #include <SerialPort.h>
 
+#include <cstring>
+#include <cstdlib>
 #include <iostream>
 #include <unistd.h>
-#include <cstdlib>
 
 using namespace LibSerial;
 
@@ -44,32 +45,46 @@ int main()
     }
 
     // Timeout value in milliseconds to wait for data being read.
-    size_t ms_timeout = 25;
+    size_t ms_timeout = 250;
 
-    // Variable to store data coming from the serial port.
+    // Char variable to store data coming from the serial port.
     char data_byte;
 
-    // Keep reading data from serial port and print it to the screen.
-    while(serial_port.IsDataAvailable()) 
+    // Read one byte from the serial port and print it to the terminal.
+    try
     {
-        try
-        {
-            // Read a single byte of data from the serial port.
-            serial_port.ReadByte(data_byte, ms_timeout);
+        // Read a single byte of data from the serial port.
+        serial_port.ReadByte(data_byte, ms_timeout);
 
-            // Show the user what is being read from the serial port.
-            std::cout << data_byte;
-        }
-        catch (ReadTimeout)
+        // Show the user what is being read from the serial port.
+        std::cout << data_byte << std::flush;
+    }
+    catch (ReadTimeout)
+    {
+        std::cerr << "\nThe ReadByte() call has timed out." << std::endl;
+    }
+
+    // Wait a brief period for more data to arrive.
+    usleep(1000);
+
+    DataBuffer read_buffer;
+
+    try
+    {
+        // Read as many bytes as are available during the timeout period.
+        serial_port.Read(read_buffer, 0, ms_timeout);
+    }
+    catch (ReadTimeout)
+    {
+        for (size_t i = 0; i < read_buffer.size(); i++)
         {
-            std::cerr << "The ReadByte() call has timed out." << std::endl;
+            std::cout << read_buffer.at(i) << std::flush;
         }
 
-        // Wait a brief period for more data to arrive.
-        usleep(1000);
+        std::cerr << "The Read() call timed out waiting for additional data." << std::endl;
     }
 
     // Successful program completion.
-    std::cout << "Done." << std::endl;
+    std::cout << "The example program successfully completed!" << std::endl;
     return EXIT_SUCCESS;
 }

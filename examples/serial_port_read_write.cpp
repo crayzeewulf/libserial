@@ -61,8 +61,11 @@ int main()
     char read_byte_2  = ' ';
 
     // Variables to store outgoing and incoming data.
-    std::string write_string_1 = "\"Do what you can, with what you have, where you are.\" - Theodore Roosevelt";
-    std::string write_string_2 = "\"Simplicity is prerequisite for reliability.\" - Edsger W. Dijkstra";
+    std::string write_string_1 =
+        "\"Do what you can, with what you have, where you are.\" - Theodore Roosevelt";
+    
+    std::string write_string_2 =
+        "\"Simplicity is prerequisite for reliability.\" - Edsger W. Dijkstra";
 
     std::string read_string_1 = "";
     std::string read_string_2 = "";
@@ -74,6 +77,10 @@ int main()
     // Write a single byte of data to the serial ports.
     serial_port_1.WriteByte(write_byte_1);
     serial_port_2.WriteByte(write_byte_2);
+
+    // Wait until the data has actually been transmitted.
+    serial_port_1.DrainWriteBuffer();
+    serial_port_2.DrainWriteBuffer();
 
     // Specify a read timeout value in milliseconds.
     size_t timeout_milliseconds = 25;
@@ -106,6 +113,10 @@ int main()
     serial_port_1.Write(write_string_1);
     serial_port_2.Write(write_string_2);
 
+    // Wait until the data has actually been transmitted.
+    serial_port_1.DrainWriteBuffer();
+    serial_port_2.DrainWriteBuffer();
+
     try
     {
         // Read the appropriate number of bytes from each serial port.
@@ -130,9 +141,13 @@ int main()
     std::string user_input;
     user_input.clear();
     
+    // Print to the terminal what will take place next.
+    std::cout << "Using Write() and ReadLine() to write a string and "
+              << "read a line of data:" << std::endl << std::endl;
+
     // Prompt the user for input.
-    std::cout << "Type something you would like to send over serial,"
-              << " (enter \"Q\" or \"q\" to quit): " << std::flush;
+    std::cout << "Enter something you would like to send over "
+              << "serial, (enter \"Q\" or \"q\" to quit): " << std::flush;
     
     while(true)
     {
@@ -144,10 +159,6 @@ int main()
         {
             break;
         }
-
-        // Print to the terminal what will take place next.
-        std::cout << "Using Write() and ReadLine() to write a string and "
-                  << "read a line of data:" << std::endl;
 
         // Write the user input to the serial port.
         serial_port_1.Write(user_input + "\n");
@@ -164,6 +175,7 @@ int main()
     serial_port_1.Close();
     serial_port_2.Close();
 
+    // Successful program completion.
     std::cout << "The example program successfully completed!" << std::endl;
     return EXIT_SUCCESS;
 }
