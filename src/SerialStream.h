@@ -91,8 +91,9 @@ namespace LibSerial
                               const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT);
 
         /**
-         * @brief Default Destructor.
-         *        Closes the stream associated with mFileDescriptor.
+         * @brief Default Destructor for a SerialStream object
+         *        Closes the stream associated with mFileDescriptor, and
+         *        also closes the serial port if open.
          *        Remaining actions are accomplished by the fstream destructor.
          */
         virtual ~SerialStream(); 
@@ -100,7 +101,7 @@ namespace LibSerial
         /**
          * @brief Opens the serial port associated with the specified
          *        file name and the specified mode.
-         * @param fileName The file name of the serial port object.
+         * @param fileName The file name of the serial port.
          * @param openMode The communication mode status when the serial
          *        communication port is opened.
          */
@@ -112,6 +113,11 @@ namespace LibSerial
          *        lost and no more I/O can be performed on the serial port.
          */
         void Close();
+
+        /**
+         * @brief Waits until the write buffer is drained and then returns.
+         */
+        void DrainWriteBuffer();
 
         /**
          * @brief Flushes the serial port input buffer.
@@ -276,6 +282,12 @@ namespace LibSerial
          * @return Returns the serial port file descriptor.
          */
         int GetFileDescriptor();
+
+        /**
+         * @brief Gets the number of bytes available in the read buffer.
+         * @return Returns the number of bytes avilable in the read buffer.
+         */
+        int GetNumberOfBytesAvailable();
 
         /**
          * @brief Gets a list of available serial ports.

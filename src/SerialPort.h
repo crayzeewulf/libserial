@@ -66,14 +66,15 @@ namespace LibSerial
                             const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT);
 
         /**
-         * @brief Default Destructor for a serial port object.
+         * @brief Default Destructor for a SerialPort object. Closes the
+         *        serial port associated with mFileDescriptor if open.
          */
         virtual ~SerialPort() noexcept;
 
         /**
          * @brief Opens the serial port associated with the specified
          *        file name and the specified mode.
-         * @param fileName The file name of the serial port object.
+         * @param fileName The file name of the serial port.
          * @param openMode The communication mode status when the serial
          *        communication port is opened.
          */
@@ -85,6 +86,11 @@ namespace LibSerial
          *        lost and no more I/O can be performed on the serial port.
          */
         void Close();
+
+        /**
+         * @brief Waits until the write buffer is drained and then returns.
+         */
+        void DrainWriteBuffer();
 
         /**
          * @brief Flushes the serial port input buffer.
@@ -251,6 +257,12 @@ namespace LibSerial
         int GetFileDescriptor();
 
         /**
+         * @brief Gets the number of bytes available in the read buffer.
+         * @return Returns the number of bytes avilable in the read buffer.
+         */
+        int GetNumberOfBytesAvailable();
+
+        /**
          * @brief Gets a list of available serial ports.
          * @return Returns a std::vector of std::strings with the name of
          *         each available serial port. 
@@ -259,76 +271,48 @@ namespace LibSerial
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
-         *        The method will timeout if no data is received in the specified
-         *        number of milliseconds (msTimeout). If msTimeout is 0, then
-         *        this method will block until all requested bytes are
-         *        received. If numberOfBytes is zero, the method will return
-         *        immediately. In all cases, received data remains available
-         *        in the charBuffer on return from this method.
-         * @param charBuffer The character array buffer to place serial data into.
-         * @param numberOfBytes The number of bytes to read before returning.
-         * @param msTimeout The timeout period in milliseconds.
-         */
-        void Read(char&        charBuffer,
-                  const size_t numberOfBytes = 0,
-                  const size_t msTimeout  = 0);
-
-        /**
-         * @brief Reads the specified number of bytes from the serial port.
-         *        The method will timeout if no data is received in the specified
-         *        number of milliseconds (msTimeout). If msTimeout is 0, then
-         *        this method will block until all requested bytes are
-         *        received. If numberOfBytes is zero, the method will return
-         *        immediately. In all cases, received data remains available
-         *        in the charBuffer on return from this method.
-         * @param charBuffer The character array buffer to place serial data into.
-         * @param numberOfBytes The number of bytes to read before returning.
-         * @param msTimeout The timeout period in milliseconds.
-         */
-        void Read(unsigned char& charBuffer,
-                  const size_t   numberOfBytes = 0,
-                  const size_t   msTimeout  = 0);
-
-        /**
-         * @brief Reads the specified number of bytes from the serial port.
-         *        The method will timeout if no data is received in the specified
-         *        number of milliseconds (msTimeout). If msTimeout is 0, then
-         *        this method will block until all requested bytes are
-         *        received. If numberOfBytes is zero, then this method will keep
-         *        reading data till no more data is available at the serial port.
-         *        In all cases, received data is available in dataBuffer on
-         *        return from this method.
-         * @param dataBuffer The data buffer to place serial data into.
+         *        The method will timeout if no data is received in the
+         *        specified number of milliseconds (msTimeout). If msTimeout
+         *        is zero, then the method will block until all requested bytes
+         *        are received. If numberOfBytes is zero and msTimeout is
+         *        non-zero,  the method will continue receiving data for the
+         *        specified of milliseconds. If numberOfBytes is zero and
+         *        msTimeout is zero, the method will return immediately. In all
+         *        cases, any data received remains available in the dataBuffer
+         *        on return from this method.
+         * @param dataBuffer The data buffer to place data into.
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
         void Read(DataBuffer&  dataBuffer,
                   const size_t numberOfBytes = 0,
-                  const size_t msTimeout  = 0);
+                  const size_t msTimeout = 0);
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
-         *        The method will timeout if no data is received in the specified
-         *        number of milliseconds (msTimeout). If msTimeout is 0, then
-         *        this method will block until all requested bytes are
-         *        received. If numberOfBytes is zero, then this method will keep
-         *        reading data till no more data is available at the serial port.
-         *        In all cases, received data is available in dataBuffer on
-         *        return from this method.
-         * @param dataString The data string read from the serial port.
+         *        The method will timeout if no data is received in the
+         *        specified number of milliseconds (msTimeout). If msTimeout
+         *        is zero, then the method will block until all requested bytes
+         *        are received. If numberOfBytes is zero and msTimeout is
+         *        non-zero,  the method will continue receiving data for the
+         *        specified of milliseconds. If numberOfBytes is zero and
+         *        msTimeout is zero, the method will return immediately. In all
+         *        cases, any data received remains available in the dataString
+         *        on return from this method.
+         * @param dataString The string to place data into.
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
         void Read(std::string& dataString,
                   const size_t numberOfBytes = 0,
-                  const size_t msTimeout  = 0);
+                  const size_t msTimeout = 0);
 
         /**
-         * @brief Reads a single byte from the serial port.
-         *        If no data is available within the specified number
-         *        of milliseconds (msTimeout), then this method will
-         *        throw a ReadTimeout exception. If msTimeout is 0,
-         *        then this method will block until data is available.
+         * @brief Reads a single byte from the serial port. If no data is 
+         *        available within the specified number of milliseconds,
+         *        (msTimeout), then this method will throw a ReadTimeout
+         *        exception. If msTimeout is zero, then this method will
+         *        block until data becomes available.
          * @param charBuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
@@ -336,11 +320,11 @@ namespace LibSerial
                       const size_t msTimeout = 0);
 
         /**
-         * @brief Reads a single byte from the serial port.
-         *        If no data is available within the specified number
-         *        of milliseconds (msTimeout), then this method will
-         *        throw a ReadTimeout exception. If msTimeout is 0,
-         *        then this method will block until data is available.
+         * @brief Reads a single byte from the serial port. If no data is 
+         *        available within the specified number of milliseconds,
+         *        (msTimeout), then this method will throw a ReadTimeout
+         *        exception. If msTimeout is zero, then this method will
+         *        block until data becomes available.
          * @param charBuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
@@ -349,12 +333,11 @@ namespace LibSerial
 
         /**
          * @brief Reads a line of characters from the serial port.
-         *        The method will timeout if no data is received in the specified
-         *        number of milliseconds (msTimeout). If msTimeout is 0, then
-         *        this method will block until a line terminator is received.
-         *        If a line terminator is read, a string will be returned,
-         *        however, if the timeout is reached, an exception will be thrown
-         *        and all previously read data will be lost.
+         *        The method will timeout if no data is received in the
+         *        specified number of milliseconds (msTimeout).
+         *        If msTimeout is 0, then this method will block until a line
+         *        terminator is received. In all cases, any data received
+         *        remains available in the string on return from this method.
          * @param dataString The data string read from the serial port.
          * @param lineTerminator The line termination character to specify the
          *        end of a line.
@@ -366,24 +349,8 @@ namespace LibSerial
                       const size_t  msTimeout = 0);
 
         /**
-         * @brief Writes a character array buffer to the serial port.
-         * @param charBuffer The character array to be written to the serial port.
-         * @param numberOfBytes The number of bytes to write to the serial port.
-         */
-        void Write(const char*  charBuffer,
-                   const size_t numberOfBytes);
-
-        /**
-         * @brief Writes a character array buffer to the serial port.
-         * @param charBuffer The character array to be written to the serial port.
-         * @param numberOfBytes The number of bytes to write to the serial port.
-         */
-        void Write(const unsigned char* charBuffer,
-                   const size_t         numberOfBytes);
-
-        /**
-         * @brief Writes a DataBuffer vector to the serial port.
-         * @param dataBuffer The DataBuffer vector to write to the serial port.
+         * @brief Writes a DataBuffer to the serial port.
+         * @param dataBuffer The DataBuffer to write to the serial port.
          */
         void Write(const DataBuffer& dataBuffer);
 
