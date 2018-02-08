@@ -22,31 +22,38 @@ ADD_DEFINITIONS(
   -DNDEBUG
 
   -Wall
-  -Warray-bounds
   -Wcast-align
   -Wchar-subscripts
-  -Wconversion
+  -Wchkp
+  #-Wconversion
   -Wdouble-promotion
   -Wextra
   -Wfatal-errors
+  -Wformat
+  -Wformat-overflow
   -Wformat-security
+  #-Winline
   -Wlogical-op
+  -Wno-format-extra-args
   -Wno-long-long
+  -Wpacked
   -Wno-parentheses
   -Wno-psabi
   -Wno-variadic-macros
+  -Woverlength-strings
   -Wpointer-arith
-  -Wuninitialized
   -Wunused-local-typedefs
   -Wwrite-strings
 
   -fstrict-aliasing
   -fno-check-new
   -fno-common
-  -fvisibility=hidden
+  #-fvisibility=hidden
+  -fvisibility=default
   -fPIC
   -c
   -g
+  -s
   -pedantic
   -pthread
   )
