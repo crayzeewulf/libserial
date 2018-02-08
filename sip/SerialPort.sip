@@ -1,257 +1,152 @@
-
-class SerialPort /NoDefaultCtors/
+class SerialPort
 {
+
 %TypeHeaderCode
 #include <SerialPort.h>
+using namespace LibSerial;
 %End
+
 public:
-    enum BaudRate {
-        BAUD_50      = B50,
-        BAUD_75      = B75,
-        BAUD_110     = B110,
-        BAUD_134     = B134,
-        BAUD_150     = B150,
-        BAUD_200     = B200,
-        BAUD_300     = B300,
-        BAUD_600     = B600,
-        BAUD_1200    = B1200,
-        BAUD_1800    = B1800,
-        BAUD_2400    = B2400,
-        BAUD_4800    = B4800,
-        BAUD_9600    = B9600,
-        BAUD_19200   = B19200,
-        BAUD_38400   = B38400,
-        BAUD_57600   = B57600,
-        BAUD_115200  = B115200,
-        BAUD_230400  = B230400,
-        BAUD_460800  = B460800,
-        BAUD_DEFAULT = BAUD_57600
-    } ;
+    explicit SerialPort();
 
-    enum CharacterSize {
-        CHAR_SIZE_5  = CS5, //!< 5 bit characters.
-        CHAR_SIZE_6  = CS6, //!< 6 bit characters.
-        CHAR_SIZE_7  = CS7, //!< 7 bit characters.
-        CHAR_SIZE_8  = CS8, //!< 8 bit characters.
-        CHAR_SIZE_DEFAULT = CHAR_SIZE_8
-    } ;
+    explicit SerialPort(const std::string&              fileName,
+                        const LibSerial::BaudRate&      baudRate        = LibSerial::BaudRate::BAUD_DEFAULT,
+                        const LibSerial::CharacterSize& characterSize   = LibSerial::CharacterSize::CHAR_SIZE_DEFAULT,
+                        const LibSerial::FlowControl&   flowControlType = LibSerial::FlowControl::FLOW_CONTROL_DEFAULT,
+                        const LibSerial::Parity&        parityType      = LibSerial::Parity::PARITY_DEFAULT,
+                        const LibSerial::StopBits&      stopBits        = LibSerial::StopBits::STOP_BITS_DEFAULT);
 
-    enum StopBits {
-        STOP_BITS_1,   //! 1 stop bit.
-        STOP_BITS_2,   //! 2 stop bits.
-        STOP_BITS_DEFAULT = STOP_BITS_1
-    } ;
-
-    enum Parity {
-        PARITY_EVEN,     //!< Even parity.
-        PARITY_ODD,      //!< Odd parity.
-        PARITY_NONE,     //!< No parity i.e. parity checking disabled.
-        PARITY_DEFAULT = PARITY_NONE
-    } ;
-
-    enum FlowControl {
-        FLOW_CONTROL_HARD,
-        // FLOW_CONTROL_SOFT,
-        FLOW_CONTROL_NONE,
-        FLOW_CONTROL_DEFAULT = FLOW_CONTROL_NONE
-    } ;
-
-    class NotOpen : std::logic_error
-    {
-    public:
-        NotOpen(const std::string& whatArg) ;
-        virtual ~NotOpen() throw() ;
-%MethodCode
-	        return ;
-%End
-    } ;
-
-    class OpenFailed : std::runtime_error
-    {
-    public:
-        OpenFailed(const std::string& whatArg) ;
-        virtual ~OpenFailed() throw() ;
-%MethodCode
-	        return ;
-%End
-    } ;
-
-    class AlreadyOpen : std::logic_error
-    {
-    public:
-        AlreadyOpen( const std::string& whatArg ) ;
-        virtual ~AlreadyOpen() throw() ;
-%MethodCode
-	        return ;
-%End
-    } ;
-
-    class UnsupportedBaudRate : std::runtime_error
-    {
-    public:
-        UnsupportedBaudRate( const std::string& whatArg ) ;
-        virtual ~UnsupportedBaudRate() throw() ;
-%MethodCode
-	        return ;
-%End
-    } ;
-
-    class ReadTimeout : std::runtime_error
-    {
-    public:
-        ReadTimeout() ;
-        virtual ~ReadTimeout() throw() ;
-%MethodCode
-	        return ;
-%End
-    } ;
-
-    explicit SerialPort( const std::string& serialPortName ) ;
-
-    ~SerialPort() throw() ;
+    virtual ~SerialPort();
 
     void
-    Open( const BaudRate      baudRate    = BAUD_DEFAULT,
-          const CharacterSize charSize    = CHAR_SIZE_DEFAULT,
-          const Parity        parityType  = PARITY_DEFAULT,
-          const StopBits      stopBits    = STOP_BITS_DEFAULT,
-          const FlowControl   flowControl = FLOW_CONTROL_DEFAULT )
-        throw( SerialPort::AlreadyOpen,
-               SerialPort::OpenFailed,
-               SerialPort::UnsupportedBaudRate,
-               std::invalid_argument ) ;
-
-    bool
-    IsOpen() const ;
+    Open(const std::string& fileName,
+         std::ios_base::openmode openMode = std::ios_base::in | std::ios_base::out);
 
     void
-    Close()
-        throw(SerialPort::NotOpen) ;
+    Close();
 
     void
-    SetBaudRate( const BaudRate baudRate )
-        throw( SerialPort::UnsupportedBaudRate,
-               SerialPort::NotOpen,
-               std::invalid_argument ) ;
-
-    BaudRate
-    GetBaudRate() const
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
+    FlushInputBuffer();
 
     void
-    SetCharSize( const CharacterSize charSize )
-        throw( SerialPort::NotOpen,
-               std::invalid_argument ) ;
-    CharacterSize
-    GetCharSize() const
-        throw(SerialPort::NotOpen) ;
-
+    FlushOutputBuffer();
+    
     void
-    SetParity( const Parity parityType )
-        throw( SerialPort::NotOpen,
-               std::invalid_argument ) ;
-
-    Parity
-    GetParity() const
-        throw(SerialPort::NotOpen) ;
-
-    void
-    SetNumOfStopBits( const StopBits numOfStopBits )
-        throw( SerialPort::NotOpen,
-               std::invalid_argument ) ;
-
-    StopBits
-    GetNumOfStopBits() const
-        throw(SerialPort::NotOpen) ;
-
-    void
-    SetFlowControl( const FlowControl   flowControl )
-        throw( SerialPort::NotOpen,
-               std::invalid_argument ) ;
-
-    FlowControl
-    GetFlowControl() const
-        throw( SerialPort::NotOpen ) ;
-
-    bool
-    IsDataAvailable() const
-        throw(SerialPort::NotOpen) ;
-
-    unsigned char
-    ReadByte( const unsigned int msTimeout = 0 )
-        throw( SerialPort::NotOpen,
-               SerialPort::ReadTimeout,
-               std::runtime_error ) ;
-
-    typedef std::vector<unsigned char> DataBuffer ;
-    void
-	Read( SerialPort::DataBuffer& dataBuffer,
-          const unsigned int numOfBytes = 0,
-          const unsigned int msTimeout  = 0 )
-        throw( SerialPort::NotOpen,
-               SerialPort::ReadTimeout,
-               std::runtime_error ) ;
-
-    const std::string
-    ReadLine( const unsigned int msTimeout,
-              const char         lineTerminator )
-        throw( SerialPort::NotOpen,
-               SerialPort::ReadTimeout,
-               std::runtime_error ) ;
-    void
-    WriteByte(const unsigned char dataByte)
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
-
-    void
-    Write( const SerialPort::DataBuffer& dataBuffer)
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
-
-    void
-    Write(const std::string& dataString)
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
-
-    void
-    SetDtr( const bool dtrState = true )
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
-    bool
-    GetDtr() const 
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
-    void
-    SetRts( const bool rtsState = true )
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
-
-    bool
-    GetRts() const 
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
-
-    //void
-    //SetCts( const bool ctsState = true )
-    //    throw( SerialPort::NotOpen,
-    //           std::runtime_error ) ;
+    FlushIOBuffers();
     
     bool
-    GetCts() const 
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
+    IsDataAvailable();
 
-    //void
-    //SetDsr( const bool dsrState = true )
-    //    throw( SerialPort::NotOpen,
-    //           std::runtime_error ) ;
+    bool
+    IsOpen();
+
+    void
+    SetDefaultSerialPortParameters();
+
+    void
+    SetBaudRate(const LibSerial::BaudRate baudRate);
+
+    LibSerial::BaudRate
+    GetBaudRate();
+
+    void
+    SetCharacterSize(const LibSerial::CharacterSize characterSize);
+    
+    LibSerial::CharacterSize
+    GetCharacterSize();
+
+    void
+    SetFlowControl(const LibSerial::FlowControl flowControlType);
+
+    LibSerial::FlowControl
+    GetFlowControl();
+
+    void
+    SetParity(const LibSerial::Parity parityType);
+
+    LibSerial::Parity
+    GetParity();
+
+    void
+    SetStopBits(const LibSerial::StopBits stopBits);
+
+    LibSerial::StopBits
+    GetStopBits();
+
+    void
+    SetVMin(const short vmin);
+
+    short
+    GetVMin();
+
+    void
+    SetVTime(const short vtime);
+
+    short
+    GetVTime();
+
+    void
+    SetDTR(const bool dtrState = true);
     
     bool
-    GetDsr() const 
-        throw( SerialPort::NotOpen,
-               std::runtime_error ) ;
+    GetDTR();
+    
+    void
+    SetRTS(const bool rtsState = true);
+
+    bool
+    GetRTS();
+
+    bool
+    GetCTS();
+
+    bool
+    GetDSR();
+
+    int
+    GetFileDescriptor();
+
+    // NOTE: There is not a Python equivalent to std::vector.
+    // std::vector<std::string>
+    // GetAvailableSerialPorts();
+
+    void
+    Read(LibSerial::DataBuffer& dataBuffer,
+         const unsigned int     numOfBytes = 0,
+         const unsigned int     msTimeout  = 0);
+
+    void
+    Read(std::string&       dataString,
+         const unsigned int numberOfBytes = 0,
+         const unsigned int msTimeout  = 0);
+
+    void
+    ReadByte(unsigned char&     charBuffer,
+             const unsigned int msTimeout = 0);
+
+    // NOTE: Python3 provides a mechanism for method overloading, however Python2 does not.
+    // void
+    // ReadByte(char&              charBuffer,
+    //          const unsigned int msTimeout = 0);
+
+    void
+    ReadLine(std::string&       dataString,
+             const char         lineTerminator = 10, // Sip does not like '\n'
+             const unsigned int msTimeout = 0);
+
+    void
+    Write(const LibSerial::DataBuffer& dataBuffer);
+
+    void
+    Write(const std::string& dataString);
+
+    void
+    WriteByte(const char charbuffer);
+
+    // NOTE: Python3 provides a mechanism for method overloading, however Python2 does not.
+    // void
+    // WriteByte(const unsigned char charbuffer);
+
 private:
-    SerialPort( const SerialPort& otherSerialPort ) ;
+    SerialPort(const SerialPort& otherSerialPort);
 } ;
-
