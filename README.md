@@ -15,11 +15,21 @@ Otherwise, if you are a developer and would like to make use of the latest code,
 	a recent g++ release, (anything after gcc-3.2 should work), the python sip library, the boost unit test library, and Google Test (gtest).  For Debian users:
 
 ```
-sudo update
-sudo apt install build-essential graphviz libgtest-dev libboost-dev python-sip-dev doxygen
+sudo apt update
+sudo apt install autogen autoconf build-essential cmake graphviz libboost-dev libgtest-dev libtool python-sip-dev doxygen
 ```
 ----
-If you get the source code from github and would like to install the library, you will need to generate the configure script first:
+If you get the source code from github and would like to install the library, there are a few steps you will need to accomplish:
+
+Fist, compile the GTest library object files and copy libgtest.a and libgtest_main.a into your /usr/lib/ directory:
+```
+cd /usr/src/gtest
+sudo cmake CMakeLists.txt
+sudo make
+sudo cp *.a /usr/lib
+```
+
+Next, generate the configure script first:
 
 ```
 make -f Makefile.dist
