@@ -1,339 +1,336 @@
-/***************************************************************************
- *   @file SerialStream.h                                                  *
- *   @copyright                                                            *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/******************************************************************************
+ *   @file SerialStream.h                                                     *
+ *   @copyright (C) 2004 Manish Pagey                                         *
+ *   crayzeewulf@users.sourceforge.net                                        *
+ *                                                                            *
+ *   This program is free software; you can redistribute it and/or modify     *
+ *   it under the terms of the GNU Lessser General Public License as          *
+ *   published by the Free Software Foundation; either version 2 of the       *
+ *   License, or (at your option) any later version.                          *
+ *                                                                            *
+ *   This program is distributed in the hope that it will be useful,          *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of           *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
+ *   GNU Lesser General Public License for more details.                      *
+ *                                                                            *
+ *   You should have received a copy of the GNU Lesser General Public         *
+ *   License along with this program; if not, write to the                    *
+ *   Free Software Foundation, Inc.,                                          *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
+ *****************************************************************************/
 
 #ifndef _SerialStream_h_
 #define _SerialStream_h_
 
-#include <SerialStreamBuf.h>
+#include "SerialPortConstants.h"
+#include "SerialStreamBuf.h"
 
-#include <fstream>
-
-extern "C++" 
+namespace LibSerial 
 {
-    namespace LibSerial 
+    /**
+     * @brief SerialStream is a stream class for accessing serial ports on
+     *        POSIX operating systems. A lot of the functionality of this class
+     *        has been obtained by looking at the code of libserial package by
+     *        Linas Vepstas, (linas@linas.org) and the excellent document on
+     *        serial programming by Michael R. Sweet. This document can be
+     *        found at
+     *        <ahref="http://www.easysw.com/~mike/serial/serial.html">
+     *        http://www.easysw.com/~mike/serial/serial.html</a>.
+     *        The libserial package can be found at
+     *        <ahref="http://www.linas.org/serial/">
+     *        http://www.linas.org/serial/</a>.
+     *        This class allows one to set various parameters of a serial
+     *        port and then access it like a simple fstream. (In fact, that
+     *        is exactly what it does!) It sets the parameters of the
+     *        serial port by maintaining a file descriptor for the port and
+     *        uses the basic_fstream functions for the IO. We have not
+     *        implemented any file locking yet but it will be added soon.
+     *
+     *        Make sure you read the documentation of the standard fstream
+     *        template before using this class because most of the
+     *        functionality is inherited from fstream. Also, a lot of
+     *        information about the various system calls used in the
+     *        implementation can also be found in the Single Unix
+     *        Specification (Version 2). A copy of this document can be
+     *        obtained from <a href="http://www.UNIX-systems.org/">
+     *        http://www.UNIX-systems.org/</a>. We will refer to this
+     *        document as SUS-2.
+     */
+    class SerialStream : public std::iostream
     {
+    public:
+
         /**
-         * @brief A stream class for accessing serial ports on POSIX operating
-         *        systems. A lot of the functionality of this class has been
-         *        obtained by looking at the code of libserial package by Linas
-         *        Vepstas, (linas@linas.org) and the excellent document on
-         *        serial programming by Michael R. Sweet. This document can be
-         *        found at
-         *        <ahref="http://www.easysw.com/~mike/serial/serial.html">
-         *        http://www.easysw.com/~mike/serial/serial.html</a>.
-         *        The libserial package can be found at
-         *        <ahref="http://www.linas.org/serial/">
-         *        http://www.linas.org/serial/</a>.
-         *        This class allows one to set various parameters of a serial
-         *        port and then access it like a simple fstream. (In fact, that
-         *        is exactly what it does!) It sets the parameters of the
-         *        serial port by maintaining a file descriptor for the port and
-         *        uses the basic_fstream functions for the IO. We have not
-         *        implemented any file locking yet but it will be added soon.
-         *
-         *        Make sure you read the documentation of the standard fstream
-         *        template before using this class because most of the
-         *        functionality is inherited from fstream. Also a lot of
-         *        information about the various system calls used in the
-         *        implementation can also be found in the Single Unix
-         *        Specification (Version 2). A copy of this document can be
-         *        obtained from <a href="http://www.UNIX-systems.org/">
-         *        http://www.UNIX-systems.org/</a>. We will refer to this
-         *        document as SUS-2.
-         *
-         * @author $Author: crayzeewulf 
-         *         $ <A HREF="pagey@gnudom.org">Manish P. Pagey</A>
-         * @version $Id: SerialStream.h,v 1.5 2004/05/06 18:32:02 crayzeewulf
-         *
+         * @brief Default Contructor.
+         *        Creates a new SerialStream object but does not open it.
+         *        The Open() method will need to be called explicitly on
+         *        the object to communicate with the serial port.
          */
-        class SerialStream : public std::iostream 
-        {
-        public:
-            /**------------------------------------------------------------
-             * Public Static Members
-             * ------------------------------------------------------------ 
-             */
-            
-            /**
-             * @brief This constructor takes a filename and an openmode to
-             *        construct a SerialStream object. This results in a
-             *        call to basic_fstream::open(s,mode). This is the only
-             *        way to contruct an object of this class. We have to
-             *        enforce this instead of providing a default
-             *        constructor because we want to get a file descriptor
-             *        whenever the basic_fstream::open() function is
-             *        called. However, this function is not made virtual in
-             *        the STL hence it is probably not very safe to overload
-             *        it. We may decide to overload it later but the users
-             *        of this class will have to make sure that this class
-             *        is not used as an fstream class. The SerialStream will
-             *        be in the "open" state (same state as after calling
-             *        the Open() method) after calling this constructor.
-             *
-             *        If the constructor has problems opening the serial port or
-             *        getting the file-descriptor for the port, it will set the
-             *        failbit for the stream. So, one must make sure that the
-             *        stream is in a good state before using it for any further
-             *        I/O operations.
-             *
-             * @param fileName The filename of the serial port. 
-             * @param openMode The openmode for the serial port file. 
-             *
-             */
-            explicit SerialStream( const std::string fileName, 
-                                   std::ios_base::openmode openMode =
-                                   std::ios::in|std::ios::out) ;
+        explicit SerialStream();
 
-            /**
-             * @brief Constructor that allows one to create a SerialStream
-             *        instance and also initialize the corresponding serial
-             *        port with the specified parameters. This was suggested
-             *        by Witek Adamus (wit3k). 
-             * 
-             * @note See https://sourceforge.net/tracker/index.php?func=detail&aid=2137885&group_id=9432&atid=359432
-             *
-             * @param fileName The file descriptor of the serial stream object.
-             * @param baudRate The communications baud rate.
-             * @param characterSize The size of the character buffer for
-             *        storing read/write streams.
-             * @param parityType The parity type for the serial stream object.
-             * @param numberOfStopBits The number of stop bits.
-             * @param flowControlType Flow control for the serial data stream.
-             */
-            SerialStream( const std::string fileName,
-                          const SerialStreamBuf::BaudRateEnum baudRate = SerialStreamBuf::DEFAULT_BAUD,
-                          const SerialStreamBuf::CharSizeEnum charSize = SerialStreamBuf::DEFAULT_CHAR_SIZE,
-                          const SerialStreamBuf::ParityEnum parityType = SerialStreamBuf::DEFAULT_PARITY,
-                          const short numOfStopBits = SerialStreamBuf::DEFAULT_NO_OF_STOP_BITS,
-                          const SerialStreamBuf::FlowControlEnum flowControlType = SerialStreamBuf::DEFAULT_FLOW_CONTROL ) ;
+        /**
+         * @brief Constructor that allows a SerialStream instance to be 
+         *        created and opened, initializing the corresponding
+         *        serial port with the specified parameters.
+         *        Suggested by Witek Adamus (wit3k):
+         *        https://sourceforge.net/tracker/index.php?func=detail&aid=2137885&group_id=9432&atid=359432
+         *
+         * @param fileName The file name of the serial stream.
+         * @param baudRate The communications baud rate.
+         * @param characterSize The size of the character buffer for
+         *        storing read/write streams.
+         * @param parityType The parity type for the serial stream.
+         * @param stopBits The number of stop bits for the serial stream.
+         * @param flowControlType The flow control type for the serial stream.
+         */
+        explicit SerialStream(const std::string&   fileName,
+                              const BaudRate&      baudRate        = BaudRate::BAUD_DEFAULT,
+                              const CharacterSize& characterSize   = CharacterSize::CHAR_SIZE_DEFAULT,
+                              const FlowControl&   flowControlType = FlowControl::FLOW_CONTROL_DEFAULT,
+                              const Parity&        parityType      = Parity::PARITY_DEFAULT,
+                              const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT);
 
-            /**
-             * @brief Default Contructor.  Creates a new SerialStream object
-             *        but does not open it.
-             *        The Open() method will need to be called explicitly on
-             *        the object to communicate with the serial port.
-             */
-            explicit SerialStream() ;
-      
-            /**
-             * @brief Default Destructor. Closes the stream associated with
-             *        mFileDescriptor. Remaining actions are accomplished by
-             *        the fstream destructor.
-             */
-            virtual ~SerialStream() ; 
+        /**
+         * @brief Default Destructor for a SerialStream object
+         *        Closes the stream associated with mFileDescriptor, and
+         *        also closes the serial port if open.
+         *        Remaining actions are accomplished by the fstream destructor.
+         */
+        virtual ~SerialStream(); 
 
-            /* -----------------------------------------------------------------
-             * Other Public Methods
-             * -----------------------------------------------------------------
-             */
-            /**
-             * @brief Opens the serial port associated with the specified
-             *        filename, and the specified mode, mode.
-             * @param fileName The file descriptor of the serial stream object.
-             * @param openMode The communication mode status when the serial
-             *        communication port is opened.
-             */
-            void Open( const std::string fileName, 
-                       std::ios_base::openmode openMode = 
-                       std::ios_base::in | std::ios_base::out) ;
+        /**
+         * @brief Opens the serial port associated with the specified
+         *        file name and the specified mode.
+         * @param fileName The file name of the serial port.
+         * @param openMode The communication mode status when the serial
+         *        communication port is opened.
+         */
+        void Open(const std::string& fileName,
+                  const std::ios_base::openmode& openMode = std::ios_base::in | std::ios_base::out);
 
-            /**
-             * @brief Closes the serial port. No communications can occur with
-             *        the serial port  after calling this routine.
-             */
-            void Close() ;
+        /**
+         * @brief Closes the serial port. All settings of the serial port will be
+         *        lost and no more I/O can be performed on the serial port.
+         */
+        void Close();
 
-            /**
-             * @brief Determines if the Serial Stream is in an open state.
-             * @return Returns true iff the Stream is in an open state.
-             */
-            bool IsOpen() const ;
+        /**
+         * @brief Waits until the write buffer is drained and then returns.
+         */
+        void DrainWriteBuffer();
 
-            /** 
-             * @brief Sets the input and output baud ratesfor the
-             *        Serial Stream object. 
-             */
-            void SetBaudRate(SerialStreamBuf::BaudRateEnum baudRate ) ;
+        /**
+         * @brief Flushes the serial port input buffer.
+         */
+        void FlushInputBuffer();
 
-            /**
-             * @brief Gets the current baud rate being used for serial
-             *        communication. This routine queries the serial port for
-             *        its current settings and returns the baud rate that is
-             *        being used by the serial port. 
-             *
-             * @note This is not a constant function because it checks to see
-             *       that it is dealing with a SerialStream with a non-null
-             *       buffer. If the buffer is null, it attempts to set the
-             *       state of the stream accordingly.
-             *
-             * @return Returns the current baud rate for the serial port.
-             */
-            SerialStreamBuf::BaudRateEnum BaudRate() ;
+        /**
+         * @brief Flushes the serial port output buffer.
+         */
+        void FlushOutputBuffer();
 
-            /**
-             * @brief Sets the character size associated with the serial port.
-             * @param characterSize The character size will be set to this
-             *        value.
-             */
-            void SetCharSize(const SerialStreamBuf::CharSizeEnum charSize ) ;
+        /**
+         * @brief Flushes the serial port input and output buffers.
+         */
+        void FlushIOBuffers();
 
-            /**
-             * @brief Gets the character size being used for serial
-             *        communication.
-             * @return Returns the current character size. 
-            */
-            SerialStreamBuf::CharSizeEnum CharSize() ;
+        /**
+         * @brief Checks if data is available at the input of the serial port.
+         * @return Returns true iff data is available to read.
+         */
+        bool IsDataAvailable();
 
-            /**
-             * @brief Sets the number of stop bits used during serial
-             *        communication.
-             *        The only valid values are 1 and 2.
-             * @param numberOfStopBits The number of stop bits. (1 or 2). 
-             */
-            void SetNumOfStopBits(short numOfStopBits) ;
+        /**
+         * @brief Determines if the serial port is open for I/O.
+         * @return Returns true iff the serial port is open.
+         */
+        bool IsOpen();
 
-            /**
-             * @brief Gets the number of stop bits being used during serial
-             *        communication.
-             * @return Returns the number of stop bits.
-             */
-            short NumOfStopBits() ; 
+        /**
+         * @brief Sets all serial port paramters to their default values.
+         */
+        void SetDefaultSerialPortParameters();
 
-            /**
-             * @brief Sets the parity type for serial communication.
-             * @param parityType The parity value. 
-             */
-            void SetParity(const SerialStreamBuf::ParityEnum parityType) ;
+        /**
+         * @brief Sets the baud rate for the serial port to the specified value
+         * @param baudRate The baud rate to be set for the serial port.
+         */
+        void SetBaudRate(const BaudRate& baudRate);
 
-            /**
-             * @brief Get the current parity setting for the serial port. 
-             * @return Returns the parity setting for the serial port. 
-             */
-            SerialStreamBuf::ParityEnum Parity() ;
+        /**
+         * @brief Gets the current baud rate for the serial port.
+         * @return Returns the baud rate.
+         */
+        BaudRate GetBaudRate();
 
-            /**
-             * @brief Sets the specified flow control type. 
-             */
-            void 
-            SetFlowControl(const SerialStreamBuf::FlowControlEnum flowControlType) ;
+        /**
+         * @brief Sets the character size for the serial port.
+         * @param characterSize The character size to be set.
+         */
+        void SetCharacterSize(const CharacterSize& characterSize);
 
-            /**
-             * @brief Returns the current flow control setting.
-             * @return Returns the current flow control setting.
-             */
-            SerialStreamBuf::FlowControlEnum FlowControl() ;
+        /**
+         * @brief Gets the character size being used for serial communication.
+         * @return Returns the current character size. 
+         */
+        CharacterSize GetCharacterSize();
 
-            /**
-             * @brief Sets character buffer size.
-             * @param vmin The size to set the read/write character buffer.
-             * @return Returns 
-             */
-            short SetVMin( const short vmin ) ;
+        /**
+         * @brief Sets flow control for the serial port.
+         * @param flowControlType The flow control type to be set.
+         */
+        void SetFlowControl(const FlowControl& flowControlType);
+
+        /**
+         * @brief Gets the current flow control setting.
+         * @return Returns the flow control type of the serial port.
+         */
+        FlowControl GetFlowControl();
+
+        /**
+         * @brief Sets the parity type for the serial port.
+         * @param parityType The parity type to be set.
+         */
+        void SetParity(const Parity& parityType);
+
+        /**
+         * @brief Gets the parity type for the serial port.
+         * @return Returns the parity type.
+         */
+        Parity GetParity();
+
+        /**
+         * @brief Sets the number of stop bits to be used with the serial port.
+         * @param stopBits The number of stop bits to set.
+         */
+        void SetStopBits(const StopBits& stopBits);
+
+        /**
+         * @brief Gets the number of stop bits currently being used by the serial
+         * @return Returns the number of stop bits.
+         */
+        StopBits GetStopBits();
+
+        /**
+         * @brief Sets the minimum number of characters for non-canonical reads.
+         * @note See VMIN in man termios(3).
+         * @param vmin the number of minimum characters to be set.
+         */
+        void SetVMin(const short vmin);
+
+        /**
+         * @brief Gets the VMIN value for the device, which represents the
+         *        minimum number of characters for non-canonical reads.
+         * @return Returns the minimum number of characters for
+         *         non-canonical reads.
+         */
+        short GetVMin();
+
+        /** 
+         * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
+         * @param vtime The timeout value in deciseconds to be set.
+         * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
+         */
+        void SetVTime(const short vtime);
+
+        /** 
+         * @brief Gets the current timeout value for non-canonical reads in deciseconds.
+         * @return Returns the character buffer timeout for non-canonical reads in deciseconds. 
+         */
+        short GetVTime();
+
+        /**
+         * @brief Sets the DTR line to the specified value.
+         * @param dtrState The line voltage state to be set,
+         *        (true = high, false = low).
+         */
+        void SetDTR(const bool dtrState = true);
+
+        /**
+         * @brief Gets the status of the DTR line.
+         * @return Returns true iff the status of the DTR line is high.
+         */
+        bool GetDTR();
+
+        /**
+         * @brief Set the RTS line to the specified value.
+         * @param rtsState The line voltage state to be set,
+         *        (true = high, false = low).
+         */
+        void SetRTS(const bool rtsState = true);
+
+        /**
+         * @brief Get the status of the RTS line.
+         * @return Returns true iff the status of the RTS line is high.
+         */
+        bool GetRTS();
+
+        /**
+         * @brief Get the status of the CTS line.
+         * @return Returns true iff the status of the CTS line is high.
+         */
+        bool GetCTS();
+
+        /**
+         * @brief Get the status of the DSR line.
+         * @return Returns true iff the status of the DSR line is high.
+         */
+        bool GetDSR();
+
+        /**
+         * @brief Gets the serial port file descriptor.
+         * @return Returns the serial port file descriptor.
+         */
+        int GetFileDescriptor();
+
+        /**
+         * @brief Gets the number of bytes available in the read buffer.
+         * @return Returns the number of bytes avilable in the read buffer.
+         */
+        int GetNumberOfBytesAvailable();
+
+        /**
+         * @brief Gets a list of available serial ports.
+         * @return Returns a std::vector of std::strings with the name of
+         *         each available serial port. 
+         */
+        std::vector<std::string> GetAvailableSerialPorts();
 
 
-            /**
-             * @brief Gets current size of character buffer.
-             *        See <A HREF="http://www.unixwiz.net/techtips/termios-vmin-vtime.html">here</A>
-             *        for more documentation about VTIME and VMIN.
-             * @return Returns 
-             */
-            short VMin() ;
+    protected:
 
-            /**
-             * @brief Sets the character buffer timing in 10ths of a second.
-             * @param vtime The character buffer timing value to be set.
-             * @return Returns 
-             */
-            short SetVTime( short vtime ) ;
+    private:
 
-            /**
-             * @brief Get current timing of character buffer in 10th of a second.
-             *        See <A HREF="http://www.unixwiz.net/techtips/termios-vmin-vtime.html">here</A>
-             *        for more documentation about VTIME and VMIN.
-             * @return Returns 
-             */
-            short VTime() ;
+        /**
+         * @brief Prevents copying of objects of this class by declaring the copy
+         *        constructor private. This method is never defined.
+         */
+        SerialStream(const SerialStream& otherSerialStream) = delete;
 
+        /**
+         * @brief Move construction is disallowed.
+         */
+        SerialStream(const SerialStream&& otherSerialStream) = delete;
 
-            /**------------------------------------------------------------
-             * Friends
-             * ------------------------------------------------------------
-             */
-        protected:
-            /**------------------------------------------------------------
-             * Protected Data Members
-             * ------------------------------------------------------------
-             */
-            /**------------------------------------------------------------
-             * Protected Methods
-             * ------------------------------------------------------------
-             */
-        private:
-            /**------------------------------------------------------------
-             * Private Data Members
-             * ------------------------------------------------------------
-             */
-            //
-            /**
-             * @brief The copy constructor and the assignment operator are
-             *        declared but never defined. This allows the compiler
-             *        to catch any attempts to copy instances of this class.
-             */
-            SerialStream( const SerialStream& ) ;
-            SerialStream& operator=( const SerialStream& ) ;
+        /**
+         * @brief Prevents copying of objects of this class by declaring the
+         *        assignment operator private. This method is never defined.
+         */
+        SerialStream& operator=(const SerialStream& otherSerialStream) = delete;
 
-            /**
-             * @brief The SerialStreamBuffer object that will be used by the
-             *        stream to communicate with the serial port.
-             */
-            SerialStreamBuf *mIOBuffer ;
+        /**
+         * @brief Move assignment is not allowed.
+         */
+        SerialStream& operator=(const SerialStream&& otherSerialStream) = delete;
 
-            /**----------------------------------------------------------------
-             * Private Methods
-             * ----------------------------------------------------------------
-             */
-            
-            /**
-             * @brief Sets the serial port to ignore the modem status lines.
-             *        If the specified boolean parameter is false then the
-             *        meaning of this function is reversed i.e. the serial
-             *        port will start using the modem status lines.
-             *
-             *  @param ignore If true then the modem status lines will be
-             *  ignored otherwise they will be used during the
-             *  communication.
-             */
-            // void IgnoreModemStatusLines(bool ignore=true);
+        /**
+         * @brief The SerialStreamBuffer object that will be used by the
+         *        stream to communicate with the serial port.
+         */
+        SerialStreamBuf* mIOBuffer;
 
-            /**
-             * @brief Enables the serial port receiver. This will allow us to
-             *        read data from the serial port.
-             * @param enable The received will be enabled iff true, otherwise
-             *        it will be disabled.
-             */
-            // void EnableReceiver(bool enable=true);
+    }; // class SerialStream
 
-        } ; // class SerialStream
-
-    } // namespace LibSerial
-
-} // extern "C++"
+} // namespace LibSerial
 
 #endif // #ifndef _SerialStream_h_
