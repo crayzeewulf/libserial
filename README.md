@@ -16,7 +16,7 @@ Otherwise, if you are a developer and would like to make use of the latest code,
 
 ```
 sudo update
-sudo apt install build-essential libgtest-dev libboost-dev python-sip-dev
+sudo apt install build-essential graphviz libgtest-dev libboost-dev python-sip-dev doxygen
 ```
 ----
 If you get the source code from github and would like to install the library, you will need to generate the configure script first:
