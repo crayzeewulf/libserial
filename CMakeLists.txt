@@ -51,6 +51,7 @@ ADD_DEFINITIONS(
   #-fvisibility=hidden
   -fvisibility=default
   -fPIC
+  
   -c
   -g
   -s
