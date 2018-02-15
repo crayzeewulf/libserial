@@ -29,14 +29,14 @@ sudo make
 sudo cp *.a /usr/lib
 ```
 
-Next, generate the configure script first:
+Next, generate the configure script:
 
 ```
 make -f Makefile.dist
 ```
 
 ----
-Then run `configure`:
+Then execute the `configure` script:
 
 ```
 ./configure 
