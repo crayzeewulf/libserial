@@ -30,7 +30,7 @@ ADD_DEFINITIONS(
   -Wextra
   -Wfatal-errors
   -Wformat
-  -Wformat-overflow
+  #-Wformat-overflow
   -Wformat-security
   #-Winline
   -Wlogical-op
