@@ -1,8 +1,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 PROJECT(LibSerial)
-SET(LibSerial_VERSION_MAJOR 0)
-SET(LibSerial_VERSION_MINOR 6)
+
+SET(LibSerial_VERSION_MAJOR 1)
+SET(LibSerial_VERSION_MINOR 0)
 
 INCLUDE(ExternalProject)
 
@@ -10,52 +11,50 @@ ENABLE_TESTING()
 
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-FIND_PACKAGE(Threads REQUIRED)
-FIND_PACKAGE(PythonLibs REQUIRED)
+FIND_PACKAGE(Doxygen REQUIRED)
 FIND_PACKAGE(Boost COMPONENTS unit_test_framework REQUIRED)
-FIND_PACKAGE(Doxygen)
-
-CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/doxygen.conf.in
-  ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf.in @ONLY
-  )
-
-ADD_CUSTOM_TARGET(docs ALL
-  ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxygen.conf.in
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  COMMENT "Generating API documentation with Doxygen" VERBATIM
-)
+FIND_PACKAGE(PythonLibs REQUIRED)
+#FIND_PACKAGE(SIP REQUIRED)
+FIND_PACKAGE(Threads REQUIRED)
 
 ADD_DEFINITIONS(
   -O3
   -DNDEBUG
 
   -Wall
-  -Warray-bounds
   -Wcast-align
   -Wchar-subscripts
+  -Wchkp
   #-Wconversion
   -Wdouble-promotion
   -Wextra
   -Wfatal-errors
+  -Wformat
+  #-Wformat-overflow
   -Wformat-security
+  #-Winline
   -Wlogical-op
+  -Wno-format-extra-args
   -Wno-long-long
+  -Wpacked
   -Wno-parentheses
   -Wno-psabi
   -Wno-variadic-macros
+  -Woverlength-strings
   -Wpointer-arith
-  -Wuninitialized
   -Wunused-local-typedefs
   -Wwrite-strings
 
   -fstrict-aliasing
   -fno-check-new
   -fno-common
-  -fvisibility=hidden
+  #-fvisibility=hidden
+  -fvisibility=default
   -fPIC
+  
   -c
   -g
+  -s
   -pedantic
   -pthread
   )
@@ -120,10 +119,22 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 SET(CMAKE_INSTALL_PREFIX /usr/local)
 SET(CMAKE_INSTALL_MESSAGE ALWAYS)
 
+#ADD_SUBDIRECTORY(docs)
 ADD_SUBDIRECTORY(examples)
 ADD_SUBDIRECTORY(sip)
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(test)
+
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/doxygen.conf.in
+  ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf.in @ONLY
+  )
+
+ADD_CUSTOM_TARGET(docs ALL
+  ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxygen.conf.in
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  COMMENT "Generating API documentation with Doxygen" VERBATIM
+)
 
 #INSTALL(
 #  FILES src/SerialPort.h src/SerialPortConstants.h src/SerialStream.h src/SerialStreamBuf.h

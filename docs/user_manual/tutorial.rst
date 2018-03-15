@@ -49,28 +49,28 @@ SerialStream::SetBaudRate() member function.
    // Set the desired baud rate using a SetBaudRate() method call.
    // Available baud rate values are defined in SerialStreamConstants.h.
 
-   my_serial_port.SetBaudRate( SerialPort::BAUD_115200 );
-   my_serial_stream.SetBaudRate( SerialStreamBuf::BAUD_115200 );
+   my_serial_port.SetBaudRate( BAUD_115200 );
+   my_serial_stream.SetBaudRate( BAUD_115200 );
 
 Setting the Character Size
 --------------------------
 
 .. code-block:: c++
 
-   // Set the desired character size using a SetCharSize() method call.
+   // Set the desired character size using a SetCharacterSize() method call.
    // Available character size values are defined in SerialStreamConstants.h.
-   my_serial_port.SetCharSize( SerialPort::CHAR_SIZE_8 );
-   my_serial_stream.SetCharSize( SerialStreamBuf::CHAR_SIZE_8 );
+   my_serial_port.SetCharacterSize( CHAR_SIZE_8 );
+   my_serial_stream.SetCharacterSize( CHAR_SIZE_8 );
 
 Setting the Flow-Control Type
 -----------------------------
 
 .. code-block:: c++ 
 
-   // Set the desired flow control type using a SetClowControl() method call.
+   // Set the desired flow control type using a SetFlowControl() method call.
    // Available flow control types are defined in SerialStreamConstants.h.
-   my_serial_port.SetFlowControl( SerialPort::FLOW_CONTROL_HARD );
-   my_serial_stream.SetFlowControl( SerialStreamBuf::FLOW_CONTROL_HARD );
+   my_serial_port.SetFlowControl( FLOW_CONTROL_HARD );
+   my_serial_stream.SetFlowControl( FLOW_CONTROL_HARD );
 
 
 Setting the Parity Type
@@ -80,8 +80,8 @@ Setting the Parity Type
 
    // Set the desired parity type using a SetParity() method call.
    // Available parity types are defined in SerialStreamConstants.h.
-   my_serial_port.SetParity( SerialPort::PARITY_ODD );
-   my_serial_stream.SetParity( SerialStreamBuf::PARITY_ODD );
+   my_serial_port.SetParity( PARITY_ODD );
+   my_serial_stream.SetParity( PARITY_ODD );
 
 
 Setting the Number of Stop Bits
@@ -91,8 +91,8 @@ Setting the Number of Stop Bits
 
    // Set the number of stop bits using a SetNumOfStopBits() method call.
    // Available stop bit values are defined in SerialStreamConstants.h.
-   my_serial_port.SetNumOfStopBits( 1 ) ;
-   my_serial_stream.SetNumOfStopBits( 1 ) ;
+   my_serial_port.SetNumOfStopBits( STOP_BITS_1 ) ;
+   my_serial_stream.SetNumOfStopBits( STOP_BITS_1 ) ;
 
 
 Reading Characters
@@ -104,10 +104,10 @@ and Readline() methods. For example:
 .. code-block:: c++ 
 
    // Read one character from the serial port within the timeout allowed.
-   int timeout_ms = 25;       // timeout value in milliseconds
-   char next_char;   // variable to store the ReadByte() result
+   int timeout_ms = 25; // timeout value in milliseconds
+   char next_char;      // variable to store the read result
 
-   next_char = my_serial_port.ReadByte( timeout_ms );
+   my_serial_port.ReadByte( next_char, timeout_ms );
    my_serial_stream.read( next_char );
 
 
@@ -161,10 +161,9 @@ Reading Blocks of Data
 
    // Read a whole array of data from the serial port. 
    const int BUFFER_SIZE = 256;
-   SerialPort::DataBuffer data_buffer[BUFFER_SIZE];
    char input_buffer[BUFFER_SIZE];
 
-   my_serial_port.Read( data_buffer, BUFFER_SIZE );
+   my_serial_port.Read( input_buffer, BUFFER_SIZE );
    my_serial_stream.read( input_buffer, BUFFER_SIZE );
 
 Writing Blocks of Data
@@ -174,16 +173,14 @@ Writing Blocks of Data
 
    // Write an array of data from the serial port. 
    const int BUFFER_SIZE = 256;
-   SerialPort::DataBuffer data_buffer[BUFFER_SIZE];
    char output_buffer[BUFFER_SIZE];
 
-   for(int i=0; i<BUFFER_SIZE; ++i) 
+   for( int i=0; i<BUFFER_SIZE; ++i ) 
    {
-       data_buffer[i] = i;
        output_buffer[i] = i;
    }
 
-   my_serial_port.Write( data_buffer, BUFFER_SIZE );
+   my_serial_port.Write( output_buffer, BUFFER_SIZE );
    my_serial_stream.write( output_buffer, BUFFER_SIZE );
 
 Closing the Serial Port

@@ -36,7 +36,8 @@ CMakeFiles
 .libs
 
 # Docs
-docs/html
+docs/html/
+docs/.doctrees/
 
 # Files resulting from make build
 Makefile
@@ -62,9 +63,7 @@ missing
 stamp-h1
 
 # Examples
-examples/read_port
-examples/read_port_01
-examples/write_port
+examples/main_page_example
 examples/serial_port_read
 examples/serial_port_read_write
 examples/serial_port_write

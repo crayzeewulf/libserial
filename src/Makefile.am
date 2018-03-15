@@ -6,18 +6,15 @@ lib_LTLIBRARIES = libserial.la
 
 include_HEADERS = \
 	SerialPort.h \
+	SerialPortConstants.h \
 	SerialStream.h \
 	SerialStreamBuf.h
 
 libserial_la_SOURCES = \
 	SerialPort.cpp \
 	SerialPort.h \
-	SerialStream.cc \
+	SerialPortConstants.h \
+	SerialStream.cpp \
 	SerialStream.h \
-	SerialStreamBuf.cc \
-	SerialStreamBuf.h \
-	PosixSignalDispatcher.cpp
-
-noinst_HEADERS = \
-	PosixSignalDispatcher.h \
-	PosixSignalHandler.h
+	SerialStreamBuf.cpp \
+	SerialStreamBuf.h
