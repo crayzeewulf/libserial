@@ -19,13 +19,13 @@ To install LibSerial from source, first clone the repository at https://github.c
 
 Using https:
 
-.. code-block:: c++
+.. code-block:: bash
 
    git clone https://github.com/crayzeewulf/libserial.git
 
 Using ssh:
 
-.. code-block:: c++
+.. code-block:: bash
 
    git clone git@github.com:crayzeewulf/libserial.git
 
@@ -42,6 +42,12 @@ To install the build to your /usr/local/ directory your may simply:
 .. code-block:: c++
 
    sudo make install
+
+To install to another directory, simply use the *prefix* argument in the configure step above:
+
+.. code-block:: c++
+
+   ./configure --prefix=<DIRECTORY_NAME>
 
 The code is also easily built using cmake via a bash script:
 
