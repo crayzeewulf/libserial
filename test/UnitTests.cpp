@@ -1942,6 +1942,7 @@ protected:
     {
         serialStream1.Open(TEST_SERIAL_PORT_1);
         serialStream1.SetBaudRate(BaudRate::BAUD_115200);
+        serialStream1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
 
         size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
         size_t timeElapsedMilliSeconds = 0;
@@ -1950,13 +1951,6 @@ protected:
         {
             serialStream1 << writeString1 << std::endl;
             serialStream1.DrainWriteBuffer();
-
-            // entryTime = getTimeInMicroSeconds();
-            // std::this_thread::sleep_for(std::chrono::milliseconds(5));
-            // // usleep(500);
-            // currentTime = getTimeInMicroSeconds();
-            // elapsedTime = currentTime - entryTime;
-            // ASSERT_GT(elapsedTime, (size_t)0);
 
             if (serialStream1.IsDataAvailable())
             {
@@ -1987,6 +1981,7 @@ protected:
     {
         serialStream2.Open(TEST_SERIAL_PORT_2);
         serialStream2.SetBaudRate(BaudRate::BAUD_115200);
+        serialStream2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
 
         size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
         size_t timeElapsedMilliSeconds = 0;
@@ -1995,13 +1990,6 @@ protected:
         {
             serialStream2 << writeString2 << std::endl;
             serialStream2.DrainWriteBuffer();
-
-            // entryTime = getTimeInMicroSeconds();
-            // std::this_thread::sleep_for(std::chrono::milliseconds(5));
-            // // usleep(500);
-            // currentTime = getTimeInMicroSeconds();
-            // elapsedTime = currentTime - entryTime;
-            // ASSERT_GT(elapsedTime, (size_t)0);
 
             if (serialStream2.IsDataAvailable())
             {
@@ -2032,6 +2020,8 @@ protected:
     {
         serialPort1.Open(TEST_SERIAL_PORT_1);
         serialPort1.SetBaudRate(BaudRate::BAUD_115200);
+        serialPort1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+
         tcflush(serialPort1.GetFileDescriptor(), TCIOFLUSH);
 
         size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
@@ -2042,13 +2032,6 @@ protected:
            
             serialPort1.Write(writeString1 + '\n');
             serialPort1.DrainWriteBuffer();
-
-            // entryTime = getTimeInMicroSeconds();
-            // std::this_thread::sleep_for(std::chrono::milliseconds(5));
-            // // usleep(500);
-            // currentTime = getTimeInMicroSeconds();
-            // elapsedTime = currentTime - entryTime;
-            // ASSERT_GT(elapsedTime, (size_t)0);
 
             if (serialPort1.IsDataAvailable())
             {
@@ -2083,6 +2066,8 @@ protected:
     {
         serialPort2.Open(TEST_SERIAL_PORT_2);
         serialPort2.SetBaudRate(BaudRate::BAUD_115200);
+        serialPort2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+
         tcflush(serialPort1.GetFileDescriptor(), TCIOFLUSH);
 
         size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
@@ -2092,13 +2077,6 @@ protected:
         {
             serialPort2.Write(writeString2 + '\n');
             serialPort2.DrainWriteBuffer();
-
-            // entryTime = getTimeInMicroSeconds();
-            // std::this_thread::sleep_for(std::chrono::milliseconds(5));
-            // // usleep(500);
-            // currentTime = getTimeInMicroSeconds();
-            // elapsedTime = currentTime - entryTime;
-            // ASSERT_GT(elapsedTime, (size_t)0);
 
             if (serialPort2.IsDataAvailable())
             {
@@ -2699,8 +2677,8 @@ TEST_F(LibSerialTest, testMultiThreadSerialStreamReadWrite)
 
     double failRate = 100. * (double)failureRate / (double)loopCount;
     
-    // If the serial communication fail rate is greater than 2.0% consider it a failed test.
-    if (failRate > 2.0)
+    // If the serial communication fail rate is greater than 0.001% consider it a failed test.
+    if (failRate > 0.001)
     {
         std::cout << "\t     SerialStream Failure Rate = " << failRate << "%" << std::endl;
         ADD_FAILURE();
@@ -2718,8 +2696,8 @@ TEST_F(LibSerialTest, testMultiThreadSerialPortReadWrite)
 
     double failRate = 100. * (double)failureRate / (double)loopCount;
     
-    // If the serial communication fail rate is greater than 2.0% consider it a failed test.
-    if (failRate > 2.0)
+    // If the serial communication fail rate is greater than 0.001% consider it a failed test.
+    if (failRate > 0.001)
     {
         std::cout << "\t     SerialPort Failure Rate = " << failRate << "%" << std::endl;
         ADD_FAILURE();
