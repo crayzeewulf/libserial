@@ -735,7 +735,7 @@ protected:
         serialStream2.SetDTR(false);
 
         dsrStatus1 = serialStream1.GetDSR();
-        dsrStatus2 = serialStream1.GetDSR();
+        dsrStatus2 = serialStream2.GetDSR();
 
         ASSERT_FALSE(dsrStatus1);
         ASSERT_FALSE(dsrStatus2);
@@ -1577,7 +1577,7 @@ protected:
         serialPort2.SetDTR(false);
 
         dsrStatus1 = serialPort1.GetDSR();
-        dsrStatus2 = serialPort1.GetDSR();
+        dsrStatus2 = serialPort2.GetDSR();
 
         ASSERT_FALSE(dsrStatus1);
         ASSERT_FALSE(dsrStatus2);
