@@ -576,7 +576,6 @@ protected:
         ASSERT_FALSE(serialStream2.IsOpen());
     }
 
-
     void testSerialStreamSetGetDTR()
     {
         serialStream1.Open(TEST_SERIAL_PORT_1);
@@ -585,8 +584,17 @@ protected:
         ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());
 
+        serialStream1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+        serialStream2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+
         bool dtrLine1 = false;
         bool dtrLine2 = false;
+
+        dtrLine1 = serialStream1.GetDTR();
+        dtrLine2 = serialStream2.GetDTR();
+
+        ASSERT_TRUE(dtrLine1);
+        ASSERT_TRUE(dtrLine2);
 
         serialStream1.SetDTR(true);
         serialStream2.SetDTR(true);
@@ -621,15 +629,15 @@ protected:
         ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());
 
+        serialStream1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+        serialStream2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+
         bool rtsLine1 = false;
         bool rtsLine2 = false;
 
-        serialStream1.SetRTS(true);
-        serialStream2.SetRTS(true);
-
         rtsLine1 = serialStream1.GetRTS();
         rtsLine2 = serialStream2.GetRTS();
-
+        
         ASSERT_TRUE(rtsLine1);
         ASSERT_TRUE(rtsLine2);
 
@@ -641,6 +649,15 @@ protected:
         
         ASSERT_FALSE(rtsLine1);
         ASSERT_FALSE(rtsLine2);
+
+        serialStream1.SetRTS(true);
+        serialStream2.SetRTS(true);
+
+        rtsLine1 = serialStream1.GetRTS();
+        rtsLine2 = serialStream2.GetRTS();
+
+        ASSERT_TRUE(rtsLine1);
+        ASSERT_TRUE(rtsLine2);
 
         serialStream1.Close();
         serialStream2.Close();
@@ -657,11 +674,11 @@ protected:
         ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());
 
+        serialStream1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+        serialStream2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+
         bool ctsLine1 = false;
         bool ctsLine2 = false;
-
-        serialStream1.SetRTS(true);
-        serialStream2.SetRTS(true);
 
         ctsLine1 = serialStream1.GetCTS();
         ctsLine2 = serialStream2.GetCTS();
@@ -678,6 +695,15 @@ protected:
         ASSERT_FALSE(ctsLine1);
         ASSERT_FALSE(ctsLine2);
 
+        serialStream1.SetRTS(true);
+        serialStream2.SetRTS(true);
+
+        ctsLine1 = serialStream1.GetCTS();
+        ctsLine2 = serialStream2.GetCTS();
+
+        ASSERT_TRUE(ctsLine1);
+        ASSERT_TRUE(ctsLine2);
+
         serialStream1.Close();
         serialStream2.Close();
 
@@ -693,11 +719,11 @@ protected:
         ASSERT_TRUE(serialStream1.IsOpen());
         ASSERT_TRUE(serialStream2.IsOpen());
 
+        serialStream1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+        serialStream2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+
         bool dsrStatus1 = false;
         bool dsrStatus2 = false;
-
-        serialStream1.SetDTR(true);
-        serialStream2.SetDTR(true);
 
         dsrStatus1 = serialStream1.GetDSR();
         dsrStatus2 = serialStream2.GetDSR();
@@ -714,13 +740,21 @@ protected:
         ASSERT_FALSE(dsrStatus1);
         ASSERT_FALSE(dsrStatus2);
 
+        serialStream1.SetDTR(true);
+        serialStream2.SetDTR(true);
+
+        dsrStatus1 = serialStream1.GetDSR();
+        dsrStatus2 = serialStream2.GetDSR();
+
+        ASSERT_TRUE(dsrStatus1);
+        ASSERT_TRUE(dsrStatus2);
+
         serialStream1.Close();
         serialStream2.Close();
 
         ASSERT_FALSE(serialStream1.IsOpen());
         ASSERT_FALSE(serialStream2.IsOpen());
     }
-
 
     void testSerialStreamGetFileDescriptor()
     {
@@ -1392,11 +1426,11 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
+        serialPort1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+        serialPort2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+
         bool dtrLine1 = false;
         bool dtrLine2 = false;
-
-        serialPort1.SetDTR(true);
-        serialPort2.SetDTR(true);
 
         dtrLine1 = serialPort1.GetDTR();
         dtrLine2 = serialPort2.GetDTR();
@@ -1413,6 +1447,15 @@ protected:
         ASSERT_FALSE(dtrLine1);
         ASSERT_FALSE(dtrLine2);
 
+        serialPort1.SetDTR(true);
+        serialPort2.SetDTR(true);
+
+        dtrLine1 = serialPort1.GetDTR();
+        dtrLine2 = serialPort2.GetDTR();
+
+        ASSERT_TRUE(dtrLine1);
+        ASSERT_TRUE(dtrLine2);
+
         serialPort1.Close();
         serialPort2.Close();
 
@@ -1428,15 +1471,15 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
+        serialPort1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+        serialPort2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+
         bool rtsLine1 = false;
         bool rtsLine2 = false;
 
-        serialPort1.SetRTS(true);
-        serialPort2.SetRTS(true);
-
         rtsLine1 = serialPort1.GetRTS();
         rtsLine2 = serialPort2.GetRTS();
-
+        
         ASSERT_TRUE(rtsLine1);
         ASSERT_TRUE(rtsLine2);
 
@@ -1448,6 +1491,15 @@ protected:
         
         ASSERT_FALSE(rtsLine1);
         ASSERT_FALSE(rtsLine2);
+
+        serialPort1.SetRTS(true);
+        serialPort2.SetRTS(true);
+
+        rtsLine1 = serialPort1.GetRTS();
+        rtsLine2 = serialPort2.GetRTS();
+
+        ASSERT_TRUE(rtsLine1);
+        ASSERT_TRUE(rtsLine2);
 
         serialPort1.Close();
         serialPort2.Close();
@@ -1464,11 +1516,11 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
+        serialPort1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+        serialPort2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+
         bool ctsLine1 = false;
         bool ctsLine2 = false;
-
-        serialPort1.SetRTS(true);
-        serialPort2.SetRTS(true);
 
         ctsLine1 = serialPort1.GetCTS();
         ctsLine2 = serialPort2.GetCTS();
@@ -1485,6 +1537,15 @@ protected:
         ASSERT_FALSE(ctsLine1);
         ASSERT_FALSE(ctsLine2);
 
+        serialPort1.SetRTS(true);
+        serialPort2.SetRTS(true);
+
+        ctsLine1 = serialPort1.GetCTS();
+        ctsLine2 = serialPort2.GetCTS();
+
+        ASSERT_TRUE(ctsLine1);
+        ASSERT_TRUE(ctsLine2);
+
         serialPort1.Close();
         serialPort2.Close();
 
@@ -1500,14 +1561,14 @@ protected:
         ASSERT_TRUE(serialPort1.IsOpen());
         ASSERT_TRUE(serialPort2.IsOpen());
 
+        serialPort1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+        serialPort2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+
         bool dsrStatus1 = false;
         bool dsrStatus2 = false;
 
-        serialPort1.SetDTR(true);
-        serialPort2.SetDTR(true);
-
         dsrStatus1 = serialPort1.GetDSR();
-        dsrStatus2 = serialPort2.GetDSR();
+        dsrStatus2 = serialPort1.GetDSR();
 
         ASSERT_TRUE(dsrStatus1);
         ASSERT_TRUE(dsrStatus2);
@@ -1520,6 +1581,15 @@ protected:
 
         ASSERT_FALSE(dsrStatus1);
         ASSERT_FALSE(dsrStatus2);
+
+        serialPort1.SetDTR(true);
+        serialPort2.SetDTR(true);
+
+        dsrStatus1 = serialPort1.GetDSR();
+        dsrStatus2 = serialPort2.GetDSR();
+
+        ASSERT_TRUE(dsrStatus1);
+        ASSERT_TRUE(dsrStatus2);
 
         serialPort1.Close();
         serialPort2.Close();
