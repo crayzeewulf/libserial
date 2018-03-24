@@ -2280,11 +2280,6 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        if (msTimeout == 0)
-        {
-            return;
-        }
-
         size_t elapsed_ms = 0;
         ssize_t read_result = 0;
 
@@ -2346,11 +2341,6 @@ namespace LibSerial
         if (!this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        if (msTimeout == 0)
-        {
-            return;
         }
 
         size_t elapsed_ms = 0;
