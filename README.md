@@ -21,7 +21,7 @@ sudo apt install autogen autoconf build-essential cmake graphviz libboost-dev li
 ----
 If you get the source code from github and would like to install the library, there are a few steps you will need to accomplish:
 
-Fist, compile the GTest library object files and copy libgtest.a and libgtest_main.a into your /usr/lib/ directory:
+First, compile the GTest library object files and copy libgtest.a and libgtest_main.a into your /usr/lib/ directory:
 ```
 cd /usr/src/gtest
 sudo cmake CMakeLists.txt
