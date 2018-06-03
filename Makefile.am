@@ -1,7 +1,11 @@
-SUBDIRS =  src test examples docs
+SUBDIRS =  src examples docs
 
 if PYTHON
 SUBDIRS += sip
+endif
+
+if TESTS
+SUBDIRS += test
 endif
 
 ACLOCAL_AMFLAGS = -I m4
