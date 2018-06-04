@@ -1,5 +1,5 @@
 /******************************************************************************
- *   @file LibSerialTest.cpp                                                  *
+ *   @file UnitTest.cpp                                                       *
  *   @copyright (C) 2016 LibSerial Development Team                           *
  *                                                                            *
  *   This program is free software; you can redistribute it and/or modify     *
@@ -55,13 +55,13 @@ LibSerialTest::LibSerialTest()
     , writeString1("Quidquid latine dictum sit, altum sonatur. (Whatever is said in Latin sounds profound.)")
     , writeString2("The secret of the man who is universally interesting is that he is universally interested. - William Dean Howells")
 {
-    /* Empty */
+    // Empty
 }
 
 
 LibSerialTest::~LibSerialTest()
 {
-    /* Empty */
+    // Empty
 }
 
 void

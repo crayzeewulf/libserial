@@ -1,5 +1,5 @@
 /******************************************************************************
- *   @file LibSerialTest.cpp                                                  *
+ *   @file UnitTest.h                                                         *
  *   @copyright (C) 2016 LibSerial Development Team                           *
  *                                                                            *
  *   This program is free software; you can redistribute it and/or modify     *
@@ -23,10 +23,19 @@
 #include "SerialStream.h"
 
 
-// Default Serial Ports.
+/**
+ * @brief Default Serial Port 1.
+ */
 #define TEST_SERIAL_PORT_1 "/dev/ttyUSB0"
+
+/**
+ * @brief Default Serial Port 2.
+ */
 #define TEST_SERIAL_PORT_2 "/dev/ttyUSB1"
 
+/**
+ * @namespace Libserial
+ */
 namespace LibSerial
 {
     class LibSerialTest : public ::testing::Test

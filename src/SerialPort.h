@@ -26,6 +26,9 @@
 
 #include <memory>
 
+/**
+ * @namespace Libserial
+ */
 namespace LibSerial 
 {
     /**
