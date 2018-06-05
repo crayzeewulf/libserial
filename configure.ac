@@ -48,6 +48,11 @@ AC_ARG_WITH([python],
 	[], [with_python=yes])
 AM_CONDITIONAL([PYTHON], [test "${with_python}" != "no"])
 
+AC_ARG_ENABLE([tests],
+	AS_HELP_STRING([--disable-tests], [Disable tests]),
+	[], [enable_tests=yes])
+AM_CONDITIONAL([TESTS], [test "${enable_tests}" != "no"])
+
 AC_OUTPUT([Makefile
 doxygen.conf
 libserial.spec
