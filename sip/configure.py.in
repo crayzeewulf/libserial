@@ -51,6 +51,10 @@ def main():
                                             threaded=1,
                                             makefile="Makefile.sip" )
     #
+    # Add extra cxxflags to be passed to C++ compiler
+    #
+    makefile.extra_cxxflags = [ "-std=c++11" ]
+    #
     # Add the library we are wrapping.  The name doesn't include any platform
     # specific prefixes or extensions (e.g. the "lib" prefix on UNIX, or the
     # ".dll" extension on Windows).
