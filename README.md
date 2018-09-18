@@ -11,7 +11,9 @@ If you simply want to use LibSerial and you already utilize a Debian Linux distr
 sudo apt install libserial-dev
 ```
 
-Otherwise, if you are a developer and would like to make use of the latest code, you will need to have a few packages installed to build LibSerial:
+(Example code files can be found in the [`examples`](https://github.com/crayzeewulf/libserial/tree/master/examples) directory.)
+
+If you are a developer and would like to make use of the latest code, you will need to have a few packages installed to build LibSerial:
 	a recent g++ release, (anything after gcc-3.2 should work), the python sip library, the boost unit test library, and Google Test (gtest).  For Debian users:
 
 ```
