@@ -22,7 +22,7 @@
 #ifndef _SerialPort_h_
 #define _SerialPort_h_
 
-#include "SerialPortConstants.h"
+#include <SerialPortConstants.h>
 
 #include <ios>
 #include <memory>
