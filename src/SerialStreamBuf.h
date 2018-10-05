@@ -19,12 +19,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
  *****************************************************************************/
 
-#ifndef _SerialStreamBuf_h_
-#define _SerialStreamBuf_h_
+#ifndef SerialStreamBuf_h
+#define SerialStreamBuf_h
 
-#include "SerialPortConstants.h"
+#include <SerialPortConstants.h>
 
 #include <memory>
+#include <streambuf>
 #include <vector>
 
 namespace LibSerial
@@ -195,7 +196,7 @@ namespace LibSerial
          * @note See VMIN in man termios(3).
          * @param vmin the number of minimum characters to be set.
          */
-        void SetVMin(const short vmin);
+        void SetVMin(short vmin);
 
         /**
          * @brief Gets the VMIN value for the device, which represents the
@@ -210,7 +211,7 @@ namespace LibSerial
          * @param vtime The timeout value in deciseconds to be set.
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
          */
-        void SetVTime(const short vtime);
+        void SetVTime(short vtime);
 
         /** 
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
@@ -223,7 +224,7 @@ namespace LibSerial
          * @param dtrState The line voltage state to be set,
          *        (true = high, false = low).
          */
-        void SetDTR(const bool dtrState = true);
+        void SetDTR(bool dtrState = true);
 
         /**
          * @brief Gets the status of the DTR line.
@@ -236,7 +237,7 @@ namespace LibSerial
          * @param rtsState The line voltage state to be set,
          *        (true = high, false = low).
          */
-        void SetRTS(const bool rtsState = true);
+        void SetRTS(bool rtsState = true);
 
         /**
          * @brief Get the status of the RTS line.
@@ -275,7 +276,27 @@ namespace LibSerial
          */
         std::vector<std::string> GetAvailableSerialPorts();
 
+        /**
+         * @brief Prevents copying of objects of this class by declaring the copy
+         *        constructor private. This method is never defined.
+         */
+        SerialStreamBuf(const SerialStreamBuf& otherSerialPort) = delete;
 
+        /**
+         * @brief Move construction is disallowed.
+         */
+        SerialStreamBuf(const SerialStreamBuf&& otherSerialPort) = delete;
+
+        /**
+         * @brief Prevents copying of objects of this class by declaring the
+         *        assignment operator private. This method is never defined.
+         */
+        SerialStreamBuf& operator=(const SerialStreamBuf& otherSerialPort) = delete;
+
+        /**
+         * @brief Move assignment is not allowed.
+         */
+        SerialStreamBuf& operator=(const SerialStreamBuf&& otherSerialPort) = delete;
     protected:
 
         /**
@@ -356,7 +377,7 @@ namespace LibSerial
          * @param character The character to putback.
          * @return Returns The character iff successful, otherwise eof to signal an error.
          */
-        virtual int_type pbackfail(const int_type character = traits_type::eof()) override;
+        virtual int_type pbackfail(const int_type character) override;
 
         /**
          * @brief Checks whether input is available on the port.
@@ -375,29 +396,6 @@ namespace LibSerial
         virtual std::streamsize showmanyc() override;
 
     private:
- 
-        /**
-         * @brief Prevents copying of objects of this class by declaring the copy
-         *        constructor private. This method is never defined.
-         */
-        SerialStreamBuf(const SerialStreamBuf& otherSerialPort) = delete;
-
-        /**
-         * @brief Move construction is disallowed.
-         */
-        SerialStreamBuf(const SerialStreamBuf&& otherSerialPort) = delete;
-
-        /**
-         * @brief Prevents copying of objects of this class by declaring the
-         *        assignment operator private. This method is never defined.
-         */
-        SerialStreamBuf& operator=(const SerialStreamBuf& otherSerialPort) = delete;
-
-        /**
-         * @brief Move assignment is not allowed.
-         */
-        SerialStreamBuf& operator=(const SerialStreamBuf&& otherSerialPort) = delete;
-
         /**
          * @brief Forward declaration of the Implementation class folowing
          *        the PImpl idiom.
@@ -413,4 +411,4 @@ namespace LibSerial
 
 } // namespace LibSerial
 
-#endif // #ifndef _SerialStreamBuf_h_
+#endif // #ifndef SerialStreamBuf_h

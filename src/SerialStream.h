@@ -1,3 +1,5 @@
+#ifndef SerialStream_h
+#define SerialStream_h
 /******************************************************************************
  *   @file SerialStream.h                                                     *
  *   @copyright (C) 2004 Manish Pagey                                         *
@@ -19,13 +21,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
  *****************************************************************************/
 
-#ifndef _SerialStream_h_
-#define _SerialStream_h_
+#include <SerialPortConstants.h>
+#include <SerialStreamBuf.h>
 
-#include "SerialPortConstants.h"
-#include "SerialStreamBuf.h"
+#include <istream>
+#include <memory>
 
-namespace LibSerial 
+namespace LibSerial
 {
     /**
      * @brief SerialStream is a stream class for accessing serial ports on
@@ -69,7 +71,7 @@ namespace LibSerial
         explicit SerialStream();
 
         /**
-         * @brief Constructor that allows a SerialStream instance to be 
+         * @brief Constructor that allows a SerialStream instance to be
          *        created and opened, initializing the corresponding
          *        serial port with the specified parameters.
          *        Suggested by Witek Adamus (wit3k):
@@ -96,7 +98,7 @@ namespace LibSerial
          *        also closes the serial port if open.
          *        Remaining actions are accomplished by the fstream destructor.
          */
-        virtual ~SerialStream(); 
+        virtual ~SerialStream();
 
         /**
          * @brief Opens the serial port associated with the specified
@@ -166,7 +168,7 @@ namespace LibSerial
 
         /**
          * @brief Gets the character size being used for serial communication.
-         * @return Returns the current character size. 
+         * @return Returns the current character size.
          */
         CharacterSize GetCharacterSize();
 
@@ -211,7 +213,7 @@ namespace LibSerial
          * @note See VMIN in man termios(3).
          * @param vmin the number of minimum characters to be set.
          */
-        void SetVMin(const short vmin);
+        void SetVMin(short vmin);
 
         /**
          * @brief Gets the VMIN value for the device, which represents the
@@ -221,16 +223,16 @@ namespace LibSerial
          */
         short GetVMin();
 
-        /** 
+        /**
          * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
          * @param vtime The timeout value in deciseconds to be set.
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
          */
-        void SetVTime(const short vtime);
+        void SetVTime(short vtime);
 
-        /** 
+        /**
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
-         * @return Returns the character buffer timeout for non-canonical reads in deciseconds. 
+         * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
          */
         short GetVTime();
 
@@ -239,7 +241,7 @@ namespace LibSerial
          * @param dtrState The line voltage state to be set,
          *        (true = high, false = low).
          */
-        void SetDTR(const bool dtrState = true);
+        void SetDTR(bool dtrState = true);
 
         /**
          * @brief Gets the status of the DTR line.
@@ -252,7 +254,7 @@ namespace LibSerial
          * @param rtsState The line voltage state to be set,
          *        (true = high, false = low).
          */
-        void SetRTS(const bool rtsState = true);
+        void SetRTS(bool rtsState = true);
 
         /**
          * @brief Get the status of the RTS line.
@@ -287,14 +289,12 @@ namespace LibSerial
         /**
          * @brief Gets a list of available serial ports.
          * @return Returns a std::vector of std::strings with the name of
-         *         each available serial port. 
+         *         each available serial port.
+         *
+         * @todo Consider making this a static member function.
          */
         std::vector<std::string> GetAvailableSerialPorts();
 
-
-    protected:
-
-    private:
 
         /**
          * @brief Prevents copying of objects of this class by declaring the copy
@@ -317,15 +317,15 @@ namespace LibSerial
          * @brief Move assignment is not allowed.
          */
         SerialStream& operator=(const SerialStream&& otherSerialStream) = delete;
-
+    private:
         /**
          * @brief The SerialStreamBuffer object that will be used by the
          *        stream to communicate with the serial port.
          */
-        SerialStreamBuf* mIOBuffer;
+        std::unique_ptr<SerialStreamBuf> mIOBuffer {nullptr} ;
 
     }; // class SerialStream
 
 } // namespace LibSerial
 
-#endif // #ifndef _SerialStream_h_
+#endif // #ifndef SerialStream_h
