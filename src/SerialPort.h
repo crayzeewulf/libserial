@@ -24,6 +24,7 @@
 
 #include "SerialPortConstants.h"
 
+#include <ios>
 #include <memory>
 
 /**

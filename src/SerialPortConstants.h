@@ -22,9 +22,10 @@
 #ifndef SERIALPORTCONSTANTS_H
 #define SERIALPORTCONSTANTS_H
 
-#include <cerrno>
-#include <iostream>
+// #include <cerrno>
 #include <limits>
+#include <stdexcept>
+#include <string>
 #include <termios.h>
 #include <vector>
 
@@ -45,36 +46,36 @@ namespace LibSerial
     /**
      * @brief Time conversion constants.
      */
-    const int MICROSECONDS_PER_MS  =    1000;
-    const int MILLISECONDS_PER_SEC =    1000;
-    const int MICROSECONDS_PER_SEC = 1000000;
+    constexpr int MICROSECONDS_PER_MS  =    1000;
+    constexpr int MILLISECONDS_PER_SEC =    1000;
+    constexpr int MICROSECONDS_PER_SEC = 1000000;
         
     /**
      * @brief The default character buffer size.
      */
-    static constexpr short VMIN_DEFAULT = 1;
+    constexpr short VMIN_DEFAULT = 1;
 
     /**
      * @brief The default character buffer timing.
      */
-    static constexpr short VTIME_DEFAULT = 0;
+    constexpr short VTIME_DEFAULT = 0;
 
     /**
      * @brief Character used to signal that I/O can start while using
      *        software flow control with the serial port.
      */
-    static constexpr char CTRL_Q = 0x11;
+    constexpr char CTRL_Q = 0x11;
 
     /**
      * @brief Character used to signal that I/O should stop while using
      *        software flow control with the serial port.
      */
-    static constexpr char CTRL_S = 0x13;
+    constexpr char CTRL_S = 0x13;
 
     /**
      * @brief Type used to receive and return raw data to/from methods.
      */
-    typedef std::vector<unsigned char> DataBuffer;
+    using DataBuffer =  std::vector<unsigned char> ;
 
 
     /**
@@ -110,7 +111,7 @@ namespace LibSerial
         /**
          * @brief Exception error thrown when the serial port is not open.
          */
-        NotOpen(const std::string& whatArg)
+        explicit NotOpen(const std::string& whatArg [[maybe_unused]])
             : logic_error(whatArg)
         {
         }
@@ -125,7 +126,7 @@ namespace LibSerial
         /**
          * @brief Exception error thrown when the serial port is already open.
          */
-        AlreadyOpen(const std::string& whatArg)
+        explicit AlreadyOpen(const std::string& whatArg [[maybe_unused]])
             : logic_error(whatArg)
         {
         }
@@ -140,7 +141,7 @@ namespace LibSerial
         /**
          * @brief Exception error thrown when the serial port could not be opened.
          */
-        OpenFailed(const std::string& whatArg)
+        explicit OpenFailed(const std::string& whatArg [[maybe_unused]])
             : runtime_error(whatArg)
         {
         }
@@ -157,7 +158,7 @@ namespace LibSerial
          * @brief Exception error thrown when data could not be read from the
          *        serial port before the timeout had been exceeded.
          */
-        ReadTimeout(const std::string& whatArg)
+        explicit ReadTimeout(const std::string& whatArg [[maybe_unused]])
             : runtime_error(whatArg)
         {
         }
