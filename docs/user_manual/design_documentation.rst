@@ -4,9 +4,15 @@ Design Documentation
 LibSerial's Coding standards
 ----------------------------
 
-Try to utilize these guidelines if you are contributing the LibSerial as a developer.  Although we attempt to maintain these standards wherever practical, on occasion you might still discover a few deviations.
+Try to utilize these guidelines if you are contributing the LibSerial as a
+developer.  Although we attempt to maintain these standards wherever practical,
+on occasion you might still discover a few deviations.
 
-ISO standard C++, C++11
+Please familiarize yourselves with `C++ Core Guidelines
+<http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines>`_ and try to
+follow these guidelines.
+
+LibSerial uses ISO standard C++ based on the C++14 standard. 
 
 Use Doxygen style comments (with @ commands) for every:
 
