@@ -39,8 +39,8 @@ Class members: mCamelCase
 Arguments to methods/functions: camelCase (lower case first word)
 
 
-Naming Convention:
-------------------
+Naming Convention
+-----------------
 Use CamelCase for Files, Classes, Namespace, Structures, Enumerations, Functions, Procedures, and Member Variables.
 
 Filenames are the name of the class or namespace within -- one class per file.
@@ -60,8 +60,9 @@ Constants and Globals are named identically to variables.
 
 Do not use abbreviations and be as precise and descriptive with naming as possible.
 
-Indentation:
-------------
+Indentation
+-----------
+
 Indentation shall be 4 space characters, not tabs.
 
 Braces shall begin and end on the indentation level.
