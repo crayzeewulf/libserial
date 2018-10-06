@@ -30,7 +30,7 @@
 /**
  * @namespace Libserial
  */
-namespace LibSerial 
+namespace LibSerial
 {
     /**
      * @brief SerialPort allows an object oriented approach to serial port
@@ -51,7 +51,7 @@ namespace LibSerial
         explicit SerialPort();
 
         /**
-         * @brief Constructor that allows a SerialPort instance to be 
+         * @brief Constructor that allows a SerialPort instance to be
          *        created and opened, initializing the corresponding
          *        serial port with the specified parameters.
          * @param fileName The file name of the serial port.
@@ -148,7 +148,7 @@ namespace LibSerial
 
         /**
          * @brief Gets the character size being used for serial communication.
-         * @return Returns the current character size. 
+         * @return Returns the current character size.
          */
         CharacterSize GetCharacterSize();
 
@@ -193,7 +193,7 @@ namespace LibSerial
          * @note See VMIN in man termios(3).
          * @param vmin the number of minimum characters to be set.
          */
-        void SetVMin(const short vmin);
+        void SetVMin(short vmin);
 
         /**
          * @brief Gets the VMIN value for the device, which represents the
@@ -203,16 +203,16 @@ namespace LibSerial
          */
         short GetVMin();
 
-        /** 
+        /**
          * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
          * @param vtime The timeout value in deciseconds to be set.
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
          */
-        void SetVTime(const short vtime);
+        void SetVTime(short vtime);
 
-        /** 
+        /**
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
-         * @return Returns the character buffer timeout for non-canonical reads in deciseconds. 
+         * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
          */
         short GetVTime();
 
@@ -221,7 +221,7 @@ namespace LibSerial
          * @param dtrState The line voltage state to be set,
          *        (true = high, false = low).
          */
-        void SetDTR(const bool dtrState = true);
+        void SetDTR(bool dtrState = true);
 
         /**
          * @brief Gets the status of the DTR line.
@@ -234,7 +234,7 @@ namespace LibSerial
          * @param rtsState The line voltage state to be set,
          *        (true = high, false = low).
          */
-        void SetRTS(const bool rtsState = true);
+        void SetRTS(bool rtsState = true);
 
         /**
          * @brief Get the status of the RTS line.
@@ -269,7 +269,7 @@ namespace LibSerial
         /**
          * @brief Gets a list of available serial ports.
          * @return Returns a std::vector of std::strings with the name of
-         *         each available serial port. 
+         *         each available serial port.
          */
         std::vector<std::string> GetAvailableSerialPorts();
 
@@ -288,9 +288,9 @@ namespace LibSerial
          * @param numberOfBytes The number of bytes to read before returning.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void Read(DataBuffer&  dataBuffer,
-                  const size_t numberOfBytes = 0,
-                  const size_t msTimeout = 0);
+        void Read(DataBuffer& dataBuffer,
+                  size_t      numberOfBytes = 0,
+                  size_t      msTimeout = 0);
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -308,11 +308,11 @@ namespace LibSerial
          * @param msTimeout The timeout period in milliseconds.
          */
         void Read(std::string& dataString,
-                  const size_t numberOfBytes = 0,
-                  const size_t msTimeout = 0);
+                  size_t       numberOfBytes = 0,
+                  size_t       msTimeout = 0);
 
         /**
-         * @brief Reads a single byte from the serial port. If no data is 
+         * @brief Reads a single byte from the serial port. If no data is
          *        available within the specified number of milliseconds,
          *        (msTimeout), then this method will throw a ReadTimeout
          *        exception. If msTimeout is zero, then this method will
@@ -320,11 +320,11 @@ namespace LibSerial
          * @param charBuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void ReadByte(char&        charBuffer,
-                      const size_t msTimeout = 0);
+        void ReadByte(char&  charBuffer,
+                      size_t msTimeout = 0);
 
         /**
-         * @brief Reads a single byte from the serial port. If no data is 
+         * @brief Reads a single byte from the serial port. If no data is
          *        available within the specified number of milliseconds,
          *        (msTimeout), then this method will throw a ReadTimeout
          *        exception. If msTimeout is zero, then this method will
@@ -333,7 +333,7 @@ namespace LibSerial
          * @param msTimeout The timeout period in milliseconds.
          */
         void ReadByte(unsigned char& charBuffer,
-                      const size_t   msTimeout = 0);
+                      size_t         msTimeout = 0);
 
         /**
          * @brief Reads a line of characters from the serial port.
@@ -348,9 +348,9 @@ namespace LibSerial
          * @param msTimeout The timeout value to return if a line termination
          *        character is not read.
          */
-        void ReadLine(std::string&  dataString,
-                      const char    lineTerminator = '\n',
-                      const size_t  msTimeout = 0);
+        void ReadLine(std::string& dataString,
+                      char         lineTerminator = '\n',
+                      size_t       msTimeout = 0);
 
         /**
          * @brief Writes a DataBuffer to the serial port.
@@ -368,18 +368,14 @@ namespace LibSerial
          * @brief Writes a single byte to the serial port.
          * @param charbuffer The byte to write to the serial port.
          */
-        void WriteByte(const char charbuffer);
+        void WriteByte(char charbuffer);
 
         /**
          * @brief Writes a single byte to the serial port.
          * @param charbuffer The byte to write to the serial port.
          */
-        void WriteByte(const unsigned char charbuffer);
+        void WriteByte(unsigned char charbuffer);
 
-
-    protected:
-
-    private:
 
         /**
          * @brief Prevents copying of objects of this class by declaring the copy
@@ -403,6 +399,9 @@ namespace LibSerial
          */
         SerialPort& operator=(const SerialPort&& otherSerialPort) = delete;
 
+    protected:
+
+    private:
         /**
          * @brief Forward declaration of the Implementation class folowing
          *        the PImpl idiom.

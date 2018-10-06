@@ -22,10 +22,10 @@
 #include "SerialPort.h"
 
 #include <chrono>
+#include <cstdlib>
 #include <cstring>
 #include <fcntl.h>
 #include <linux/serial.h>
-#include <stdlib.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
@@ -40,7 +40,11 @@ namespace LibSerial
         /**
          * @brief Default Constructor.
          */
-        Implementation();
+        Implementation() = default ;
+        Implementation(const Implementation&) = delete ;
+        Implementation(Implementation&&) = delete ;
+        Implementation& operator=(const Implementation&) = delete ;
+        Implementation& operator=(Implementation&&) = delete ;
 
         /**
          * @brief Constructor that allows a SerialPort instance to be 
@@ -183,7 +187,7 @@ namespace LibSerial
          * @brief Sets the minimum number of characters for non-canonical reads.
          * @param vmin the number of minimum characters to be set.
          */
-        void SetVMin(const short vmin);
+        void SetVMin(short vmin);
 
         /**
          * @brief Gets the VMIN value for the device, which represents the
@@ -196,7 +200,7 @@ namespace LibSerial
          * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
          * @param vtime The timeout value in deciseconds to be set.
          */
-        void SetVTime(const short vtime);
+        void SetVTime(short vtime);
 
         /** 
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
@@ -208,7 +212,7 @@ namespace LibSerial
          * @brief Sets the serial port DTR line status.
          * @param dtrState The state to set the DTR line
          */
-        void SetDTR(const bool dtrState);
+        void SetDTR(bool dtrState);
 
         /**
          * @brief Gets the serial port DTR line status.
@@ -220,7 +224,7 @@ namespace LibSerial
          * @brief Sets the serial port RTS line status.
          * @param rtsState The state to set the RTS line
          */
-        void SetRTS(const bool rtsState);
+        void SetRTS(bool rtsState);
 
         /**
          * @brief Gets the serial port RTS line status.
@@ -274,8 +278,8 @@ namespace LibSerial
          * @param msTimeout The timeout period in milliseconds.
          */
         void Read(DataBuffer&  dataBuffer,
-                  const size_t numberOfBytes = 0,
-                  const size_t msTimeout = 0);
+                  size_t       numberOfBytes = 0,
+                  size_t       msTimeout = 0);
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -291,8 +295,8 @@ namespace LibSerial
          * @param msTimeout The timeout period in milliseconds.
          */
         void Read(std::string& dataString,
-                  const size_t numberOfBytes = 0,
-                  const size_t msTimeout = 0);
+                  size_t       numberOfBytes = 0,
+                  size_t       msTimeout = 0);
 
         /**
          * @brief Reads a single byte from the serial port.
@@ -303,8 +307,8 @@ namespace LibSerial
          * @param charBuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void ReadByte(char&        charBuffer, 
-                      const size_t msTimeout = 0);
+        void ReadByte(char&  charBuffer, 
+                      size_t msTimeout = 0);
 
         /**
          * @brief Reads a single byte from the serial port.
@@ -316,7 +320,7 @@ namespace LibSerial
          * @param msTimeout The timeout period in milliseconds.
          */
         void ReadByte(unsigned char& charBuffer, 
-                      const size_t   msTimeout = 0);
+                      size_t         msTimeout = 0);
 
         /**
          * @brief Reads a line of characters from the serial port.
@@ -332,9 +336,9 @@ namespace LibSerial
          * @param msTimeout The timeout value to return if a line termination
          *        character is not read.
          */
-        void ReadLine(std::string&  dataString,
-                      const char    lineTerminator = '\n',
-                      const size_t  msTimeout = 0);
+        void ReadLine(std::string& dataString,
+                      char         lineTerminator = '\n',
+                      size_t       msTimeout = 0);
 
         /**
          * @brief Writes a DataBuffer to the serial port.
@@ -352,13 +356,13 @@ namespace LibSerial
          * @brief Writes a single byte to the serial port.
          * @param charBuffer The byte to be written to the serial port.
          */
-        void WriteByte(const char charBuffer);
+        void WriteByte(char charBuffer);
 
         /**
          * @brief Writes a single byte to the serial port.
          * @param charBuffer The byte to be written to the serial port.
          */
-        void WriteByte(const unsigned char charBuffer);
+        void WriteByte(unsigned char charBuffer);
 
     private:
 
@@ -369,8 +373,8 @@ namespace LibSerial
          * @param lineState State of the modem line after successful
          *        call to this method.
          */
-        void SetModemControlLine(const int modemLine,
-                                 const bool lineState);
+        void SetModemControlLine(int modemLine,
+                                 bool lineState);
 
         /**
          * @brief Get the current state of the specified modem control line.
@@ -379,14 +383,14 @@ namespace LibSerial
          * @return True if the specified line is currently set and false
          *         otherwise.
          */
-        bool GetModemControlLine(const int modemLine);
+        bool GetModemControlLine(int modemLine);
 
         /**
          * @brief Sets the current state of the serial port blocking status.
          * @param blockingStatus The serial port blocking status to be set,
          *        true if to be set blocking, false if to be set non-blocking.
          */
-        void SetSerialPortBlockingStatus(const bool blockingStatus);
+        void SetSerialPortBlockingStatus(bool blockingStatus);
 
         /**
          * @brief Gets the current state of the serial port blocking status.
@@ -454,15 +458,13 @@ namespace LibSerial
         /* Empty */
     }
 
-    SerialPort::~SerialPort()
+    SerialPort::~SerialPort() noexcept
     {
         // Close the serial port if it is open.
         if (mImpl->IsOpen())
         {
             mImpl->Close();
         }
-
-        return;
     }
 
     void
@@ -471,42 +473,36 @@ namespace LibSerial
     {
         mImpl->Open(fileName,
                     openMode);
-        return;
     }
 
     void
     SerialPort::Close()
     {
         mImpl->Close();
-        return;
     }
 
     void
     SerialPort::DrainWriteBuffer()
     {
         mImpl->DrainWriteBuffer();
-        return;
     }
 
     void
     SerialPort::FlushInputBuffer()
     {
         mImpl->FlushInputBuffer();
-        return;
     }
 
     void
     SerialPort::FlushOutputBuffer()
     {
         mImpl->FlushOutputBuffer();
-        return;
     }
 
     void
     SerialPort::FlushIOBuffers()
     {
         mImpl->FlushIOBuffers();
-        return;
     }
 
     bool
@@ -525,14 +521,12 @@ namespace LibSerial
     SerialPort::SetDefaultSerialPortParameters()
     {
         mImpl->SetDefaultSerialPortParameters();
-        return;
     }
 
     void
     SerialPort::SetBaudRate(const BaudRate& baudRate)
     {
         mImpl->SetBaudRate(baudRate);
-        return;
     }
 
     BaudRate
@@ -545,7 +539,6 @@ namespace LibSerial
     SerialPort::SetCharacterSize(const CharacterSize& characterSize)
     {
         mImpl->SetCharacterSize(characterSize);
-        return;
     }
 
     CharacterSize
@@ -558,7 +551,6 @@ namespace LibSerial
     SerialPort::SetFlowControl(const FlowControl& flowControlType)
     {
         mImpl->SetFlowControl(flowControlType);
-        return;
     }
 
     FlowControl
@@ -571,7 +563,6 @@ namespace LibSerial
     SerialPort::SetParity(const Parity& parityType)
     {
         mImpl->SetParity(parityType);
-        return;
     }
 
     Parity
@@ -584,7 +575,6 @@ namespace LibSerial
     SerialPort::SetStopBits(const StopBits& stopBits)
     {
         mImpl->SetStopBits(stopBits);
-        return;
     }
 
     StopBits
@@ -597,7 +587,6 @@ namespace LibSerial
     SerialPort::SetVMin(const short vmin)
     {
         mImpl->SetVMin(vmin);
-        return;
     }
 
     short
@@ -610,7 +599,6 @@ namespace LibSerial
     SerialPort::SetVTime(const short vtime)
     {
         mImpl->SetVTime(vtime);
-        return;
     }
 
     short
@@ -623,7 +611,6 @@ namespace LibSerial
     SerialPort::SetDTR(const bool dtrState)
     {
         mImpl->SetDTR(dtrState);
-        return;
     }
 
     bool
@@ -636,7 +623,6 @@ namespace LibSerial
     SerialPort::SetRTS(const bool rtsState)
     {
         mImpl->SetRTS(rtsState);
-        return;
     }
 
     bool
@@ -683,7 +669,6 @@ namespace LibSerial
         mImpl->Read(dataBuffer,
                     numberOfBytes,
                     msTimeout);
-        return;
     }
 
     void
@@ -694,7 +679,6 @@ namespace LibSerial
         mImpl->Read(dataString,
                     numberOfBytes,
                     msTimeout);
-        return;
     }
 
     void
@@ -703,7 +687,6 @@ namespace LibSerial
     {
         mImpl->ReadByte(charBuffer,
                         msTimeout);
-        return;
     }
 
     void
@@ -712,7 +695,6 @@ namespace LibSerial
     {
         mImpl->ReadByte(charBuffer,
                         msTimeout);
-        return;
     }
 
     void
@@ -723,46 +705,34 @@ namespace LibSerial
         mImpl->ReadLine(dataString,
                         lineTerminator,
                         msTimeout);
-        return;
     }
 
     void
     SerialPort::Write(const DataBuffer& dataBuffer)
     {
         mImpl->Write(dataBuffer);
-        return;
     }
 
     void
     SerialPort::Write(const std::string& dataString)
     {
         mImpl->Write(dataString);
-        return;
     }
 
     void
     SerialPort::WriteByte(const char charBuffer)
     {
         mImpl->WriteByte(charBuffer);
-        return;
     }
 
     void
     SerialPort::WriteByte(const unsigned char charBuffer)
     {
         mImpl->WriteByte(charBuffer);
-        return;
     }
 
 
     /** ------------------------------------------------------------ */
-    inline
-    SerialPort::Implementation::Implementation()
-        : mFileDescriptor(-1)
-    {
-        /* empty */
-    }
-
     inline
     SerialPort::Implementation::Implementation(const std::string&   fileName,
                                                const BaudRate&      baudRate,
@@ -770,7 +740,6 @@ namespace LibSerial
                                                const FlowControl&   flowControlType,
                                                const Parity&        parityType,
                                                const StopBits&      stopBits)
-        : mFileDescriptor(-1)
     {
         this->Open(fileName, std::ios_base::in | std::ios_base::out);
         this->SetBaudRate(baudRate);
@@ -778,7 +747,6 @@ namespace LibSerial
         this->SetFlowControl(flowControlType);
         this->SetParity(parityType);
         this->SetStopBits(stopBits);
-        return;
     }
 
     inline
@@ -789,8 +757,6 @@ namespace LibSerial
         {
             this->Close();
         }
-
-        return;
     }
 
     inline
@@ -804,10 +770,11 @@ namespace LibSerial
             throw AlreadyOpen(ERR_MSG_PORT_ALREADY_OPEN);
         }
 
-        // We only allow three different combinations of ios_base::openmode so we can
-        // use a switch here to construct the flags to be used with the open() system call.
-        // Since we are dealing with the serial port we need to use the O_NOCTTY option.
-        int flags = (O_NOCTTY | O_NONBLOCK);
+        // We only allow three different combinations of ios_base::openmode so
+        // we can use a switch here to construct the flags to be used with the
+        // open() system call.  Since we are dealing with the serial port we
+        // need to use the O_NOCTTY option.
+        int flags = (O_NOCTTY | O_NONBLOCK); // NOLINT (hicpp-signed-bitwise)
 
         if (openMode == (std::ios_base::in | std::ios_base::out))
         {
@@ -823,10 +790,11 @@ namespace LibSerial
         }
         else
         {
-            return;
+            throw OpenFailed {"Invalid or unsupported open mode"} ;
         }
 
         // Try to open the serial port. 
+        // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
         mFileDescriptor = open(fileName.c_str(), flags);
         
         if (this->mFileDescriptor < 0)
@@ -836,6 +804,7 @@ namespace LibSerial
         }
 
         // Set the serial port to exclusive access to this process.
+        // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
         if (ioctl(this->mFileDescriptor,
                   TIOCEXCL) == -1)
         {
@@ -855,8 +824,6 @@ namespace LibSerial
 
         // Flush the input and output buffers associated with the port.
         this->FlushIOBuffers();
-
-        return;
     }
 
     inline
@@ -864,7 +831,7 @@ namespace LibSerial
     SerialPort::Implementation::Close()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -886,7 +853,6 @@ namespace LibSerial
 
         // Set the file descriptor to an invalid value, -1. 
         mFileDescriptor = -1;
-        return;
     }
 
     inline
@@ -894,7 +860,7 @@ namespace LibSerial
     SerialPort::Implementation::DrainWriteBuffer()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -903,8 +869,6 @@ namespace LibSerial
         {
             throw std::runtime_error(std::strerror(errno));
         }
-
-        return;
     }
 
     inline
@@ -912,7 +876,7 @@ namespace LibSerial
     SerialPort::Implementation::FlushInputBuffer()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -921,8 +885,6 @@ namespace LibSerial
         {
             throw std::runtime_error(std::strerror(errno));
         }
-
-        return;
     }
 
     inline
@@ -930,7 +892,7 @@ namespace LibSerial
     SerialPort::Implementation::FlushOutputBuffer()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -939,8 +901,6 @@ namespace LibSerial
         {
             throw std::runtime_error(std::strerror(errno));
         }
-
-        return;
     }
 
     inline
@@ -948,7 +908,7 @@ namespace LibSerial
     SerialPort::Implementation::FlushIOBuffers()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -957,8 +917,6 @@ namespace LibSerial
         {
             throw std::runtime_error(std::strerror(errno));
         }
-
-        return;
     }
 
     inline
@@ -973,25 +931,26 @@ namespace LibSerial
     SerialPort::Implementation::IsDataAvailable()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         int number_of_bytes_available = 0;
-        bool dataAvailableStatus = false;
+        bool is_data_available = false;
 
-        int ioctl_result = ioctl(this->mFileDescriptor,
-                                 FIONREAD,
-                                 &number_of_bytes_available);
+        // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
+        const auto ioctl_result = ioctl(this->mFileDescriptor,
+                                        FIONREAD,
+                                        &number_of_bytes_available);
         
-        if (ioctl_result >= 0 &&
-            number_of_bytes_available > 0)
+        if ((ioctl_result >= 0) and
+            (number_of_bytes_available > 0))
         {
-            dataAvailableStatus = true;
+            is_data_available = true;
         }
 
-        return dataAvailableStatus;
+        return is_data_available;
     }
 
     inline
@@ -999,7 +958,7 @@ namespace LibSerial
     SerialPort::Implementation::SetDefaultSerialPortParameters()
     {
         // Make sure that the serial port is open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1020,8 +979,6 @@ namespace LibSerial
         SetStopBits(StopBits::STOP_BITS_DEFAULT);
         SetVMin(VMIN_DEFAULT);
         SetVTime(VTIME_DEFAULT);
-
-        return;
     }
 
     inline
@@ -1029,13 +986,13 @@ namespace LibSerial
     SerialPort::Implementation::SetBaudRate(const BaudRate& baudRate)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -1045,7 +1002,7 @@ namespace LibSerial
         }
 
         // Set the baud rate for both input and output.
-        if (cfsetspeed(&port_settings, (speed_t)baudRate))
+        if (0 != cfsetspeed(&port_settings, static_cast<speed_t>(baudRate)))
         {
             // If applying the baud rate settings fail, throw an exception.
             throw std::runtime_error(ERR_MSG_INVALID_BAUD_RATE);
@@ -1059,8 +1016,6 @@ namespace LibSerial
             // If applying the settings fails, throw an exception.
             throw std::runtime_error(std::strerror(errno));
         }
-
-        return;
     }
 
     inline
@@ -1068,13 +1023,13 @@ namespace LibSerial
     SerialPort::Implementation::GetBaudRate()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -1084,8 +1039,8 @@ namespace LibSerial
         }
 
         // Read the input and output baud rates.
-        speed_t input_baud = cfgetispeed(&port_settings);
-        speed_t output_baud = cfgetospeed(&port_settings);
+        const auto input_baud = cfgetispeed(&port_settings);
+        const auto output_baud = cfgetospeed(&port_settings);
 
         // Make sure that the input and output baud rates are
         // equal. Otherwise, we do not know which one to return.
@@ -1104,13 +1059,13 @@ namespace LibSerial
     SerialPort::Implementation::SetCharacterSize(const CharacterSize& characterSize)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -1129,6 +1084,7 @@ namespace LibSerial
         // setting; it just sets every bit above the low 7 bits to zero).
         if (characterSize == CharacterSize::CHAR_SIZE_8)
         {
+            // NOLINTNEXTLINE (hicpp-signed-bitwise)
             port_settings.c_iflag &= ~ISTRIP; // Clear the ISTRIP flag.
         }
         else
@@ -1137,6 +1093,7 @@ namespace LibSerial
         }
 
         // Set the character size.
+            // NOLINTNEXTLINE (hicpp-signed-bitwise)
         port_settings.c_cflag &= ~CSIZE;                               // Clear all CSIZE bits.
         port_settings.c_cflag |= static_cast<tcflag_t>(characterSize); // Set the character size.
 
@@ -1147,8 +1104,6 @@ namespace LibSerial
         {
             throw std::runtime_error(std::strerror(errno));
         }
-
-        return;
     }
 
     inline
@@ -1156,13 +1111,13 @@ namespace LibSerial
     SerialPort::Implementation::GetCharacterSize()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -1172,6 +1127,7 @@ namespace LibSerial
         }
 
         // Read the character size from the setttings.
+        // NOLINTNEXTLINE (hicpp-signed-bitwise)
         return CharacterSize(port_settings.c_cflag & CSIZE);
     }
 
@@ -1180,7 +1136,7 @@ namespace LibSerial
     SerialPort::Implementation::SetFlowControl(const FlowControl& flowControlType)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1193,7 +1149,7 @@ namespace LibSerial
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -1208,19 +1164,19 @@ namespace LibSerial
         switch(flowControlType)
         {
         case FlowControl::FLOW_CONTROL_HARDWARE:
-            port_settings.c_iflag &= ~ (IXON|IXOFF);
+            port_settings.c_iflag &= ~ (IXON|IXOFF); // NOLINT (hicpp-signed-bitwise)
             port_settings.c_cflag |= CRTSCTS;
             port_settings.c_cc[VSTART] = _POSIX_VDISABLE;
             port_settings.c_cc[VSTOP] = _POSIX_VDISABLE;
             break;
         case FlowControl::FLOW_CONTROL_SOFTWARE:
-            port_settings.c_iflag |= IXON|IXOFF;
+            port_settings.c_iflag |= IXON|IXOFF; // NOLINT(hicpp-signed-bitwise)
             port_settings.c_cflag &= ~CRTSCTS;
             port_settings.c_cc[VSTART] = CTRL_Q; // 0x11 (021) ^q
             port_settings.c_cc[VSTOP]  = CTRL_S; // 0x13 (023) ^s
             break;
         case FlowControl::FLOW_CONTROL_NONE:
-            port_settings.c_iflag &= ~(IXON|IXOFF);
+            port_settings.c_iflag &= ~(IXON|IXOFF); // NOLINT(hicpp-signed-bitwise)
             port_settings.c_cflag &= ~CRTSCTS;
             break;
         default:
@@ -1235,8 +1191,6 @@ namespace LibSerial
         {
             throw std::runtime_error(std::strerror(errno));
         }
-
-        return;
     }
 
     inline
@@ -1244,13 +1198,13 @@ namespace LibSerial
     SerialPort::Implementation::GetFlowControl()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -1262,26 +1216,24 @@ namespace LibSerial
         // Check if IXON and IXOFF are set in c_iflag. If both are set and
         // VSTART and VSTOP are set to 0x11 (^Q) and 0x13 (^S) respectively,
         // then we are using software flow control.
-        if (port_settings.c_iflag & IXON &&
-            port_settings.c_iflag & IXOFF &&
-            CTRL_Q == port_settings.c_cc[VSTART] &&
-            CTRL_S == port_settings.c_cc[VSTOP])
+        if ((port_settings.c_iflag & IXON) and // NOLINT (hicpp-signed-bitwise)
+            (port_settings.c_iflag & IXOFF) and // NOLINT (hicpp-signed-bitwise)
+            (CTRL_Q == port_settings.c_cc[VSTART]) and
+            (CTRL_S == port_settings.c_cc[VSTOP]))
         {
             return FlowControl::FLOW_CONTROL_SOFTWARE;
         }
-        else if (!(port_settings.c_iflag & IXON ||
-                   port_settings.c_iflag & IXOFF))
+
+        if (not ((port_settings.c_iflag & IXON) or // NOLINT (hicpp-signed-bitwise)
+                 (port_settings.c_iflag & IXOFF))) // NOLINT (hicpp-signed-bitwise)
         {
-            if (port_settings.c_cflag & CRTSCTS)
+            if (0 != (port_settings.c_cflag & CRTSCTS))
             {
                 // If neither IXON or IXOFF is set then we must have hardware flow
                 // control.
                 return FlowControl::FLOW_CONTROL_HARDWARE;
             }
-            else
-            {
-                return FlowControl::FLOW_CONTROL_NONE;
-            }
+            return FlowControl::FLOW_CONTROL_NONE;
         }
 
         // If none of the above conditions are satisfied then the serial port
@@ -1294,13 +1246,13 @@ namespace LibSerial
     SerialPort::Implementation::SetParity(const Parity& parityType)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {};
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -1314,7 +1266,7 @@ namespace LibSerial
         {
         case Parity::PARITY_EVEN:
             port_settings.c_cflag |= PARENB;
-            port_settings.c_cflag &= ~PARODD;
+            port_settings.c_cflag &= ~PARODD; // NOLINT (hicpp-signed-bitwise)
             port_settings.c_iflag |= INPCK;
             break;
         case Parity::PARITY_ODD:
@@ -1323,7 +1275,7 @@ namespace LibSerial
             port_settings.c_iflag |= INPCK;
             break;
         case Parity::PARITY_NONE:
-            port_settings.c_cflag &= ~PARENB;
+            port_settings.c_cflag &= ~PARENB; // NOLINT (hicpp-signed-bitwise)
             port_settings.c_iflag |= IGNPAR;
             break;
         default:
@@ -1338,8 +1290,6 @@ namespace LibSerial
         {
             throw std::runtime_error(std::strerror(errno));
         }
-
-        return;
     }
 
     inline
@@ -1347,13 +1297,13 @@ namespace LibSerial
     SerialPort::Implementation::GetParity()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -1363,24 +1313,16 @@ namespace LibSerial
         }
 
         // Get the parity setting from the termios structure. 
-        if (port_settings.c_cflag & PARENB)
+        if (0 != (port_settings.c_cflag & PARENB)) // NOLINT (hicpp-signed-bitwise)
         {
             // parity is enabled.
-            if (port_settings.c_cflag & PARODD)
+            if (port_settings.c_cflag & PARODD) // NOLINT (hicpp-signed-bitwise)
             {
                 return Parity::PARITY_ODD; // odd parity
             }
-            else
-            {
-                return Parity::PARITY_EVEN; // even parity
-            }
+            return Parity::PARITY_EVEN; // even parity
         }
-        else
-        {
-            return Parity::PARITY_NONE; // no parity.
-        }
-
-        return Parity::PARITY_INVALID; // execution should never reach here.
+        return Parity::PARITY_NONE; // no parity.
     }
 
     inline
@@ -1388,13 +1330,13 @@ namespace LibSerial
     SerialPort::Implementation::SetStopBits(const StopBits& stopBits)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -1407,7 +1349,7 @@ namespace LibSerial
         switch(stopBits)
         {
         case StopBits::STOP_BITS_1:
-            port_settings.c_cflag &= ~CSTOPB;
+            port_settings.c_cflag &= ~CSTOPB; // NOLINT (hicpp-signed-bitwise)
             break;
         case StopBits::STOP_BITS_2:
             port_settings.c_cflag |= CSTOPB;
@@ -1424,8 +1366,6 @@ namespace LibSerial
         {
             throw std::runtime_error(std::strerror(errno));
         }
-
-        return;
     }
 
     inline
@@ -1433,13 +1373,13 @@ namespace LibSerial
     SerialPort::Implementation::GetStopBits()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -1450,14 +1390,11 @@ namespace LibSerial
 
         // If CSTOPB is set then we are using two stop bits, otherwise we
         // are using 1 stop bit.
-        if (port_settings.c_cflag & CSTOPB)
+        if (port_settings.c_cflag & CSTOPB) // NOLINT (hicpp-signed-bitwise)
         {
             return StopBits::STOP_BITS_2;
         }
-        else
-        {
-            return StopBits::STOP_BITS_1;
-        }
+        return StopBits::STOP_BITS_1;
     }
 
     inline
@@ -1465,7 +1402,7 @@ namespace LibSerial
     SerialPort::Implementation::SetVMin(const short vmin)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1476,7 +1413,7 @@ namespace LibSerial
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -1485,7 +1422,7 @@ namespace LibSerial
             throw std::runtime_error(std::strerror(errno));
         }
 
-        port_settings.c_cc[VMIN] = (cc_t)vmin;
+        port_settings.c_cc[VMIN] = static_cast<cc_t>(vmin) ;
 
         // Apply the modified settings.
         if (tcsetattr(this->mFileDescriptor,
@@ -1494,8 +1431,6 @@ namespace LibSerial
         {
             throw std::runtime_error(std::strerror(errno));
         }
-
-        return;
     }
 
     inline
@@ -1503,13 +1438,13 @@ namespace LibSerial
     SerialPort::Implementation::GetVMin()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -1526,7 +1461,7 @@ namespace LibSerial
     SerialPort::Implementation::SetVTime(const short vtime)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1537,7 +1472,7 @@ namespace LibSerial
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -1546,7 +1481,7 @@ namespace LibSerial
             throw std::runtime_error(std::strerror(errno));
         }
 
-        port_settings.c_cc[VTIME] = (cc_t)vtime;
+        port_settings.c_cc[VTIME] = static_cast<cc_t>(vtime);
 
         // Apply the modified settings.
         if (tcsetattr(this->mFileDescriptor,
@@ -1555,8 +1490,6 @@ namespace LibSerial
         {
             throw std::runtime_error(std::strerror(errno));
         }
-
-        return;
     }
 
     inline
@@ -1564,13 +1497,13 @@ namespace LibSerial
     SerialPort::Implementation::GetVTime()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -1587,14 +1520,13 @@ namespace LibSerial
     SerialPort::Implementation::SetDTR(const bool dtrState)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         this->SetModemControlLine(TIOCM_DTR, 
                                    dtrState);
-        return;
     }
 
     inline
@@ -1602,7 +1534,7 @@ namespace LibSerial
     SerialPort::Implementation::GetDTR()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1615,14 +1547,13 @@ namespace LibSerial
     SerialPort::Implementation::SetRTS(const bool rtsState)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         this->SetModemControlLine(TIOCM_RTS, 
                                   rtsState);
-        return;
     }
 
     inline
@@ -1630,7 +1561,7 @@ namespace LibSerial
     SerialPort::Implementation::GetRTS()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1643,7 +1574,7 @@ namespace LibSerial
     SerialPort::Implementation::GetCTS()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1656,7 +1587,7 @@ namespace LibSerial
     SerialPort::Implementation::GetDSR()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1669,7 +1600,7 @@ namespace LibSerial
     SerialPort::Implementation::GetFileDescriptor()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1682,13 +1613,14 @@ namespace LibSerial
     SerialPort::Implementation::GetNumberOfBytesAvailable()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         int number_of_bytes_available = 0;
 
+        // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
         if (ioctl(this->mFileDescriptor,
                   FIONREAD,
                   &number_of_bytes_available) < 0)
@@ -1703,33 +1635,28 @@ namespace LibSerial
     std::vector<std::string>
     SerialPort::Implementation::GetAvailableSerialPorts()
     {
-        const int array_size = 3;
-        int file_descriptor = -1;
-        size_t max_port_number = 128;
+        constexpr int array_size = 3;
+        constexpr size_t max_port_number = 128;
         
-        serial_struct serial_port_info;
-
-        std::string file_name;
-        file_name.clear();
-
-        std::vector<std::string> serial_port_names;
-        serial_port_names.clear();
-
         std::string serial_ports[array_size] = {"/dev/ttyS",
                                                 "/dev/ttyACM",
                                                 "/dev/ttyUSB"};
 
-        for (size_t i = 0; i < array_size; i++)
+        std::vector<std::string> serial_port_names {} ;
+        for (const auto& port_prefix: serial_ports)
         {
             for (size_t j = 0; j < max_port_number; j++)
             {
-                file_name = serial_ports[i] + std::to_string(j);
+                const auto file_name = port_prefix + std::to_string(j);
 
                 // Try to open the serial port. 
-                file_descriptor = open(file_name.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
+                // NOLINTNEXTLINE (hicpp-vararg)
+                const auto file_descriptor = open(file_name.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
 
                 if (file_descriptor > 0)
                 {
+                    serial_struct serial_port_info {} ;
+                    // NOLINTNEXTLINE (hicpp-vararg)
                     if (ioctl(file_descriptor,
                               TIOCGSERIAL,
                               &serial_port_info) == -1)
@@ -1753,7 +1680,7 @@ namespace LibSerial
                                                     const bool lineState)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1776,9 +1703,10 @@ namespace LibSerial
         // Set or unset the specified bit according to the value of lineState.
         int ioctl_result = -1;
         
-        if (true == lineState)
+        if (lineState)
         {
             int set_line_mask = modemLine;
+            // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
             ioctl_result = ioctl(this->mFileDescriptor, 
                                  TIOCMBIS,
                                  &set_line_mask);
@@ -1786,6 +1714,7 @@ namespace LibSerial
         else
         {
             int reset_line_mask = modemLine;
+            // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
             ioctl_result = ioctl(this->mFileDescriptor, 
                                  TIOCMBIC,
                                  &reset_line_mask);
@@ -1796,8 +1725,6 @@ namespace LibSerial
         {
             throw std::runtime_error(std::strerror(errno));
         }
-
-        return;
     }
 
     inline
@@ -1805,7 +1732,7 @@ namespace LibSerial
     SerialPort::Implementation::GetModemControlLine(const int modemLine)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1828,6 +1755,7 @@ namespace LibSerial
         // Use an ioctl() call to get the state of the line.
         int serial_port_state = 0;
         
+        // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
         if (ioctl(this->mFileDescriptor,
                   TIOCMGET,
                   &serial_port_state) < 0)
@@ -1835,7 +1763,7 @@ namespace LibSerial
             throw std::runtime_error(std::strerror(errno));
         }
 
-        return (serial_port_state & modemLine);
+        return (0 != (serial_port_state & modemLine)) ; // NOLINT(hicpp-signed-bitwise)
     }
 
     inline
@@ -1843,27 +1771,29 @@ namespace LibSerial
     SerialPort::Implementation::SetSerialPortBlockingStatus(const bool blockingStatus)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         int flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
         
-        if (blockingStatus == true)
+        if (blockingStatus)
         {
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg, hicpp-vararg)
             if (fcntl(this->mFileDescriptor, 
                       F_SETFL, 
-                      flags &~ O_NONBLOCK) < 0)
+                      flags &~ O_NONBLOCK) < 0) // NOLINT (hicpp-signed-bitwise)
             {
                 throw std::runtime_error(std::strerror(errno));
             }
         }
         else
         {
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg, hicpp-vararg)
             if (fcntl(this->mFileDescriptor, 
                       F_SETFL, 
-                      flags | O_NONBLOCK) < 0)
+                      flags | O_NONBLOCK) < 0) // NOLINT (hicpp-signed-bitwise)
             {
                 throw std::runtime_error(std::strerror(errno));
             }
@@ -1875,7 +1805,7 @@ namespace LibSerial
     SerialPort::Implementation::GetSerialPortBlockingStatus()
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -1888,7 +1818,8 @@ namespace LibSerial
         {
             throw std::runtime_error(std::strerror(errno));
         }
-        else if (flags == (flags | O_NONBLOCK))
+
+        if (flags == (flags | O_NONBLOCK)) // NOLINT (hicpp-signed-bitwise)
         {
             blocking_status = true;
         }
@@ -1901,13 +1832,13 @@ namespace LibSerial
     SerialPort::Implementation::SetDefaultLinuxSpecificModes()
     {
         // Make sure that the serial port is open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -1927,8 +1858,6 @@ namespace LibSerial
         {
             throw OpenFailed(std::strerror(errno));
         }
-
-        return;
     }
 
     inline
@@ -1936,13 +1865,13 @@ namespace LibSerial
     SerialPort::Implementation::SetDefaultInputModes()
     {
         // Make sure that the serial port is open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -1961,8 +1890,6 @@ namespace LibSerial
         {
             throw OpenFailed(std::strerror(errno));
         }
-
-        return;
     }
 
     inline
@@ -1970,13 +1897,13 @@ namespace LibSerial
     SerialPort::Implementation::SetDefaultOutputModes()
     {
         // Make sure that the serial port is open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -1994,8 +1921,6 @@ namespace LibSerial
         {
             throw OpenFailed(std::strerror(errno));
         }
-
-        return;
     }
 
     inline
@@ -2003,13 +1928,13 @@ namespace LibSerial
     SerialPort::Implementation::SetDefaultControlModes()
     {
         // Make sure that the serial port is open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -2019,7 +1944,7 @@ namespace LibSerial
         }
 
         // Enable the receiver (CREAD) and ignore modem control lines (CLOCAL).
-        port_settings.c_cflag |= CREAD | CLOCAL;
+        port_settings.c_cflag |= CREAD | CLOCAL; // NOLINT (hicpp-signed-bitwise)
 
         // Apply the modified settings.
         if (tcsetattr(this->mFileDescriptor,
@@ -2028,8 +1953,6 @@ namespace LibSerial
         {
             throw OpenFailed(std::strerror(errno));
         }
-
-        return;
     }
 
     inline
@@ -2037,13 +1960,13 @@ namespace LibSerial
     SerialPort::Implementation::SetDefaultLocalModes()
     {
         // Make sure that the serial port is open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
         // Get the current serial port settings.
-        termios port_settings;
+        termios port_settings {} ;
         std::memset(&port_settings, 0, sizeof(port_settings));
         
         if (tcgetattr(this->mFileDescriptor,
@@ -2061,8 +1984,6 @@ namespace LibSerial
         {
             throw OpenFailed(std::strerror(errno));
         }
-
-        return;
     }
 
     inline
@@ -2072,35 +1993,28 @@ namespace LibSerial
                                      const size_t msTimeout)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        if (numberOfBytes == 0 &&
-            msTimeout == 0)
+        if ((numberOfBytes == 0) and
+            (msTimeout == 0))
         {
             return;
         }
 
         // Local variables.
-        size_t elapsed_ms = 0;
         size_t number_of_bytes_read = 0;
-        size_t number_of_bytes_remaining = std::max((int)numberOfBytes, 1);
+        size_t number_of_bytes_remaining = std::max(numberOfBytes, 1UL);
         size_t maximum_number_of_bytes = dataBuffer.max_size();
         
-        ssize_t read_result = 0;
-
         // Clear the data buffer and reserve enough space in the buffer to store the incoming data.
         dataBuffer.clear();
         dataBuffer.resize(number_of_bytes_remaining);
 
-        std::chrono::high_resolution_clock::duration entry_time;
-        std::chrono::high_resolution_clock::duration current_time;
-        std::chrono::high_resolution_clock::duration elapsed_time;
-
         // Obtain the entry time.
-        entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
+        const auto entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
         while (number_of_bytes_remaining > 0)
         {
@@ -2116,9 +2030,9 @@ namespace LibSerial
                 dataBuffer.resize(number_of_bytes_read + 1);
             }
 
-            read_result = read(this->mFileDescriptor,
-                               &dataBuffer[number_of_bytes_read],
-                               number_of_bytes_remaining);
+            const auto read_result = read(this->mFileDescriptor,
+                                          &dataBuffer[number_of_bytes_read],
+                                          number_of_bytes_remaining);
 
             if (read_result > 0)
             {
@@ -2134,25 +2048,25 @@ namespace LibSerial
                     }
                 }
             }
-            else if (read_result <= 0 &&
-                     errno != EWOULDBLOCK)
+            else if ((read_result <= 0) and
+                     (errno != EWOULDBLOCK))
             {
                 throw std::runtime_error(std::strerror(errno));
             }
 
             // Obtain the current time.
-            current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
+            const auto current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
             // Calculate the time delta.
-            elapsed_time = current_time - entry_time;
+            const auto elapsed_time = current_time - entry_time;
 
             // Calculate the elapsed number of milliseconds.
-            elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
+            const auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
 
             // If more than msTimeout milliseconds have elapsed while
             // waiting for data, then we throw a ReadTimeout exception.
-            if (msTimeout > 0 &&
-                elapsed_ms > msTimeout)
+            if ((msTimeout > 0) and
+                (static_cast<size_t>(elapsed_ms) > msTimeout))
             {
                 // Resize the data buffer.
                 dataBuffer.resize(number_of_bytes_read);
@@ -2161,10 +2075,11 @@ namespace LibSerial
             }
             
             // Allow 100us for additional data to arrive.
+            //
+            // :TODO: Explain why 100us was hard-coded here?
+            //
             usleep(100);
         }
-
-        return;
     }
 
     inline
@@ -2174,35 +2089,28 @@ namespace LibSerial
                                      const size_t msTimeout)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        if (numberOfBytes == 0 &&
-            msTimeout == 0)
+        if ((numberOfBytes == 0) and
+            (msTimeout == 0))
         {
             return;
         }
 
         // Local variables.
-        size_t elapsed_ms = 0;
         size_t number_of_bytes_read = 0;
-        size_t number_of_bytes_remaining = std::max((int)numberOfBytes, 1);
+        size_t number_of_bytes_remaining = std::max(numberOfBytes, 1UL);
         size_t maximum_number_of_bytes = dataString.max_size();
         
-        ssize_t read_result = 0;
-
         // Clear the data buffer and reserve enough space in the buffer to store the incoming data.
         dataString.clear();
         dataString.resize(number_of_bytes_remaining);
 
-        std::chrono::high_resolution_clock::duration entry_time;
-        std::chrono::high_resolution_clock::duration current_time;
-        std::chrono::high_resolution_clock::duration elapsed_time;
-
         // Obtain the entry time.
-        entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
+        const auto entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
         while (number_of_bytes_remaining > 0)
         { 
@@ -2218,9 +2126,9 @@ namespace LibSerial
                 dataString.resize(number_of_bytes_read + 1);
             }
 
-            read_result = read(this->mFileDescriptor,
-                               &dataString[number_of_bytes_read],
-                               number_of_bytes_remaining);
+            const auto read_result = read(this->mFileDescriptor,
+                                          &dataString[number_of_bytes_read],
+                                          number_of_bytes_remaining);
 
             if (read_result > 0)
             {
@@ -2243,18 +2151,18 @@ namespace LibSerial
             }
 
             // Obtain the current time.
-            current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
+            const auto current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
             // Calculate the time delta.
-            elapsed_time = current_time - entry_time;
+            const auto elapsed_time = current_time - entry_time;
 
             // Calculate the elapsed number of milliseconds.
-            elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
+            const auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
 
             // If more than msTimeout milliseconds have elapsed while
             // waiting for data, then we throw a ReadTimeout exception.
-            if (msTimeout > 0 &&
-                elapsed_ms > msTimeout)
+            if ((msTimeout > 0) and
+                (static_cast<size_t>(elapsed_ms) > msTimeout))
             {
                 // Resize the data string.
                 dataString.resize(number_of_bytes_read);
@@ -2263,10 +2171,11 @@ namespace LibSerial
             }
 
             // Allow 100us for additional data to arrive.
+            //
+            // :TODO: Explain why 100us was hard-coded here
+            //
             usleep(100);
         }
-
-        return;
     }
 
     inline
@@ -2275,22 +2184,16 @@ namespace LibSerial
                                          const size_t msTimeout)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        size_t elapsed_ms = 0;
-        ssize_t read_result = 0;
-
-        std::chrono::high_resolution_clock::duration entry_time;
-        std::chrono::high_resolution_clock::duration current_time;
-        std::chrono::high_resolution_clock::duration elapsed_time;
-
         // Obtain the entry time.
-        entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
+        const auto entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
         // Loop until the number of bytes requested have been read or the timeout has elapsed.
+        ssize_t read_result = 0;
         while (read_result < 1)
         {
             read_result = read(this->mFileDescriptor,
@@ -2302,34 +2205,36 @@ namespace LibSerial
             {
                 break;
             }
-            else if (read_result <= 0 &&
-                     errno != EWOULDBLOCK)
+
+            if ((read_result <= 0) and
+                (errno != EWOULDBLOCK))
             {
                 throw std::runtime_error(std::strerror(errno));
             }
 
             // Obtain the current time.
-            current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
+            const auto current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
             // Calculate the time delta.
-            elapsed_time = current_time - entry_time;
+            const auto elapsed_time = current_time - entry_time;
 
             // Calculate the elapsed number of milliseconds.
-            elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
+            const auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
 
             // Throw a ReadTimeout exception if more than msTimeout milliseconds
             // have elapsed while waiting for data.
-            if (msTimeout > 0 &&
-                elapsed_ms > msTimeout)
+            if ((msTimeout > 0) and
+                (static_cast<size_t>(elapsed_ms) > msTimeout))
             {
                 throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
             }
 
             // Allow 100us for additional data to arrive.
+            //
+            // :TODO: Explain why 100us was hard-coded here
+            //
             usleep(100);
         }
-
-        return;
     }
 
     inline
@@ -2338,22 +2243,17 @@ namespace LibSerial
                                          const size_t   msTimeout)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
 
-        size_t elapsed_ms = 0;
-        ssize_t read_result = 0;
-
-        std::chrono::high_resolution_clock::duration entry_time;
-        std::chrono::high_resolution_clock::duration current_time;
-        std::chrono::high_resolution_clock::duration elapsed_time;
 
         // Obtain the entry time.
-        entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
+        const auto entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
         // Loop until the number of bytes requested have been read or the timeout has elapsed.
+        size_t read_result = 0 ;
         while (read_result < 1)
         {
             read_result = read(this->mFileDescriptor,
@@ -2365,34 +2265,36 @@ namespace LibSerial
             {
                 break;
             }
-            else if (read_result <= 0 &&
-                     errno != EWOULDBLOCK)
+
+            if ((read_result <= 0) and
+                (errno != EWOULDBLOCK))
             {
                 throw std::runtime_error(std::strerror(errno));
             }
 
             // Obtain the current time.
-            current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
+            const auto current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
             // Calculate the time delta.
-            elapsed_time = current_time - entry_time;
+            const auto elapsed_time = current_time - entry_time;
 
             // Calculate the elapsed number of milliseconds.
-            elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
+            const auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
 
             // Throw a ReadTimeout exception if more than msTimeout milliseconds
             // have elapsed while waiting for data.
-            if (msTimeout > 0 &&
-                elapsed_ms > msTimeout)
+            if ((msTimeout > 0) and
+                (static_cast<size_t>(elapsed_ms) > msTimeout))
             {
                 throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
             }
 
             // Allow 100us for additional data to arrive.
+            //
+            // :TODO: Explain why 100us was hard-coded here
+            //
             usleep(100);
         }
-
-        return;
     }
 
     inline
@@ -2402,7 +2304,7 @@ namespace LibSerial
                                          const size_t msTimeout)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -2449,8 +2351,6 @@ namespace LibSerial
 
             dataString += next_char;
         }
-        
-        return;
     }
 
     inline
@@ -2458,7 +2358,7 @@ namespace LibSerial
     SerialPort::Implementation::Write(const DataBuffer& dataBuffer)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -2508,7 +2408,7 @@ namespace LibSerial
     SerialPort::Implementation::Write(const std::string& dataString)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -2558,7 +2458,7 @@ namespace LibSerial
     SerialPort::Implementation::WriteByte(const char charBuffer)
     {
         // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -2577,14 +2477,13 @@ namespace LibSerial
             {
                 break;
             }
-            else if (write_result <= 0 &&
-                     errno != EWOULDBLOCK)
+
+            if ((write_result <= 0) and
+                (errno != EWOULDBLOCK))
             {
                 throw std::runtime_error(std::strerror(errno));
             }
         }
-
-        return;
     }
 
     inline
@@ -2592,7 +2491,7 @@ namespace LibSerial
     SerialPort::Implementation::WriteByte(const unsigned char charBuffer)
     {
                 // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
+        if (not this->IsOpen())
         {
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
         }
@@ -2611,13 +2510,12 @@ namespace LibSerial
             {
                 break;
             }
-            else if (write_result <= 0 &&
-                     errno != EWOULDBLOCK)
+
+            if ((write_result <= 0) and
+                (errno != EWOULDBLOCK))
             {
                 throw std::runtime_error(std::strerror(errno));
             }
         }
-
-        return;
     }
-}
+} // namespace LibSerial

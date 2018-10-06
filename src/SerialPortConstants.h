@@ -75,7 +75,7 @@ namespace LibSerial
     /**
      * @brief Type used to receive and return raw data to/from methods.
      */
-    using DataBuffer =  std::vector<unsigned char> ;
+    using DataBuffer =  std::vector<uint8_t> ;
 
 
     /**
