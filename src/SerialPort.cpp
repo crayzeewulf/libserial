@@ -2253,7 +2253,7 @@ namespace LibSerial
         const auto entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
         // Loop until the number of bytes requested have been read or the timeout has elapsed.
-        size_t read_result = 0 ;
+        ssize_t read_result = 0 ;
         while (read_result < 1)
         {
             read_result = read(this->mFileDescriptor,
