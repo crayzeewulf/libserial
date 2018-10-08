@@ -27,6 +27,7 @@
 #include <fcntl.h>
 #include <linux/serial.h>
 #include <sys/ioctl.h>
+#include <type_traits>
 #include <unistd.h>
 
 namespace LibSerial 
@@ -307,20 +308,10 @@ namespace LibSerial
          * @param charBuffer The character read from the serial port.
          * @param msTimeout The timeout period in milliseconds.
          */
-        void ReadByte(char&  charBuffer, 
+        template <typename ByteType,
+                  typename = std::enable_if_t<(sizeof(ByteType) == 1)>>
+        void ReadByte(ByteType&  charBuffer, 
                       size_t msTimeout = 0);
-
-        /**
-         * @brief Reads a single byte from the serial port.
-         *        If no data is available within the specified number
-         *        of milliseconds (msTimeout), then this method will
-         *        throw a ReadTimeout exception. If msTimeout is 0,
-         *        then this method will block until data is available.
-         * @param charBuffer The character read from the serial port.
-         * @param msTimeout The timeout period in milliseconds.
-         */
-        void ReadByte(unsigned char& charBuffer, 
-                      size_t         msTimeout = 0);
 
         /**
          * @brief Reads a line of characters from the serial port.
@@ -2178,11 +2169,18 @@ namespace LibSerial
         }
     }
 
+    template <typename ByteType, typename /* unused */>
     inline
-    void
-    SerialPort::Implementation::ReadByte(char&        charBuffer,
-                                         const size_t msTimeout)
+    void 
+    SerialPort::Implementation::ReadByte(ByteType&  charBuffer, 
+                                         const size_t msTimeout) 
     {
+        //
+        // Double check to make sure that ByteType is exactly one byte long.
+        //
+        static_assert(sizeof(ByteType) == 1, 
+                      "ByteType must have a size of exactly one byte.") ;
+
         // Throw an exception if the serial port is not open.
         if (not this->IsOpen())
         {
@@ -2192,76 +2190,17 @@ namespace LibSerial
         // Obtain the entry time.
         const auto entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
 
-        // Loop until the number of bytes requested have been read or the timeout has elapsed.
+        // Loop until the number of bytes requested have been read or the
+        // timeout has elapsed.
         ssize_t read_result = 0;
         while (read_result < 1)
         {
             read_result = read(this->mFileDescriptor,
                                &charBuffer,
-                               1);
+                               sizeof(ByteType));
             
             // If the byte has been successfully read, exit the loop and return.
-            if (read_result == 1)
-            {
-                break;
-            }
-
-            if ((read_result <= 0) and
-                (errno != EWOULDBLOCK))
-            {
-                throw std::runtime_error(std::strerror(errno));
-            }
-
-            // Obtain the current time.
-            const auto current_time = std::chrono::high_resolution_clock::now().time_since_epoch();
-
-            // Calculate the time delta.
-            const auto elapsed_time = current_time - entry_time;
-
-            // Calculate the elapsed number of milliseconds.
-            const auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
-
-            // Throw a ReadTimeout exception if more than msTimeout milliseconds
-            // have elapsed while waiting for data.
-            if ((msTimeout > 0) and
-                (static_cast<size_t>(elapsed_ms) > msTimeout))
-            {
-                throw ReadTimeout(ERR_MSG_READ_TIMEOUT);
-            }
-
-            // Allow 100us for additional data to arrive.
-            //
-            // :TODO: Explain why 100us was hard-coded here
-            //
-            usleep(100);
-        }
-    }
-
-    inline
-    void
-    SerialPort::Implementation::ReadByte(unsigned char& charBuffer,
-                                         const size_t   msTimeout)
-    {
-        // Throw an exception if the serial port is not open.
-        if (not this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-
-        // Obtain the entry time.
-        const auto entry_time = std::chrono::high_resolution_clock::now().time_since_epoch();
-
-        // Loop until the number of bytes requested have been read or the timeout has elapsed.
-        ssize_t read_result = 0 ;
-        while (read_result < 1)
-        {
-            read_result = read(this->mFileDescriptor,
-                               &charBuffer,
-                               1);
-            
-            // If the byte has been successfully read, exit the loop and return.
-            if (read_result == 1)
+            if (read_result == sizeof(ByteType))
             {
                 break;
             }
