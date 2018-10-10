@@ -22,6 +22,8 @@
 #include "SerialPortConstants.h"
 #include "SerialStream.h"
 
+#include <gtest/gtest.h>
+#include <mutex>
 
 /**
  * @brief Default Serial Port 1.
@@ -379,21 +381,6 @@ namespace LibSerial
          * @param C++11 thread std::mutex for locking parameters in the threaded unit tests.
          */
         std::mutex mutex;
-
-        /**
-         * @param Time since epoch at entry of a method.
-         */
-        size_t entryTime;
-
-        /**
-         * @param Current time since epoch during execution of a method.
-         */
-        size_t currentTime;
-
-        /**
-         * @param Time elapsed during execution of a method.
-         */
-        size_t elapsedTime;
 
         /**
          * @param Failure rate of serial communications being tracked in the threaded tests.

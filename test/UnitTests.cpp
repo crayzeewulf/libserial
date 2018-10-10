@@ -18,25 +18,19 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
  *****************************************************************************/
 
+#include "UnitTests.h"
 
 #include <chrono>
 #include <iostream>
-#include <gtest/gtest.h>
-#include <mutex>
 #include <thread>
 #include <unistd.h>
 #include <vector>
-
-#include "UnitTests.h"
 
 using namespace LibSerial;
 
 LibSerialTest::LibSerialTest()
     : numberOfTestIterations(10)
     , mutex{}
-    , entryTime(0)
-    , currentTime(0)
-    , elapsedTime(0)
     , failureRate(0)
     , loopCount(0)
     , timeOutMilliseconds(250)   // 250ms timeout
@@ -2005,21 +1999,19 @@ LibSerialTest::serialStream1ThreadLoop()
             
             if(readString2 != writeString2)
             {
-                mutex.lock();
+                std::lock_guard<std::mutex> lock {mutex} ;
+                // EXPECT_TRUE(false) << "Expected '" << writeString2 << "' but got '" << readString2 << "'." ;
                 failureRate++;
-                mutex.unlock();
             }
         }
 
         timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
 
-        mutex.lock();
+        std::lock_guard<std::mutex> lock {mutex} ;
         loopCount++;
-        mutex.unlock();
     }
 
     serialStream1.Close();
-    return;
 }
 
 void
@@ -2045,21 +2037,19 @@ LibSerialTest::serialStream2ThreadLoop()
 
             if(readString1 != writeString1)
             {
-                mutex.lock();
+                std::lock_guard<std::mutex> lock {mutex} ;
+                // EXPECT_TRUE(false) << "Expected '" << writeString1 << "' but got '" << readString1 << "'." ;
                 failureRate++;
-                mutex.unlock();
             }
         }
         
         timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
         
-        mutex.lock();
+        std::lock_guard<std::mutex> lock {mutex} ;
         loopCount++;
-        mutex.unlock();
     }
 
     serialStream2.Close();
-    return;
 }
 
 void
@@ -2069,7 +2059,7 @@ LibSerialTest::serialPort1ThreadLoop()
     serialPort1.SetBaudRate(BaudRate::BAUD_115200);
     serialPort1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
 
-    tcflush(serialPort1.GetFileDescriptor(), TCIOFLUSH);
+    serialPort1.FlushIOBuffers() ;
 
     size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
     size_t timeElapsedMilliSeconds = 0;
@@ -2088,9 +2078,8 @@ LibSerialTest::serialPort1ThreadLoop()
 
                 if(readString2 != writeString2 + '\n')
                 {
-                    mutex.lock();
+                    std::lock_guard<std::mutex> lock {mutex} ;
                     failureRate++;
-                    mutex.unlock();
                 }
             }
             catch(...)
@@ -2100,13 +2089,11 @@ LibSerialTest::serialPort1ThreadLoop()
 
         timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
 
-        mutex.lock();
+        std::lock_guard<std::mutex> lock {mutex} ;
         loopCount++;
-        mutex.unlock();
     }
 
     serialPort1.Close();
-    return;
 }
 
 void
@@ -2116,7 +2103,7 @@ LibSerialTest::serialPort2ThreadLoop()
     serialPort2.SetBaudRate(BaudRate::BAUD_115200);
     serialPort2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
 
-    tcflush(serialPort1.GetFileDescriptor(), TCIOFLUSH);
+    serialPort2.FlushIOBuffers() ;
 
     size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
     size_t timeElapsedMilliSeconds = 0;
@@ -2134,9 +2121,8 @@ LibSerialTest::serialPort2ThreadLoop()
 
                 if(readString1 != writeString1 + '\n')
                 {
-                    mutex.lock();
+                    std::lock_guard<std::mutex> lock {mutex} ;
                     failureRate++;
-                    mutex.unlock();
                 }
             }
             catch(...)
@@ -2146,13 +2132,11 @@ LibSerialTest::serialPort2ThreadLoop()
 
         timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
 
-        mutex.lock();
+        std::lock_guard<std::mutex> lock {mutex} ;
         loopCount++;
-        mutex.unlock();
     }
 
     serialPort2.Close();
-    return;
 }
 
 void
