@@ -7,7 +7,7 @@ After you get to know LibSerial a bit, if you find that you have ideas for impro
 
 If you simply want to use LibSerial and you already utilize a Debian Linux distribution, use apt to install the current release package:
 
-```
+```sh
 sudo apt install libserial-dev
 ```
 
@@ -18,7 +18,7 @@ Example code to demonstrate how to use the library can be found in the [`example
 If you are a developer and would like to make use of the latest code, you will need to have a few packages installed to build LibSerial:
 	a recent g++ release, (anything after gcc-3.2 should work), the python sip library, the boost unit test library, and Google Test (gtest).  For Debian users:
 
-```
+```sh
 sudo apt update
 sudo apt install autogen autoconf build-essential cmake graphviz libboost-dev libgtest-dev libtool python-sip-dev doxygen
 ```
@@ -26,60 +26,60 @@ sudo apt install autogen autoconf build-essential cmake graphviz libboost-dev li
 If you get the source code from github and would like to install the library, there are a few steps you will need to accomplish:
 
 First, compile the GTest library object files and copy libgtest.a and libgtest_main.a into your /usr/lib/ directory:
-```
-cd /usr/src/gtest
-sudo cmake CMakeLists.txt
-sudo make
+```sh
+mkdir build-gtest
+cd build-gtest
+cmake /usr/src/gtest/CMakeLists.txt
+make
 sudo cp *.a /usr/lib
 ```
 
 Next, generate the configure script:
 
-```
+```sh
 make -f Makefile.dist
 ```
 
 ----
 Then execute the `configure` script:
 
-```
+```sh
 ./configure 
 ```
 
 You can specify an installation directory different from the default, (/usr/local/), by adding `--prefix=/installation/directory/path/` to the configure command.  For example:
-```
+```sh
 ./configure --prefix=/usr/include/
 ```
 
 Once you have executed the `configure` script, you can build the library with `make` and install with `make install`:
 
-```
+```sh
 make
 sudo make install
 ```
 
 ----
-If you are interested in running the unit tests, ensure serial port names are appropriate for your hardware configuration in the UnitTests.cpp file:
+If you are interested in running the unit tests, ensure serial port names are appropriate for your hardware configuration in the `test/UnitTests.cpp` file:
 
-```
+```cpp
 #define TEST_SERIAL_PORT_1 "/dev/ttyUSB0"
 #define TEST_SERIAL_PORT_2 "/dev/ttyUSB1"
 ```
 
 The unit tests will be built during the make step above or you can build them by simply by running the compile script (which uses cmake):
 
-```
+```sh
 ./compile.sh
 ```
 
-Unit test executables built using make can be run from the libserial/test/ directory:
-```
-./test/UnitTests
-./unit_tests
+Unit test executables built using make can be run from the `build` directory using the command:
+```sh
+ctest -V .
 ```
 
 Alternatively, unit test executables built using the compile script can be run from the libserial/build/bin/ directory: 
-```
+```sh
 ./build/bin/UnitTests
 ./build/bin/unit_tests
 ```
