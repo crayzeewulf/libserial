@@ -20,6 +20,7 @@
  *****************************************************************************/
 
 #include "SerialStreamBuf.h"
+#include "SerialPort.h"
 
 #include <cassert>
 #include <cstring>
@@ -41,6 +42,7 @@ namespace LibSerial
         Implementation(Implementation&&) = delete;
         Implementation& operator=(const Implementation&) = delete;
         Implementation& operator=(Implementation&&) = delete;
+        ~Implementation() = default ;
 
         /**
          * @brief Constructor that allows a SerialStreamBuf instance to be
@@ -60,12 +62,6 @@ namespace LibSerial
                        const FlowControl&   flowControlType,
                        const Parity&        parityType,
                        const StopBits&      stopBits);
-
-        /**
-         * @brief Default Destructor for a SerialStreamBuf object. Closes the
-         *        serial port associated with mFileDescriptor if open.
-         */
-        ~Implementation();
 
         /**
          * @brief Opens the serial port associated with the specified
@@ -106,13 +102,13 @@ namespace LibSerial
         /**
          * @brief Determines if data is available at the serial port.
          */
-        bool IsDataAvailable();
+        bool IsDataAvailable() ;
 
         /**
          * @brief Determines if the serial port is open for I/O.
          * @return Returns true iff the serial port is open.
          */
-        bool IsOpen();
+        bool IsOpen() const;
 
         /**
          * @brief Sets all serial port paramters to their default values.
@@ -129,7 +125,7 @@ namespace LibSerial
          * @brief Gets the current baud rate for the serial port.
          * @return Returns the baud rate.
          */
-        BaudRate GetBaudRate();
+        BaudRate GetBaudRate() const;
 
         /**
          * @brief Sets the character size for the serial port.
@@ -141,7 +137,7 @@ namespace LibSerial
          * @brief Gets the character size being used for serial communication.
          * @return Returns the current character size.
          */
-        CharacterSize GetCharacterSize();
+        CharacterSize GetCharacterSize() const;
 
         /**
          * @brief Sets flow control for the serial port.
@@ -153,7 +149,7 @@ namespace LibSerial
          * @brief Get the current flow control setting.
          * @return Returns the flow control type of the serial port.
          */
-        FlowControl GetFlowControl();
+        FlowControl GetFlowControl() const;
 
         /**
          * @brief Sets the parity type for the serial port.
@@ -165,7 +161,7 @@ namespace LibSerial
          * @brief Gets the parity type for the serial port.
          * @return Returns the parity type.
          */
-        Parity GetParity();
+        Parity GetParity() const;
 
         /**
          * @brief Sets the number of stop bits to be used with the serial port.
@@ -177,7 +173,7 @@ namespace LibSerial
          * @brief Gets the number of stop bits currently being used by the serial
          * @return Returns the number of stop bits.
          */
-        StopBits GetStopBits();
+        StopBits GetStopBits() const;
 
         /**
          * @brief Sets the minimum number of characters for non-canonical reads.
@@ -190,7 +186,7 @@ namespace LibSerial
          *        minimum number of characters for non-canonical reads.
          * @return Returns the minimum number of characters for non-canonical reads.
          */
-        short GetVMin();
+        short GetVMin() const;
 
         /**
          * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
@@ -202,7 +198,7 @@ namespace LibSerial
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
          */
-        short GetVTime();
+        short GetVTime() const;
 
         /**
          * @brief Sets the serial port DTR line status.
@@ -214,7 +210,7 @@ namespace LibSerial
          * @brief Gets the serial port DTR line status.
          * @return Returns true iff the status of the DTR line is high.
          */
-        bool GetDTR();
+        bool GetDTR() const;
 
         /**
          * @brief Sets the serial port RTS line status.
@@ -226,38 +222,38 @@ namespace LibSerial
          * @brief Gets the serial port RTS line status.
          * @return Returns true iff the status of the RTS line is high.
          */
-        bool GetRTS();
+        bool GetRTS() const;
 
         /**
          * @brief Gets the serial port CTS line status.
          * @return Returns true iff the status of the CTS line is high.
          */
-        bool GetCTS();
+        bool GetCTS() ;
 
         /**
          * @brief Gets the serial port DSR line status.
          * @return Returns true iff the status of the DSR line is high.
          */
-        bool GetDSR();
+        bool GetDSR() ;
 
         /**
          * @brief Gets the serial port file descriptor.
          * @return Returns the serial port file descriptor.
          */
-        int GetFileDescriptor();
+        int GetFileDescriptor() const;
 
         /**
          * @brief Gets the number of bytes available in the read buffer.
          * @return Returns the number of bytes avilable in the read buffer.
          */
-        int GetNumberOfBytesAvailable();
+        int GetNumberOfBytesAvailable() ;
 
         /**
          * @brief Gets a list of available serial ports.
          * @return Returns a std::vector of std::strings with the name of
          *         each available serial port.
          */
-        std::vector<std::string> GetAvailableSerialPorts();
+        std::vector<std::string> GetAvailableSerialPorts() const;
 
         /**
          * @brief Writes up to n characters from the character sequence at
@@ -339,76 +335,10 @@ namespace LibSerial
          */
         char mPutbackChar {0} ;
     private:
-
         /**
-         * @brief Set the specified modem control line to the specified value.
-         * @param modemLine One of the following four values: TIOCM_DTR,
-         *        TIOCM_RTS, TIOCM_CTS, or TIOCM_DSR.
-         * @param lineState State of the modem line after successful
-         *        call to this method.
+         * SerialPort device that will be used for communication.
          */
-        void SetModemControlLine(int modemLine,
-                                 bool lineState);
-
-        /**
-         * @brief Get the current state of the specified modem control line.
-         * @param modemLine One of the following four values: TIOCM_DTR,
-         *        TIOCM_RTS, TIOCM_CTS, or TIOCM_DSR.
-         * @return True if the specified line is currently set and false
-         *         otherwise.
-         */
-        bool GetModemControlLine(int modemLine);
-
-        /**
-         * @brief Sets the current state of the serial port blocking status.
-         * @param blockingStatus The serial port blocking status to be set,
-         *        true if to be set blocking, false if to be set non-blocking.
-         */
-        void SetSerialPortBlockingStatus(bool blockingStatus);
-
-        /**
-         * @brief Gets the current state of the serial port blocking status.
-         * @return True if port is blocking, false if port non-blocking.
-         */
-        bool GetSerialPortBlockingStatus();
-
-        /**
-         * @brief Sets the default Linux specific line discipline modes.
-         */
-        void SetDefaultLinuxSpecificModes();
-
-        /**
-         * @brief Sets the default serial port input modes.
-         */
-        void SetDefaultInputModes();
-
-        /**
-         * @brief Sets the default serial port output modes.
-         */
-        void SetDefaultOutputModes();
-
-        /**
-         * @brief Sets the default serial port control modes.
-         */
-        void SetDefaultControlModes();
-
-        /**
-         * @brief Sets the default serial port local modes.
-         */
-        void SetDefaultLocalModes();
-
-
-        /**
-         * @brief The file descriptor corresponding to the serial port.
-         */
-        int mFileDescriptor {-1};
-
-        /**
-         * @brief Serial port settings are saved into this variable immediately
-         *        after the port is opened. These settings are restored when the
-         *        serial port is closed.
-         */
-        termios mOldPortSettings {};
+        SerialPort mSerialPort {} ;
     };
 
     SerialStreamBuf::SerialStreamBuf()
@@ -487,7 +417,7 @@ namespace LibSerial
     }
 
     bool
-    SerialStreamBuf::IsOpen()
+    SerialStreamBuf::IsOpen() const
     {
         return mImpl->IsOpen();
     }
@@ -505,7 +435,7 @@ namespace LibSerial
     }
 
     BaudRate
-    SerialStreamBuf::GetBaudRate()
+    SerialStreamBuf::GetBaudRate() const
     {
         return mImpl->GetBaudRate();
     }
@@ -517,7 +447,7 @@ namespace LibSerial
     }
 
     CharacterSize
-    SerialStreamBuf::GetCharacterSize()
+    SerialStreamBuf::GetCharacterSize() const
     {
         return mImpl->GetCharacterSize();
     }
@@ -529,7 +459,7 @@ namespace LibSerial
     }
 
     FlowControl
-    SerialStreamBuf::GetFlowControl()
+    SerialStreamBuf::GetFlowControl() const
     {
         return mImpl->GetFlowControl();
     }
@@ -541,7 +471,7 @@ namespace LibSerial
     }
 
     Parity
-    SerialStreamBuf::GetParity()
+    SerialStreamBuf::GetParity() const
     {
         return mImpl->GetParity();
     }
@@ -553,7 +483,7 @@ namespace LibSerial
     }
 
     StopBits
-    SerialStreamBuf::GetStopBits()
+    SerialStreamBuf::GetStopBits() const
     {
         return mImpl->GetStopBits();
     }
@@ -565,7 +495,7 @@ namespace LibSerial
     }
 
     short
-    SerialStreamBuf::GetVMin()
+    SerialStreamBuf::GetVMin() const
     {
         return mImpl->GetVMin();
     }
@@ -577,7 +507,7 @@ namespace LibSerial
     }
 
     short
-    SerialStreamBuf::GetVTime()
+    SerialStreamBuf::GetVTime() const
     {
         return mImpl->GetVTime();
     }
@@ -589,7 +519,7 @@ namespace LibSerial
     }
 
     bool
-    SerialStreamBuf::GetDTR()
+    SerialStreamBuf::GetDTR() const
     {
         return mImpl->GetDTR();
     }
@@ -601,7 +531,7 @@ namespace LibSerial
     }
 
     bool
-    SerialStreamBuf::GetRTS()
+    SerialStreamBuf::GetRTS() const
     {
         return mImpl->GetRTS();
     }
@@ -619,7 +549,7 @@ namespace LibSerial
     }
 
     int
-    SerialStreamBuf::GetFileDescriptor()
+    SerialStreamBuf::GetFileDescriptor() const
     {
         return mImpl->GetFileDescriptor();
     }
@@ -631,7 +561,7 @@ namespace LibSerial
     }
 
     std::vector<std::string>
-    SerialStreamBuf::GetAvailableSerialPorts()
+    SerialStreamBuf::GetAvailableSerialPorts() const
     {
         return mImpl->GetAvailableSerialPorts();
     }
@@ -693,23 +623,16 @@ namespace LibSerial
                                                     const FlowControl&   flowControlType,
                                                     const Parity&        parityType,
                                                     const StopBits&      stopBits)
+    try : mSerialPort(fileName,
+                      baudRate, 
+                      characterSize,
+                      flowControlType,
+                      parityType,
+                      stopBits)
     {
-        this->Open(fileName, std::ios_base::in | std::ios_base::out);
-        this->SetBaudRate(baudRate);
-        this->SetCharacterSize(characterSize);
-        this->SetFlowControl(flowControlType);
-        this->SetParity(parityType);
-        this->SetStopBits(stopBits);
-    }
-
-    inline
-    SerialStreamBuf::Implementation::~Implementation()
-    {
-        // Close the serial port if it is open.
-        if (this->IsOpen())
-        {
-            this->Close();
-        }
+        //  empty
+    } catch(const std::exception& err) {
+        throw OpenFailed(err.what()) ;
     }
 
     inline
@@ -717,80 +640,16 @@ namespace LibSerial
     SerialStreamBuf::Implementation::Open(const std::string& fileName,
                                           const std::ios_base::openmode& openMode)
     try {
-        // Throw an exception if the port is already open.
-        if (this->IsOpen())
-        {
-            throw AlreadyOpen(ERR_MSG_PORT_ALREADY_OPEN);
-        }
-
-        // We only allow three different combinations of ios_base::openmode so we can
-        // use a switch here to construct the flags to be used with the open() system call.
-        // Since we are dealing with the serial port we need to use the O_NOCTTY option.
-        int flags = (O_NOCTTY | O_NONBLOCK);
-
-        if (openMode == (std::ios_base::in | std::ios_base::out))
-        {
-            flags |= O_RDWR;
-        }
-        else if (openMode == std::ios_base::in)
-        {
-            flags |= O_RDONLY;
-        }
-        else if (openMode == std::ios_base::out)
-        {
-            flags |= O_WRONLY;
-        }
-        else
-        {
-            throw OpenFailed("Invalid or unsupported open mode.") ;
-            return;
-        }
-
-        // Try to open the serial port.
-        // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-        mFileDescriptor = open(fileName.c_str(), flags);
-
-        if (this->mFileDescriptor < 0)
-        {
-            throw OpenFailed(std::strerror(errno));
-        }
-
-        // Set the serial port to exclusive access to this process.
-        // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-        if (ioctl(this->mFileDescriptor, TIOCEXCL) == -1)
-        {
-            throw OpenFailed(std::strerror(errno));
-        }
-
-        // Save the current settings of the serial port so they can be
-        // restored when the serial port is closed.
-        if (tcgetattr(this->mFileDescriptor,
-                      &mOldPortSettings) < 0)
-        {
-            throw OpenFailed(std::strerror(errno));
-        }
-
-        // Set up the default configuration for the serial port.
-        this->SetDefaultSerialPortParameters();
-
-        // Flush the input and output buffers associated with the port.
-        this->FlushIOBuffers();
+        mSerialPort.Open(fileName, 
+                         openMode) ;
 
         // @note - Stream communications need to happen in blocking mode.
-        this->SetSerialPortBlockingStatus(true);
+        mSerialPort.SetSerialPortBlockingStatus(true);
     } catch(const AlreadyOpen&) {
         throw ;
     } catch(const OpenFailed&) {
-        if (mFileDescriptor >= 0) {
-            close(mFileDescriptor) ;
-            mFileDescriptor = -1 ;
-        }
         throw ;
     } catch(const std::exception& err) {
-        if (mFileDescriptor >= 0) {
-            close(mFileDescriptor) ;
-            mFileDescriptor = -1 ;
-        }
         throw OpenFailed(err.what()) ;
     }
 
@@ -798,1171 +657,217 @@ namespace LibSerial
     void
     SerialStreamBuf::Implementation::Close()
     {
-        // Throw an exception if the serial port is not open.
-        if (not this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Restore the old settings of the port.
-        assert(mFileDescriptor >= 0) ;
-        if (tcsetattr(this->mFileDescriptor,
-                      TCSANOW,
-                      &mOldPortSettings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        // Otherwise, close the serial port and set the file descriptor
-        // to an invalid value.
-        assert(mFileDescriptor >= 0) ;
-        if (close(this->mFileDescriptor) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        // Set the file descriptor to an invalid value, -1.
-        mFileDescriptor = -1;
+        mSerialPort.Close() ;
     }
 
     inline
     void
     SerialStreamBuf::Implementation::DrainWriteBuffer()
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        if (tcdrain(this->mFileDescriptor) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
+        mSerialPort.DrainWriteBuffer() ;
     }
 
     inline
     void
     SerialStreamBuf::Implementation::FlushInputBuffer()
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        if (tcflush(this->mFileDescriptor, TCIFLUSH) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
+        mSerialPort.FlushInputBuffer() ;
     }
 
     inline
     void
     SerialStreamBuf::Implementation::FlushOutputBuffer()
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        if (tcflush(this->mFileDescriptor, TCOFLUSH) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
+        mSerialPort.FlushOutputBuffer() ;
     }
 
     inline
     void
     SerialStreamBuf::Implementation::FlushIOBuffers()
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        if (tcflush(this->mFileDescriptor, TCIOFLUSH) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
+        mSerialPort.FlushIOBuffers() ;
     }
 
     inline
     bool
-    SerialStreamBuf::Implementation::IsOpen()
+    SerialStreamBuf::Implementation::IsOpen() const
     {
-        return (this->mFileDescriptor != -1);
+        return mSerialPort.IsOpen() ;
     }
 
     inline
     bool
-    SerialStreamBuf::Implementation::IsDataAvailable()
+    SerialStreamBuf::Implementation::IsDataAvailable() 
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        int number_of_bytes_available = 0;
-        bool dataAvailableStatus = false;
-
-        // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-        const auto result = ioctl(this->mFileDescriptor,
-                                  FIONREAD,
-                                  &number_of_bytes_available);
-
-        if (result >= 0 &&
-            number_of_bytes_available > 0)
-        {
-            dataAvailableStatus = true;
-        }
-
-        return dataAvailableStatus;
+        return mSerialPort.IsDataAvailable() ;
     }
 
     inline
     void
     SerialStreamBuf::Implementation::SetDefaultSerialPortParameters()
     {
-        // Make sure that the serial port is open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        #ifdef __linux__
-            SetDefaultLinuxSpecificModes();
-        #endif
-
-        SetDefaultInputModes();
-        SetDefaultOutputModes();
-        SetDefaultControlModes();
-        SetDefaultLocalModes();
-
-        SetBaudRate(BaudRate::BAUD_DEFAULT);
-        SetCharacterSize(CharacterSize::CHAR_SIZE_DEFAULT);
-        SetFlowControl(FlowControl::FLOW_CONTROL_DEFAULT);
-        SetParity(Parity::PARITY_DEFAULT);
-        SetStopBits(StopBits::STOP_BITS_DEFAULT);
-        SetVMin(VMIN_DEFAULT);
-        SetVTime(VTIME_DEFAULT);
+        mSerialPort.SetDefaultSerialPortParameters() ;
     }
 
     inline
     void
     SerialStreamBuf::Implementation::SetBaudRate(const BaudRate& baudRate)
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {} ;
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        // Set the baud rate for both input and output.
-        if (0 != cfsetspeed(&port_settings, static_cast<speed_t>(baudRate)))
-        {
-            // If applying the baud rate settings fail, throw an exception.
-            throw std::runtime_error(ERR_MSG_INVALID_BAUD_RATE);
-        }
-
-        // Apply the modified settings.
-        if (tcsetattr(this->mFileDescriptor,
-                      TCSANOW,
-                      &port_settings) < 0)
-        {
-            // If applying the settings fails, throw an exception.
-            throw std::runtime_error(std::strerror(errno));
-        }
+        mSerialPort.SetBaudRate(baudRate) ;
     }
 
     inline
     BaudRate
-    SerialStreamBuf::Implementation::GetBaudRate()
+    SerialStreamBuf::Implementation::GetBaudRate() const
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {} ;
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        // Read the input and output baud rates.
-        speed_t input_baud = cfgetispeed(&port_settings);
-        speed_t output_baud = cfgetospeed(&port_settings);
-
-        // Make sure that the input and output baud rates are
-        // equal. Otherwise, we do not know which one to return.
-        if (input_baud != output_baud)
-        {
-            throw std::runtime_error(ERR_MSG_INVALID_BAUD_RATE);
-            return BaudRate::BAUD_INVALID;
-        }
-
-        // Obtain the input baud rate from the current settings.
-        return BaudRate(input_baud);
+        return mSerialPort.GetBaudRate() ;
     }
 
     inline
     void
     SerialStreamBuf::Implementation::SetCharacterSize(const CharacterSize& characterSize)
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {} ;
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(ERR_MSG_INVALID_CHARACTER_SIZE);
-        }
-
-        // Set the character size to the specified value. If the character
-        // size is not 8 then it is also important to set ISTRIP. Setting
-        // ISTRIP causes all but the 7 low-order bits to be set to
-        // zero. Otherwise they are set to unspecified values and may
-        // cause problems. At the same time, we should clear the ISTRIP
-        // flag when the character size is 8 otherwise the MSB will always
-        // be set to zero (ISTRIP does not check the character size
-        // setting; it just sets every bit above the low 7 bits to zero).
-        if (characterSize == CharacterSize::CHAR_SIZE_8)
-        {
-            // NOLINTNEXTLINE (hicpp-signed-bitwise)
-            port_settings.c_iflag &= ~ISTRIP; // Clear the ISTRIP flag.
-        }
-        else
-        {
-            port_settings.c_iflag |= ISTRIP;  // Set the ISTRIP flag.
-        }
-
-        // Set the character size.
-        // NOLINTNEXTLINE (hicpp-signed-bitwise)
-        port_settings.c_cflag &= ~CSIZE;                               // Clear all CSIZE bits.
-        port_settings.c_cflag |= static_cast<tcflag_t>(characterSize); // Set the character size.
-
-        // Apply the modified settings.
-        if (tcsetattr(this->mFileDescriptor,
-                      TCSANOW,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
+        mSerialPort.SetCharacterSize(characterSize) ;
     }
 
     inline
     CharacterSize
-    SerialStreamBuf::Implementation::GetCharacterSize()
+    SerialStreamBuf::Implementation::GetCharacterSize() const
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {};
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        // Read the character size from the setttings.
-        // NOLINTNEXTLINE (hicpp-signed-bitwise)
-        return CharacterSize(port_settings.c_cflag & CSIZE);
+        return mSerialPort.GetCharacterSize() ;
     }
 
     inline
     void
     SerialStreamBuf::Implementation::SetFlowControl(const FlowControl& flowControlType)
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Flush the input and output buffers associated with the port.
-        if (tcflush(this->mFileDescriptor,
-                    TCIOFLUSH) < 0)
-        {
-            throw OpenFailed(std::strerror(errno));
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {};
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(ERR_MSG_INVALID_FLOW_CONTROL);
-        }
-
-        // Set the flow control. Hardware flow control uses the RTS (Ready
-        // To Send) and CTS (clear to Send) lines. Software flow control
-        // uses IXON|IXOFF
-        switch(flowControlType)
-        {
-        case FlowControl::FLOW_CONTROL_HARDWARE:
-            // NOLINTNEXTLINE (hicpp-signed-bitwise)
-            port_settings.c_iflag &= ~ (IXON|IXOFF);
-            port_settings.c_cflag |= CRTSCTS;
-            port_settings.c_cc[VSTART] = _POSIX_VDISABLE;
-            port_settings.c_cc[VSTOP] = _POSIX_VDISABLE;
-            break;
-        case FlowControl::FLOW_CONTROL_SOFTWARE:
-            // NOLINTNEXTLINE (hicpp-signed-bitwise)
-            port_settings.c_iflag |= IXON|IXOFF;
-            port_settings.c_cflag &= ~CRTSCTS;
-            port_settings.c_cc[VSTART] = CTRL_Q; // 0x11 (021) ^q
-            port_settings.c_cc[VSTOP]  = CTRL_S; // 0x13 (023) ^s
-            break;
-        case FlowControl::FLOW_CONTROL_NONE:
-            // NOLINTNEXTLINE (hicpp-signed-bitwise)
-            port_settings.c_iflag &= ~(IXON|IXOFF);
-            port_settings.c_cflag &= ~CRTSCTS;
-            break;
-        default:
-            throw std::invalid_argument(ERR_MSG_INVALID_FLOW_CONTROL);
-            break;
-        }
-
-        // Apply the modified settings.
-        if (tcsetattr(this->mFileDescriptor,
-                      TCSANOW,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
+        mSerialPort.SetFlowControl(flowControlType) ;
     }
 
     inline
     FlowControl
-    SerialStreamBuf::Implementation::GetFlowControl()
+    SerialStreamBuf::Implementation::GetFlowControl() const
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {};
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        // Check if IXON and IXOFF are set in c_iflag. If both are set and
-        // VSTART and VSTOP are set to 0x11 (^Q) and 0x13 (^S) respectively,
-        // then we are using software flow control.
-        if (port_settings.c_iflag & IXON &&  // NOLINT (hicpp-signed-bitwise)
-            port_settings.c_iflag & IXOFF && // NOLINT (hicpp-signed-bitwise)
-            CTRL_Q == port_settings.c_cc[VSTART] &&
-            CTRL_S == port_settings.c_cc[VSTOP])
-        {
-            return FlowControl::FLOW_CONTROL_SOFTWARE;
-        }
-        else if (!(port_settings.c_iflag & IXON ||  // NOLINT (hicpp-signed-bitwise)
-                   port_settings.c_iflag & IXOFF))  // NOLINT (hicpp-signed-bitwise)
-        {
-            if (0 != (port_settings.c_cflag & CRTSCTS))
-            {
-                // If neither IXON or IXOFF is set then we must have hardware flow
-                // control.
-                return FlowControl::FLOW_CONTROL_HARDWARE;
-            }
-            return FlowControl::FLOW_CONTROL_NONE;
-        }
-
-        // If none of the above conditions are satisfied then the serial port
-        // is using a flow control setup which we do not support at present.
-        return FlowControl::FLOW_CONTROL_INVALID;
+        return mSerialPort.GetFlowControl() ;
     }
 
     inline
     void
     SerialStreamBuf::Implementation::SetParity(const Parity& parityType)
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {};
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        // Set the parity type
-        switch(parityType)
-        {
-        case Parity::PARITY_EVEN:
-            port_settings.c_cflag |= PARENB;
-            // NOLINTNEXTLINE (hicpp-signed-bitwise)
-            port_settings.c_cflag &= ~PARODD;
-            port_settings.c_iflag |= INPCK;
-            break;
-        case Parity::PARITY_ODD:
-            port_settings.c_cflag |= PARENB;
-            port_settings.c_cflag |= PARODD;
-            port_settings.c_iflag |= INPCK;
-            break;
-        case Parity::PARITY_NONE:
-            // NOLINTNEXTLINE (hicpp-signed-bitwise)
-            port_settings.c_cflag &= ~PARENB;
-            port_settings.c_iflag |= IGNPAR;
-            break;
-        default:
-            throw std::invalid_argument(ERR_MSG_INVALID_PARITY);
-            break;
-        }
-
-        // Apply the modified port settings.
-        if (tcsetattr(this->mFileDescriptor,
-                      TCSANOW,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
+        mSerialPort.SetParity(parityType) ;
     }
 
     inline
     Parity
-    SerialStreamBuf::Implementation::GetParity()
+    SerialStreamBuf::Implementation::GetParity() const
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {};
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        // Get the parity setting from the termios structure.
-        // NOLINTNEXTLINE (hicpp-signed-bitwise)
-        if (port_settings.c_cflag & PARENB)
-        {
-            // parity is enabled.
-            // NOLINTNEXTLINE (hicpp-signed-bitwise)
-            if (port_settings.c_cflag & PARODD)
-            {
-                return Parity::PARITY_ODD; // odd parity
-            }
-            return Parity::PARITY_EVEN; // even parity
-        }
-        return Parity::PARITY_NONE; // no parity.
+        return mSerialPort.GetParity() ;
     }
 
     inline
     void
     SerialStreamBuf::Implementation::SetStopBits(const StopBits& stopBits)
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {} ;
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        // Set the number of stop bits.
-        switch(stopBits)
-        {
-        case StopBits::STOP_BITS_1:
-            // NOLINTNEXTLINE (hicpp-signed-bitwise)
-            port_settings.c_cflag &= ~CSTOPB;
-            break;
-        case StopBits::STOP_BITS_2:
-            port_settings.c_cflag |= CSTOPB;
-            break;
-        default:
-            throw std::invalid_argument(ERR_MSG_INVALID_STOP_BITS);
-            break;
-        }
-
-        // Apply the modified settings.
-        if (tcsetattr(this->mFileDescriptor,
-                      TCSANOW,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
+        mSerialPort.SetStopBits(stopBits) ;
     }
 
     inline
     StopBits
-    SerialStreamBuf::Implementation::GetStopBits()
+    SerialStreamBuf::Implementation::GetStopBits() const
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {};
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        // If CSTOPB is set then we are using two stop bits, otherwise we
-        // are using 1 stop bit.
-        // NOLINTNEXTLINE (hicpp-signed-bitwise)
-        if (port_settings.c_cflag & CSTOPB)
-        {
-            return StopBits::STOP_BITS_2;
-        }
-        return StopBits::STOP_BITS_1;
+        return mSerialPort.GetStopBits() ;
     }
 
     inline
     void
     SerialStreamBuf::Implementation::SetVMin(const short vmin)
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        if (vmin < 0 || vmin > 255)
-        {
-            throw std::invalid_argument(std::strerror(errno));
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {};
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        port_settings.c_cc[VMIN] = static_cast<cc_t>(vmin) ;
-
-        // Apply the modified settings.
-        if (tcsetattr(this->mFileDescriptor,
-                      TCSANOW,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
+        mSerialPort.SetVMin(vmin) ;
     }
 
     inline
     short
-    SerialStreamBuf::Implementation::GetVMin()
+    SerialStreamBuf::Implementation::GetVMin() const
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {};
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        return port_settings.c_cc[VMIN];
+        return mSerialPort.GetVMin() ;
     }
 
     inline
     void
     SerialStreamBuf::Implementation::SetVTime(const short vtime)
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        if (vtime < 0 || vtime > 255)
-        {
-            throw std::invalid_argument(std::strerror(errno));
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {};
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        port_settings.c_cc[VTIME] = static_cast<cc_t>(vtime) ;
-
-        // Apply the modified settings.
-        if (tcsetattr(this->mFileDescriptor,
-                      TCSANOW,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
+        mSerialPort.SetVTime(vtime) ;
     }
 
     inline
     short
-    SerialStreamBuf::Implementation::GetVTime()
+    SerialStreamBuf::Implementation::GetVTime() const
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {};
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        return port_settings.c_cc[VTIME];
+        return mSerialPort.GetVTime() ;
     }
 
     inline
     void
     SerialStreamBuf::Implementation::SetDTR(const bool dtrState)
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        this->SetModemControlLine(TIOCM_DTR,
-                                   dtrState);
+        mSerialPort.SetDTR(dtrState) ;
     }
 
     inline
     bool
-    SerialStreamBuf::Implementation::GetDTR()
+    SerialStreamBuf::Implementation::GetDTR() const
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        return this->GetModemControlLine(TIOCM_DTR);
+        return mSerialPort.GetDTR() ;
     }
 
     inline
     void
     SerialStreamBuf::Implementation::SetRTS(const bool rtsState)
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        this->SetModemControlLine(TIOCM_RTS,
-                                  rtsState);
+        mSerialPort.SetRTS(rtsState) ;
     }
 
     inline
     bool
-    SerialStreamBuf::Implementation::GetRTS()
+    SerialStreamBuf::Implementation::GetRTS() const
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        return this->GetModemControlLine(TIOCM_RTS);
+        return mSerialPort.GetRTS() ;
     }
 
     inline
     bool
-    SerialStreamBuf::Implementation::GetCTS()
+    SerialStreamBuf::Implementation::GetCTS() 
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        return this->GetModemControlLine(TIOCM_CTS);
+        return mSerialPort.GetCTS() ;
     }
 
     inline
     bool
     SerialStreamBuf::Implementation::GetDSR()
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        return this->GetModemControlLine(TIOCM_DSR);
+        return mSerialPort.GetDSR() ;
     }
 
     inline
     int
-    SerialStreamBuf::Implementation::GetFileDescriptor()
+    SerialStreamBuf::Implementation::GetFileDescriptor() const
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        return this->mFileDescriptor;
+        return mSerialPort.GetFileDescriptor() ;
     }
 
     inline
     int
     SerialStreamBuf::Implementation::GetNumberOfBytesAvailable()
     {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        int number_of_bytes_available = 0;
-
-        if (ioctl(this->mFileDescriptor,
-                  FIONREAD,
-                  &number_of_bytes_available) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        return number_of_bytes_available;
+        return mSerialPort.GetNumberOfBytesAvailable() ;
     }
 
     inline
     std::vector<std::string>
-    SerialStreamBuf::Implementation::GetAvailableSerialPorts()
+    SerialStreamBuf::Implementation::GetAvailableSerialPorts() const
     {
-        const int array_size = 3;
-        int file_descriptor = -1;
-        size_t max_port_number = 128;
-
-        serial_struct serial_port_info {} ;
-
-        std::string file_name;
-        file_name.clear();
-
-        std::vector<std::string> serial_port_names;
-        serial_port_names.clear();
-
-        std::string serial_ports[array_size] = {"/dev/ttyS",
-                                                "/dev/ttyACM",
-                                                "/dev/ttyUSB"};
-
-        for (size_t i = 0; i < array_size; i++)
-        {
-            for (size_t j = 0; j < max_port_number; j++)
-            {
-                file_name = serial_ports[i] + std::to_string(j);
-
-                // Try to open the serial port.
-                // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-                file_descriptor = open(file_name.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
-
-                if (file_descriptor > 0)
-                {
-                    // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-                    if (ioctl(file_descriptor,
-                              TIOCGSERIAL,
-                              &serial_port_info) == -1)
-                    {
-                        throw std::runtime_error(std::strerror(errno));
-                    }
-
-                    serial_port_names.push_back(file_name);
-
-                    close(file_descriptor);
-                }
-            }
-        }
-
-        return serial_port_names;
-    }
-
-    inline
-    void
-    SerialStreamBuf::Implementation::SetModemControlLine(const int  modemLine,
-                                                         const bool lineState)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        if (modemLine != TIOCM_LE  &&
-            modemLine != TIOCM_DTR &&
-            modemLine != TIOCM_RTS &&
-            modemLine != TIOCM_ST  &&
-            modemLine != TIOCM_SR  &&
-            modemLine != TIOCM_CTS &&
-            modemLine != TIOCM_CAR &&
-            modemLine != TIOCM_CD  &&
-            modemLine != TIOCM_RNG &&
-            modemLine != TIOCM_RI  &&
-            modemLine != TIOCM_DSR)
-        {
-            throw std::invalid_argument(std::strerror(errno));
-        }
-
-        // Set or unset the specified bit according to the value of lineState.
-        int ioctl_result = -1;
-
-        if (lineState)
-        {
-            int set_line_mask = modemLine;
-            // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-            ioctl_result = ioctl(this->mFileDescriptor,
-                                 TIOCMBIS,
-                                 &set_line_mask);
-        }
-        else
-        {
-            int reset_line_mask = modemLine;
-            // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-            ioctl_result = ioctl(this->mFileDescriptor,
-                                 TIOCMBIC,
-                                 &reset_line_mask);
-        }
-
-        // Check for errors.
-        if (ioctl_result < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-    }
-
-    inline
-    bool
-    SerialStreamBuf::Implementation::GetModemControlLine(const int modemLine)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        if (modemLine != TIOCM_LE  &&
-            modemLine != TIOCM_DTR &&
-            modemLine != TIOCM_RTS &&
-            modemLine != TIOCM_ST  &&
-            modemLine != TIOCM_SR  &&
-            modemLine != TIOCM_CTS &&
-            modemLine != TIOCM_CAR &&
-            modemLine != TIOCM_CD  &&
-            modemLine != TIOCM_RNG &&
-            modemLine != TIOCM_RI  &&
-            modemLine != TIOCM_DSR)
-        {
-            throw std::invalid_argument(std::strerror(errno));
-        }
-
-        // Use an ioctl() call to get the state of the line.
-        int serial_port_state = 0;
-
-        // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-        if (ioctl(this->mFileDescriptor,
-                  TIOCMGET,
-                  &serial_port_state) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        // NOLINTNEXTLINE (hicpp-signed-bitwise)
-        return ((serial_port_state & modemLine) != 0) ;
-    }
-
-    inline
-    void
-    SerialStreamBuf::Implementation::SetSerialPortBlockingStatus(const bool blockingStatus)
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        const int flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
-
-        if (blockingStatus)
-        {
-            // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-            if (fcntl(this->mFileDescriptor,
-                      F_SETFL,
-                      (flags & ~O_NONBLOCK)) < 0) // NOLINT (hicpp-signed-bitwise)
-            {
-                throw std::runtime_error(std::strerror(errno));
-            }
-        }
-        else
-        {
-            // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-            if (fcntl(this->mFileDescriptor,
-                      F_SETFL,
-                      (flags | O_NONBLOCK)) < 0) // NOLINT (hicpp-signed-bitwise)
-            {
-                throw std::runtime_error(std::strerror(errno));
-            }
-        }
-    }
-
-    inline
-    bool
-    SerialStreamBuf::Implementation::GetSerialPortBlockingStatus()
-    {
-        // Throw an exception if the serial port is not open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        int flags = fcntl(this->mFileDescriptor, F_GETFL, 0);
-        if (flags == -1)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-        // NOLINTNEXTLINE (hicpp-signed-bitwise)
-        const bool blocking_status = (flags == (flags | O_NONBLOCK)) ;
-        return blocking_status;
-    }
-
-    inline
-    void
-    SerialStreamBuf::Implementation::SetDefaultLinuxSpecificModes()
-    {
-        // Make sure that the serial port is open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {} ;
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        // @NOTE - termios.c_line is not a standard element of the termios
-        // structure, (as per the Single Unix Specification 3).
-        port_settings.c_line = '\0';
-
-        // Apply the modified settings.
-        if (tcsetattr(this->mFileDescriptor,
-                      TCSANOW,
-                      &port_settings) < 0)
-        {
-            throw OpenFailed(std::strerror(errno));
-        }
-    }
-
-    inline
-    void
-    SerialStreamBuf::Implementation::SetDefaultInputModes()
-    {
-        // Make sure that the serial port is open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {} ;
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        // Ignore Break conditions on input.
-        port_settings.c_iflag = IGNBRK;
-
-        // Apply the modified settings.
-        if (tcsetattr(this->mFileDescriptor,
-                      TCSANOW,
-                      &port_settings) < 0)
-        {
-            throw OpenFailed(std::strerror(errno));
-        }
-    }
-
-    inline
-    void
-    SerialStreamBuf::Implementation::SetDefaultOutputModes()
-    {
-        // Make sure that the serial port is open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {} ;
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        port_settings.c_oflag = 0;
-
-        // Apply the modified settings.
-        if (tcsetattr(this->mFileDescriptor,
-                      TCSANOW,
-                      &port_settings) < 0)
-        {
-            throw OpenFailed(std::strerror(errno));
-        }
-    }
-
-    inline
-    void
-    SerialStreamBuf::Implementation::SetDefaultControlModes()
-    {
-        // Make sure that the serial port is open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {} ;
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        // Enable the receiver (CREAD) and ignore modem control lines (CLOCAL).
-        // NOLINTNEXTLINE (hicpp-signed-bitwise)
-        port_settings.c_cflag |= (CREAD | CLOCAL);
-
-        // Apply the modified settings.
-        if (tcsetattr(this->mFileDescriptor,
-                      TCSANOW,
-                      &port_settings) < 0)
-        {
-            throw OpenFailed(std::strerror(errno));
-        }
-    }
-
-    inline
-    void
-    SerialStreamBuf::Implementation::SetDefaultLocalModes()
-    {
-        // Make sure that the serial port is open.
-        if (!this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN);
-        }
-
-        // Get the current serial port settings.
-        termios port_settings {};
-        std::memset(&port_settings, 0, sizeof(port_settings));
-
-        if (tcgetattr(this->mFileDescriptor,
-                      &port_settings) < 0)
-        {
-            throw std::runtime_error(std::strerror(errno));
-        }
-
-        port_settings.c_lflag = 0;
-
-        // Apply the modified settings.
-        if (tcsetattr(this->mFileDescriptor,
-                      TCSANOW,
-                      &port_settings) < 0)
-        {
-            throw OpenFailed(std::strerror(errno));
-        }
+        return mSerialPort.GetAvailableSerialPorts() ;
     }
 
     inline
@@ -1983,7 +888,12 @@ namespace LibSerial
         }
 
         // Write the n characters to the serial port.
-        ssize_t result = write(this->mFileDescriptor, character, numberOfBytes);
+        // 
+        // :TODO: Consider using mSerialPort.Write() here instead of writing
+        // to the file descriptor directly.
+        //
+        const auto fd = mSerialPort.GetFileDescriptor() ;
+        ssize_t result = write(fd, character, numberOfBytes);
 
         // If the write failed then return 0.
         if (result <= 0)
@@ -2036,7 +946,12 @@ namespace LibSerial
             // at location starting from &character[1].
             if (numberOfBytes > 1)
             {
-                result = read(this->mFileDescriptor, &character[1], numberOfBytes-1);
+                // 
+                // :TODO: Consider using mSerialPort.Read() here instead of
+                // using the file descriptor.
+                //
+                const auto fd = mSerialPort.GetFileDescriptor() ;
+                result = read(fd, &character[1], numberOfBytes-1);
 
                 // If read was successful, then we need to increment result by
                 // one to indicate that the putback character was prepended to
@@ -2051,7 +966,12 @@ namespace LibSerial
         {
             // If no putback character is available then we try to
             // read numberOfBytes characters.
-            result = read(this->mFileDescriptor, character, numberOfBytes);
+            // 
+            // :TODO: Consider using mSerialPort.Read() here instead of
+            // using the file descriptor.
+            //
+            const auto fd = mSerialPort.GetFileDescriptor() ;
+            result = read(fd, character, numberOfBytes);
         }
 
         // If result == -1 then the read call had an error, otherwise, if
@@ -2085,8 +1005,13 @@ namespace LibSerial
         }
 
         // Otherwise we write the character to the serial port.
+        // 
+        // :TODO: Consider using a method of SerialPort class here instead
+        // of using the file descriptor.
+        //
+        const auto fd = mSerialPort.GetFileDescriptor() ;
         char out_char = traits_type::to_char_type(character);
-        ssize_t result = write(this->mFileDescriptor, &out_char, 1);
+        ssize_t result = write(fd, &out_char, 1);
 
         // If the write failed then return eof.
         if (result <= 0)
@@ -2123,7 +1048,12 @@ namespace LibSerial
         {
             // If no putback character is available then we need to read one
             // character from the serial port.
-            result = read(this->mFileDescriptor, &next_char, 1);
+            // 
+            // :TODO: Consider using a method of SerialPort class here instead
+            // of using the file descriptor.
+            //
+            const auto fd = mSerialPort.GetFileDescriptor() ;
+            result = read(fd, &next_char, 1);
 
             // Make the next character the putback character. This has the
             // effect of returning the next character without changing gptr()
@@ -2211,7 +1141,12 @@ namespace LibSerial
         ssize_t number_of_bytes_available = 0;
 
         // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-        const auto result = ioctl(this->mFileDescriptor,
+        // 
+        // :TODO: Consider using a method of SerialPort class here instead
+        // of using the file descriptor.
+        //
+        const auto fd = mSerialPort.GetFileDescriptor() ;
+        const auto result = ioctl(fd,
                                   FIONREAD,
                                   &number_of_bytes_available);
 

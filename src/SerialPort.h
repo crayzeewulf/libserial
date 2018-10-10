@@ -115,13 +115,13 @@ namespace LibSerial
          * @brief Checks if data is available at the input of the serial port.
          * @return Returns true iff data is available to read.
          */
-        bool IsDataAvailable();
+        bool IsDataAvailable() ;
 
         /**
          * @brief Determines if the serial port is open for I/O.
          * @return Returns true iff the serial port is open.
          */
-        bool IsOpen();
+        bool IsOpen() const;
 
         /**
          * @brief Sets all serial port paramters to their default values.
@@ -138,7 +138,7 @@ namespace LibSerial
          * @brief Gets the current baud rate for the serial port.
          * @return Returns the baud rate.
          */
-        BaudRate GetBaudRate();
+        BaudRate GetBaudRate() const;
 
         /**
          * @brief Sets the character size for the serial port.
@@ -150,7 +150,7 @@ namespace LibSerial
          * @brief Gets the character size being used for serial communication.
          * @return Returns the current character size.
          */
-        CharacterSize GetCharacterSize();
+        CharacterSize GetCharacterSize() const;
 
         /**
          * @brief Sets flow control for the serial port.
@@ -162,7 +162,7 @@ namespace LibSerial
          * @brief Gets the current flow control setting.
          * @return Returns the flow control type of the serial port.
          */
-        FlowControl GetFlowControl();
+        FlowControl GetFlowControl() const;
 
         /**
          * @brief Sets the parity type for the serial port.
@@ -174,7 +174,7 @@ namespace LibSerial
          * @brief Gets the parity type for the serial port.
          * @return Returns the parity type.
          */
-        Parity GetParity();
+        Parity GetParity() const;
 
         /**
          * @brief Sets the number of stop bits to be used with the serial port.
@@ -186,7 +186,7 @@ namespace LibSerial
          * @brief Gets the number of stop bits currently being used by the serial
          * @return Returns the number of stop bits.
          */
-        StopBits GetStopBits();
+        StopBits GetStopBits() const;
 
         /**
          * @brief Sets the minimum number of characters for non-canonical reads.
@@ -201,7 +201,7 @@ namespace LibSerial
          * @return Returns the minimum number of characters for
          *         non-canonical reads.
          */
-        short GetVMin();
+        short GetVMin() const;
 
         /**
          * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
@@ -214,7 +214,7 @@ namespace LibSerial
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
          */
-        short GetVTime();
+        short GetVTime() const;
 
         /**
          * @brief Sets the DTR line to the specified value.
@@ -227,7 +227,7 @@ namespace LibSerial
          * @brief Gets the status of the DTR line.
          * @return Returns true iff the status of the DTR line is high.
          */
-        bool GetDTR();
+        bool GetDTR() const;
 
         /**
          * @brief Set the RTS line to the specified value.
@@ -240,38 +240,38 @@ namespace LibSerial
          * @brief Get the status of the RTS line.
          * @return Returns true iff the status of the RTS line is high.
          */
-        bool GetRTS();
+        bool GetRTS() const;
 
         /**
          * @brief Get the status of the CTS line.
          * @return Returns true iff the status of the CTS line is high.
          */
-        bool GetCTS();
+        bool GetCTS() ;
 
         /**
          * @brief Get the status of the DSR line.
          * @return Returns true iff the status of the DSR line is high.
          */
-        bool GetDSR();
+        bool GetDSR() ;
 
         /**
          * @brief Gets the serial port file descriptor.
          * @return Returns the serial port file descriptor.
          */
-        int GetFileDescriptor();
+        int GetFileDescriptor() const;
 
         /**
          * @brief Gets the number of bytes available in the read buffer.
          * @return Returns the number of bytes avilable in the read buffer.
          */
-        int GetNumberOfBytesAvailable();
+        int GetNumberOfBytesAvailable() ;
 
         /**
          * @brief Gets a list of available serial ports.
          * @return Returns a std::vector of std::strings with the name of
          *         each available serial port.
          */
-        std::vector<std::string> GetAvailableSerialPorts();
+        std::vector<std::string> GetAvailableSerialPorts() const;
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -376,6 +376,37 @@ namespace LibSerial
          */
         void WriteByte(unsigned char charbuffer);
 
+        /**
+         * @brief Sets the current state of the serial port blocking status.
+         * @param blockingStatus The serial port blocking status to be set,
+         *        true if to be set blocking, false if to be set non-blocking.
+         */
+        void SetSerialPortBlockingStatus(bool blockingStatus);
+
+        /**
+         * @brief Gets the current state of the serial port blocking status.
+         * @return True if port is blocking, false if port non-blocking.
+         */
+        bool GetSerialPortBlockingStatus() const;
+
+        /**
+         * @brief Set the specified modem control line to the specified value.
+         * @param modemLine One of the following four values: TIOCM_DTR,
+         *        TIOCM_RTS, TIOCM_CTS, or TIOCM_DSR.
+         * @param lineState State of the modem line after successful
+         *        call to this method.
+         */
+        void SetModemControlLine(int modemLine,
+                                 bool lineState);
+
+        /**
+         * @brief Get the current state of the specified modem control line.
+         * @param modemLine One of the following four values: TIOCM_DTR,
+         *        TIOCM_RTS, TIOCM_CTS, or TIOCM_DSR.
+         * @return True if the specified line is currently set and false
+         *         otherwise.
+         */
+        bool GetModemControlLine(int modemLine) ;
 
         /**
          * @brief Prevents copying of objects of this class by declaring the copy

@@ -111,13 +111,13 @@ namespace LibSerial
         /**
          * @brief Determines if data is available at the serial port.
          */
-        bool IsDataAvailable();
+        bool IsDataAvailable() ;
 
         /**
          * @brief Determines if the serial port is open for I/O.
          * @return Returns true iff the serial port is open.
          */
-        bool IsOpen();
+        bool IsOpen() const;
 
         /**
          * @brief Sets all serial port paramters to their default values.
@@ -134,7 +134,7 @@ namespace LibSerial
          * @brief Gets the current baud rate for the serial port.
          * @return Returns the baud rate.
          */
-        BaudRate GetBaudRate();
+        BaudRate GetBaudRate() const;
 
         /**
          * @brief Sets the character size for the serial port.
@@ -146,7 +146,7 @@ namespace LibSerial
          * @brief Gets the character size being used for serial communication.
          * @return Returns the current character size. 
          */
-        CharacterSize GetCharacterSize();
+        CharacterSize GetCharacterSize() const;
 
         /**
          * @brief Sets flow control for the serial port.
@@ -158,7 +158,7 @@ namespace LibSerial
          * @brief Get the current flow control setting.
          * @return Returns the flow control type of the serial port.
          */
-        FlowControl GetFlowControl();
+        FlowControl GetFlowControl() const;
 
         /**
          * @brief Sets the parity type for the serial port.
@@ -170,7 +170,7 @@ namespace LibSerial
          * @brief Gets the parity type for the serial port.
          * @return Returns the parity type.
          */
-        Parity GetParity();
+        Parity GetParity() const;
 
         /**
          * @brief Sets the number of stop bits to be used with the serial port.
@@ -182,7 +182,7 @@ namespace LibSerial
          * @brief Gets the number of stop bits currently being used by the serial
          * @return Returns the number of stop bits.
          */
-        StopBits GetStopBits();
+        StopBits GetStopBits() const;
 
         /**
          * @brief Sets the minimum number of characters for non-canonical reads.
@@ -195,7 +195,7 @@ namespace LibSerial
          *        minimum number of characters for non-canonical reads.
          * @return Returns the minimum number of characters for non-canonical reads.
          */
-        short GetVMin();
+        short GetVMin() const;
 
         /** 
          * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
@@ -207,7 +207,7 @@ namespace LibSerial
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds. 
          */
-        short GetVTime();
+        short GetVTime() const;
 
         /**
          * @brief Sets the serial port DTR line status.
@@ -219,7 +219,7 @@ namespace LibSerial
          * @brief Gets the serial port DTR line status.
          * @return Returns true iff the status of the DTR line is high.
          */
-        bool GetDTR();
+        bool GetDTR() ;
 
         /**
          * @brief Sets the serial port RTS line status.
@@ -231,38 +231,38 @@ namespace LibSerial
          * @brief Gets the serial port RTS line status.
          * @return Returns true iff the status of the RTS line is high.
          */
-        bool GetRTS();
+        bool GetRTS() ;
 
         /**
          * @brief Gets the serial port CTS line status.
          * @return Returns true iff the status of the CTS line is high.
          */
-        bool GetCTS();
+        bool GetCTS() ;
 
         /**
          * @brief Gets the serial port DSR line status.
          * @return Returns true iff the status of the DSR line is high.
          */
-        bool GetDSR();
+        bool GetDSR() ;
 
         /**
          * @brief Gets the serial port file descriptor.
          * @return Returns the serial port file descriptor.
          */
-        int GetFileDescriptor();
+        int GetFileDescriptor() const;
 
         /**
          * @brief Gets the number of bytes available in the read buffer.
          * @return Returns the number of bytes avilable in the read buffer.
          */
-        int GetNumberOfBytesAvailable();
+        int GetNumberOfBytesAvailable() const;
 
         /**
          * @brief Gets a list of available serial ports.
          * @return Returns a std::vector of std::strings with the name of
          *         each available serial port. 
          */
-        std::vector<std::string> GetAvailableSerialPorts();
+        std::vector<std::string> GetAvailableSerialPorts() const;
         /**
          * @brief Reads the specified number of bytes from the serial port.
          *        The method will timeout if no data is received in the
@@ -355,7 +355,18 @@ namespace LibSerial
          */
         void WriteByte(unsigned char charBuffer);
 
-    private:
+        /**
+         * @brief Sets the current state of the serial port blocking status.
+         * @param blockingStatus The serial port blocking status to be set,
+         *        true if to be set blocking, false if to be set non-blocking.
+         */
+        void SetSerialPortBlockingStatus(bool blockingStatus);
+
+        /**
+         * @brief Gets the current state of the serial port blocking status.
+         * @return True if port is blocking, false if port non-blocking.
+         */
+        bool GetSerialPortBlockingStatus() const;
 
         /**
          * @brief Set the specified modem control line to the specified value.
@@ -374,21 +385,9 @@ namespace LibSerial
          * @return True if the specified line is currently set and false
          *         otherwise.
          */
-        bool GetModemControlLine(int modemLine);
+        bool GetModemControlLine(int modemLine) ;
 
-        /**
-         * @brief Sets the current state of the serial port blocking status.
-         * @param blockingStatus The serial port blocking status to be set,
-         *        true if to be set blocking, false if to be set non-blocking.
-         */
-        void SetSerialPortBlockingStatus(bool blockingStatus);
-
-        /**
-         * @brief Gets the current state of the serial port blocking status.
-         * @return True if port is blocking, false if port non-blocking.
-         */
-        bool GetSerialPortBlockingStatus();
-
+    private:
         /**
          * @brief Sets the default Linux specific line discipline modes.
          */
@@ -497,13 +496,13 @@ namespace LibSerial
     }
 
     bool
-    SerialPort::IsDataAvailable()
+    SerialPort::IsDataAvailable() 
     {
         return mImpl->IsDataAvailable();
     }
 
     bool
-    SerialPort::IsOpen()
+    SerialPort::IsOpen() const
     {
         return mImpl->IsOpen();
     }
@@ -521,7 +520,7 @@ namespace LibSerial
     }
 
     BaudRate
-    SerialPort::GetBaudRate()
+    SerialPort::GetBaudRate() const
     {
         return mImpl->GetBaudRate();
     }
@@ -533,7 +532,7 @@ namespace LibSerial
     }
 
     CharacterSize
-    SerialPort::GetCharacterSize()
+    SerialPort::GetCharacterSize() const
     {
         return mImpl->GetCharacterSize();
     }
@@ -545,7 +544,7 @@ namespace LibSerial
     }
 
     FlowControl
-    SerialPort::GetFlowControl()
+    SerialPort::GetFlowControl() const
     {
         return mImpl->GetFlowControl();
     }
@@ -557,7 +556,7 @@ namespace LibSerial
     }
 
     Parity
-    SerialPort::GetParity()
+    SerialPort::GetParity() const
     {
         return mImpl->GetParity();
     }
@@ -569,7 +568,7 @@ namespace LibSerial
     }
 
     StopBits
-    SerialPort::GetStopBits()
+    SerialPort::GetStopBits() const
     {
         return mImpl->GetStopBits();
     }
@@ -581,7 +580,7 @@ namespace LibSerial
     }
 
     short
-    SerialPort::GetVMin()
+    SerialPort::GetVMin() const
     {
         return mImpl->GetVMin();
     }
@@ -593,7 +592,7 @@ namespace LibSerial
     }
 
     short
-    SerialPort::GetVTime()
+    SerialPort::GetVTime() const
     {
         return mImpl->GetVTime();
     }
@@ -605,7 +604,7 @@ namespace LibSerial
     }
 
     bool
-    SerialPort::GetDTR()
+    SerialPort::GetDTR() const
     {
         return mImpl->GetDTR();
     }
@@ -617,13 +616,13 @@ namespace LibSerial
     }
 
     bool
-    SerialPort::GetRTS()
+    SerialPort::GetRTS() const
     {
         return mImpl->GetRTS();
     }
 
     bool
-    SerialPort::GetCTS()
+    SerialPort::GetCTS() 
     {
         return mImpl->GetCTS();
     }
@@ -635,19 +634,19 @@ namespace LibSerial
     }
 
     int
-    SerialPort::GetFileDescriptor()
+    SerialPort::GetFileDescriptor() const
     {
         return mImpl->GetFileDescriptor();
     }
 
     int
-    SerialPort::GetNumberOfBytesAvailable()
+    SerialPort::GetNumberOfBytesAvailable() 
     {
         return mImpl->GetNumberOfBytesAvailable();
     }
 
     std::vector<std::string>
-    SerialPort::GetAvailableSerialPorts()
+    SerialPort::GetAvailableSerialPorts() const
     {
         return mImpl->GetAvailableSerialPorts();
     }
@@ -722,6 +721,30 @@ namespace LibSerial
         mImpl->WriteByte(charBuffer);
     }
 
+    void 
+    SerialPort::SetSerialPortBlockingStatus(const bool blockingStatus)
+    {
+        mImpl->SetSerialPortBlockingStatus(blockingStatus) ;
+    }
+
+    bool 
+    SerialPort::GetSerialPortBlockingStatus() const
+    {
+        return mImpl->GetSerialPortBlockingStatus() ;
+    }
+
+    void 
+    SerialPort::SetModemControlLine(const int modemLine,
+                                    const bool lineState)
+    {
+        mImpl->SetModemControlLine(modemLine, lineState) ;
+    }
+
+    bool 
+    SerialPort::GetModemControlLine(const int modemLine) 
+    {
+        return mImpl->GetModemControlLine(modemLine) ;
+    }
 
     /** ------------------------------------------------------------ */
     inline
@@ -912,14 +935,14 @@ namespace LibSerial
 
     inline
     bool
-    SerialPort::Implementation::IsOpen()
+    SerialPort::Implementation::IsOpen() const
     {
         return (this->mFileDescriptor != -1);
     }
 
     inline
     bool
-    SerialPort::Implementation::IsDataAvailable()
+    SerialPort::Implementation::IsDataAvailable() 
     {
         // Throw an exception if the serial port is not open.
         if (not this->IsOpen())
@@ -1011,7 +1034,7 @@ namespace LibSerial
 
     inline
     BaudRate
-    SerialPort::Implementation::GetBaudRate()
+    SerialPort::Implementation::GetBaudRate() const
     {
         // Throw an exception if the serial port is not open.
         if (not this->IsOpen())
@@ -1099,7 +1122,7 @@ namespace LibSerial
 
     inline
     CharacterSize
-    SerialPort::Implementation::GetCharacterSize()
+    SerialPort::Implementation::GetCharacterSize() const
     {
         // Throw an exception if the serial port is not open.
         if (not this->IsOpen())
@@ -1186,7 +1209,7 @@ namespace LibSerial
 
     inline
     FlowControl
-    SerialPort::Implementation::GetFlowControl()
+    SerialPort::Implementation::GetFlowControl() const
     {
         // Throw an exception if the serial port is not open.
         if (not this->IsOpen())
@@ -1285,7 +1308,7 @@ namespace LibSerial
 
     inline
     Parity
-    SerialPort::Implementation::GetParity()
+    SerialPort::Implementation::GetParity() const
     {
         // Throw an exception if the serial port is not open.
         if (not this->IsOpen())
@@ -1361,7 +1384,7 @@ namespace LibSerial
 
     inline
     StopBits
-    SerialPort::Implementation::GetStopBits()
+    SerialPort::Implementation::GetStopBits() const
     {
         // Throw an exception if the serial port is not open.
         if (not this->IsOpen())
@@ -1426,7 +1449,7 @@ namespace LibSerial
 
     inline
     short 
-    SerialPort::Implementation::GetVMin()
+    SerialPort::Implementation::GetVMin() const
     {
         // Throw an exception if the serial port is not open.
         if (not this->IsOpen())
@@ -1485,7 +1508,7 @@ namespace LibSerial
 
     inline
     short 
-    SerialPort::Implementation::GetVTime()
+    SerialPort::Implementation::GetVTime() const
     {
         // Throw an exception if the serial port is not open.
         if (not this->IsOpen())
@@ -1522,7 +1545,7 @@ namespace LibSerial
 
     inline
     bool
-    SerialPort::Implementation::GetDTR()
+    SerialPort::Implementation::GetDTR() 
     {
         // Throw an exception if the serial port is not open.
         if (not this->IsOpen())
@@ -1575,7 +1598,7 @@ namespace LibSerial
 
     inline
     bool
-    SerialPort::Implementation::GetDSR()
+    SerialPort::Implementation::GetDSR() 
     {
         // Throw an exception if the serial port is not open.
         if (not this->IsOpen())
@@ -1588,7 +1611,7 @@ namespace LibSerial
 
     inline
     int
-    SerialPort::Implementation::GetFileDescriptor()
+    SerialPort::Implementation::GetFileDescriptor() const
     {
         // Throw an exception if the serial port is not open.
         if (not this->IsOpen())
@@ -1601,7 +1624,7 @@ namespace LibSerial
 
     inline
     int
-    SerialPort::Implementation::GetNumberOfBytesAvailable()
+    SerialPort::Implementation::GetNumberOfBytesAvailable() const
     {
         // Throw an exception if the serial port is not open.
         if (not this->IsOpen())
@@ -1624,7 +1647,7 @@ namespace LibSerial
 
     inline
     std::vector<std::string>
-    SerialPort::Implementation::GetAvailableSerialPorts()
+    SerialPort::Implementation::GetAvailableSerialPorts() const
     {
         constexpr int array_size = 3;
         constexpr size_t max_port_number = 128;
@@ -1720,7 +1743,7 @@ namespace LibSerial
 
     inline
     bool
-    SerialPort::Implementation::GetModemControlLine(const int modemLine)
+    SerialPort::Implementation::GetModemControlLine(const int modemLine) 
     {
         // Throw an exception if the serial port is not open.
         if (not this->IsOpen())
@@ -1793,7 +1816,7 @@ namespace LibSerial
 
     inline
     bool
-    SerialPort::Implementation::GetSerialPortBlockingStatus()
+    SerialPort::Implementation::GetSerialPortBlockingStatus() const
     {
         // Throw an exception if the serial port is not open.
         if (not this->IsOpen())
