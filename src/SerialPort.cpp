@@ -255,7 +255,7 @@ namespace LibSerial
          * @brief Gets the number of bytes available in the read buffer.
          * @return Returns the number of bytes avilable in the read buffer.
          */
-        int GetNumberOfBytesAvailable() const;
+        int GetNumberOfBytesAvailable() ;
 
         /**
          * @brief Gets a list of available serial ports.
@@ -1624,7 +1624,7 @@ namespace LibSerial
 
     inline
     int
-    SerialPort::Implementation::GetNumberOfBytesAvailable() const
+    SerialPort::Implementation::GetNumberOfBytesAvailable()
     {
         // Throw an exception if the serial port is not open.
         if (not this->IsOpen())
