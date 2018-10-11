@@ -1,6 +1,6 @@
 /******************************************************************************
  *   @file UnitTest.h                                                         *
- *   @copyright (C) 2016 LibSerial Development Team                           *
+ *   @copyright (C) 2016-2018 LibSerial Development Team                      *
  *                                                                            *
  *   This program is free software; you can redistribute it and/or modify     *
  *   it under the terms of the GNU Lessser General Public License as          *
@@ -17,6 +17,8 @@
  *   Free Software Foundation, Inc.,                                          *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
  *****************************************************************************/
+
+#pragma once
 
 #include "SerialPort.h"
 #include "SerialPortConstants.h"
@@ -380,7 +382,7 @@ namespace LibSerial
         /**
          * @param C++11 thread std::mutex for locking parameters in the threaded unit tests.
          */
-        std::mutex mutex = {};
+        std::mutex mutex {};
 
         /**
          * @param Failure rate of serial communications being tracked in the threaded tests.
@@ -450,12 +452,12 @@ namespace LibSerial
         /**
          * @param String to store received data.
          */
-        std::string readString1 {""};
+        std::string readString1 {};
 
         /**
          * @param String to store received data.
          */
-        std::string readString2 {""};
+        std::string readString2 {};
 
         /**
          * @param String to store data to be written to the serial port.

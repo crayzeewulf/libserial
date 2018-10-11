@@ -1,6 +1,6 @@
 /******************************************************************************
  *   @file UnitTest.cpp                                                       *
- *   @copyright (C) 2016 LibSerial Development Team                           *
+ *   @copyright (C) 2016-2018 LibSerial Development Team                      *
  *                                                                            *
  *   This program is free software; you can redistribute it and/or modify     *
  *   it under the terms of the GNU Lessser General Public License as          *
