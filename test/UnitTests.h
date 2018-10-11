@@ -380,92 +380,92 @@ namespace LibSerial
         /**
          * @param C++11 thread std::mutex for locking parameters in the threaded unit tests.
          */
-        std::mutex mutex;
+        std::mutex mutex = {};
 
         /**
          * @param Failure rate of serial communications being tracked in the threaded tests.
          */
-        size_t failureRate;
+        size_t failureRate = 0;
 
         /**
          * @param Loop count variable.
          */
-        size_t loopCount;
+        size_t loopCount = 0;
 
         /**
-         * @param Timeout to be used for test methods.
+         * @param Timeout to be used for test methods, (ms).
          */
-        size_t timeOutMilliseconds;
+        size_t timeOutMilliseconds = 250;
 
         /**
-         * @param Time to allow the hardware read buffer to fill or empty.
+         * @param Time to allow the hardware read buffer to fill or empty (us).
          */
-        unsigned int readBufferDelay;
+        unsigned int readBufferDelay = 20000;
 
         /**
          * @struct Standard baud rates.
          */
-        std::vector<LibSerial::BaudRate> baudRates;
+        std::vector<LibSerial::BaudRate> baudRates {};
 
         /**
          * @struct Standard character sizes.
          */
-        std::vector<LibSerial::CharacterSize> characterSizes;
+        std::vector<LibSerial::CharacterSize> characterSizes {};
 
         /**
          * @struct Standard flow control types.
          */
-        std::vector<LibSerial::FlowControl> flowControlTypes;
+        std::vector<LibSerial::FlowControl> flowControlTypes {};
 
         /**
          * @struct Standard flow parity types.
          */
-        std::vector<LibSerial::Parity> parityTypes;
+        std::vector<LibSerial::Parity> parityTypes {};
 
         /**
          * @struct Standard number of stop bits.
          */
-        std::vector<LibSerial::StopBits> stopBits;
+        std::vector<LibSerial::StopBits> stopBits {};
 
         /**
          * @param Serial Stream instance 1 for unit testing applications.
          */
-        LibSerial::SerialStream serialStream1;
+        LibSerial::SerialStream serialStream1 {};
 
         /**
          * @param Serial Stream instance 2 for unit testing applications.
          */
-        LibSerial::SerialStream serialStream2;
+        LibSerial::SerialStream serialStream2 {};
 
         /**
          * @param Serial Port instance 1 for unit testing applications.
          */
-        LibSerial::SerialPort serialPort1;
+        LibSerial::SerialPort serialPort1 {};
 
         /**
          * @param Serial Port instance 2 for unit testing applications.
          */
-        LibSerial::SerialPort serialPort2;
+        LibSerial::SerialPort serialPort2 {};
 
         /**
          * @param String to store received data.
          */
-        std::string readString1;
+        std::string readString1 {""};
 
         /**
          * @param String to store received data.
          */
-        std::string readString2;
+        std::string readString2 {""};
 
         /**
          * @param String to store data to be written to the serial port.
          */
-        std::string writeString1;
+        std::string writeString1 {"Quidquid latine dictum sit, altum sonatur. (Whatever is said in Latin sounds profound.)"};
 
         /**
          * @param String to store data to be written to the serial port.
          */
-        std::string writeString2;
+        std::string writeString2 {"The secret of the man who is universally interesting is that he is universally interested. - William Dean Howells"};
 
     };
 }

@@ -3,18 +3,18 @@
  *   @copyright (C) 2015 Manish Pagey                                         *
  *   crayzeewulf@users.sourceforge.net                                        *
  *                                                                            *
- *   This program is free software; you can redistribute it and/or modify     *
+ *   This program is free software;you can redistribute it and/or modify     *
  *   it under the terms of the GNU Lessser General Public License as          *
- *   published by the Free Software Foundation; either version 2 of the       *
+ *   published by the Free Software Foundation;either version 2 of the       *
  *   License, or (at your option) any later version.                          *
  *                                                                            *
  *   This program is distributed in the hope that it will be useful,          *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of           *
+ *   but WITHOUT ANY WARRANTY;without even the implied warranty of           *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
  *   GNU Lesser General Public License for more details.                      *
  *                                                                            *
  *   You should have received a copy of the GNU Lesser General Public         *
- *   License along with this program; if not, write to the                    *
+ *   License along with this program;if not, write to the                    *
  *   Free Software Foundation, Inc.,                                          *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
  *****************************************************************************/
@@ -46,31 +46,36 @@ namespace LibSerial
     /**
      * @brief Time conversion constants.
      */
-    constexpr int MICROSECONDS_PER_MS  =    1000;
-    constexpr int MILLISECONDS_PER_SEC =    1000;
-    constexpr int MICROSECONDS_PER_SEC = 1000000;
+    constexpr int MICROSECONDS_PER_MS  =    1000 ;
+    constexpr int MILLISECONDS_PER_SEC =    1000 ;
+    constexpr int MICROSECONDS_PER_SEC = 1000000 ;
         
+    /**
+     * @brief Bits to bytes conversion constant.
+     */
+    constexpr int BITS_PER_BYTE = 8 ;
+
     /**
      * @brief The default character buffer size.
      */
-    constexpr short VMIN_DEFAULT = 1;
+    constexpr short VMIN_DEFAULT = 1 ;
 
     /**
      * @brief The default character buffer timing.
      */
-    constexpr short VTIME_DEFAULT = 0;
+    constexpr short VTIME_DEFAULT = 0 ;
 
     /**
      * @brief Character used to signal that I/O can start while using
      *        software flow control with the serial port.
      */
-    constexpr char CTRL_Q = 0x11;
+    constexpr char CTRL_Q = 0x11 ;
 
     /**
      * @brief Character used to signal that I/O should stop while using
      *        software flow control with the serial port.
      */
-    constexpr char CTRL_S = 0x13;
+    constexpr char CTRL_S = 0x13 ;
 
     /**
      * @brief Type used to receive and return raw data to/from methods.
@@ -115,7 +120,7 @@ namespace LibSerial
             : logic_error(whatArg)
         {
         }
-    };
+    } ;
 
     /**
      * @brief Exception error thrown when the serial port is already open.
@@ -130,7 +135,7 @@ namespace LibSerial
             : logic_error(whatArg)
         {
         }
-    };
+    } ;
 
     /**
      * @brief Exception error thrown when the serial port could not be opened.
@@ -145,7 +150,7 @@ namespace LibSerial
             : runtime_error(whatArg)
         {
         }
-    };
+    } ;
 
     /**
      * @brief Exception error thrown when data could not be read from the
@@ -162,7 +167,7 @@ namespace LibSerial
             : runtime_error(whatArg)
         {
         }
-    };
+    } ;
 
     /**
      * @brief The baud rates currently supported by the Single Unix
@@ -211,7 +216,7 @@ namespace LibSerial
 #endif /* __linux__ */
         BAUD_DEFAULT = BAUD_115200,
         BAUD_INVALID = std::numeric_limits<speed_t>::max()
-    };
+    } ;
 
     /**
      * @brief The allowed character sizes.
@@ -224,7 +229,7 @@ namespace LibSerial
         CHAR_SIZE_8       = CS8, // !< 8 bit characters.
         CHAR_SIZE_DEFAULT = CS8, // !< 8 bit characters.
         CHAR_SIZE_INVALID = std::numeric_limits<tcflag_t>::max()
-    };
+    } ;
 
     /**
      * @brief The allowed flow control types.
@@ -236,7 +241,7 @@ namespace LibSerial
         FLOW_CONTROL_NONE,
         FLOW_CONTROL_DEFAULT = FLOW_CONTROL_NONE,
         FLOW_CONTROL_INVALID = std::numeric_limits<tcflag_t>::max()
-    };
+    } ;
 
     /**
      * @brief The allowed parity types.
@@ -248,7 +253,7 @@ namespace LibSerial
         PARITY_NONE,                    // No parity i.e. parity checking disabled.
         PARITY_DEFAULT = PARITY_NONE,   // No parity i.e. parity checking disabled.
         PARITY_INVALID = std::numeric_limits<tcflag_t>::max() //!< Invalid parity value.
-    };
+    } ;
 
     /**
      * @brief The allowed number of stop bits.
@@ -259,7 +264,7 @@ namespace LibSerial
         STOP_BITS_2,                     // 2 stop bits.
         STOP_BITS_DEFAULT = STOP_BITS_1, // 1 stop bit.
         STOP_BITS_INVALID = std::numeric_limits<tcflag_t>::max()
-    };
+    } ;
 
 } // namespace LibSerial
 

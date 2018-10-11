@@ -29,25 +29,6 @@
 using namespace LibSerial;
 
 LibSerialTest::LibSerialTest()
-    : numberOfTestIterations(10)
-    , mutex{}
-    , failureRate(0)
-    , loopCount(0)
-    , timeOutMilliseconds(250)   // 250ms timeout
-    , readBufferDelay(20000)     // 20ms delay
-    , baudRates{}
-    , characterSizes{}
-    , flowControlTypes{}
-    , parityTypes{}
-    , stopBits{}
-    , serialStream1{}
-    , serialStream2{}
-    , serialPort1{}
-    , serialPort2{}
-    , readString1("")
-    , readString2("")
-    , writeString1("Quidquid latine dictum sit, altum sonatur. (Whatever is said in Latin sounds profound.)")
-    , writeString2("The secret of the man who is universally interesting is that he is universally interested. - William Dean Howells")
 {
     // Empty
 }
@@ -121,11 +102,17 @@ LibSerialTest::testSerialStreamOpenClose()
     ASSERT_TRUE(serialStream1.IsOpen());
     ASSERT_TRUE(serialStream2.IsOpen());
 
+    ASSERT_TRUE(serialStream1.good());
+    ASSERT_TRUE(serialStream2.good());
+
     SerialStream serialStream3;
     SerialStream serialStream4;
 
     ASSERT_FALSE(serialStream3.IsOpen());
     ASSERT_FALSE(serialStream4.IsOpen());
+
+    ASSERT_FALSE(serialStream3.good());
+    ASSERT_FALSE(serialStream4.good());
 
     bool exclusiveUseTestPass = false;
 
@@ -1782,7 +1769,7 @@ LibSerialTest::testSerialPortReadDataBufferWriteDataBuffer()
 
         serialPort2.Read(readVector1, 0, 75);
     }
-    catch(...)
+    catch (...)
     {
         timeOutTestPass = true;
     }
@@ -1833,7 +1820,7 @@ LibSerialTest::testSerialPortReadStringWriteString()
 
         serialPort2.Read(readString1, 0, 75);
     }
-    catch(...)
+    catch (...)
     {
         timeOutTestPass = true;
     }
@@ -1882,7 +1869,7 @@ LibSerialTest::testSerialPortReadByteWriteByte()
         serialPort1.ReadByte(readByte1, 1);
         serialPort2.ReadByte(readByte2, 1);
     }
-    catch(ReadTimeout)
+    catch (ReadTimeout)
     {
         timeOutTestPass = true;
     }
@@ -1924,7 +1911,7 @@ LibSerialTest::testSerialPortReadLineWriteString()
         serialPort1.ReadLine(readString2, '\n', 1);
         serialPort2.ReadLine(readString1, '\n', 1);
     }
-    catch(ReadTimeout)
+    catch (ReadTimeout)
     {
         timeOutTestPass = true;
     }
@@ -2079,7 +2066,7 @@ LibSerialTest::serialPort1ThreadLoop()
                 readString2.clear() ;
                 serialPort1.ReadLine(readString2, '\n', timeOutMilliseconds);
             }
-            catch(const std::exception& err)
+            catch (const std::exception& err)
             {
                 std::cerr << err.what() << std::endl ;
             }
@@ -2123,7 +2110,7 @@ LibSerialTest::serialPort2ThreadLoop()
                 readString1.clear() ;
                 serialPort2.ReadLine(readString1, '\n', timeOutMilliseconds);
             }
-            catch(const std::exception& err)
+            catch (const std::exception& err)
             {
                 std::cerr << err.what() << std::endl ;
             }
@@ -2729,9 +2716,6 @@ TEST_F(LibSerialTest, testMultiThreadSerialStreamReadWrite)
 {
     SCOPED_TRACE("Test Multi-Thread Serial Stream Communication.");
 
-    std::cout << "Note: This test calls getline() which can block indefinitely "
-              << "if a newline character is not recieved." << std::endl;
-
     failureRate = 0;
     loopCount = 0;
     
@@ -2742,8 +2726,8 @@ TEST_F(LibSerialTest, testMultiThreadSerialStreamReadWrite)
 
     const double failRate = 100. * (double)failureRate / (double)loopCount;
     
-    // If the serial communication fail rate is greater than 0.001% consider it a failed test.
-    if (failRate > 0.001)
+    // If the serial communication fail rate is greater than 0.0001% consider it a failed test.
+    if (failRate > 0.0001)
     {
         std::cout << "\t     SerialStream Failure Rate = " << failRate << "%" << std::endl;
         ADD_FAILURE();
@@ -2764,8 +2748,8 @@ TEST_F(LibSerialTest, testMultiThreadSerialPortReadWrite)
 
     const double failRate = 100. * (double)failureRate / (double)loopCount;
     
-    // If the serial communication fail rate is greater than 0.001% consider it a failed test.
-    if (failRate > 0.001)
+    // If the serial communication fail rate is greater than 0.0001% consider it a failed test.
+    if (failRate > 0.0001)
     {
         std::cout << "\t     SerialPort Failure Rate = " << failRate << "%" << std::endl;
         ADD_FAILURE();
