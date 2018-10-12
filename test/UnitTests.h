@@ -51,6 +51,11 @@
 #define TEST_SERIAL_PORT_2 "/dev/ttyUSB1"
 
 /**
+ * @param The number of iterations to perform on each unit test.
+ */
+#define TEST_ITERATIONS 10
+
+/**
  * @namespace Libserial
  */
 namespace LibSerial
@@ -68,11 +73,6 @@ namespace LibSerial
          * @brief Default Destructor.
          */
         virtual ~UnitTests();
-
-        /**
-         * @param The number of iterations to perform on each unit test.
-         */
-        size_t numberOfTestIterations = 10;
 
         /**
          * @brief Gets the time since epoch in milliseconds.

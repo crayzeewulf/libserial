@@ -946,7 +946,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamConstructors)
 {
     SCOPED_TRACE("Serial Stream Constructor Tests");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamConstructors();
     }  
@@ -956,7 +956,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamOpenClose)
 {
     SCOPED_TRACE("Serial Stream Open() and Close() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamOpenClose();
     }
@@ -966,7 +966,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamDrainWriteBuffer)
 {
     SCOPED_TRACE("Serial Stream DrainWriteBuffer() Test");
 
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamDrainWriteBuffer();
     }
@@ -976,7 +976,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamFlushInputBuffer)
 {
     SCOPED_TRACE("Serial Stream FlushInputBuffer() Test");
 
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamFlushInputBuffer();
     }
@@ -986,7 +986,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamFlushOutputBuffer)
 {
     SCOPED_TRACE("Serial Stream FlushOutputBuffer() Test");
 
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamFlushOutputBuffer();
     }
@@ -996,7 +996,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamFlushIOBuffers)
 {
     SCOPED_TRACE("Serial Stream FlushIOBuffers() Test");
 
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamFlushIOBuffers();
     }
@@ -1006,7 +1006,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamIsDataAvailableTest)
 {
     SCOPED_TRACE("Serial Stream IsDataAvailable() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamIsDataAvailableTest();
     }
@@ -1016,7 +1016,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamIsOpenTest)
 {
     SCOPED_TRACE("Serial Stream IsOpen() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamIsOpenTest();
     }
@@ -1026,7 +1026,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamSetGetBaudRate)
 {
     SCOPED_TRACE("Serial Stream SetBaudRate() and GetBaudRate() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamSetGetBaudRate();
     }
@@ -1036,7 +1036,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamSetGetCharacterSize)
 {
     SCOPED_TRACE("Serial Stream SetCharacterSize() and GetCharacterSize() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamSetGetCharacterSize();
     }
@@ -1046,7 +1046,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamSetGetParity)
 {
     SCOPED_TRACE("Serial Stream SetParityType() and GetParityType() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamSetGetParity();
     }
@@ -1056,7 +1056,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamSetGetFlowControl)
 {
     SCOPED_TRACE("Serial Stream SetFlowControl() and GetFlowControl() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamSetGetFlowControl();
     }
@@ -1066,7 +1066,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamSetGetStopBits)
 {
     SCOPED_TRACE("Serial Stream SetStopBits() and GetStopBits() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamSetGetStopBits();
     }
@@ -1076,7 +1076,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamSetGetVMin)
 {
     SCOPED_TRACE("Serial Stream SetVMin() and GetVMin() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamSetGetVMin();
     }
@@ -1086,7 +1086,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamSetGetVTime)
 {
     SCOPED_TRACE("Serial Stream SetVTime() and GetVTime() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamSetGetVTime();
     }
@@ -1096,7 +1096,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamSetGetDTR)
 {
     SCOPED_TRACE("Serial Stream SetDTR() and GetDTR() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamSetGetDTR();
     }
@@ -1106,7 +1106,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamSetGetRTS)
 {
     SCOPED_TRACE("Serial Stream SetRTS() and GetRTS() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamSetGetRTS();
     }
@@ -1116,7 +1116,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamSetRTSGetCTS)
 {
     SCOPED_TRACE("Serial Stream SetRTS() and GetCTS() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamSetRTSGetCTS();
     }
@@ -1126,7 +1126,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamSetDTRGetDSR)
 {
     SCOPED_TRACE("Serial Stream SetDTR() and GetDSR() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamSetDTRGetDSR();
     }
@@ -1136,7 +1136,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamGetFileDescriptor)
 {
     SCOPED_TRACE("Serial Stream GetFileDescriptor() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamGetFileDescriptor();
     }
@@ -1146,7 +1146,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamGetNumberOfBytesAvailable)
 {
     SCOPED_TRACE("Serial Stream GetNumberOfBytesAvailable() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamGetNumberOfBytesAvailable();
     }
@@ -1156,7 +1156,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamGetAvailableSerialPorts)
 {
     SCOPED_TRACE("Serial Stream GetAvailableSerialPorts() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamGetAvailableSerialPorts();
     }
@@ -1166,7 +1166,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamReadByteWriteByte)
 {
     SCOPED_TRACE("Serial Stream Read() and WriteByte() Test");
 
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamReadByteWriteByte();
     }
@@ -1176,7 +1176,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamGetLineWriteString)
 {
     SCOPED_TRACE("Serial Stream GetLine() and Write(string) Test");
         
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamGetLineWriteString();
     }
@@ -1186,7 +1186,7 @@ TEST_F(SerialStreamUnitTests, testSerialStreamGetWriteByte)
 {
     SCOPED_TRACE("Serial Stream Get() and WriteByte() Test");
         
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamGetWriteByte();
     }

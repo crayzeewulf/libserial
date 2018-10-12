@@ -112,7 +112,7 @@ TEST_F(UnitTests, testSerialStreamToSerialPortReadWrite)
 {
     SCOPED_TRACE("Serial Stream To Serial Port Read and Write Test");
 
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialStreamToSerialPortReadWrite();
     }

@@ -1023,7 +1023,7 @@ TEST_F(SerialPortUnitTests, testSerialPortConstructors)
 {
     SCOPED_TRACE("Serial Port Constructors Tests");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortConstructors();
     }  
@@ -1033,7 +1033,7 @@ TEST_F(SerialPortUnitTests, testSerialPortOpenClose)
 {
     SCOPED_TRACE("Serial Port Open() and Close() Test");
 
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortOpenClose();
     }
@@ -1043,7 +1043,7 @@ TEST_F(SerialPortUnitTests, testSerialPortDrainWriteBuffer)
 {
     SCOPED_TRACE("Serial Port DrainWriteBuffer() Test");
 
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortDrainWriteBuffer();
     }
@@ -1053,7 +1053,7 @@ TEST_F(SerialPortUnitTests, testSerialPortFlushInputBuffer)
 {
     SCOPED_TRACE("Serial Port FlushInputBuffer() Test");
 
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortFlushInputBuffer();
     }
@@ -1063,7 +1063,7 @@ TEST_F(SerialPortUnitTests, testSerialPortFlushOutputBuffer)
 {
     SCOPED_TRACE("Serial Port FlushOutputBuffer() Test");
 
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortFlushOutputBuffer();
     }
@@ -1073,7 +1073,7 @@ TEST_F(SerialPortUnitTests, testSerialPortFlushIOBuffers)
 {
     SCOPED_TRACE("Serial Port FlushIOBuffers() Test");
 
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortFlushIOBuffers();
     }
@@ -1083,7 +1083,7 @@ TEST_F(SerialPortUnitTests, testSerialPortIsDataAvailableTest)
 {
     SCOPED_TRACE("Serial Port IsDataAvailable() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortIsDataAvailableTest();
     }
@@ -1093,7 +1093,7 @@ TEST_F(SerialPortUnitTests, testSerialPortIsOpenTest)
 {
     SCOPED_TRACE("Serial Port IsOpen() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortIsOpenTest();
     }
@@ -1103,7 +1103,7 @@ TEST_F(SerialPortUnitTests, testSerialPortSetGetBaudRate)
 {
     SCOPED_TRACE("Serial Port SetBaudRate() and GetBaudRate() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortSetGetBaudRate();
     }
@@ -1113,7 +1113,7 @@ TEST_F(SerialPortUnitTests, testSerialPortSetGetCharacterSize)
 {
     SCOPED_TRACE("Serial Port SetCharacterSize() and GetCharacterSize() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortSetGetCharacterSize();
     }
@@ -1123,7 +1123,7 @@ TEST_F(SerialPortUnitTests, testSerialPortSetGetParity)
 {
     SCOPED_TRACE("Serial Port SetParityType() and GetParityType() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortSetGetParity();
     }
@@ -1133,7 +1133,7 @@ TEST_F(SerialPortUnitTests, testSerialPortSetGetFlowControl)
 {
     SCOPED_TRACE("Serial Port SetFlowControl() and GetFlowControl() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortSetGetFlowControl();
     }
@@ -1143,7 +1143,7 @@ TEST_F(SerialPortUnitTests, testSerialPortSetGetStopBits)
 {
     SCOPED_TRACE("Serial Port SetStopBits() and GetStopBits() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortSetGetStopBits();
     }
@@ -1153,7 +1153,7 @@ TEST_F(SerialPortUnitTests, testSerialPortSetGetVMin)
 {
     SCOPED_TRACE("Serial Port SetVMin() and GetVMin() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortSetGetVMin();
     }
@@ -1163,7 +1163,7 @@ TEST_F(SerialPortUnitTests, testSerialPortSetGetVTime)
 {
     SCOPED_TRACE("Serial Port SetVTime() and GetVTime() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortSetGetVTime();
     }
@@ -1173,7 +1173,7 @@ TEST_F(SerialPortUnitTests, testSerialPortSetGetDTR)
 {
     SCOPED_TRACE("Serial Port SetDTR() and GetDTR() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortSetGetDTR();
     }
@@ -1183,7 +1183,7 @@ TEST_F(SerialPortUnitTests, testSerialPortSetGetRTS)
 {
     SCOPED_TRACE("Serial Port SetRTS() and GetRTS() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortSetGetRTS();
     }
@@ -1193,7 +1193,7 @@ TEST_F(SerialPortUnitTests, testSerialPortSetRTSGetCTS)
 {
     SCOPED_TRACE("Serial Port SetRTS() and GetCTS() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortSetRTSGetCTS();
     }
@@ -1203,7 +1203,7 @@ TEST_F(SerialPortUnitTests, testSerialPortSetDTRGetDSR)
 {
     SCOPED_TRACE("Serial Port SetDTR() and GetDSR() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortSetDTRGetDSR();
     }
@@ -1213,7 +1213,7 @@ TEST_F(SerialPortUnitTests, testSerialPortGetFileDescriptor)
 {
     SCOPED_TRACE("Serial Port GetFileDescriptor() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortGetFileDescriptor();
     }
@@ -1223,7 +1223,7 @@ TEST_F(SerialPortUnitTests, testSerialPortGetNumberOfBytesAvailable)
 {
     SCOPED_TRACE("Serial Port GetNumberOfBytesAvailable() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortGetNumberOfBytesAvailable();
     }
@@ -1233,7 +1233,7 @@ TEST_F(SerialPortUnitTests, testSerialPortGetAvailableSerialPorts)
 {
     SCOPED_TRACE("Serial Port GetAvailableSerialPorts() Test");
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortGetAvailableSerialPorts();
     }
@@ -1243,7 +1243,7 @@ TEST_F(SerialPortUnitTests, testSerialPortReadDataBufferWriteDataBuffer)
 {
     SCOPED_TRACE("Serial Port Read(DataBuffer) and Write(DataBuffer) Test");
 
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortReadDataBufferWriteDataBuffer();
     }
@@ -1253,7 +1253,7 @@ TEST_F(SerialPortUnitTests, testSerialPortReadStringWriteString)
 {
     SCOPED_TRACE("Serial Port Read(string) and Write(string) Test");
 
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortReadStringWriteString();
     }
@@ -1263,7 +1263,7 @@ TEST_F(SerialPortUnitTests, testSerialPortReadByteWriteByte)
 {
     SCOPED_TRACE("Serial Port ReadByte() and WriteByte() Test");
 
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortReadByteWriteByte();
     }
@@ -1273,7 +1273,7 @@ TEST_F(SerialPortUnitTests, testSerialPortReadLineWriteString)
 {
     SCOPED_TRACE("Serial Port ReadLine() and Write(string) Test");
 
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortReadLineWriteString();
     }

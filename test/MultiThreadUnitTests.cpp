@@ -277,7 +277,7 @@ TEST_F(MultiThreadUnitTests, testMultiThreadSerialStreamReadWrite)
     failureRate = 0;
     loopCount = 0;
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testMultiThreadSerialStreamReadWrite();
     }
@@ -299,7 +299,7 @@ TEST_F(MultiThreadUnitTests, testMultiThreadSerialPortReadWrite)
     failureRate = 0;
     loopCount = 0;
     
-    for (size_t i = 0; i < numberOfTestIterations; i++)
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testMultiThreadSerialPortReadWrite();
     }
