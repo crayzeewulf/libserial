@@ -1,59 +1,47 @@
 /******************************************************************************
- *   @file UnitTest.cpp                                                       *
- *   @copyright (C) 2016 LibSerial Development Team                           *
+ * @file UnitTests.cpp                                                        *
+ * @copyright (C) 2004-2018 LibSerial Development Team. All rights reserved.  *
+ * crayzeewulf@gmail.com                                                      *
  *                                                                            *
- *   This program is free software; you can redistribute it and/or modify     *
- *   it under the terms of the GNU Lessser General Public License as          *
- *   published by the Free Software Foundation; either version 2 of the       *
- *   License, or (at your option) any later version.                          *
+ * Redistribution and use in source and binary forms, with or without         *
+ * modification, are permitted provided that the following conditions         *
+ * are met:                                                                   *
  *                                                                            *
- *   This program is distributed in the hope that it will be useful,          *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of           *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
- *   GNU Lesser General Public License for more details.                      *
+ * 1. Redistributions of source code must retain the above copyright          *
+ *    notice, this list of conditions and the following disclaimer.           *
+ * 2. Redistributions in binary form must reproduce the above copyright       *
+ *    notice, this list of conditions and the following disclaimer in         *
+ *    the documentation and/or other materials provided with the              *
+ *    distribution.                                                           *
+ * 3. Neither the name PX4 nor the names of its contributors may be           *
+ *    used to endorse or promote products derived from this software          *
+ *    without specific prior written permission.                              *
  *                                                                            *
- *   You should have received a copy of the GNU Lesser General Public         *
- *   License along with this program; if not, write to the                    *
- *   Free Software Foundation, Inc.,                                          *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS        *
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT          *
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS          *
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE             *
+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,        *
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,       *
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS      *
+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED         *
+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT                *
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN          *
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE            *
+ * POSSIBILITY OF SUCH DAMAGE.                                                *
  *****************************************************************************/
 
+#include "UnitTests.h"
 
 #include <chrono>
 #include <iostream>
-#include <gtest/gtest.h>
-#include <mutex>
 #include <thread>
 #include <unistd.h>
 #include <vector>
 
-#include "UnitTests.h"
-
 using namespace LibSerial;
 
 LibSerialTest::LibSerialTest()
-    : numberOfTestIterations(10)
-    , mutex{}
-    , entryTime(0)
-    , currentTime(0)
-    , elapsedTime(0)
-    , failureRate(0)
-    , loopCount(0)
-    , timeOutMilliseconds(250)   // 250ms timeout
-    , readBufferDelay(20000)     // 20ms delay
-    , baudRates{}
-    , characterSizes{}
-    , flowControlTypes{}
-    , parityTypes{}
-    , stopBits{}
-    , serialStream1{}
-    , serialStream2{}
-    , serialPort1{}
-    , serialPort2{}
-    , readString1("")
-    , readString2("")
-    , writeString1("Quidquid latine dictum sit, altum sonatur. (Whatever is said in Latin sounds profound.)")
-    , writeString2("The secret of the man who is universally interesting is that he is universally interested. - William Dean Howells")
 {
     // Empty
 }
@@ -127,11 +115,17 @@ LibSerialTest::testSerialStreamOpenClose()
     ASSERT_TRUE(serialStream1.IsOpen());
     ASSERT_TRUE(serialStream2.IsOpen());
 
+    ASSERT_TRUE(serialStream1.good());
+    ASSERT_TRUE(serialStream2.good());
+
     SerialStream serialStream3;
     SerialStream serialStream4;
 
     ASSERT_FALSE(serialStream3.IsOpen());
     ASSERT_FALSE(serialStream4.IsOpen());
+
+    ASSERT_FALSE(serialStream3.good());
+    ASSERT_FALSE(serialStream4.good());
 
     bool exclusiveUseTestPass = false;
 
@@ -1788,7 +1782,7 @@ LibSerialTest::testSerialPortReadDataBufferWriteDataBuffer()
 
         serialPort2.Read(readVector1, 0, 75);
     }
-    catch(...)
+    catch (...)
     {
         timeOutTestPass = true;
     }
@@ -1839,7 +1833,7 @@ LibSerialTest::testSerialPortReadStringWriteString()
 
         serialPort2.Read(readString1, 0, 75);
     }
-    catch(...)
+    catch (...)
     {
         timeOutTestPass = true;
     }
@@ -1888,7 +1882,7 @@ LibSerialTest::testSerialPortReadByteWriteByte()
         serialPort1.ReadByte(readByte1, 1);
         serialPort2.ReadByte(readByte2, 1);
     }
-    catch(ReadTimeout)
+    catch (ReadTimeout)
     {
         timeOutTestPass = true;
     }
@@ -1930,7 +1924,7 @@ LibSerialTest::testSerialPortReadLineWriteString()
         serialPort1.ReadLine(readString2, '\n', 1);
         serialPort2.ReadLine(readString1, '\n', 1);
     }
-    catch(ReadTimeout)
+    catch (ReadTimeout)
     {
         timeOutTestPass = true;
     }
@@ -1985,200 +1979,219 @@ LibSerialTest::testSerialStreamToSerialPortReadWrite()
 void
 LibSerialTest::serialStream1ThreadLoop()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1);
-    serialStream1.SetBaudRate(BaudRate::BAUD_115200);
-    serialStream1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
-
     size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
     size_t timeElapsedMilliSeconds = 0;
 
     while (timeElapsedMilliSeconds < timeOutMilliseconds)
     {
+        //
+        // Write data to the serial port. It should be received by the other
+        // thread.
+        //
         serialStream1 << writeString1 << std::endl;
         serialStream1.DrainWriteBuffer();
 
+        //
+        // Wait for data to arrive from the other thread
+        //
         if (serialStream1.IsDataAvailable())
         {
             alarm(5);   // Set a system alarm in case getline() blocks longer than 5 seconds.
+            readString2.clear() ;
             getline(serialStream1, readString2);
             alarm(0);   // Deactivate the alarm.
             
             if(readString2 != writeString2)
             {
-                mutex.lock();
+                std::lock_guard<std::mutex> lock {mutex} ;
                 failureRate++;
-                mutex.unlock();
-            }
+            } 
         }
 
-        timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
-
-        mutex.lock();
+        std::lock_guard<std::mutex> lock {mutex} ;
         loopCount++;
-        mutex.unlock();
-    }
 
-    serialStream1.Close();
-    return;
+        timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
+    }
 }
 
 void
 LibSerialTest::serialStream2ThreadLoop()
 {
-    serialStream2.Open(TEST_SERIAL_PORT_2);
-    serialStream2.SetBaudRate(BaudRate::BAUD_115200);
-    serialStream2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
-
-    size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
+    const size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
     size_t timeElapsedMilliSeconds = 0;
 
     while (timeElapsedMilliSeconds < timeOutMilliseconds)
     {
+        //
+        // Write data to the serial port. It should be received by the other
+        // thread.
+        //
         serialStream2 << writeString2 << std::endl;
         serialStream2.DrainWriteBuffer();
 
+        //
+        // Wait for data to arrive from the other thread
+        //
         if (serialStream2.IsDataAvailable())
         {
             alarm(5);   // Set a system alarm in case getline() blocks longer than 5 seconds.
+            readString1.clear() ;
             getline(serialStream2, readString1);
             alarm(0);   // Deactivate the alarm.
 
             if(readString1 != writeString1)
             {
-                mutex.lock();
+                std::lock_guard<std::mutex> lock {mutex} ;
                 failureRate++;
-                mutex.unlock();
-            }
-        }
-        
-        timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
-        
-        mutex.lock();
-        loopCount++;
-        mutex.unlock();
-    }
+            } 
+        } 
 
-    serialStream2.Close();
-    return;
+        std::lock_guard<std::mutex> lock {mutex} ;
+        loopCount++;
+
+        timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
+    }
 }
 
 void
 LibSerialTest::serialPort1ThreadLoop()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1);
-    serialPort1.SetBaudRate(BaudRate::BAUD_115200);
-    serialPort1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
-
-    tcflush(serialPort1.GetFileDescriptor(), TCIOFLUSH);
-
-    size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
+    const size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
     size_t timeElapsedMilliSeconds = 0;
 
     while (timeElapsedMilliSeconds < timeOutMilliseconds)
     {
-       
+        //
+        // Write data to the serial port. It should be received by the other
+        // thread.
+        //
         serialPort1.Write(writeString1 + '\n');
         serialPort1.DrainWriteBuffer();
 
+        //
+        // Wait for data to arrive from the other thread
+        //
         if (serialPort1.IsDataAvailable())
         {
             try
             {
+                readString2.clear() ;
                 serialPort1.ReadLine(readString2, '\n', timeOutMilliseconds);
-
-                if(readString2 != writeString2 + '\n')
-                {
-                    mutex.lock();
-                    failureRate++;
-                    mutex.unlock();
-                }
             }
-            catch(...)
+            catch (const std::exception& err)
             {
+                std::cerr << err.what() << std::endl ;
             }
-        }
+
+            if(readString2 != writeString2 + '\n')
+            {
+                std::lock_guard<std::mutex> lock {mutex} ;
+                failureRate++;
+            }
+        } 
+
+        std::lock_guard<std::mutex> lock {mutex} ;
+        loopCount++;
 
         timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
-
-        mutex.lock();
-        loopCount++;
-        mutex.unlock();
     }
-
-    serialPort1.Close();
-    return;
 }
 
 void
 LibSerialTest::serialPort2ThreadLoop()
 {
-    serialPort2.Open(TEST_SERIAL_PORT_2);
-    serialPort2.SetBaudRate(BaudRate::BAUD_115200);
-    serialPort2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
-
-    tcflush(serialPort1.GetFileDescriptor(), TCIOFLUSH);
-
-    size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
+    const size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
     size_t timeElapsedMilliSeconds = 0;
 
     while (timeElapsedMilliSeconds < timeOutMilliseconds)
     {
+        //
+        // Write data to the serial port. It should be received by the other
+        // thread.
+        //
         serialPort2.Write(writeString2 + '\n');
         serialPort2.DrainWriteBuffer();
 
+        //
+        // Wait for data to arrive from the other thread
+        //
         if (serialPort2.IsDataAvailable())
         {
             try
             {
+                readString1.clear() ;
                 serialPort2.ReadLine(readString1, '\n', timeOutMilliseconds);
-
-                if(readString1 != writeString1 + '\n')
-                {
-                    mutex.lock();
-                    failureRate++;
-                    mutex.unlock();
-                }
             }
-            catch(...)
+            catch (const std::exception& err)
             {
+                std::cerr << err.what() << std::endl ;
+            }
+
+            if(readString1 != writeString1 + '\n')
+            {
+                std::lock_guard<std::mutex> lock {mutex} ;
+                failureRate++;
             }
         }
 
-        timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
-
-        mutex.lock();
+        std::lock_guard<std::mutex> lock {mutex} ;
         loopCount++;
-        mutex.unlock();
-    }
 
-    serialPort2.Close();
-    return;
+        timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
+    }
 }
 
 void
 LibSerialTest::testMultiThreadSerialStreamReadWrite()
 {
-    failureRate = 0;
-    loopCount = 0;
+    //
+    // We must open the two serial ports before spawning the threads.
+    // Otherwise, one thread may flush the serial port I/O buffers *after* the
+    // other thread has already sent data. 
+    //
+    serialStream1.Open(TEST_SERIAL_PORT_1);
+    serialStream1.SetBaudRate(BaudRate::BAUD_115200);
+    serialStream1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+
+    serialStream2.Open(TEST_SERIAL_PORT_2);
+    serialStream2.SetBaudRate(BaudRate::BAUD_115200);
+    serialStream2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
 
     std::thread serialStream1Thread(&LibSerialTest::serialStream1ThreadLoop, this);
     std::thread serialStream2Thread(&LibSerialTest::serialStream2ThreadLoop, this);
 
     serialStream1Thread.join();
     serialStream2Thread.join();
+
+    serialStream1.Close() ;
+    serialStream2.Close() ;
 }
 
 void
 LibSerialTest::testMultiThreadSerialPortReadWrite()
 {
-    failureRate = 0;
-    loopCount = 0;
-    
+    //
+    // We must open the two serial ports before spawning the threads.
+    // Otherwise, one thread may flush the serial port I/O buffers *after* the
+    // other thread has already sent data. 
+    //
+    serialPort1.Open(TEST_SERIAL_PORT_1);
+    serialPort1.SetBaudRate(BaudRate::BAUD_115200);
+    serialPort1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+
+    serialPort2.Open(TEST_SERIAL_PORT_2);
+    serialPort2.SetBaudRate(BaudRate::BAUD_115200);
+    serialPort2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+
     std::thread serialPort1Thread(&LibSerialTest::serialPort1ThreadLoop, this);
     std::thread serialPort2Thread(&LibSerialTest::serialPort2ThreadLoop, this);
 
     serialPort1Thread.join();
     serialPort2Thread.join();
+
+    serialPort1.Close() ;
+    serialPort2.Close() ;
 }
 
 
@@ -2716,18 +2729,18 @@ TEST_F(LibSerialTest, testMultiThreadSerialStreamReadWrite)
 {
     SCOPED_TRACE("Test Multi-Thread Serial Stream Communication.");
 
-    std::cout << "Note: This test calls getline() which can block indefinitely "
-              << "if a newline character is not recieved." << std::endl;
-
+    failureRate = 0;
+    loopCount = 0;
+    
     for (size_t i = 0; i < numberOfTestIterations; i++)
     {
         testMultiThreadSerialStreamReadWrite();
     }
 
-    double failRate = 100. * (double)failureRate / (double)loopCount;
+    const double failRate = 100. * (double)failureRate / (double)loopCount;
     
-    // If the serial communication fail rate is greater than 0.001% consider it a failed test.
-    if (failRate > 0.001)
+    // If the serial communication fail rate is greater than 0.0001% consider it a failed test.
+    if (failRate > 0.0001)
     {
         std::cout << "\t     SerialStream Failure Rate = " << failRate << "%" << std::endl;
         ADD_FAILURE();
@@ -2738,15 +2751,18 @@ TEST_F(LibSerialTest, testMultiThreadSerialPortReadWrite)
 {
     SCOPED_TRACE("Test Multi-Thread Serial Port Communication.");
 
+    failureRate = 0;
+    loopCount = 0;
+    
     for (size_t i = 0; i < numberOfTestIterations; i++)
     {
         testMultiThreadSerialPortReadWrite();
     }
 
-    double failRate = 100. * (double)failureRate / (double)loopCount;
+    const double failRate = 100. * (double)failureRate / (double)loopCount;
     
-    // If the serial communication fail rate is greater than 0.001% consider it a failed test.
-    if (failRate > 0.001)
+    // If the serial communication fail rate is greater than 0.0001% consider it a failed test.
+    if (failRate > 0.0001)
     {
         std::cout << "\t     SerialPort Failure Rate = " << failRate << "%" << std::endl;
         ADD_FAILURE();

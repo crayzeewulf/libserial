@@ -15,3 +15,5 @@ TARGET_LINK_LIBRARIES(unit_tests
   libserial
   ${Boost_LIBRARIES}
 )
+
+ADD_TEST(NAME UnitTests COMMAND UnitTests)

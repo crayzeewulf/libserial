@@ -4,9 +4,15 @@ Design Documentation
 LibSerial's Coding standards
 ----------------------------
 
-Try to utilize these guidelines if you are contributing the LibSerial as a developer.  Although we attempt to maintain these standards wherever practical, on occasion you might still discover a few deviations.
+Try to utilize these guidelines if you are contributing the LibSerial as a
+developer.  Although we attempt to maintain these standards wherever practical,
+on occasion you might still discover a few deviations.
 
-ISO standard C++, C++11
+Please familiarize yourselves with `C++ Core Guidelines
+<http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines>`_ and try to
+follow these guidelines.
+
+LibSerial uses ISO standard C++ based on the C++14 standard. 
 
 Use Doxygen style comments (with @ commands) for every:
 
@@ -33,8 +39,8 @@ Class members: mCamelCase
 Arguments to methods/functions: camelCase (lower case first word)
 
 
-Naming Convention:
-------------------
+Naming Convention
+-----------------
 Use CamelCase for Files, Classes, Namespace, Structures, Enumerations, Functions, Procedures, and Member Variables.
 
 Filenames are the name of the class or namespace within -- one class per file.
@@ -54,8 +60,9 @@ Constants and Globals are named identically to variables.
 
 Do not use abbreviations and be as precise and descriptive with naming as possible.
 
-Indentation:
-------------
+Indentation
+-----------
+
 Indentation shall be 4 space characters, not tabs.
 
 Braces shall begin and end on the indentation level.
