@@ -1,6 +1,6 @@
 /******************************************************************************
  *   @file SerialPort.h                                                       *
- *   @copyright (C) 2004 Manish Pagey                                         *
+ *   @copyright (C) 2004-2018 Manish Pagey                                    *
  *   crayzeewulf@users.sourceforge.net                                        *
  *                                                                            *
  *   This program is free software; you can redistribute it and/or modify     *
@@ -18,9 +18,7 @@
  *   Free Software Foundation, Inc.,                                          *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
  *****************************************************************************/
-
-#ifndef _SerialPort_h_
-#define _SerialPort_h_
+#pragma once
 
 #include <SerialPortConstants.h>
 
@@ -48,7 +46,7 @@ namespace LibSerial
         /**
          * @brief Default Constructor.
          */
-        explicit SerialPort();
+        explicit SerialPort() ;
 
         /**
          * @brief Constructor that allows a SerialPort instance to be
@@ -67,13 +65,33 @@ namespace LibSerial
                             const CharacterSize& characterSize   = CharacterSize::CHAR_SIZE_DEFAULT,
                             const FlowControl&   flowControlType = FlowControl::FLOW_CONTROL_DEFAULT,
                             const Parity&        parityType      = Parity::PARITY_DEFAULT,
-                            const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT);
+                            const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT) ;
 
         /**
          * @brief Default Destructor for a SerialPort object. Closes the
          *        serial port associated with mFileDescriptor if open.
          */
         virtual ~SerialPort() noexcept;
+
+        /**
+         * @brief Copy construction is disallowed.
+         */
+        SerialPort(const SerialPort& otherSerialPort) = delete ;
+
+        /**
+         * @brief Move construction is disallowed.
+         */
+        SerialPort(const SerialPort&& otherSerialPort) = delete ;
+
+        /**
+         * @brief Copy assignment is disallowed.
+         */
+        SerialPort& operator=(const SerialPort& otherSerialPort) = delete ;
+
+        /**
+         * @brief Move assignment is disallowed.
+         */
+        SerialPort& operator=(const SerialPort&& otherSerialPort) = delete ;
 
         /**
          * @brief Opens the serial port associated with the specified
@@ -83,33 +101,33 @@ namespace LibSerial
          *        communication port is opened.
          */
         void Open(const std::string& fileName,
-                  const std::ios_base::openmode& openMode = std::ios_base::in | std::ios_base::out);
+                  const std::ios_base::openmode& openMode = std::ios_base::in | std::ios_base::out) ;
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
          *        lost and no more I/O can be performed on the serial port.
          */
-        void Close();
+        void Close() ;
 
         /**
          * @brief Waits until the write buffer is drained and then returns.
          */
-        void DrainWriteBuffer();
+        void DrainWriteBuffer() ;
 
         /**
          * @brief Flushes the serial port input buffer.
          */
-        void FlushInputBuffer();
+        void FlushInputBuffer() ;
 
         /**
          * @brief Flushes the serial port output buffer.
          */
-        void FlushOutputBuffer();
+        void FlushOutputBuffer() ;
 
         /**
          * @brief Flushes the serial port input and output buffers.
          */
-        void FlushIOBuffers();
+        void FlushIOBuffers() ;
 
         /**
          * @brief Checks if data is available at the input of the serial port.
@@ -121,79 +139,79 @@ namespace LibSerial
          * @brief Determines if the serial port is open for I/O.
          * @return Returns true iff the serial port is open.
          */
-        bool IsOpen() const;
+        bool IsOpen() const ;
 
         /**
          * @brief Sets all serial port paramters to their default values.
          */
-        void SetDefaultSerialPortParameters();
+        void SetDefaultSerialPortParameters() ;
 
         /**
          * @brief Sets the baud rate for the serial port to the specified value
          * @param baudRate The baud rate to be set for the serial port.
          */
-        void SetBaudRate(const BaudRate& baudRate);
+        void SetBaudRate(const BaudRate& baudRate) ;
 
         /**
          * @brief Gets the current baud rate for the serial port.
          * @return Returns the baud rate.
          */
-        BaudRate GetBaudRate() const;
+        BaudRate GetBaudRate() const ;
 
         /**
          * @brief Sets the character size for the serial port.
          * @param characterSize The character size to be set.
          */
-        void SetCharacterSize(const CharacterSize& characterSize);
+        void SetCharacterSize(const CharacterSize& characterSize) ;
 
         /**
          * @brief Gets the character size being used for serial communication.
          * @return Returns the current character size.
          */
-        CharacterSize GetCharacterSize() const;
+        CharacterSize GetCharacterSize() const ;
 
         /**
          * @brief Sets flow control for the serial port.
          * @param flowControlType The flow control type to be set.
          */
-        void SetFlowControl(const FlowControl& flowControlType);
+        void SetFlowControl(const FlowControl& flowControlType) ;
 
         /**
          * @brief Gets the current flow control setting.
          * @return Returns the flow control type of the serial port.
          */
-        FlowControl GetFlowControl() const;
+        FlowControl GetFlowControl() const ;
 
         /**
          * @brief Sets the parity type for the serial port.
          * @param parityType The parity type to be set.
          */
-        void SetParity(const Parity& parityType);
+        void SetParity(const Parity& parityType) ;
 
         /**
          * @brief Gets the parity type for the serial port.
          * @return Returns the parity type.
          */
-        Parity GetParity() const;
+        Parity GetParity() const ;
 
         /**
          * @brief Sets the number of stop bits to be used with the serial port.
          * @param stopBits The number of stop bits to set.
          */
-        void SetStopBits(const StopBits& stopBits);
+        void SetStopBits(const StopBits& stopBits) ;
 
         /**
          * @brief Gets the number of stop bits currently being used by the serial
          * @return Returns the number of stop bits.
          */
-        StopBits GetStopBits() const;
+        StopBits GetStopBits() const ;
 
         /**
          * @brief Sets the minimum number of characters for non-canonical reads.
          * @note See VMIN in man termios(3).
          * @param vmin the number of minimum characters to be set.
          */
-        void SetVMin(short vmin);
+        void SetVMin(short vmin) ;
 
         /**
          * @brief Gets the VMIN value for the device, which represents the
@@ -201,46 +219,46 @@ namespace LibSerial
          * @return Returns the minimum number of characters for
          *         non-canonical reads.
          */
-        short GetVMin() const;
+        short GetVMin() const ;
 
         /**
          * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
          * @param vtime The timeout value in deciseconds to be set.
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
          */
-        void SetVTime(short vtime);
+        void SetVTime(short vtime) ;
 
         /**
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
          */
-        short GetVTime() const;
+        short GetVTime() const ;
 
         /**
          * @brief Sets the DTR line to the specified value.
          * @param dtrState The line voltage state to be set,
          *        (true = high, false = low).
          */
-        void SetDTR(bool dtrState = true);
+        void SetDTR(bool dtrState = true) ;
 
         /**
          * @brief Gets the status of the DTR line.
          * @return Returns true iff the status of the DTR line is high.
          */
-        bool GetDTR() const;
+        bool GetDTR() const ;
 
         /**
          * @brief Set the RTS line to the specified value.
          * @param rtsState The line voltage state to be set,
          *        (true = high, false = low).
          */
-        void SetRTS(bool rtsState = true);
+        void SetRTS(bool rtsState = true) ;
 
         /**
          * @brief Get the status of the RTS line.
          * @return Returns true iff the status of the RTS line is high.
          */
-        bool GetRTS() const;
+        bool GetRTS() const ;
 
         /**
          * @brief Get the status of the CTS line.
@@ -258,7 +276,7 @@ namespace LibSerial
          * @brief Gets the serial port file descriptor.
          * @return Returns the serial port file descriptor.
          */
-        int GetFileDescriptor() const;
+        int GetFileDescriptor() const ;
 
         /**
          * @brief Gets the number of bytes available in the read buffer.
@@ -271,7 +289,7 @@ namespace LibSerial
          * @return Returns a std::vector of std::strings with the name of
          *         each available serial port.
          */
-        std::vector<std::string> GetAvailableSerialPorts() const;
+        std::vector<std::string> GetAvailableSerialPorts() const ;
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -290,7 +308,7 @@ namespace LibSerial
          */
         void Read(DataBuffer& dataBuffer,
                   size_t      numberOfBytes = 0,
-                  size_t      msTimeout = 0);
+                  size_t      msTimeout = 0) ;
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
@@ -309,7 +327,7 @@ namespace LibSerial
          */
         void Read(std::string& dataString,
                   size_t       numberOfBytes = 0,
-                  size_t       msTimeout = 0);
+                  size_t       msTimeout = 0) ;
 
         /**
          * @brief Reads a single byte from the serial port. If no data is
@@ -321,7 +339,7 @@ namespace LibSerial
          * @param msTimeout The timeout period in milliseconds.
          */
         void ReadByte(char&  charBuffer,
-                      size_t msTimeout = 0);
+                      size_t msTimeout = 0) ;
 
         /**
          * @brief Reads a single byte from the serial port. If no data is
@@ -333,7 +351,7 @@ namespace LibSerial
          * @param msTimeout The timeout period in milliseconds.
          */
         void ReadByte(unsigned char& charBuffer,
-                      size_t         msTimeout = 0);
+                      size_t         msTimeout = 0) ;
 
         /**
          * @brief Reads a line of characters from the serial port.
@@ -350,44 +368,44 @@ namespace LibSerial
          */
         void ReadLine(std::string& dataString,
                       char         lineTerminator = '\n',
-                      size_t       msTimeout = 0);
+                      size_t       msTimeout = 0) ;
 
         /**
          * @brief Writes a DataBuffer to the serial port.
          * @param dataBuffer The DataBuffer to write to the serial port.
          */
-        void Write(const DataBuffer& dataBuffer);
+        void Write(const DataBuffer& dataBuffer) ;
 
         /**
          * @brief Writes a std::string to the serial port.
          * @param dataString The data string to write to the serial port.
          */
-        void Write(const std::string& dataString);
+        void Write(const std::string& dataString) ;
 
         /**
          * @brief Writes a single byte to the serial port.
          * @param charbuffer The byte to write to the serial port.
          */
-        void WriteByte(char charbuffer);
+        void WriteByte(char charbuffer) ;
 
         /**
          * @brief Writes a single byte to the serial port.
          * @param charbuffer The byte to write to the serial port.
          */
-        void WriteByte(unsigned char charbuffer);
+        void WriteByte(unsigned char charbuffer) ;
 
         /**
          * @brief Sets the current state of the serial port blocking status.
          * @param blockingStatus The serial port blocking status to be set,
          *        true if to be set blocking, false if to be set non-blocking.
          */
-        void SetSerialPortBlockingStatus(bool blockingStatus);
+        void SetSerialPortBlockingStatus(bool blockingStatus) ;
 
         /**
          * @brief Gets the current state of the serial port blocking status.
          * @return True if port is blocking, false if port non-blocking.
          */
-        bool GetSerialPortBlockingStatus() const;
+        bool GetSerialPortBlockingStatus() const ;
 
         /**
          * @brief Set the specified modem control line to the specified value.
@@ -397,7 +415,7 @@ namespace LibSerial
          *        call to this method.
          */
         void SetModemControlLine(int modemLine,
-                                 bool lineState);
+                                 bool lineState) ;
 
         /**
          * @brief Get the current state of the specified modem control line.
@@ -407,28 +425,6 @@ namespace LibSerial
          *         otherwise.
          */
         bool GetModemControlLine(int modemLine) ;
-
-        /**
-         * @brief Prevents copying of objects of this class by declaring the copy
-         *        constructor private. This method is never defined.
-         */
-        SerialPort(const SerialPort& otherSerialPort) = delete;
-
-        /**
-         * @brief Move construction is disallowed.
-         */
-        SerialPort(const SerialPort&& otherSerialPort) = delete;
-
-        /**
-         * @brief Prevents copying of objects of this class by declaring the
-         *        assignment operator private. This method is never defined.
-         */
-        SerialPort& operator=(const SerialPort& otherSerialPort) = delete;
-
-        /**
-         * @brief Move assignment is not allowed.
-         */
-        SerialPort& operator=(const SerialPort&& otherSerialPort) = delete;
 
     protected:
 
@@ -444,8 +440,6 @@ namespace LibSerial
          */
         std::unique_ptr<Implementation> mImpl;
 
-    }; // class SerialPort
+    } ;// class SerialPort
 
 } // namespace LibSerial
-
-#endif // #ifndef _SerialPort_h_
