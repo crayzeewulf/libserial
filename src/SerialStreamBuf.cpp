@@ -667,27 +667,25 @@ namespace LibSerial
     void
     SerialStreamBuf::Implementation::Open(const std::string& fileName,
                                           const std::ios_base::openmode& openMode)
+    try
     {
-        try
-        {
-            mSerialPort.Open(fileName, 
-                             openMode) ;
+        mSerialPort.Open(fileName, 
+                         openMode) ;
 
-            // @note - Stream communications need to happen in blocking mode.
-            mSerialPort.SetSerialPortBlockingStatus(true) ;
-        }
-        catch (const AlreadyOpen&)
-        {
-            throw ;
-        }
-        catch (const OpenFailed&)
-        {
-            throw ;
-        }
-        catch (const std::exception& err)
-        {
-            throw OpenFailed(err.what()) ;
-        }
+        // @note - Stream communications need to happen in blocking mode.
+        mSerialPort.SetSerialPortBlockingStatus(true) ;
+    }
+    catch (const AlreadyOpen&)
+    {
+        throw ;
+    }
+    catch (const OpenFailed&)
+    {
+        throw ;
+    }
+    catch (const std::exception& err)
+    {
+        throw OpenFailed(err.what()) ;
     }
 
     inline
