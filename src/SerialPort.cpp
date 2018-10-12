@@ -1,22 +1,34 @@
 /******************************************************************************
- *   @file SerialPort.cpp                                                     *
- *   @copyright (C) 2004-2018 Manish Pagey                                    *
- *   crayzeewulf@users.sourceforge.net                                        *
+ * @file SerialPort.cpp                                                       *
+ * @copyright (C) 2004-2018 LibSerial Development Team. All rights reserved.  *
+ * crayzeewulf@gmail.com                                                      *
  *                                                                            *
- *   This program is free software; you can redistribute it and/or modify     *
- *   it under the terms of the GNU Lessser General Public License as          *
- *   published by the Free Software Foundation; either version 2 of the       *
- *   License, or (at your option) any later version.                          *
+ * Redistribution and use in source and binary forms, with or without         *
+ * modification, are permitted provided that the following conditions         *
+ * are met:                                                                   *
  *                                                                            *
- *   This program is distributed in the hope that it will be useful,          *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of           *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
- *   GNU Lesser General Public License for more details.                      *
+ * 1. Redistributions of source code must retain the above copyright          *
+ *    notice, this list of conditions and the following disclaimer.           *
+ * 2. Redistributions in binary form must reproduce the above copyright       *
+ *    notice, this list of conditions and the following disclaimer in         *
+ *    the documentation and/or other materials provided with the              *
+ *    distribution.                                                           *
+ * 3. Neither the name PX4 nor the names of its contributors may be           *
+ *    used to endorse or promote products derived from this software          *
+ *    without specific prior written permission.                              *
  *                                                                            *
- *   You should have received a copy of the GNU Lesser General Public         *
- *   License along with this program; if not, write to the                    *
- *   Free Software Foundation, Inc.,                                          *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS        *
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT          *
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS          *
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE             *
+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,        *
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,       *
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS      *
+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED         *
+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT                *
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN          *
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE            *
+ * POSSIBILITY OF SUCH DAMAGE.                                                *
  *****************************************************************************/
 
 #include "SerialPort.h"
@@ -819,7 +831,7 @@ namespace LibSerial
         // we can use a switch here to construct the flags to be used with the
         // open() system call.  Since we are dealing with the serial port we
         // need to use the O_NOCTTY option.
-        int flags = (O_NOCTTY | O_NONBLOCK) ;// NOLINT (hicpp-signed-bitwise)
+        int flags = (O_NOCTTY | O_NONBLOCK) ;   // NOLINT (hicpp-signed-bitwise)
 
         if (openMode == (std::ios_base::in | std::ios_base::out))
         {
@@ -1268,17 +1280,17 @@ namespace LibSerial
         if (characterSize == CharacterSize::CHAR_SIZE_8)
         {
             // NOLINTNEXTLINE (hicpp-signed-bitwise)
-            port_settings.c_iflag &= ~ISTRIP ;// Clear the ISTRIP flag.
+            port_settings.c_iflag &= ~ISTRIP ;  // Clear the ISTRIP flag.
         }
         else
         {
-            port_settings.c_iflag |= ISTRIP ; // Set the ISTRIP flag.
+            port_settings.c_iflag |= ISTRIP ;   // Set the ISTRIP flag.
         }
 
         // Set the character size.
         // NOLINTNEXTLINE (hicpp-signed-bitwise)
-        port_settings.c_cflag &= ~CSIZE;                               // Clear all CSIZE bits.
-        port_settings.c_cflag |= static_cast<tcflag_t>(characterSize) ;// Set the character size.
+        port_settings.c_cflag &= ~CSIZE;                                // Clear all CSIZE bits.
+        port_settings.c_cflag |= static_cast<tcflag_t>(characterSize) ; // Set the character size.
 
         // Apply the modified settings.
         if (tcsetattr(this->mFileDescriptor,
@@ -1347,19 +1359,19 @@ namespace LibSerial
         switch(flowControlType)
         {
         case FlowControl::FLOW_CONTROL_HARDWARE:
-            port_settings.c_iflag &= ~ (IXON|IXOFF) ;// NOLINT (hicpp-signed-bitwise)
+            port_settings.c_iflag &= ~ (IXON|IXOFF) ;   // NOLINT (hicpp-signed-bitwise)
             port_settings.c_cflag |= CRTSCTS;
             port_settings.c_cc[VSTART] = _POSIX_VDISABLE;
             port_settings.c_cc[VSTOP] = _POSIX_VDISABLE;
             break;
         case FlowControl::FLOW_CONTROL_SOFTWARE:
-            port_settings.c_iflag |= IXON|IXOFF;// NOLINT(hicpp-signed-bitwise)
+            port_settings.c_iflag |= IXON|IXOFF;        // NOLINT(hicpp-signed-bitwise)
             port_settings.c_cflag &= ~CRTSCTS;
-            port_settings.c_cc[VSTART] = CTRL_Q;// 0x11 (021) ^q
-            port_settings.c_cc[VSTOP]  = CTRL_S;// 0x13 (023) ^s
+            port_settings.c_cc[VSTART] = CTRL_Q;        // 0x11 (021) ^q
+            port_settings.c_cc[VSTOP]  = CTRL_S;        // 0x13 (023) ^s
             break;
         case FlowControl::FLOW_CONTROL_NONE:
-            port_settings.c_iflag &= ~(IXON|IXOFF) ;// NOLINT(hicpp-signed-bitwise)
+            port_settings.c_iflag &= ~(IXON|IXOFF) ;    // NOLINT(hicpp-signed-bitwise)
             port_settings.c_cflag &= ~CRTSCTS;
             break;
         default:
@@ -1449,7 +1461,7 @@ namespace LibSerial
         {
         case Parity::PARITY_EVEN:
             port_settings.c_cflag |= PARENB ;
-            port_settings.c_cflag &= ~PARODD ;// NOLINT (hicpp-signed-bitwise)
+            port_settings.c_cflag &= ~PARODD ;  // NOLINT (hicpp-signed-bitwise)
             port_settings.c_iflag |= INPCK ;
             break;
         case Parity::PARITY_ODD:
@@ -1458,7 +1470,7 @@ namespace LibSerial
             port_settings.c_iflag |= INPCK ;
             break;
         case Parity::PARITY_NONE:
-            port_settings.c_cflag &= ~PARENB ;// NOLINT (hicpp-signed-bitwise)
+            port_settings.c_cflag &= ~PARENB ;  // NOLINT (hicpp-signed-bitwise)
             port_settings.c_iflag |= IGNPAR ;
             break;
         default:
@@ -1501,11 +1513,11 @@ namespace LibSerial
             // parity is enabled.
             if (port_settings.c_cflag & PARODD) // NOLINT (hicpp-signed-bitwise)
             {
-                return Parity::PARITY_ODD ;// odd parity
+                return Parity::PARITY_ODD ; // odd parity
             }
-            return Parity::PARITY_EVEN ;// even parity
+            return Parity::PARITY_EVEN ;    // even parity
         }
-        return Parity::PARITY_NONE ;// no parity.
+        return Parity::PARITY_NONE ;        // no parity.
     }
 
     inline
@@ -1532,7 +1544,7 @@ namespace LibSerial
         switch(stopBits)
         {
         case StopBits::STOP_BITS_1:
-            port_settings.c_cflag &= ~CSTOPB ;// NOLINT (hicpp-signed-bitwise)
+            port_settings.c_cflag &= ~CSTOPB ;  // NOLINT (hicpp-signed-bitwise)
             break;
         case StopBits::STOP_BITS_2:
             port_settings.c_cflag |= CSTOPB ;
@@ -1946,7 +1958,7 @@ namespace LibSerial
             throw std::runtime_error(std::strerror(errno)) ;
         }
 
-        return (0 != (serial_port_state & modemLine)) ;// NOLINT(hicpp-signed-bitwise)
+        return (0 != (serial_port_state & modemLine)) ; // NOLINT(hicpp-signed-bitwise)
     }
 
     inline
@@ -2127,7 +2139,7 @@ namespace LibSerial
         }
 
         // Enable the receiver (CREAD) and ignore modem control lines (CLOCAL).
-        port_settings.c_cflag |= CREAD | CLOCAL;// NOLINT (hicpp-signed-bitwise)
+        port_settings.c_cflag |= CREAD | CLOCAL;    // NOLINT (hicpp-signed-bitwise)
 
         // Apply the modified settings.
         if (tcsetattr(this->mFileDescriptor,
