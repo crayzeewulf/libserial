@@ -1,4 +1,7 @@
 ADD_EXECUTABLE(UnitTests
+  SerialPortUnitTests.cpp
+  SerialStreamUnitTests.cpp
+  MultiThreadUnitTests.cpp
   UnitTests.cpp
   )
 
