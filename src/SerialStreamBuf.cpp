@@ -939,7 +939,7 @@ namespace LibSerial
         // :TODO: Consider using mSerialPort.Write() here instead of writing
         //        to the file descriptor directly.
         const auto fd = mSerialPort.GetFileDescriptor() ;
-        ssize_t result = write(fd, character, numberOfBytes) ;
+        ssize_t result = call_with_retry(write, fd, character, numberOfBytes) ;
 
         // If the write failed then return 0.
         if (result <= 0)
@@ -997,7 +997,7 @@ namespace LibSerial
                 // using the file descriptor.
                 //
                 const auto fd = mSerialPort.GetFileDescriptor() ;
-                result = read(fd, &character[1], numberOfBytes-1) ;
+                result = call_with_retry(read, fd, &character[1], numberOfBytes-1) ;
 
                 // If read was successful, then we need to increment result by
                 // one to indicate that the putback character was prepended to
@@ -1016,7 +1016,7 @@ namespace LibSerial
             // :TODO: Consider using mSerialPort.Read() here instead of
             //        using the file descriptor.
             const auto fd = mSerialPort.GetFileDescriptor() ;
-            result = read(fd, character, numberOfBytes) ;
+            result = call_with_retry(read, fd, character, numberOfBytes) ;
         }
 
         // If result == -1 then the read call had an error, otherwise, if
@@ -1055,7 +1055,7 @@ namespace LibSerial
         //        of using the file descriptor.
         const auto fd = mSerialPort.GetFileDescriptor() ;
         char out_char = traits_type::to_char_type(character) ;
-        ssize_t result = write(fd, &out_char, 1) ;
+        ssize_t result = call_with_retry(write, fd, &out_char, 1) ;
 
         // If the write failed then return eof.
         if (result <= 0)
@@ -1097,7 +1097,7 @@ namespace LibSerial
             // of using the file descriptor.
             //
             const auto fd = mSerialPort.GetFileDescriptor() ;
-            result = read(fd, &next_char, 1) ;
+            result = call_with_retry(read, fd, &next_char, 1) ;
 
             // Make the next character the putback character. This has the
             // effect of returning the next character without changing gptr()
@@ -1189,9 +1189,10 @@ namespace LibSerial
         // :TODO: Consider using a method of SerialPort class here instead
         //        of using the file descriptor.
         const auto fd = mSerialPort.GetFileDescriptor() ;
-        const auto result = ioctl(fd,
-                                  FIONREAD,
-                                  &number_of_bytes_available) ;
+        const auto result = call_with_retry(ioctl,
+                                            fd,
+                                            FIONREAD,
+                                            &number_of_bytes_available) ;
 
         if ((result >= 0) and (number_of_bytes_available > 0))
         {
