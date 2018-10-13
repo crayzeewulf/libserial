@@ -449,21 +449,20 @@ namespace LibSerial
         void SetDefaultLocalModes() ;
 
         /**
-         * @var The file descriptor corresponding to the serial port.
+         * The file descriptor corresponding to the serial port.
          */
         int mFileDescriptor = -1 ;
 
         /**
-         * @var The time in microseconds required for a byte of data to
-         *      arrive at the serial port.
+         * The time in microseconds required for a byte of data to arrive at
+         * the serial port.
          */
         int mByteArrivalTimeDelta = 1 ;
 
-
         /**
-         * @struct Serial port settings are saved into this struct immediately
-         *         after the port is opened. These settings are restored when the
-         *         serial port is closed.
+         * Serial port settings are saved into this struct immediately after
+         * the port is opened. These settings are restored when the serial port
+         * is closed.
          */
         termios mOldPortSettings {} ;
     } ;
@@ -852,7 +851,7 @@ namespace LibSerial
 
         // Try to open the serial port. 
         // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-        mFileDescriptor = open(fileName.c_str(), flags) ;
+        mFileDescriptor = call_with_retry(open, fileName.c_str(), flags) ;
         
         if (this->mFileDescriptor < 0)
         {
@@ -862,8 +861,9 @@ namespace LibSerial
 
         // Set the serial port to exclusive access to this process.
         // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-        if (ioctl(this->mFileDescriptor,
-                  TIOCEXCL) == -1)
+        if (call_with_retry(ioctl,
+                            this->mFileDescriptor,
+                            TIOCEXCL) == -1)
         {
             throw std::runtime_error(std::strerror(errno)) ;
         }
@@ -997,9 +997,10 @@ namespace LibSerial
         bool is_data_available = false ;
 
         // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-        const auto ioctl_result = ioctl(this->mFileDescriptor,
-                                        FIONREAD,
-                                        &number_of_bytes_available) ;
+        const auto ioctl_result = call_with_retry(ioctl,
+                                                  this->mFileDescriptor,
+                                                  FIONREAD,
+                                                  &number_of_bytes_available) ;
         
         if ((ioctl_result >= 0) and
             (number_of_bytes_available > 0))
@@ -1118,7 +1119,7 @@ namespace LibSerial
     int
     SerialPort::Implementation::GetBitRate(const BaudRate& baudRate) const
     {
-        int baud_rate_as_int = 1;
+        int baud_rate_as_int = 1 ;
 
         switch (baudRate)
         {
@@ -1289,7 +1290,7 @@ namespace LibSerial
 
         // Set the character size.
         // NOLINTNEXTLINE (hicpp-signed-bitwise)
-        port_settings.c_cflag &= ~CSIZE;                                // Clear all CSIZE bits.
+        port_settings.c_cflag &= ~CSIZE ;                               // Clear all CSIZE bits.
         port_settings.c_cflag |= static_cast<tcflag_t>(characterSize) ; // Set the character size.
 
         // Apply the modified settings.
@@ -1360,23 +1361,23 @@ namespace LibSerial
         {
         case FlowControl::FLOW_CONTROL_HARDWARE:
             port_settings.c_iflag &= ~ (IXON|IXOFF) ;   // NOLINT (hicpp-signed-bitwise)
-            port_settings.c_cflag |= CRTSCTS;
-            port_settings.c_cc[VSTART] = _POSIX_VDISABLE;
-            port_settings.c_cc[VSTOP] = _POSIX_VDISABLE;
-            break;
+            port_settings.c_cflag |= CRTSCTS ;
+            port_settings.c_cc[VSTART] = _POSIX_VDISABLE ;
+            port_settings.c_cc[VSTOP] = _POSIX_VDISABLE ;
+            break ;
         case FlowControl::FLOW_CONTROL_SOFTWARE:
-            port_settings.c_iflag |= IXON|IXOFF;        // NOLINT(hicpp-signed-bitwise)
-            port_settings.c_cflag &= ~CRTSCTS;
-            port_settings.c_cc[VSTART] = CTRL_Q;        // 0x11 (021) ^q
-            port_settings.c_cc[VSTOP]  = CTRL_S;        // 0x13 (023) ^s
-            break;
+            port_settings.c_iflag |= IXON|IXOFF ;        // NOLINT(hicpp-signed-bitwise)
+            port_settings.c_cflag &= ~CRTSCTS ;
+            port_settings.c_cc[VSTART] = CTRL_Q ;        // 0x11 (021) ^q
+            port_settings.c_cc[VSTOP]  = CTRL_S ;        // 0x13 (023) ^s
+            break ;
         case FlowControl::FLOW_CONTROL_NONE:
             port_settings.c_iflag &= ~(IXON|IXOFF) ;    // NOLINT(hicpp-signed-bitwise)
-            port_settings.c_cflag &= ~CRTSCTS;
-            break;
+            port_settings.c_cflag &= ~CRTSCTS ;
+            break ;
         default:
             throw std::invalid_argument(ERR_MSG_INVALID_FLOW_CONTROL) ;
-            break;
+            break ;
         }
         
         // Apply the modified settings.
@@ -1416,7 +1417,7 @@ namespace LibSerial
             (CTRL_Q == port_settings.c_cc[VSTART]) and
             (CTRL_S == port_settings.c_cc[VSTOP]))
         {
-            return FlowControl::FLOW_CONTROL_SOFTWARE;
+            return FlowControl::FLOW_CONTROL_SOFTWARE ;
         }
 
         if (not ((port_settings.c_iflag & IXON) or // NOLINT (hicpp-signed-bitwise)
@@ -1426,14 +1427,14 @@ namespace LibSerial
             {
                 // If neither IXON or IXOFF is set then we must have hardware flow
                 // control.
-                return FlowControl::FLOW_CONTROL_HARDWARE;
+                return FlowControl::FLOW_CONTROL_HARDWARE ;
             }
-            return FlowControl::FLOW_CONTROL_NONE;
+            return FlowControl::FLOW_CONTROL_NONE ;
         }
 
         // If none of the above conditions are satisfied then the serial port
         // is using a flow control setup which we do not support at present.
-        return FlowControl::FLOW_CONTROL_INVALID;
+        return FlowControl::FLOW_CONTROL_INVALID ;
     }
 
     inline
@@ -1463,19 +1464,19 @@ namespace LibSerial
             port_settings.c_cflag |= PARENB ;
             port_settings.c_cflag &= ~PARODD ;  // NOLINT (hicpp-signed-bitwise)
             port_settings.c_iflag |= INPCK ;
-            break;
+            break ;
         case Parity::PARITY_ODD:
             port_settings.c_cflag |= PARENB ;
             port_settings.c_cflag |= PARODD ;
             port_settings.c_iflag |= INPCK ;
-            break;
+            break ;
         case Parity::PARITY_NONE:
             port_settings.c_cflag &= ~PARENB ;  // NOLINT (hicpp-signed-bitwise)
             port_settings.c_iflag |= IGNPAR ;
-            break;
+            break ;
         default:
             throw std::invalid_argument(ERR_MSG_INVALID_PARITY) ;
-            break;
+            break ;
         }
 
         // Apply the modified port settings.
@@ -1545,13 +1546,13 @@ namespace LibSerial
         {
         case StopBits::STOP_BITS_1:
             port_settings.c_cflag &= ~CSTOPB ;  // NOLINT (hicpp-signed-bitwise)
-            break;
+            break ;
         case StopBits::STOP_BITS_2:
             port_settings.c_cflag |= CSTOPB ;
-            break;
+            break ;
         default: 
             throw std::invalid_argument(ERR_MSG_INVALID_STOP_BITS) ;
-            break;
+            break ;
         }
 
         // Apply the modified settings.
@@ -1800,7 +1801,7 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN) ;
         }
 
-        return this->mFileDescriptor;
+        return this->mFileDescriptor ;
     }
 
     inline
@@ -1816,22 +1817,23 @@ namespace LibSerial
         int number_of_bytes_available = 0 ;
 
         // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-        if (ioctl(this->mFileDescriptor,
-                  FIONREAD,
-                  &number_of_bytes_available) < 0)
+        if (call_with_retry(ioctl,
+                            this->mFileDescriptor,
+                            FIONREAD,
+                            &number_of_bytes_available) < 0)
         {
             throw std::runtime_error(std::strerror(errno)) ;
         }
 
-        return number_of_bytes_available;
+        return number_of_bytes_available ;
     }
 
     inline
     std::vector<std::string>
     SerialPort::Implementation::GetAvailableSerialPorts() const
     {
-        constexpr int array_size = 3;
-        constexpr size_t max_port_number = 128;
+        constexpr int array_size = 3 ;
+        constexpr size_t max_port_number = 128 ;
         
         std::string serial_ports[array_size] = {"/dev/ttyS",
                                                 "/dev/ttyACM",
@@ -1845,23 +1847,25 @@ namespace LibSerial
                 const auto file_name = port_prefix + std::to_string(j) ;
 
                 // Try to open the serial port. 
-                // NOLINTNEXTLINE (hicpp-vararg)
-                const auto file_descriptor = open(file_name.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK) ;
+                const auto file_desc = call_with_retry(open,
+                                                       file_name.c_str(), 
+                                                       O_RDWR | O_NOCTTY | O_NONBLOCK) ; // NOLINT (hicpp-vararg)
 
-                if (file_descriptor > 0)
+                if (file_desc > 0)
                 {
                     serial_struct serial_port_info {} ;
                     // NOLINTNEXTLINE (hicpp-vararg)
-                    if (ioctl(file_descriptor,
-                              TIOCGSERIAL,
-                              &serial_port_info) == -1)
+                    if (call_with_retry(ioctl,
+                                        file_desc,
+                                        TIOCGSERIAL,
+                                        &serial_port_info) == -1)
                     {
                         throw std::runtime_error(std::strerror(errno)) ;
                     }
 
                     serial_port_names.push_back(file_name) ;
 
-                    close(file_descriptor) ;
+                    close(file_desc) ;
                 }
             }
         }
@@ -1896,23 +1900,25 @@ namespace LibSerial
         }
 
         // Set or unset the specified bit according to the value of lineState.
-        int ioctl_result = -1;
+        int ioctl_result = -1 ;
         
         if (lineState)
         {
-            int set_line_mask = modemLine;
+            int set_line_mask = modemLine ;
             // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-            ioctl_result = ioctl(this->mFileDescriptor, 
-                                 TIOCMBIS,
-                                 &set_line_mask) ;
+            ioctl_result = call_with_retry(ioctl,
+                                           this->mFileDescriptor, 
+                                           TIOCMBIS,
+                                           &set_line_mask) ;
         }
         else
         {
-            int reset_line_mask = modemLine;
+            int reset_line_mask = modemLine ;
             // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-            ioctl_result = ioctl(this->mFileDescriptor, 
-                                 TIOCMBIC,
-                                 &reset_line_mask) ;
+            ioctl_result = call_with_retry(ioctl,
+                                           this->mFileDescriptor, 
+                                           TIOCMBIC,
+                                           &reset_line_mask) ;
         }
 
         // Check for errors.
@@ -1951,9 +1957,10 @@ namespace LibSerial
         int serial_port_state = 0 ;
         
         // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-        if (ioctl(this->mFileDescriptor,
-                  TIOCMGET,
-                  &serial_port_state) < 0)
+        if (call_with_retry(ioctl,
+                            this->mFileDescriptor,
+                            TIOCMGET,
+                            &serial_port_state) < 0)
         {
             throw std::runtime_error(std::strerror(errno)) ;
         }
@@ -2005,7 +2012,7 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN) ;
         }
 
-        bool blocking_status = false;
+        bool blocking_status = false ;
 
         int flags = fcntl(this->mFileDescriptor, F_GETFL, 0) ;
         
@@ -2044,7 +2051,7 @@ namespace LibSerial
 
         // @NOTE - termios.c_line is not a standard element of the termios
         // structure, (as per the Single Unix Specification 3).
-        port_settings.c_line = '\0';
+        port_settings.c_line = '\0' ;
 
         // Apply the modified settings.
         if (tcsetattr(this->mFileDescriptor,
@@ -2076,7 +2083,7 @@ namespace LibSerial
         }
 
         // Ignore Break conditions on input.
-        port_settings.c_iflag = IGNBRK;
+        port_settings.c_iflag = IGNBRK ;
 
         // Apply the modified settings.
         if (tcsetattr(this->mFileDescriptor,
@@ -2139,7 +2146,7 @@ namespace LibSerial
         }
 
         // Enable the receiver (CREAD) and ignore modem control lines (CLOCAL).
-        port_settings.c_cflag |= CREAD | CLOCAL;    // NOLINT (hicpp-signed-bitwise)
+        port_settings.c_cflag |= CREAD | CLOCAL ;    // NOLINT (hicpp-signed-bitwise)
 
         // Apply the modified settings.
         if (tcsetattr(this->mFileDescriptor,
@@ -2196,7 +2203,7 @@ namespace LibSerial
         if ((numberOfBytes == 0) and
             (msTimeout == 0))
         {
-            return;
+            return ;
         }
 
         // Local variables.
@@ -2216,7 +2223,7 @@ namespace LibSerial
             // If insufficient space remains in the buffer, exit the loop and return .
             if (number_of_bytes_remaining >= maximum_number_of_bytes - number_of_bytes_read)
             {
-                break;
+                break ;
             }
 
             if (numberOfBytes == 0)
@@ -2225,21 +2232,22 @@ namespace LibSerial
                 dataBuffer.resize(number_of_bytes_read + 1) ;
             }
 
-            const auto read_result = read(this->mFileDescriptor,
-                                          &dataBuffer[number_of_bytes_read],
-                                          number_of_bytes_remaining) ;
+            const auto read_result = call_with_retry(read,
+                                                     this->mFileDescriptor,
+                                                     &dataBuffer[number_of_bytes_read],
+                                                     number_of_bytes_remaining) ;
 
             if (read_result > 0)
             {
-                number_of_bytes_read += read_result;
+                number_of_bytes_read += read_result ;
 
                 if (numberOfBytes != 0)
                 {
-                    number_of_bytes_remaining = numberOfBytes - number_of_bytes_read;
+                    number_of_bytes_remaining = numberOfBytes - number_of_bytes_read ;
 
                     if (number_of_bytes_remaining == 0)
                     {
-                        break;
+                        break ;
                     }
                 }
             }
@@ -2253,7 +2261,7 @@ namespace LibSerial
             const auto current_time = std::chrono::high_resolution_clock::now().time_since_epoch() ;
 
             // Calculate the time delta.
-            const auto elapsed_time = current_time - entry_time;
+            const auto elapsed_time = current_time - entry_time ;
 
             // Calculate the elapsed number of milliseconds.
             const auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count() ;
@@ -2289,7 +2297,7 @@ namespace LibSerial
         if ((numberOfBytes == 0) and
             (msTimeout == 0))
         {
-            return;
+            return ;
         }
 
         // Local variables.
@@ -2309,7 +2317,7 @@ namespace LibSerial
             // If insufficient space remains in the buffer, exit the loop and return .
             if (number_of_bytes_remaining >= maximum_number_of_bytes - number_of_bytes_read)
             {
-                break;
+                break ;
             }
 
             if (numberOfBytes == 0)
@@ -2318,21 +2326,22 @@ namespace LibSerial
                 dataString.resize(number_of_bytes_read + 1) ;
             }
 
-            const auto read_result = read(this->mFileDescriptor,
-                                          &dataString[number_of_bytes_read],
-                                          number_of_bytes_remaining) ;
+            const auto read_result = call_with_retry(read,
+                                                     this->mFileDescriptor,
+                                                     &dataString[number_of_bytes_read],
+                                                     number_of_bytes_remaining) ;
 
             if (read_result > 0)
             {
-                number_of_bytes_read += read_result;
+                number_of_bytes_read += read_result ;
 
                 if (numberOfBytes != 0)
                 {
-                    number_of_bytes_remaining = numberOfBytes - number_of_bytes_read;
+                    number_of_bytes_remaining = numberOfBytes - number_of_bytes_read ;
 
                     if (number_of_bytes_remaining == 0)
                     {
-                        break;
+                        break ;
                     }
                 }
             }
@@ -2346,7 +2355,7 @@ namespace LibSerial
             const auto current_time = std::chrono::high_resolution_clock::now().time_since_epoch() ;
 
             // Calculate the time delta.
-            const auto elapsed_time = current_time - entry_time;
+            const auto elapsed_time = current_time - entry_time ;
 
             // Calculate the elapsed number of milliseconds.
             const auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count() ;
@@ -2391,14 +2400,15 @@ namespace LibSerial
         ssize_t read_result = 0 ;
         while (read_result < 1)
         {
-            read_result = read(this->mFileDescriptor,
-                               &charBuffer,
-                               sizeof(ByteType)) ;
+            read_result = call_with_retry(read,
+                                          this->mFileDescriptor,
+                                          &charBuffer,
+                                          sizeof(ByteType)) ;
             
             // If the byte has been successfully read, exit the loop and return.
             if (read_result == sizeof(ByteType))
             {
-                break;
+                break ;
             }
 
             if ((read_result <= 0) and
@@ -2411,7 +2421,7 @@ namespace LibSerial
             const auto current_time = std::chrono::high_resolution_clock::now().time_since_epoch() ;
 
             // Calculate the time delta.
-            const auto elapsed_time = current_time - entry_time;
+            const auto elapsed_time = current_time - entry_time ;
 
             // Calculate the elapsed number of milliseconds.
             const auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count() ;
@@ -2450,9 +2460,9 @@ namespace LibSerial
         
         ssize_t remaining_ms = 0 ;
 
-        std::chrono::high_resolution_clock::duration entry_time;
-        std::chrono::high_resolution_clock::duration current_time;
-        std::chrono::high_resolution_clock::duration elapsed_time;
+        std::chrono::high_resolution_clock::duration entry_time ;
+        std::chrono::high_resolution_clock::duration current_time ;
+        std::chrono::high_resolution_clock::duration elapsed_time ;
 
         // Obtain the entry time.
         entry_time = std::chrono::high_resolution_clock::now().time_since_epoch() ;
@@ -2463,7 +2473,7 @@ namespace LibSerial
             current_time = std::chrono::high_resolution_clock::now().time_since_epoch() ;
 
             // Calculate the time delta.
-            elapsed_time = current_time - entry_time;
+            elapsed_time = current_time - entry_time ;
 
             // Calculate the elapsed number of milliseconds.
             elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count() ;
@@ -2476,12 +2486,12 @@ namespace LibSerial
                 throw ReadTimeout(ERR_MSG_READ_TIMEOUT) ;
             }
 
-            remaining_ms = msTimeout - elapsed_ms;
+            remaining_ms = msTimeout - elapsed_ms ;
 
             this->ReadByte(next_char,
                            remaining_ms) ;
 
-            dataString += next_char;
+            dataString += next_char ;
         }
     }
 
@@ -2500,12 +2510,12 @@ namespace LibSerial
         // Nothing needs to be done if there is no data in the string.
         if (number_of_bytes <= 0)
         {
-            return;
+            return ;
         }
 
         // Local variables.
         size_t number_of_bytes_written = 0 ;
-        size_t number_of_bytes_remaining = number_of_bytes;
+        size_t number_of_bytes_remaining = number_of_bytes ;
 
         // Write the data to the serial port. Keep retrying if EAGAIN
         // error is received and EWOULDBLOCK is not received.
@@ -2513,18 +2523,19 @@ namespace LibSerial
         
         while (number_of_bytes_remaining > 0)
         {
-            write_result = write(this->mFileDescriptor,
-                                 &dataBuffer[number_of_bytes_written],
-                                 number_of_bytes_remaining) ;
+            write_result = call_with_retry(write,
+                                           this->mFileDescriptor,
+                                           &dataBuffer[number_of_bytes_written],
+                                           number_of_bytes_remaining) ;
 
             if (write_result >= 0)
             {
-                number_of_bytes_written += write_result;
-                number_of_bytes_remaining = number_of_bytes - number_of_bytes_written;
+                number_of_bytes_written += write_result ;
+                number_of_bytes_remaining = number_of_bytes - number_of_bytes_written ;
 
                 if (number_of_bytes_remaining == 0)
                 {
-                    break;
+                    break ;
                 }
             }
             else if (write_result <= 0 &&
@@ -2550,12 +2561,12 @@ namespace LibSerial
         // Nothing needs to be done if there is no data in the string.
         if (number_of_bytes <= 0)
         {
-            return;
+            return ;
         }
 
         // Local variables.
         size_t number_of_bytes_written = 0 ;
-        size_t number_of_bytes_remaining = number_of_bytes;
+        size_t number_of_bytes_remaining = number_of_bytes ;
 
         // Write the data to the serial port. Keep retrying if EAGAIN
         // error is received and EWOULDBLOCK is not received.
@@ -2563,18 +2574,19 @@ namespace LibSerial
         
         while (number_of_bytes_remaining > 0)
         {
-            write_result = write(this->mFileDescriptor,
-                                 &dataString[number_of_bytes_written],
-                                 number_of_bytes_remaining) ;
+            write_result = call_with_retry(write,
+                                           this->mFileDescriptor,
+                                           &dataString[number_of_bytes_written],
+                                           number_of_bytes_remaining) ;
 
             if (write_result >= 0)
             {
-                number_of_bytes_written += write_result;
-                number_of_bytes_remaining = number_of_bytes - number_of_bytes_written;
+                number_of_bytes_written += write_result ;
+                number_of_bytes_remaining = number_of_bytes - number_of_bytes_written ;
 
                 if (number_of_bytes_remaining == 0)
                 {
-                    break;
+                    break ;
                 }
             }
             else if (write_result <= 0 &&
@@ -2601,13 +2613,14 @@ namespace LibSerial
         
         while (write_result <= 0)
         {
-            write_result = write(this->mFileDescriptor,
-                                 &charBuffer,
-                                 1) ;
+            write_result = call_with_retry(write,
+                                           this->mFileDescriptor,
+                                           &charBuffer,
+                                           1) ;
 
             if (write_result == 1)
             {
-                break;
+                break ;
             }
 
             if ((write_result <= 0) and
@@ -2634,13 +2647,14 @@ namespace LibSerial
         
         while (write_result <= 0)
         {
-            write_result = write(this->mFileDescriptor,
-                                 &charBuffer,
-                                 1) ;
+            write_result = call_with_retry(write,
+                                           this->mFileDescriptor,
+                                           &charBuffer,
+                                           1) ;
 
             if (write_result == 1)
             {
-                break;
+                break ;
             }
 
             if ((write_result <= 0) and
