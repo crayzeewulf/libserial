@@ -455,4 +455,55 @@ namespace LibSerial
 
     } ; // class SerialPort
 
+    /**
+     * Type-safe and portable equivalent of TEMP_FAILURE_RETRY macro that is
+     * provided gcc. See
+     * https://www.gnu.org/software/libc/manual/html_node/Interrupted-Primitives.html
+     * and signal(7) man-page for details. The purpose of this function is to
+     * repeat system calls that are interrupted and set errno to EINTR.
+     * Typically, POSIX applications that use signal handlers must check for
+     * EINTR after each library function that can return it in order to try the
+     * call again. Often programmers forget to check, which is a common source
+     * of error. This may also happen in multi-threaded applications. For
+     * example, see
+     * https://www.linuxquestions.org/questions/programming-9/problem-in-creating-serial-port-application-using-threads-869149/#post4299011
+     *
+     * As an example of usage of this function, consider the following use of
+     * open() system call:
+     *
+     * @code{.cpp}
+     * const auto fd = open("foo.txt", O_WRONLY | O_APPEND);
+     * @endcode
+     *
+     * If this system call is interrupted by a signal, it will return -1 and
+     * errno will be set to EINTR. In order to retry this system call on
+     * such interruptions, replace the above call with the following:
+     *
+     * @code{.cpp}
+     * const auto fd = call_with_retry(open, "foo.txt", O_WRONLY | O_APPEND);
+     * @endcode
+     *
+     * @param func
+     *     The function to be called and retried on EINTR. This function is
+     *     expected to return -1 and set errno to EINTR in case of a system
+     *     call interruption.
+     *
+     * @param args
+     *     The arguments to be passed to the function.
+     *
+     * @return
+     *     The value returned by the function after it completes without
+     *     interruption that sets errno to EINTR.
+     */
+    template<typename Fn, typename... Args>
+    typename std::result_of<Fn(Args...)>::type
+    call_with_retry(Fn func, Args... args)
+    {
+        using result_type = typename std::result_of<Fn(Args...)>::type ;
+        result_type result ;
+        do {
+            result = func(std::forward<Args>(args)...);
+        } while((result == -1) and (errno == EINTR)) ;
+        return result ;
+    }
 } // namespace LibSerial
