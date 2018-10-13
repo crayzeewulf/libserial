@@ -12,6 +12,7 @@ sudo apt install libserial-dev
 ```
 
 Example code to demonstrate how to use the library can be found in the [`examples`](https://github.com/crayzeewulf/libserial/tree/master/examples) directory.
+An self-contained example project demonstrating the use of CMake and GNU Autotools (make) can be found in [`examples/example_project`](https://github.com/crayzeewulf/libserial/tree/master/examples/example_project) directory.
 
 ## Developers
 
@@ -25,31 +26,39 @@ sudo apt install autogen autoconf build-essential cmake graphviz libboost-dev li
 ----
 If you get the source code from github and would like to install the library, there are a few steps you will need to accomplish:
 
-First, compile the GTest library object files and copy libgtest.a and libgtest_main.a into your /usr/lib/ directory:
+
+----
+If you are using CMake you can simply run the `compile.sh` script:
 ```sh
-mkdir build-gtest
-cd build-gtest
-cmake /usr/src/gtest/CMakeLists.txt
-make
-sudo cp *.a /usr/lib
+./compile.sh
 ```
 
-Next, generate the configure script:
+----
+If you are using GNU Autotools (make):
+
+GNU Autotools is currently configured to built all unit tests, so first you will need to compile the GTest library object files and copy `libgtest.a` and `libgtest_main.a` into your `/usr/lib/` directory which you can accomplish by running the `build-gtest` convenience script:
+```sh
+sudo ./build-gtest.sh
+```
+
+To generate the configure script:
 
 ```sh
 make -f Makefile.dist
 ```
 
 ----
-Then execute the `configure` script:
+To execute the `configure` script, first create a build directory, then run the script from the build directory as follows:
 
 ```sh
-./configure 
+mkdir -p build
+cd build
+../configure 
 ```
 
-You can specify an installation directory different from the default, (/usr/local/), by adding `--prefix=/installation/directory/path/` to the configure command.  For example:
+You can specify an installation directory different from the default, (/usr/local/), by adding `--prefix=/installation/directory/path/` to the configure command.  For example, to install into the top level include directory as the package manager would accomplish, you can simply run the following:
 ```sh
-./configure --prefix=/usr/include/
+../configure --prefix=/usr/
 ```
 
 Once you have executed the `configure` script, you can build the library with `make` and install with `make install`:
@@ -78,7 +87,7 @@ Unit test executables built using make can be run from the `build` directory usi
 ctest -V .
 ```
 
-Alternatively, unit test executables built using the compile script can be run from the libserial/build/bin/ directory: 
+Alternatively, unit test executables built using CMake can be run from the libserial/build/bin/ directory: 
 ```sh
 ./build/bin/UnitTests
 ./build/bin/unit_tests
@@ -88,4 +97,4 @@ Alternatively, unit test executables built using the compile script can be run f
 Complete documentation is available [here](http://libserial.readthedocs.io/en/latest/index.html).
 
 ----
-(You can let people know that this Repository was useful to you by clicking the "star" in the upper right of the repository home page!)
+(Let us know that this repository was useful to you by clicking the "star" in the upper right corner of the LibSerial Github home page!)
