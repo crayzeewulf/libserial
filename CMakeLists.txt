@@ -42,22 +42,19 @@ ADD_DEFINITIONS(
   -Wcast-align
   -Wchar-subscripts
   -Wchkp
-  #-Wconversion
   -Wdouble-promotion
   -Wextra
   -Wfatal-errors
   -Wformat
-  #-Wformat-overflow
   -Wformat-security
-  #-Winline
   -Wlogical-op
   -Wno-format-extra-args
   -Wno-long-long
-  -Wpacked
   -Wno-parentheses
   -Wno-psabi
   -Wno-variadic-macros
   -Woverlength-strings
+  -Wpacked
   -Wpointer-arith
   -Wunused-local-typedefs
   -Wwrite-strings
@@ -65,7 +62,6 @@ ADD_DEFINITIONS(
   -fstrict-aliasing
   -fno-check-new
   -fno-common
-  #-fvisibility=hidden
   -fvisibility=default
   -pedantic
   )

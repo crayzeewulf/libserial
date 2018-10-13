@@ -38,7 +38,7 @@ If you are using GNU Autotools (make):
 
 GNU Autotools is currently configured to built all unit tests, so first you will need to compile the GTest library object files and copy `libgtest.a` and `libgtest_main.a` into your `/usr/lib/` directory which you can accomplish by running the `build-gtest` convenience script:
 ```sh
-sudo ./build-gtest.sh
+./gtest.sh
 ```
 
 To generate the configure script:
@@ -51,14 +51,12 @@ make -f Makefile.dist
 To execute the `configure` script, first create a build directory, then run the script from the build directory as follows:
 
 ```sh
-mkdir -p build
-cd build
-../configure 
+./configure 
 ```
 
 You can specify an installation directory different from the default, (/usr/local/), by adding `--prefix=/installation/directory/path/` to the configure command.  For example, to install into the top level include directory as the package manager would accomplish, you can simply run the following:
 ```sh
-../configure --prefix=/usr/
+./configure --prefix=/usr/
 ```
 
 Once you have executed the `configure` script, you can build the library with `make` and install with `make install`:

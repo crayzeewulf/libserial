@@ -24,8 +24,7 @@ TAGS
 
 gtest
 
-# Sublime project
-*.sublime-project
+# Sublime workspace
 *.sublime-workspace
 
 cmake_install.cmake
