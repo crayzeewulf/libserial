@@ -41,25 +41,25 @@
 #include <mutex>
 
 /**
- * @brief Default Serial Port 1.
- */
-#define TEST_SERIAL_PORT_1 "/dev/ttyUSB0"
-
-/**
- * @brief Default Serial Port 2.
- */
-#define TEST_SERIAL_PORT_2 "/dev/ttyUSB1"
-
-/**
- * @param The number of iterations to perform on each unit test.
- */
-#define TEST_ITERATIONS 10
-
-/**
  * @namespace Libserial
  */
 namespace LibSerial
 {
+    /**
+     * @brief Default Serial Port 1.
+     */
+    constexpr const char* const TEST_SERIAL_PORT_1 = "/dev/ttyUSB0" ;
+
+    /**
+     * @brief Default Serial Port 2.
+     */
+    constexpr const char* const TEST_SERIAL_PORT_2 = "/dev/ttyUSB1" ;
+
+    /**
+     * @param The number of iterations to perform on each unit test.
+     */
+    constexpr int TEST_ITERATIONS = 10 ;
+
     class UnitTests : public ::testing::Test
     {
     public:
