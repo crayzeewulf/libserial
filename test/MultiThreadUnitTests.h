@@ -1,5 +1,5 @@
 /******************************************************************************
- * @file UnitTests.cpp                                                        *
+ * @file SerialPortTests.h                                                    *
  * @copyright (C) 2004-2018 LibSerial Development Team. All rights reserved.  *
  * crayzeewulf@gmail.com                                                      *
  *                                                                            *
@@ -31,89 +31,71 @@
  * POSSIBILITY OF SUCH DAMAGE.                                                *
  *****************************************************************************/
 
+#pragma once
+
+#include "SerialPort.h"
+#include "SerialPortConstants.h"
 #include "UnitTests.h"
 
-#include <chrono>
-#include <iostream>
-#include <thread>
-#include <unistd.h>
-#include <vector>
+#include <gtest/gtest.h>
+#include <mutex>
 
-using namespace LibSerial;
-
-UnitTests::UnitTests()
+/**
+ * @namespace Libserial
+ */
+namespace LibSerial
 {
-    // Empty
-}
-
-
-UnitTests::~UnitTests()
-{
-    // Empty
-}
-
-size_t
-UnitTests::getTimeInMilliSeconds()
-{
-    std::chrono::high_resolution_clock::duration timeNow = 
-        std::chrono::high_resolution_clock::now().time_since_epoch();
-
-    return std::chrono::duration_cast<std::chrono::milliseconds>(timeNow).count();
-}
-
-size_t
-UnitTests::getTimeInMicroSeconds()
-{
-    std::chrono::high_resolution_clock::duration timeNow = 
-        std::chrono::high_resolution_clock::now().time_since_epoch();
-
-    return std::chrono::duration_cast<std::chrono::microseconds>(timeNow).count();
-}
-
-void
-UnitTests::testSerialStreamToSerialPortReadWrite()
-{
-    serialPort1.Open(TEST_SERIAL_PORT_1);
-    ASSERT_TRUE(serialPort1.IsOpen());
-
-    serialStream1.Open(TEST_SERIAL_PORT_2);
-    ASSERT_TRUE(serialStream1.IsOpen());
-
-    const auto baud_rate = BaudRate::BAUD_115200 ;
-    serialPort1.SetBaudRate(baud_rate);
-    serialStream1.SetBaudRate(baud_rate);
-
-    BaudRate baudRate1 = serialPort1.GetBaudRate();
-    BaudRate baudRate2 = serialStream1.GetBaudRate();
-
-    ASSERT_EQ(baudRate1, baud_rate);
-    ASSERT_EQ(baudRate2, baud_rate);
-
-    serialStream1 << writeString1 << std::endl;
-    serialPort1.ReadLine(readString1, '\n', timeOutMilliseconds);
-
-    ASSERT_EQ(readString1, writeString1 + '\n');
-    ASSERT_EQ(readString1.size(), writeString1.size() + 1);
-
-    serialPort1.Write(writeString2 + '\n');
-    serialPort1.DrainWriteBuffer();
-    getline(serialStream1, readString2);
-
-    ASSERT_EQ(readString2, writeString2);
-
-    serialPort1.Close();
-    serialStream1.Close();
-
-    ASSERT_FALSE(serialPort1.IsOpen());
-    ASSERT_FALSE(serialStream1.IsOpen());
-}
-
-TEST_F(UnitTests, testSerialStreamToSerialPortReadWrite)
-{
-    SCOPED_TRACE("Serial Stream To Serial Port Read and Write Test");
-
-    for (size_t i = 0; i < TEST_ITERATIONS; i++)
+    class MultiThreadUnitTests : public UnitTests
     {
-        testSerialStreamToSerialPortReadWrite();
-    }
-}
+    public:
+
+        /**
+         * @brief Default Constructor.
+         */
+        explicit MultiThreadUnitTests();
+
+        /**
+         * @brief Default Destructor.
+         */
+        virtual ~MultiThreadUnitTests();
+
+    protected:
+
+        /**
+         * @brief Tests for correct functionality of a multi-threaded serial stream application.
+         */
+        void serialStream1ThreadLoop();
+
+        /**
+         * @brief Tests for correct functionality of a multi-threaded serial port application.
+         */
+        void serialStream2ThreadLoop();
+
+        /**
+         * @brief Main loop for the multi-threaded serial stream unit test.
+         */
+        void serialPort1ThreadLoop();
+
+        /**
+         * @brief Main loop for the multi-threaded serial port unit test.
+         */
+        void serialPort2ThreadLoop();
+
+        /**
+         * @brief Entry point for the multi-thread serial stream unit test.
+         */
+        void testMultiThreadSerialStreamReadWrite();
+
+        /**
+         * @brief Entry point for the multi-thread serial port unit test.
+         */
+        void testMultiThreadSerialPortReadWrite();
+
+        /**
+         * @param C++11 thread std::mutex for locking parameters in the threaded unit tests.
+         */
+        std::mutex mutex {};
+
+    }; // class MultiThreadUnitTests
+
+} // namespace LibSerial
