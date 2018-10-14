@@ -6,12 +6,24 @@ noinst_PROGRAMS = unit_tests UnitTests
 
 unit_tests_SOURCES = unit_tests.cpp
 
-unit_tests_LDADD = ../src/libserial.la -lboost_unit_test_framework
+unit_tests_LDADD = \
+	../src/libserial.la \
+	-lboost_unit_test_framework
+
+include_HEADERS = \
+	SerialPortUnitTests.h \
+	SerialStreamUnitTests.h \
+	MultiThreadUnitTests.h \
+	UnitTests.h
 
 UnitTests_SOURCES = \
 	SerialPortUnitTests.cpp \
 	SerialStreamUnitTests.cpp \
 	MultiThreadUnitTests.cpp \
-	SerialPortUnitTests.cpp
+	UnitTests.cpp
 
-UnitTests_LDADD = ../src/libserial.la /usr/lib/libgtest.a /usr/lib/libgtest_main.a -lpthread
+UnitTests_LDADD = \
+	../src/libserial.la \
+	/usr/lib/libgtest.a \
+	/usr/lib/libgtest_main.a \
+	-lpthread
