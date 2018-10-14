@@ -74,7 +74,7 @@ If you are interested in running the unit tests, ensure serial port names are ap
 #define TEST_SERIAL_PORT_2 "/dev/ttyUSB1"
 ```
 
-The unit tests will be built during the make step above or you can build them by simply by running the compile script (which uses cmake):
+The unit tests will be built during the make steps above or by running the cmake compile script:
 
 ```sh
 ./compile.sh

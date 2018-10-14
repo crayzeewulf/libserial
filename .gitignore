@@ -11,7 +11,8 @@
 # build directories
 build
 
-# external projects
+# lincense files
+COPYING
 
 # tag files
 GPATH
@@ -114,3 +115,4 @@ test/MakeFile
 test/MakeFile.in
 test/UnitTests
 test/unit_tests
+Testing/
