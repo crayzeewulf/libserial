@@ -40,7 +40,7 @@ int main()
     serial_stream << write_byte_2 ;
 
     // Specify a timeout value (in milliseconds).
-    size_t timeout_milliseconds = 5 ;
+    size_t timeout_milliseconds = 25 ;
 
     using LibSerial::ReadTimeout ;
     try

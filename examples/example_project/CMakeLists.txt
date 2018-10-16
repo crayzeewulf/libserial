@@ -68,5 +68,5 @@ ADD_EXECUTABLE(ExampleProject
 )
 
 TARGET_LINK_LIBRARIES(ExampleProject
-  libserial_static
+  libserial.a
 )
