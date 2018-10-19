@@ -28,9 +28,9 @@ ENDIF()
 # "-I/usr/include/libserial").
 #
 INSTALL(FILES SerialPort.h SerialPortConstants.h SerialStream.h SerialStreamBuf.h
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libserial)
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libserial/)
+
 INSTALL(TARGETS libserial_static
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-

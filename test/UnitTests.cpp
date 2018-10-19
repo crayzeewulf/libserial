@@ -56,64 +56,64 @@ size_t
 UnitTests::getTimeInMilliSeconds()
 {
     std::chrono::high_resolution_clock::duration timeNow = 
-        std::chrono::high_resolution_clock::now().time_since_epoch();
+        std::chrono::high_resolution_clock::now().time_since_epoch() ;
 
-    return std::chrono::duration_cast<std::chrono::milliseconds>(timeNow).count();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(timeNow).count() ;
 }
 
 size_t
 UnitTests::getTimeInMicroSeconds()
 {
     std::chrono::high_resolution_clock::duration timeNow = 
-        std::chrono::high_resolution_clock::now().time_since_epoch();
+        std::chrono::high_resolution_clock::now().time_since_epoch() ;
 
-    return std::chrono::duration_cast<std::chrono::microseconds>(timeNow).count();
+    return std::chrono::duration_cast<std::chrono::microseconds>(timeNow).count() ;
 }
 
 void
 UnitTests::testSerialStreamToSerialPortReadWrite()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1);
-    ASSERT_TRUE(serialPort1.IsOpen());
+    serialPort1.Open(TEST_SERIAL_PORT_1) ;
+    ASSERT_TRUE(serialPort1.IsOpen()) ;
 
-    serialStream1.Open(TEST_SERIAL_PORT_2);
-    ASSERT_TRUE(serialStream1.IsOpen());
+    serialStream1.Open(TEST_SERIAL_PORT_2) ;
+    ASSERT_TRUE(serialStream1.IsOpen()) ;
 
     const auto baud_rate = BaudRate::BAUD_115200 ;
-    serialPort1.SetBaudRate(baud_rate);
-    serialStream1.SetBaudRate(baud_rate);
+    serialPort1.SetBaudRate(baud_rate) ;
+    serialStream1.SetBaudRate(baud_rate) ;
 
-    BaudRate baudRate1 = serialPort1.GetBaudRate();
-    BaudRate baudRate2 = serialStream1.GetBaudRate();
+    BaudRate baudRate1 = serialPort1.GetBaudRate() ;
+    BaudRate baudRate2 = serialStream1.GetBaudRate() ;
 
-    ASSERT_EQ(baudRate1, baud_rate);
-    ASSERT_EQ(baudRate2, baud_rate);
+    ASSERT_EQ(baudRate1, baud_rate) ;
+    ASSERT_EQ(baudRate2, baud_rate) ;
 
     serialStream1 << writeString1 << std::endl;
-    serialPort1.ReadLine(readString1, '\n', timeOutMilliseconds);
+    serialPort1.ReadLine(readString1, '\n', timeOutMilliseconds) ;
 
-    ASSERT_EQ(readString1, writeString1 + '\n');
-    ASSERT_EQ(readString1.size(), writeString1.size() + 1);
+    ASSERT_EQ(readString1, writeString1 + '\n') ;
+    ASSERT_EQ(readString1.size(), writeString1.size() + 1) ;
 
-    serialPort1.Write(writeString2 + '\n');
-    serialPort1.DrainWriteBuffer();
-    getline(serialStream1, readString2);
+    serialPort1.Write(writeString2 + '\n') ;
+    serialPort1.DrainWriteBuffer() ;
+    getline(serialStream1, readString2) ;
 
-    ASSERT_EQ(readString2, writeString2);
+    ASSERT_EQ(readString2, writeString2) ;
 
-    serialPort1.Close();
-    serialStream1.Close();
+    serialPort1.Close() ;
+    serialStream1.Close() ;
 
-    ASSERT_FALSE(serialPort1.IsOpen());
-    ASSERT_FALSE(serialStream1.IsOpen());
+    ASSERT_FALSE(serialPort1.IsOpen()) ;
+    ASSERT_FALSE(serialStream1.IsOpen()) ;
 }
 
 TEST_F(UnitTests, testSerialStreamToSerialPortReadWrite)
 {
-    SCOPED_TRACE("Serial Stream To Serial Port Read and Write Test");
+    SCOPED_TRACE("Serial Stream To Serial Port Read and Write Test") ;
 
     for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
-        testSerialStreamToSerialPortReadWrite();
+        testSerialStreamToSerialPortReadWrite() ;
     }
 }

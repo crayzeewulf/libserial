@@ -55,7 +55,7 @@ MultiThreadUnitTests::~MultiThreadUnitTests()
 void
 MultiThreadUnitTests::serialStream1ThreadLoop()
 {
-    size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
+    size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds() ;
     size_t timeElapsedMilliSeconds = 0;
 
     while (timeElapsedMilliSeconds < timeOutMilliseconds)
@@ -65,17 +65,17 @@ MultiThreadUnitTests::serialStream1ThreadLoop()
         // thread.
         //
         serialStream1 << writeString1 << std::endl;
-        serialStream1.DrainWriteBuffer();
+        serialStream1.DrainWriteBuffer() ;
 
         //
         // Wait for data to arrive from the other thread
         //
         if (serialStream1.IsDataAvailable())
         {
-            alarm(5);   // Set a system alarm in case getline() blocks longer than 5 seconds.
+            alarm(5) ;   // Set a system alarm in case getline() blocks longer than 5 seconds.
             readString2.clear() ;
-            getline(serialStream1, readString2);
-            alarm(0);   // Deactivate the alarm.
+            getline(serialStream1, readString2) ;
+            alarm(0) ;   // Deactivate the alarm.
             
             if(readString2 != writeString2)
             {
@@ -94,7 +94,7 @@ MultiThreadUnitTests::serialStream1ThreadLoop()
 void
 MultiThreadUnitTests::serialStream2ThreadLoop()
 {
-    const size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
+    const size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds() ;
     size_t timeElapsedMilliSeconds = 0;
 
     while (timeElapsedMilliSeconds < timeOutMilliseconds)
@@ -104,17 +104,17 @@ MultiThreadUnitTests::serialStream2ThreadLoop()
         // thread.
         //
         serialStream2 << writeString2 << std::endl;
-        serialStream2.DrainWriteBuffer();
+        serialStream2.DrainWriteBuffer() ;
 
         //
         // Wait for data to arrive from the other thread
         //
         if (serialStream2.IsDataAvailable())
         {
-            alarm(5);   // Set a system alarm in case getline() blocks longer than 5 seconds.
+            alarm(5) ;   // Set a system alarm in case getline() blocks longer than 5 seconds.
             readString1.clear() ;
-            getline(serialStream2, readString1);
-            alarm(0);   // Deactivate the alarm.
+            getline(serialStream2, readString1) ;
+            alarm(0) ;   // Deactivate the alarm.
 
             if(readString1 != writeString1)
             {
@@ -133,7 +133,7 @@ MultiThreadUnitTests::serialStream2ThreadLoop()
 void
 MultiThreadUnitTests::serialPort1ThreadLoop()
 {
-    const size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
+    const size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds() ;
     size_t timeElapsedMilliSeconds = 0;
 
     while (timeElapsedMilliSeconds < timeOutMilliseconds)
@@ -142,8 +142,8 @@ MultiThreadUnitTests::serialPort1ThreadLoop()
         // Write data to the serial port. It should be received by the other
         // thread.
         //
-        serialPort1.Write(writeString1 + '\n');
-        serialPort1.DrainWriteBuffer();
+        serialPort1.Write(writeString1 + '\n') ;
+        serialPort1.DrainWriteBuffer() ;
 
         //
         // Wait for data to arrive from the other thread
@@ -153,7 +153,7 @@ MultiThreadUnitTests::serialPort1ThreadLoop()
             try
             {
                 readString2.clear() ;
-                serialPort1.ReadLine(readString2, '\n', timeOutMilliseconds);
+                serialPort1.ReadLine(readString2, '\n', timeOutMilliseconds) ;
             }
             catch (const std::exception& err)
             {
@@ -177,7 +177,7 @@ MultiThreadUnitTests::serialPort1ThreadLoop()
 void
 MultiThreadUnitTests::serialPort2ThreadLoop()
 {
-    const size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds();
+    const size_t threadLoopStartTimeMilliseconds = getTimeInMilliSeconds() ;
     size_t timeElapsedMilliSeconds = 0;
 
     while (timeElapsedMilliSeconds < timeOutMilliseconds)
@@ -186,8 +186,8 @@ MultiThreadUnitTests::serialPort2ThreadLoop()
         // Write data to the serial port. It should be received by the other
         // thread.
         //
-        serialPort2.Write(writeString2 + '\n');
-        serialPort2.DrainWriteBuffer();
+        serialPort2.Write(writeString2 + '\n') ;
+        serialPort2.DrainWriteBuffer() ;
 
         //
         // Wait for data to arrive from the other thread
@@ -197,7 +197,7 @@ MultiThreadUnitTests::serialPort2ThreadLoop()
             try
             {
                 readString1.clear() ;
-                serialPort2.ReadLine(readString1, '\n', timeOutMilliseconds);
+                serialPort2.ReadLine(readString1, '\n', timeOutMilliseconds) ;
             }
             catch (const std::exception& err)
             {
@@ -226,19 +226,19 @@ MultiThreadUnitTests::testMultiThreadSerialStreamReadWrite()
     // Otherwise, one thread may flush the serial port I/O buffers *after* the
     // other thread has already sent data. 
     //
-    serialStream1.Open(TEST_SERIAL_PORT_1);
-    serialStream1.SetBaudRate(BaudRate::BAUD_115200);
-    serialStream1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+    serialStream1.Open(TEST_SERIAL_PORT_1) ;
+    serialStream1.SetBaudRate(BaudRate::BAUD_115200) ;
+    serialStream1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE) ;
 
-    serialStream2.Open(TEST_SERIAL_PORT_2);
-    serialStream2.SetBaudRate(BaudRate::BAUD_115200);
-    serialStream2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream2.SetBaudRate(BaudRate::BAUD_115200) ;
+    serialStream2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE) ;
 
-    std::thread serialStream1Thread(&MultiThreadUnitTests::serialStream1ThreadLoop, this);
-    std::thread serialStream2Thread(&MultiThreadUnitTests::serialStream2ThreadLoop, this);
+    std::thread serialStream1Thread(&MultiThreadUnitTests::serialStream1ThreadLoop, this) ;
+    std::thread serialStream2Thread(&MultiThreadUnitTests::serialStream2ThreadLoop, this) ;
 
-    serialStream1Thread.join();
-    serialStream2Thread.join();
+    serialStream1Thread.join() ;
+    serialStream2Thread.join() ;
 
     serialStream1.Close() ;
     serialStream2.Close() ;
@@ -252,19 +252,19 @@ MultiThreadUnitTests::testMultiThreadSerialPortReadWrite()
     // Otherwise, one thread may flush the serial port I/O buffers *after* the
     // other thread has already sent data. 
     //
-    serialPort1.Open(TEST_SERIAL_PORT_1);
-    serialPort1.SetBaudRate(BaudRate::BAUD_115200);
-    serialPort1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+    serialPort1.Open(TEST_SERIAL_PORT_1) ;
+    serialPort1.SetBaudRate(BaudRate::BAUD_115200) ;
+    serialPort1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE) ;
 
-    serialPort2.Open(TEST_SERIAL_PORT_2);
-    serialPort2.SetBaudRate(BaudRate::BAUD_115200);
-    serialPort2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE);
+    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort2.SetBaudRate(BaudRate::BAUD_115200) ;
+    serialPort2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE) ;
 
-    std::thread serialPort1Thread(&MultiThreadUnitTests::serialPort1ThreadLoop, this);
-    std::thread serialPort2Thread(&MultiThreadUnitTests::serialPort2ThreadLoop, this);
+    std::thread serialPort1Thread(&MultiThreadUnitTests::serialPort1ThreadLoop, this) ;
+    std::thread serialPort2Thread(&MultiThreadUnitTests::serialPort2ThreadLoop, this) ;
 
-    serialPort1Thread.join();
-    serialPort2Thread.join();
+    serialPort1Thread.join() ;
+    serialPort2Thread.join() ;
 
     serialPort1.Close() ;
     serialPort2.Close() ;
@@ -272,14 +272,14 @@ MultiThreadUnitTests::testMultiThreadSerialPortReadWrite()
 
 TEST_F(MultiThreadUnitTests, testMultiThreadSerialStreamReadWrite)
 {
-    SCOPED_TRACE("Test Multi-Thread Serial Stream Communication.");
+    SCOPED_TRACE("Test Multi-Thread Serial Stream Communication.") ;
 
     failureRate = 0;
     loopCount = 0;
     
     for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
-        testMultiThreadSerialStreamReadWrite();
+        testMultiThreadSerialStreamReadWrite() ;
     }
 
     const double failRate = 100. * (double)failureRate / (double)loopCount;
@@ -288,20 +288,20 @@ TEST_F(MultiThreadUnitTests, testMultiThreadSerialStreamReadWrite)
     if (failRate > 0.0001)
     {
         std::cout << "\t     SerialStream Failure Rate = " << failRate << "%" << std::endl;
-        ADD_FAILURE();
+        ADD_FAILURE() ;
     }
 }
 
 TEST_F(MultiThreadUnitTests, testMultiThreadSerialPortReadWrite)
 {
-    SCOPED_TRACE("Test Multi-Thread Serial Port Communication.");
+    SCOPED_TRACE("Test Multi-Thread Serial Port Communication.") ;
 
     failureRate = 0;
     loopCount = 0;
     
     for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
-        testMultiThreadSerialPortReadWrite();
+        testMultiThreadSerialPortReadWrite() ;
     }
 
     const double failRate = 100. * (double)failureRate / (double)loopCount;
@@ -310,6 +310,6 @@ TEST_F(MultiThreadUnitTests, testMultiThreadSerialPortReadWrite)
     if (failRate > 0.0001)
     {
         std::cout << "\t     SerialPort Failure Rate = " << failRate << "%" << std::endl;
-        ADD_FAILURE();
+        ADD_FAILURE() ;
     }
 }

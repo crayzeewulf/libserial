@@ -53,140 +53,140 @@ namespace LibSerial
         /**
          * @brief Default Constructor.
          */
-        explicit SerialStreamUnitTests();
+        explicit SerialStreamUnitTests() ;
 
         /**
          * @brief Default Destructor.
          */
-        virtual ~SerialStreamUnitTests();
+        virtual ~SerialStreamUnitTests() ;
 
     protected:
 
         /**
          * @brief Tests constructor overloads and destructors.
          */
-        void testSerialStreamConstructors();
+        void testSerialStreamConstructors() ;
 
         /**
          * @brief Tests correct functionality for opening and closing serial streams.
          */
-        void testSerialStreamOpenClose();
+        void testSerialStreamOpenClose() ;
 
         /**
          * @brief Tests correct functionality for draining the hardware write buffer using tcdrain().
          */
-        void testSerialStreamDrainWriteBuffer();
+        void testSerialStreamDrainWriteBuffer() ;
 
         /**
-         * @brief Tests correct functionality for draining the hardware input (read) buffer using tcflush();
+         * @brief Tests correct functionality for draining the hardware input (read) buffer using tcflush() ;
          */
-        void testSerialStreamFlushInputBuffer();
+        void testSerialStreamFlushInputBuffer() ;
 
         /**
-         * @brief Tests correct functionality for draining the hardware write buffer using tcflush();
+         * @brief Tests correct functionality for draining the hardware write buffer using tcflush() ;
          */
-        void testSerialStreamFlushOutputBuffer();
+        void testSerialStreamFlushOutputBuffer() ;
 
         /**
-         * @brief Tests correct functionality for draining the hardware read/write buffers using tcflush();
+         * @brief Tests correct functionality for draining the hardware read/write buffers using tcflush() ;
          */
-        void testSerialStreamFlushIOBuffers();
+        void testSerialStreamFlushIOBuffers() ;
 
         /**
          * @brief Tests correct functionality for checking if data is available.
          */
-        void testSerialStreamIsDataAvailableTest();
+        void testSerialStreamIsDataAvailableTest() ;
 
         /**
          * @brief Tests for correct functionality of the Open() and Close() methods.
          */
-        void testSerialStreamIsOpenTest();
+        void testSerialStreamIsOpenTest() ;
 
         /**
          * @brief Tests for correct functionality of the SetBaudRate() and GetBaudRate() methods.
          */
-        void testSerialStreamSetGetBaudRate();
+        void testSerialStreamSetGetBaudRate() ;
 
         /**
          * @brief Tests for correct functionality of the SetCharacterSize() and GetCharactersize() methods.
          */
-        void testSerialStreamSetGetCharacterSize();
+        void testSerialStreamSetGetCharacterSize() ;
 
         /**
          * @brief Tests for correct functionality of the SetFlowControl() and GetFlowControl() methods.
          */
-        void testSerialStreamSetGetFlowControl();
+        void testSerialStreamSetGetFlowControl() ;
 
         /**
          * @brief Tests for correct functionality of the SetParity() and GetParity() methods.
          */
-        void testSerialStreamSetGetParity();
+        void testSerialStreamSetGetParity() ;
 
         /**
          * @brief Tests for correct functionality of the SetStopBits() and GetStopBits() methods.
          */
-        void testSerialStreamSetGetStopBits();
+        void testSerialStreamSetGetStopBits() ;
 
         /**
          * @brief Tests for correct functionality of the SetVMin() and GetVMin() methods.
          */
-        void testSerialStreamSetGetVMin();
+        void testSerialStreamSetGetVMin() ;
 
         /**
          * @brief Tests for correct functionality of the SetVTime() and GetVMin() methods.
          */
-        void testSerialStreamSetGetVTime();
+        void testSerialStreamSetGetVTime() ;
 
         /**
          * @brief Tests for correct functionality of the SetDTR() and GetDTR() methods.
          */
-        void testSerialStreamSetGetDTR();
+        void testSerialStreamSetGetDTR() ;
 
         /**
          * @brief Tests for correct functionality of the SetRTS() and GetRTS() methods.
          */
-        void testSerialStreamSetGetRTS();
+        void testSerialStreamSetGetRTS() ;
 
         /**
          * @brief Tests for correct functionality of the SetRTS() and GetCTS() methods.
          */
-        void testSerialStreamSetRTSGetCTS();
+        void testSerialStreamSetRTSGetCTS() ;
 
         /**
          * @brief Tests for correct functionality of the SetDTR() and GetDSR() methods.
          */
-        void testSerialStreamSetDTRGetDSR();
+        void testSerialStreamSetDTRGetDSR() ;
 
         /**
          * @brief Tests for correct functionality of the GetFileDescriptor() method.
          */
-        void testSerialStreamGetFileDescriptor();
+        void testSerialStreamGetFileDescriptor() ;
 
         /**
          * @brief Tests for correct functionality of the GetNumberOfBytesAvailable() method.
          */
-        void testSerialStreamGetNumberOfBytesAvailable();
+        void testSerialStreamGetNumberOfBytesAvailable() ;
 
         /**
          * @brief Tests for correct functionality of the GetAvailableSerialPorts() method.
          */
-        void testSerialStreamGetAvailableSerialPorts();
+        void testSerialStreamGetAvailableSerialPorts() ;
 
         /**
          * @brief Tests for correct functionality of the ReadByte() and WriteByte() methods.
          */
-        void testSerialStreamReadByteWriteByte();
+        void testSerialStreamReadByteWriteByte() ;
 
         /**
          * @brief Tests for correct functionality of the GetLine() and WriteString() methods.
          */
-        void testSerialStreamGetLineWriteString();
+        void testSerialStreamGetLineWriteString() ;
 
         /**
          * @brief Tests for correct functionality of the Get() and WriteByte() methods.
          */
-        void testSerialStreamGetWriteByte();
+        void testSerialStreamGetWriteByte() ;
 
-    }; // class SerialStreamUnitTests
+    } ; // class SerialStreamUnitTests
 
 } // namespace LibSerial

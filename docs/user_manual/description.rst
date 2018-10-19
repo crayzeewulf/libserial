@@ -20,8 +20,8 @@ Here is short example using libserial:
 
 .. code-block:: c++
 
-   #include <SerialPort.h>
-   #include <SerialStream.h>
+   #include <libserial/SerialPort.h>
+   #include <libserial/SerialStream.h>
 
    using namespace LibSerial;
 
