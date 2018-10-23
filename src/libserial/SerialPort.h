@@ -33,7 +33,7 @@
 
 #pragma once
 
-#include <SerialPortConstants.h>
+#include <libserial/SerialPortConstants.h>
 
 #include <ios>
 #include <memory>

@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.                                                *
  *****************************************************************************/
 
-#include <SerialStream.h>
-#include <SerialStreamBuf.h>
+#include <libserial/SerialStream.h>
+#include <libserial/SerialStreamBuf.h>
 
 #define BOOST_TEST_MODULE libserial
 #define BOOST_TEST_DYN_LINK

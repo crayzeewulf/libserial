@@ -2,15 +2,13 @@
  *  @example serial_stream_read_write.cpp
  */
 
-#include <SerialStream.h>
+#include <libserial/SerialStream.h>
 
 #include <cstdlib>
-#include <iostream>
+#include <cstring>
 #include <fstream>
-#include <string.h>
+#include <iostream>
 #include <unistd.h>
-
-using namespace LibSerial ;
 
 /**
  * @brief This example demonstrates multiple methods to read and write
@@ -18,6 +16,7 @@ using namespace LibSerial ;
  */
 int main()
 {
+    using namespace LibSerial ;
     // Instantiate two SerialStream objects.
     SerialStream serial_stream_1 ;
     SerialStream serial_stream_2 ;

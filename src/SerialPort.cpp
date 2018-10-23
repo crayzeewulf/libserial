@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.                                                *
  *****************************************************************************/
 
-#include "SerialPort.h"
+#include "libserial/SerialPort.h"
 
 #include <chrono>
 #include <cstdlib>

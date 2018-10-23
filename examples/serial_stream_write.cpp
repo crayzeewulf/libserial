@@ -2,13 +2,11 @@
  *  @example serial_stream_write.cpp
  */
 
-#include <SerialStream.h>
+#include <libserial/SerialStream.h>
 
-#include <iostream>
-#include <fstream>
 #include <cstdlib>
-
-using namespace LibSerial ;
+#include <fstream>
+#include <iostream>
 
 /**
  * @brief This example reads the contents of a file and writes the entire 
@@ -18,6 +16,7 @@ using namespace LibSerial ;
  */
 int main(int argc, char** argv)
 {
+    using namespace LibSerial ;
     // Determine if an appropriate number of arguments has been provided.
     if (argc < 2)
     {

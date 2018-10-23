@@ -33,9 +33,9 @@
 
 #pragma once
 
-#include "SerialPort.h"
-#include "SerialPortConstants.h"
-#include "SerialStream.h"
+#include "libserial/SerialPort.h"
+#include "libserial/SerialPortConstants.h"
+#include "libserial/SerialStream.h"
 
 #include <gtest/gtest.h>
 #include <mutex>

@@ -2,14 +2,12 @@
  *  @example serial_port_read_write.cpp
  */
 
-#include <SerialPort.h>
+#include <libserial/SerialPort.h>
 
 #include <cstdlib>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <unistd.h>
-
-using namespace LibSerial ;
 
 /**
  * @brief This example demonstrates multiple methods to read and write
@@ -17,6 +15,7 @@ using namespace LibSerial ;
  */
 int main()
 {
+    using namespace LibSerial ;
     // Instantiate two SerialPort objects.
     SerialPort serial_port_1 ;
     SerialPort serial_port_2 ;
@@ -67,8 +66,8 @@ int main()
     std::string write_string_2 =
         "\"Simplicity is prerequisite for reliability.\" - Edsger W. Dijkstra" ;
 
-    std::string read_string_1 = "" ;
-    std::string read_string_2 = "" ;
+    std::string read_string_1 ;
+    std::string read_string_2 ;
 
     // Print to the terminal what will take place next.
     std::cout << "\nUsing WriteByte() and ReadByte() for one byte of data:"
@@ -91,7 +90,7 @@ int main()
         serial_port_1.ReadByte(read_byte_1, timeout_milliseconds) ;
         serial_port_2.ReadByte(read_byte_2, timeout_milliseconds) ;
     }
-    catch (ReadTimeout)
+    catch (const ReadTimeout&)
     {
         std::cerr << "The ReadByte() call has timed out." << std::endl ;
     }
@@ -123,7 +122,7 @@ int main()
         serial_port_1.Read(read_string_1, write_string_2.size(), timeout_milliseconds) ;
         serial_port_2.Read(read_string_2, write_string_1.size(), timeout_milliseconds) ;
     }
-    catch (ReadTimeout)
+    catch (const ReadTimeout&)
     {
         std::cerr << "The Read() call has timed out." << std::endl ;
     }
@@ -146,8 +145,8 @@ int main()
               << "read a line of data:" << std::endl << std::endl ;
 
     // Prompt the user for input.
-    std::cout << "Enter something you would like to send over "
-              << "serial, (enter \"Q\" or \"q\" to quit): " << std::flush ;
+    std::cout << R"(Enter something you would like to send over )"
+              << R"(serial, (enter "Q" or "q" to quit): )" << std::flush ;
     
     while(true)
     {

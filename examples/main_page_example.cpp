@@ -2,8 +2,8 @@
  *  @example main_page_example.cpp
  */
 
-#include <SerialPort.h>
-#include <SerialStream.h>
+#include <libserial/SerialPort.h>
+#include <libserial/SerialStream.h>
 
 #include <iostream>
 

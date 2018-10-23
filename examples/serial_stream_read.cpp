@@ -2,13 +2,11 @@
  *  @example serial_stream_read.cpp
  */
 
-#include <SerialStream.h>
+#include <libserial/SerialStream.h>
 
+#include <cstdlib>
 #include <iostream>
 #include <unistd.h>
-#include <cstdlib>
-
-using namespace LibSerial ;
 
 /**
  * @brief This example demonstrates configuring a serial stream and 
@@ -16,6 +14,7 @@ using namespace LibSerial ;
  */
 int main()
 {
+    using namespace LibSerial ;
     // Instantiate a SerialStream object.
     SerialStream serial_stream ;
 
@@ -43,15 +42,12 @@ int main()
         usleep(1000) ;
     }
 
-    // Variable to store data coming from the serial port.
-    char data_byte ;
-
-    // String to store data for printing to terminal.
-    std::string data_string ;
-
     // Keep reading data from serial port and print it to the screen.
     while(serial_stream.IsDataAvailable()) 
     {
+        // Variable to store data coming from the serial port.
+        char data_byte ;
+
         // Read a single byte of data from the serial port.
         serial_stream.get(data_byte) ;
 

@@ -33,8 +33,8 @@
 
 #pragma once
 
-#include "SerialPort.h"
-#include "SerialPortConstants.h"
+#include "libserial/SerialPort.h"
+#include "libserial/SerialPortConstants.h"
 #include "UnitTests.h"
 
 #include <gtest/gtest.h>

@@ -2,13 +2,12 @@
  *  @example serial_port_write.cpp
  */
 
-#include <SerialPort.h>
+#include <libserial/SerialPort.h>
 
-#include <iostream>
-#include <fstream>
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
 
-using namespace LibSerial ;
 
 /**
  * @brief This example reads the contents of a file and writes the entire 
@@ -18,6 +17,7 @@ using namespace LibSerial ;
  */
 int main(int argc, char** argv)
 {   
+    using namespace LibSerial ;
     // Determine if an appropriate number of arguments has been provided.
     if (argc < 2)
     {
@@ -63,11 +63,12 @@ int main(int argc, char** argv)
     // Read characters from the input file and write them to the serial port. 
     std::cout << "Writing input file contents to the serial port." << std::endl ;
     
-    // Create a variable to store data from the input file and write to the serial port.
-    char data_byte ;
-
     while (input_file) 
     {
+        // Create a variable to store data from the input file and write to the
+        // serial port.
+        char data_byte ;
+
         // Read data from the input file.
         input_file.read(&data_byte, 1) ;
 

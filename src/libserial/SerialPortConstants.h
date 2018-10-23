@@ -60,7 +60,7 @@ namespace LibSerial
     constexpr int MICROSECONDS_PER_MS  =    1000 ;
     constexpr int MILLISECONDS_PER_SEC =    1000 ;
     constexpr int MICROSECONDS_PER_SEC = 1000000 ;
-        
+
     /**
      * @brief Bits to bytes conversion constant.
      */
@@ -96,7 +96,7 @@ namespace LibSerial
 
     /**
      * @note - For reference, below is a list of std::exception types:
-     *         logic_error 
+     *         logic_error
      *         invalid_argument
      *         domain_error
      *         length_error
@@ -113,7 +113,7 @@ namespace LibSerial
      *         bad_cast
      *         bad_weak_ptr
      *         bad_function_call
-     *         bad_alloc 
+     *         bad_alloc
      *         bad_array_new_length
      *         bad_exception
      */
@@ -214,8 +214,8 @@ namespace LibSerial
         BAUD_500000  = B500000,
         BAUD_576000  = B576000,
         BAUD_921600  = B921600,
-        BAUD_1000000 = B1000000, 
-        BAUD_1152000 = B1152000, 
+        BAUD_1000000 = B1000000,
+        BAUD_1152000 = B1152000,
         BAUD_1500000 = B1500000,
 #if __MAX_BAUD > B2000000
         BAUD_2000000 = B2000000,

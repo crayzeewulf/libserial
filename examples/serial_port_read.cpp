@@ -2,14 +2,13 @@
  *  @example serial_port_read.cpp
  */
 
-#include <SerialPort.h>
+#include <libserial/SerialPort.h>
 
-#include <cstring>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <unistd.h>
 
-using namespace LibSerial ;
 
 /**
  * @brief This example demonstrates configuring a serial port and 
@@ -17,6 +16,8 @@ using namespace LibSerial ;
  */
 int main()
 {
+    using namespace LibSerial ;
+
     // Instantiate a SerialPort object.
     SerialPort serial_port ;
 
@@ -59,7 +60,7 @@ int main()
         // Show the user what is being read from the serial port.
         std::cout << data_byte << std::flush ;
     }
-    catch (ReadTimeout)
+    catch (const ReadTimeout&)
     {
         std::cerr << "\nThe ReadByte() call has timed out." << std::endl ;
     }
@@ -74,7 +75,7 @@ int main()
         // Read as many bytes as are available during the timeout period.
         serial_port.Read(read_buffer, 0, ms_timeout) ;
     }
-    catch (ReadTimeout)
+    catch (const ReadTimeout&)
     {
         for (size_t i = 0 ; i < read_buffer.size() ; i++)
         {
