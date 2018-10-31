@@ -1,7 +1,7 @@
 #!/bin/bash
-MYPWD=$(pwd)
+present_working_directory=$(pwd)
 cd /usr/src/gtest
 sudo cmake CMakeLists.txt
 sudo make
 sudo cp *.a /usr/lib
-cd $MYPWD
+cd $present_working_directory

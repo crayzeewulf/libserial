@@ -47,7 +47,7 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 ----
 If you are using GNU Autotools (make):
 
-GNU Autotools is currently configured to built all unit tests, so first you will need to compile the GTest library object files and copy `libgtest.a` and `libgtest_main.a` into your `/usr/lib/` directory which you can accomplish by running the `build-gtest` convenience script:
+GNU Autotools is currently configured to built all unit tests, so first you will need to compile the GTest library object files and copy `libgtest.a` and `libgtest_main.a` into your `/usr/lib/` directory which you can accomplish by running the `gtest.sh` convenience script:
 ```sh
 ./gtest.sh
 ```

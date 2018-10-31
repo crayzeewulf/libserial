@@ -1,4 +1,3 @@
-
 include_HEADERS = \
 	SerialPort.h \
 	SerialPortConstants.h \
