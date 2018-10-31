@@ -33,7 +33,6 @@
 
 #pragma once
 
-// #include <cerrno>
 #include <limits>
 #include <stdexcept>
 #include <string>
@@ -259,11 +258,11 @@ namespace LibSerial
      */
     enum class Parity : tcflag_t
     {
-        PARITY_EVEN,                    // Even parity.
-        PARITY_ODD,                     // Odd parity.
-        PARITY_NONE,                    // No parity i.e. parity checking disabled.
-        PARITY_DEFAULT = PARITY_NONE,   // No parity i.e. parity checking disabled.
-        PARITY_INVALID = std::numeric_limits<tcflag_t>::max() //!< Invalid parity value.
+        PARITY_EVEN,                                          // !< Even parity.
+        PARITY_ODD,                                           // !< Odd parity.
+        PARITY_NONE,                                          // !< No parity i.e. parity checking disabled.
+        PARITY_DEFAULT = PARITY_NONE,                         // !< No parity i.e. parity checking disabled.
+        PARITY_INVALID = std::numeric_limits<tcflag_t>::max() // !< Invalid parity value.
     } ;
 
     /**
@@ -271,9 +270,9 @@ namespace LibSerial
      */
     enum class StopBits : tcflag_t
     {
-        STOP_BITS_1,                     // 1 stop bit.
-        STOP_BITS_2,                     // 2 stop bits.
-        STOP_BITS_DEFAULT = STOP_BITS_1, // 1 stop bit.
+        STOP_BITS_1,                     // !< 1 stop bit.
+        STOP_BITS_2,                     // !< 2 stop bits.
+        STOP_BITS_DEFAULT = STOP_BITS_1, // !< 1 stop bit.
         STOP_BITS_INVALID = std::numeric_limits<tcflag_t>::max()
     } ;
 
