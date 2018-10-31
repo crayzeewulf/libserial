@@ -12,7 +12,7 @@ To generate a new set of docs using Sphinx, simply run:
 
 The Sphinx output will be located in the */libserial/docs/html/* directory.
 
-To generate a new set of doxy docs, you can run the compile.sh script or simply invoke doxygen directly:
+To generate a new set of doxygen documentation, you can run the compile.sh script or simply invoke doxygen directly:
 
 .. code-block:: bash
 
