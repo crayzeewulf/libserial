@@ -6,3 +6,4 @@ cmake ..
 make
 cd ..
 make -j3 -C build
+sphinx-build -b html docs/user_manual/ docs/html/
