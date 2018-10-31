@@ -28,9 +28,15 @@ If you get the source code from github and would like to install the library, th
 
 
 ----
-If you are using CMake, to build and install the library you can simply run the `compile.sh` script:
+If you are using CMake, to build the library you can simply run the `compile.sh` script:
 ```sh
 ./compile.sh
+```
+
+To install the library:
+```sh
+cd build
+sudo make install
 ```
 
 You can specify an installation directory different from the default, (/usr/local/), by replacing the `cmake ..` command in the `compile.sh` script.  For example, to install into the top level `usr/include` instead of the `usr/local/include` directory, use the following:
