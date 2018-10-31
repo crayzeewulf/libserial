@@ -36,6 +36,7 @@ CMakeFiles
 .libs
 
 # Docs
+docs/doxygen/
 docs/html/
 docs/.doctrees/
 
