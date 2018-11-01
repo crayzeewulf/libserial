@@ -52,50 +52,50 @@ namespace LibSerial
         /**
          * @brief Default Constructor.
          */
-        explicit MultiThreadUnitTests();
+        explicit MultiThreadUnitTests() ;
 
         /**
          * @brief Default Destructor.
          */
-        virtual ~MultiThreadUnitTests();
+        virtual ~MultiThreadUnitTests() ;
 
     protected:
 
         /**
          * @brief Tests for correct functionality of a multi-threaded serial stream application.
          */
-        void serialStream1ThreadLoop();
+        void serialStream1ThreadLoop() ;
 
         /**
          * @brief Tests for correct functionality of a multi-threaded serial port application.
          */
-        void serialStream2ThreadLoop();
+        void serialStream2ThreadLoop() ;
 
         /**
          * @brief Main loop for the multi-threaded serial stream unit test.
          */
-        void serialPort1ThreadLoop();
+        void serialPort1ThreadLoop() ;
 
         /**
          * @brief Main loop for the multi-threaded serial port unit test.
          */
-        void serialPort2ThreadLoop();
+        void serialPort2ThreadLoop() ;
 
         /**
          * @brief Entry point for the multi-thread serial stream unit test.
          */
-        void testMultiThreadSerialStreamReadWrite();
+        void testMultiThreadSerialStreamReadWrite() ;
 
         /**
          * @brief Entry point for the multi-thread serial port unit test.
          */
-        void testMultiThreadSerialPortReadWrite();
+        void testMultiThreadSerialPortReadWrite() ;
 
         /**
          * @param C++11 thread std::mutex for locking parameters in the threaded unit tests.
          */
-        std::mutex mutex {};
+        std::mutex mutex {} ;
 
-    }; // class MultiThreadUnitTests
+    } ; // class MultiThreadUnitTests
 
 } // namespace LibSerial

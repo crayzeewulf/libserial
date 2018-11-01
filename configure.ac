@@ -62,5 +62,6 @@ examples/Makefile
 sip/configure.py
 sip/Makefile
 src/Makefile
+src/libserial/Makefile
 test/Makefile
 libserial.pc])

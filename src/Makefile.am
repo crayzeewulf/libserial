@@ -2,19 +2,15 @@ AM_CXXFLAGS = -Weffc++
 
 AM_CPPFLAGS = -I@top_srcdir@/src
 
-lib_LTLIBRARIES = libserial.la
+SUBDIRS = libserial
 
-include_HEADERS = \
-	SerialPort.h \
-	SerialPortConstants.h \
-	SerialStream.h \
-	SerialStreamBuf.h
+lib_LTLIBRARIES = libserial.la
 
 libserial_la_SOURCES = \
 	SerialPort.cpp \
+	SerialStream.cpp \
+	SerialStreamBuf.cpp
 	SerialPort.h \
 	SerialPortConstants.h \
-	SerialStream.cpp \
 	SerialStream.h \
-	SerialStreamBuf.cpp \
 	SerialStreamBuf.h

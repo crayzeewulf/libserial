@@ -56,6 +56,7 @@ rm -rf %{buildroot}
 %defattr(-, root, root)
 %doc AUTHORS COPYING ChangeLog NEWS README 
 %{_includedir}/SerialPort.h
+%{_includedir}/SerialPortConstants.h
 %{_includedir}/SerialStream.h
 %{_includedir}/SerialStreamBuf.h
 %{_libdir}/libserial.a

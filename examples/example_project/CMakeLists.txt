@@ -1,11 +1,11 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+cmake_minimum_required(VERSION 3.8)
 
-PROJECT(ExampleProject LANGUAGES C CXX)
+project(ExampleProject LANGUAGES C CXX)
 
-SET(ExampleProject_VERSION_MAJOR 1)
-SET(ExampleProject_VERSION_MINOR 0)
+set(ExampleProject_VERSION_MAJOR 1)
+set(ExampleProject_VERSION_MINOR 0)
 
-SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 #
 # Use GNU standard installation directories. CMake will use /usr/local
 # as the default install directory. Users may override this by setting
@@ -13,15 +13,18 @@ SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 #
 # cd build && cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 #
-INCLUDE(GNUInstallDirs)
+
+include(GNUInstallDirs)
 
 #
 # Prefer -pthread compiler and linker flag when using libpthread. This must
-# be set before call to FIND_PACKAGE(Threads).
+# be set before call to find_package(Threads).
 #
-SET(THREADS_HAVE_PTHREAD_ARG 1)
-FIND_PACKAGE(PythonLibs REQUIRED)
-FIND_PACKAGE(Threads REQUIRED)
+set(THREADS_HAVE_PTHREAD_ARG 1)
+find_package(PythonLibs REQUIRED)
+find_package(Threads REQUIRED)
+find_package(PkgConfig)
+#pkg_check_modules(SERIAL libserial)
 
 #
 # Use -DCMAKE_BUILD_TYPE=Release or -DCMAKE_BUILD_TYPE=Debug to let CMake
@@ -30,42 +33,20 @@ FIND_PACKAGE(Threads REQUIRED)
 # (such as -fPIC). Additionally, "-pthread" flag will also be handled by CMake
 # via the use of CMAKE_THREAD_LIBS_INIT (cmake < 3.1) or Threads::Threads.
 #
-ADD_DEFINITIONS(
+add_definitions(
   -Wall
   -Wextra
   )
 
-#
-# We require support for C++11 features in the compiler. This can be
-# achieved using CMAKE_CXX_STANDARD in CMake version 3.1 or later. For
-# older versions we have to add the compiler flags manually.
-#
-macro(USE_CXX11)
-    IF (CMAKE_VERSION VERSION_LESS "3.1")
-        IF (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-            SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -fms-extensions")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
-        ENDIF ()
-    ELSE ()
-        SET(CMAKE_CXX_STANDARD 14)
-        SET(CMAKE_STANDARD_REQUIRES ON)
-    ENDIF ()
-endmacro(USE_CXX11)
-USE_CXX11()
+set(LIBPREFIX "${CMAKE_STATIC_LIBRARY_PREFIX}")
+set(LIBSUFFIX "${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
-SET(LIBPREFIX "${CMAKE_STATIC_LIBRARY_PREFIX}")
-SET(LIBSUFFIX "${CMAKE_STATIC_LIBRARY_SUFFIX}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-SET(CMAKE_INSTALL_MESSAGE ALWAYS)
-
-
-ADD_EXECUTABLE(ExampleProject
+add_executable(ExampleProject
   example_project.cpp
 )
 
-TARGET_LINK_LIBRARIES(ExampleProject
-  libserial.a
+target_link_libraries(ExampleProject
+  libserial_static.a
 )

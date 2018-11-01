@@ -28,15 +28,26 @@ If you get the source code from github and would like to install the library, th
 
 
 ----
-If you are using CMake you can simply run the `compile.sh` script:
+If you are using CMake, to build the library you can simply run the `compile.sh` script:
 ```sh
 ./compile.sh
+```
+
+To install the library:
+```sh
+cd build
+sudo make install
+```
+
+You can specify an installation directory different from the default, (/usr/local/), by replacing the `cmake ..` command in the `compile.sh` script.  For example, to install into the top level `usr/include` instead of the `usr/local/include` directory, use the following:
+```sh
+cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 ```
 
 ----
 If you are using GNU Autotools (make):
 
-GNU Autotools is currently configured to built all unit tests, so first you will need to compile the GTest library object files and copy `libgtest.a` and `libgtest_main.a` into your `/usr/lib/` directory which you can accomplish by running the `build-gtest` convenience script:
+GNU Autotools is currently configured to built all unit tests, so first you will need to compile the GTest library object files and copy `libgtest.a` and `libgtest_main.a` into your `/usr/lib/` directory which you can accomplish by running the `gtest.sh` convenience script:
 ```sh
 ./gtest.sh
 ```

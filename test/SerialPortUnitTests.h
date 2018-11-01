@@ -52,145 +52,145 @@ namespace LibSerial
         /**
          * @brief Default Constructor.
          */
-        explicit SerialPortUnitTests();
+        explicit SerialPortUnitTests() ;
 
         /**
          * @brief Default Destructor.
          */
-        virtual ~SerialPortUnitTests();
+        virtual ~SerialPortUnitTests() ;
 
     protected:
 
         /**
          * @brief Tests constructor overloads and destructors.
          */
-        void testSerialPortConstructors();
+        void testSerialPortConstructors() ;
 
         /**
          * @brief Tests correct functionality for opening and closing serial ports.
          */
-        void testSerialPortOpenClose();
+        void testSerialPortOpenClose() ;
 
         /**
          * @brief Tests correct functionality for draining the hardware write buffer using tcdrain().
          */
-        void testSerialPortDrainWriteBuffer();
+        void testSerialPortDrainWriteBuffer() ;
 
         /**
-         * @brief Tests correct functionality for draining the hardware input (read) buffer using tcflush();
+         * @brief Tests correct functionality for draining the hardware input (read) buffer using tcflush() ;
          */
-        void testSerialPortFlushInputBuffer();
+        void testSerialPortFlushInputBuffer() ;
 
         /**
-         * @brief Tests correct functionality for draining the hardware write buffer using tcflush();
+         * @brief Tests correct functionality for draining the hardware write buffer using tcflush() ;
          */
-        void testSerialPortFlushOutputBuffer();
+        void testSerialPortFlushOutputBuffer() ;
 
         /**
-         * @brief Tests correct functionality for draining the hardware read/write buffers using tcflush();
+         * @brief Tests correct functionality for draining the hardware read/write buffers using tcflush() ;
          */
-        void testSerialPortFlushIOBuffers();
+        void testSerialPortFlushIOBuffers() ;
 
         /**
          * @brief Tests correct functionality for checking if data is available.
          */
-        void testSerialPortIsDataAvailableTest();
+        void testSerialPortIsDataAvailableTest() ;
 
         /**
          * @brief Tests for correct functionality of the Open() and Close() methods.
          */
-        void testSerialPortIsOpenTest();
+        void testSerialPortIsOpenTest() ;
 
         /**
          * @brief Tests for correct functionality of the SetBaudRate() and GetBaudRate() methods.
          */
-        void testSerialPortSetGetBaudRate();
+        void testSerialPortSetGetBaudRate() ;
 
         /**
          * @brief Tests for correct functionality of the SetCharacterSize() and GetCharactersize() methods.
          */
-        void testSerialPortSetGetCharacterSize();
+        void testSerialPortSetGetCharacterSize() ;
 
         /**
          * @brief Tests for correct functionality of the SetFlowControl() and GetFlowControl() methods.
          */
-        void testSerialPortSetGetFlowControl();
+        void testSerialPortSetGetFlowControl() ;
 
         /**
          * @brief Tests for correct functionality of the SetParity() and GetParity() methods.
          */
-        void testSerialPortSetGetParity();
+        void testSerialPortSetGetParity() ;
 
         /**
          * @brief Tests for correct functionality of the SetStopBits() and GetStopBits() methods.
          */
-        void testSerialPortSetGetStopBits();
+        void testSerialPortSetGetStopBits() ;
 
         /**
          * @brief Tests for correct functionality of the SetVMin() and GetVMin() methods.
          */
-        void testSerialPortSetGetVMin();
+        void testSerialPortSetGetVMin() ;
 
         /**
          * @brief Tests for correct functionality of the SetVTime() and GetVMin() methods.
          */
-        void testSerialPortSetGetVTime();
+        void testSerialPortSetGetVTime() ;
 
         /**
          * @brief Tests for correct functionality of the SetDTR() and GetDTR() methods.
          */
-        void testSerialPortSetGetDTR();
+        void testSerialPortSetGetDTR() ;
 
         /**
          * @brief Tests for correct functionality of the SetRTS() and GetRTS() methods.
          */
-        void testSerialPortSetGetRTS();
+        void testSerialPortSetGetRTS() ;
 
         /**
          * @brief Tests for correct functionality of the SetRTS() and GetCTS() methods.
          */
-        void testSerialPortSetRTSGetCTS();
+        void testSerialPortSetRTSGetCTS() ;
 
         /**
          * @brief Tests for correct functionality of the SetDTR() and GetDSR() methods.
          */
-        void testSerialPortSetDTRGetDSR();
+        void testSerialPortSetDTRGetDSR() ;
 
         /**
          * @brief Tests for correct functionality of the GetFileDescriptor() method.
          */
-        void testSerialPortGetFileDescriptor();
+        void testSerialPortGetFileDescriptor() ;
 
         /**
          * @brief Tests for correct functionality of the GetNumberOfBytesAvailable() method.
          */
-        void testSerialPortGetNumberOfBytesAvailable();
+        void testSerialPortGetNumberOfBytesAvailable() ;
 
         /**
          * @brief Tests for correct functionality of the GetAvailableSerialPorts() method.
          */
-        void testSerialPortGetAvailableSerialPorts();
+        void testSerialPortGetAvailableSerialPorts() ;
 
         /**
          * @brief Tests for correct functionality of the ReadDataBuffer() and WriteDataBuffer() methods.
          */
-        void testSerialPortReadDataBufferWriteDataBuffer();
+        void testSerialPortReadDataBufferWriteDataBuffer() ;
 
         /**
          * @brief Tests for correct functionality of the ReadString() and WriteString() methods.
          */
-        void testSerialPortReadStringWriteString();
+        void testSerialPortReadStringWriteString() ;
 
         /**
          * @brief Tests for correct functionality of the ReadByte() and WriteByte() methods.
          */
-        void testSerialPortReadByteWriteByte();
+        void testSerialPortReadByteWriteByte() ;
 
         /**
          * @brief Tests for correct functionality of the ReadLine() and WriteString() methods.
          */
-        void testSerialPortReadLineWriteString();
+        void testSerialPortReadLineWriteString() ;
 
-    }; // class SerialPortUnitTests
+    } ; // class SerialPortUnitTests
 
 } // namespace LibSerial

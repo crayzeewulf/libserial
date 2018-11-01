@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE( SerialStreamBuf_Constructor_Test ) // NOLINT (cert-err58-c
     //
     using LibSerial::SerialStreamBuf ;
     SerialStreamBuf buf ;
-    BOOST_CHECK( false == buf.IsOpen() ); // NOLINT (cppcoreguidelines-pro-type-vararg)
+    BOOST_CHECK( false == buf.IsOpen() ) ; // NOLINT (cppcoreguidelines-pro-type-vararg)
 }
 
 BOOST_AUTO_TEST_CASE( SerialStream_Constructor_Test ) // NOLINT (cert-err58-cpp)
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE( SerialStream_Constructor_Test ) // NOLINT (cert-err58-cpp)
     //
     {
         SerialStream serial_stream;
-        BOOST_CHECK( false == serial_stream.IsOpen() ); // NOLINT (cppcoreguidelines-pro-type-vararg)
+        BOOST_CHECK( false == serial_stream.IsOpen() ) ; // NOLINT (cppcoreguidelines-pro-type-vararg)
     }
     //
     // Attempting to open a non-existent serial port should leave the 
