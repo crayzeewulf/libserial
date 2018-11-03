@@ -963,7 +963,7 @@ SerialPortUnitTests::testSerialPortReadByteWriteByte()
         serialPort1.ReadByte(readByte1, 1) ;
         serialPort2.ReadByte(readByte2, 1) ;
     }
-    catch (ReadTimeout)
+    catch (...)
     {
         timeOutTestPass = true;
     }
@@ -1005,7 +1005,7 @@ SerialPortUnitTests::testSerialPortReadLineWriteString()
         serialPort1.ReadLine(readString2, '\n', 1) ;
         serialPort2.ReadLine(readString1, '\n', 1) ;
     }
-    catch (ReadTimeout)
+    catch (...)
     {
         timeOutTestPass = true;
     }
