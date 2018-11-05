@@ -5,13 +5,13 @@ To install LibSerial the current release package on many Linux distributions you
 
 For Debian distrbutions:
 
-.. code-block:: c++
+.. code-block:: bash
 
    sudo apt install libserial-dev
 
 For Arch Linux distributions:
 
-.. code-block:: c++
+.. code-block:: bash
 
    sudo pacman -S libserial-dev
 
@@ -31,7 +31,7 @@ Using ssh:
 
 Next, using make, execute the following commands from your libserial directory:
 
-.. code-block:: c++
+.. code-block:: bash
 
    make -F Makefile.dist
    ./configure
@@ -39,18 +39,25 @@ Next, using make, execute the following commands from your libserial directory:
 
 To install the build to your /usr/local/ directory your may simply:
 
-.. code-block:: c++
+.. code-block:: bash
 
    sudo make install
 
 To install to another directory, simply use the *prefix* argument in the configure step above:
 
-.. code-block:: c++
+.. code-block:: bash
 
    ./configure --prefix=<DIRECTORY_NAME>
 
-The code is also easily built using cmake via a bash script:
+The code is also easily built using `CMake` via a bash script:
 
-.. code-block:: c++
+.. code-block:: bash
 
    ./compile.sh
+
+To install, change directories to the build directory and proceed as with make:
+
+.. code-block:: bash
+
+   cd build/
+   sudo make install

@@ -11,7 +11,8 @@
 # build directories
 build
 
-# external projects
+# lincense files
+COPYING
 
 # tag files
 GPATH
@@ -24,8 +25,7 @@ TAGS
 
 gtest
 
-# Sublime project
-*.sublime-project
+# Sublime workspace
 *.sublime-workspace
 
 cmake_install.cmake
@@ -36,6 +36,7 @@ CMakeFiles
 .libs
 
 # Docs
+docs/doxygen/
 docs/html/
 docs/.doctrees/
 
@@ -115,3 +116,4 @@ test/MakeFile
 test/MakeFile.in
 test/UnitTests
 test/unit_tests
+Testing/

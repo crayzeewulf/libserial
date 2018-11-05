@@ -21,8 +21,8 @@ AC_PROG_LIBTOOL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
-dnl LibSerial now requires at least C++11 features in the compiler.
-AX_CXX_COMPILE_STDCXX_11(noext, mandatory)
+dnl LibSerial now requires at least C++14 features in the compiler.
+AX_CXX_COMPILE_STDCXX(14, noext, mandatory)
 
 AC_CHECK_PROG(DOCBOOK2PDF, docbook2pdf, docbook2pdf, no)
 
@@ -62,5 +62,6 @@ examples/Makefile
 sip/configure.py
 sip/Makefile
 src/Makefile
+src/libserial/Makefile
 test/Makefile
 libserial.pc])

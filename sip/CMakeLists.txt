@@ -5,18 +5,19 @@ ADD_LIBRARY(libserial SHARED
 	libserial.sip
 	stdexcept.sip
 	string.sip
-	vector.sip 
+	vector.sip
 )
+
+SET_TARGET_PROPERTIES(libserial PROPERTIES PREFIX "")
 
 TARGET_LINK_LIBRARIES(libserial
 	libserial_static
 )
 
-SET_TARGET_PROPERTIES(libserial
-	PROPERTIES
-	PREFIX ""
-	SUFFIX .so
-)
+INSTALL(TARGETS libserial
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # TODO - Generate the SIP output with CMake:
 #ADD_CUSTOM_COMMAND(OUTPUT

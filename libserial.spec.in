@@ -10,7 +10,7 @@ Summary:	C++ library for programming serial ports on POSIX systems.
 Version:	@VERSION@
 # Use release "0" so that distro-released versions will override ours.
 Release:	0
-License:	GPL
+License:	BSD 3-CLAUSE
 Group:		Development/Libraries
 Source:		%{name}-%{version}.tar.gz
 URL:		http://libserial.sourceforge.net/
@@ -56,6 +56,7 @@ rm -rf %{buildroot}
 %defattr(-, root, root)
 %doc AUTHORS COPYING ChangeLog NEWS README 
 %{_includedir}/SerialPort.h
+%{_includedir}/SerialPortConstants.h
 %{_includedir}/SerialStream.h
 %{_includedir}/SerialStreamBuf.h
 %{_libdir}/libserial.a

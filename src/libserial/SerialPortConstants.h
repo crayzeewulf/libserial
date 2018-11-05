@@ -1,30 +1,41 @@
 /******************************************************************************
- *   @file SerialPortConstants.h                                              *
- *   @copyright (C) 2015 Manish Pagey                                         *
- *   crayzeewulf@users.sourceforge.net                                        *
+ * @file SerialPortConstants.h                                                *
+ * @copyright (C) 2004-2018 LibSerial Development Team. All rights reserved.  *
+ * crayzeewulf@gmail.com                                                      *
  *                                                                            *
- *   This program is free software; you can redistribute it and/or modify     *
- *   it under the terms of the GNU Lessser General Public License as          *
- *   published by the Free Software Foundation; either version 2 of the       *
- *   License, or (at your option) any later version.                          *
+ * Redistribution and use in source and binary forms, with or without         *
+ * modification, are permitted provided that the following conditions         *
+ * are met:                                                                   *
  *                                                                            *
- *   This program is distributed in the hope that it will be useful,          *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of           *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
- *   GNU Lesser General Public License for more details.                      *
+ * 1. Redistributions of source code must retain the above copyright          *
+ *    notice, this list of conditions and the following disclaimer.           *
+ * 2. Redistributions in binary form must reproduce the above copyright       *
+ *    notice, this list of conditions and the following disclaimer in         *
+ *    the documentation and/or other materials provided with the              *
+ *    distribution.                                                           *
+ * 3. Neither the name PX4 nor the names of its contributors may be           *
+ *    used to endorse or promote products derived from this software          *
+ *    without specific prior written permission.                              *
  *                                                                            *
- *   You should have received a copy of the GNU Lesser General Public         *
- *   License along with this program; if not, write to the                    *
- *   Free Software Foundation, Inc.,                                          *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS        *
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT          *
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS          *
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE             *
+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,        *
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,       *
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS      *
+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED         *
+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT                *
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN          *
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE            *
+ * POSSIBILITY OF SUCH DAMAGE.                                                *
  *****************************************************************************/
 
-#ifndef SERIALPORTCONSTANTS_H
-#define SERIALPORTCONSTANTS_H
+#pragma once
 
-#include <cerrno>
-#include <iostream>
 #include <limits>
+#include <stdexcept>
+#include <string>
 #include <termios.h>
 #include <vector>
 
@@ -45,41 +56,46 @@ namespace LibSerial
     /**
      * @brief Time conversion constants.
      */
-    const int MICROSECONDS_PER_MS  =    1000;
-    const int MILLISECONDS_PER_SEC =    1000;
-    const int MICROSECONDS_PER_SEC = 1000000;
-        
+    constexpr int MICROSECONDS_PER_MS  =    1000 ;
+    constexpr int MILLISECONDS_PER_SEC =    1000 ;
+    constexpr int MICROSECONDS_PER_SEC = 1000000 ;
+
+    /**
+     * @brief Bits to bytes conversion constant.
+     */
+    constexpr int BITS_PER_BYTE = 8 ;
+
     /**
      * @brief The default character buffer size.
      */
-    static constexpr short VMIN_DEFAULT = 1;
+    constexpr short VMIN_DEFAULT = 1 ;
 
     /**
      * @brief The default character buffer timing.
      */
-    static constexpr short VTIME_DEFAULT = 0;
+    constexpr short VTIME_DEFAULT = 0 ;
 
     /**
      * @brief Character used to signal that I/O can start while using
      *        software flow control with the serial port.
      */
-    static constexpr char CTRL_Q = 0x11;
+    constexpr char CTRL_Q = 0x11 ;
 
     /**
      * @brief Character used to signal that I/O should stop while using
      *        software flow control with the serial port.
      */
-    static constexpr char CTRL_S = 0x13;
+    constexpr char CTRL_S = 0x13 ;
 
     /**
      * @brief Type used to receive and return raw data to/from methods.
      */
-    typedef std::vector<unsigned char> DataBuffer;
+    using DataBuffer =  std::vector<uint8_t> ;
 
 
     /**
      * @note - For reference, below is a list of std::exception types:
-     *         logic_error 
+     *         logic_error
      *         invalid_argument
      *         domain_error
      *         length_error
@@ -96,7 +112,7 @@ namespace LibSerial
      *         bad_cast
      *         bad_weak_ptr
      *         bad_function_call
-     *         bad_alloc 
+     *         bad_alloc
      *         bad_array_new_length
      *         bad_exception
      */
@@ -110,11 +126,11 @@ namespace LibSerial
         /**
          * @brief Exception error thrown when the serial port is not open.
          */
-        NotOpen(const std::string& whatArg)
+        explicit NotOpen(const std::string& whatArg [[maybe_unused]])
             : logic_error(whatArg)
         {
         }
-    };
+    } ;
 
     /**
      * @brief Exception error thrown when the serial port is already open.
@@ -125,11 +141,11 @@ namespace LibSerial
         /**
          * @brief Exception error thrown when the serial port is already open.
          */
-        AlreadyOpen(const std::string& whatArg)
+        explicit AlreadyOpen(const std::string& whatArg [[maybe_unused]])
             : logic_error(whatArg)
         {
         }
-    };
+    } ;
 
     /**
      * @brief Exception error thrown when the serial port could not be opened.
@@ -140,11 +156,11 @@ namespace LibSerial
         /**
          * @brief Exception error thrown when the serial port could not be opened.
          */
-        OpenFailed(const std::string& whatArg)
+        explicit OpenFailed(const std::string& whatArg [[maybe_unused]])
             : runtime_error(whatArg)
         {
         }
-    };
+    } ;
 
     /**
      * @brief Exception error thrown when data could not be read from the
@@ -157,11 +173,11 @@ namespace LibSerial
          * @brief Exception error thrown when data could not be read from the
          *        serial port before the timeout had been exceeded.
          */
-        ReadTimeout(const std::string& whatArg)
+        explicit ReadTimeout(const std::string& whatArg [[maybe_unused]])
             : runtime_error(whatArg)
         {
         }
-    };
+    } ;
 
     /**
      * @brief The baud rates currently supported by the Single Unix
@@ -197,8 +213,8 @@ namespace LibSerial
         BAUD_500000  = B500000,
         BAUD_576000  = B576000,
         BAUD_921600  = B921600,
-        BAUD_1000000 = B1000000, 
-        BAUD_1152000 = B1152000, 
+        BAUD_1000000 = B1000000,
+        BAUD_1152000 = B1152000,
         BAUD_1500000 = B1500000,
 #if __MAX_BAUD > B2000000
         BAUD_2000000 = B2000000,
@@ -210,7 +226,7 @@ namespace LibSerial
 #endif /* __linux__ */
         BAUD_DEFAULT = BAUD_115200,
         BAUD_INVALID = std::numeric_limits<speed_t>::max()
-    };
+    } ;
 
     /**
      * @brief The allowed character sizes.
@@ -223,7 +239,7 @@ namespace LibSerial
         CHAR_SIZE_8       = CS8, // !< 8 bit characters.
         CHAR_SIZE_DEFAULT = CS8, // !< 8 bit characters.
         CHAR_SIZE_INVALID = std::numeric_limits<tcflag_t>::max()
-    };
+    } ;
 
     /**
      * @brief The allowed flow control types.
@@ -235,31 +251,29 @@ namespace LibSerial
         FLOW_CONTROL_NONE,
         FLOW_CONTROL_DEFAULT = FLOW_CONTROL_NONE,
         FLOW_CONTROL_INVALID = std::numeric_limits<tcflag_t>::max()
-    };
+    } ;
 
     /**
      * @brief The allowed parity types.
      */
     enum class Parity : tcflag_t
     {
-        PARITY_EVEN,                    // Even parity.
-        PARITY_ODD,                     // Odd parity.
-        PARITY_NONE,                    // No parity i.e. parity checking disabled.
-        PARITY_DEFAULT = PARITY_NONE,   // No parity i.e. parity checking disabled.
-        PARITY_INVALID = std::numeric_limits<tcflag_t>::max() //!< Invalid parity value.
-    };
+        PARITY_EVEN,                                          // !< Even parity.
+        PARITY_ODD,                                           // !< Odd parity.
+        PARITY_NONE,                                          // !< No parity i.e. parity checking disabled.
+        PARITY_DEFAULT = PARITY_NONE,                         // !< No parity i.e. parity checking disabled.
+        PARITY_INVALID = std::numeric_limits<tcflag_t>::max() // !< Invalid parity value.
+    } ;
 
     /**
      * @brief The allowed number of stop bits.
      */
     enum class StopBits : tcflag_t
     {
-        STOP_BITS_1,                     // 1 stop bit.
-        STOP_BITS_2,                     // 2 stop bits.
-        STOP_BITS_DEFAULT = STOP_BITS_1, // 1 stop bit.
+        STOP_BITS_1,                     // !< 1 stop bit.
+        STOP_BITS_2,                     // !< 2 stop bits.
+        STOP_BITS_DEFAULT = STOP_BITS_1, // !< 1 stop bit.
         STOP_BITS_INVALID = std::numeric_limits<tcflag_t>::max()
-    };
+    } ;
 
 } // namespace LibSerial
-
-#endif // #ifndef SERIALPORTCONSTANTS_H */

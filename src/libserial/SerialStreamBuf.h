@@ -1,30 +1,42 @@
 /******************************************************************************
- *   @file SerialStreamBuf.h                                                  *
- *   @copyright (C) 2004 Manish Pagey                                         *
- *   crayzeewulf@users.sourceforge.net                                        *
+ * @file SerialStreamBuf.h                                                    *
+ * @copyright (C) 2004-2018 LibSerial Development Team. All rights reserved.  *
+ * crayzeewulf@gmail.com                                                      *
  *                                                                            *
- *   This program is free software; you can redistribute it and/or modify     *
- *   it under the terms of the GNU Lessser General Public License as          *
- *   published by the Free Software Foundation; either version 2 of the       *
- *   License, or (at your option) any later version.                          *
+ * Redistribution and use in source and binary forms, with or without         *
+ * modification, are permitted provided that the following conditions         *
+ * are met:                                                                   *
  *                                                                            *
- *   This program is distributed in the hope that it will be useful,          *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of           *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
- *   GNU Lesser General Public License for more details.                      *
+ * 1. Redistributions of source code must retain the above copyright          *
+ *    notice, this list of conditions and the following disclaimer.           *
+ * 2. Redistributions in binary form must reproduce the above copyright       *
+ *    notice, this list of conditions and the following disclaimer in         *
+ *    the documentation and/or other materials provided with the              *
+ *    distribution.                                                           *
+ * 3. Neither the name PX4 nor the names of its contributors may be           *
+ *    used to endorse or promote products derived from this software          *
+ *    without specific prior written permission.                              *
  *                                                                            *
- *   You should have received a copy of the GNU Lesser General Public         *
- *   License along with this program; if not, write to the                    *
- *   Free Software Foundation, Inc.,                                          *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.                *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS        *
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT          *
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS          *
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE             *
+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,        *
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,       *
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS      *
+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED         *
+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT                *
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN          *
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE            *
+ * POSSIBILITY OF SUCH DAMAGE.                                                *
  *****************************************************************************/
 
-#ifndef _SerialStreamBuf_h_
-#define _SerialStreamBuf_h_
+#pragma once
 
-#include "SerialPortConstants.h"
+#include <libserial/SerialPortConstants.h>
 
 #include <memory>
+#include <streambuf>
 #include <vector>
 
 namespace LibSerial
@@ -50,7 +62,7 @@ namespace LibSerial
         /**
          * @brief Default Constructor.
          */
-        explicit SerialStreamBuf();
+        explicit SerialStreamBuf() ;
 
         /**
          * @brief Constructor that allows a SerialStreamBuf instance to be 
@@ -69,13 +81,33 @@ namespace LibSerial
                                  const CharacterSize& characterSize   = CharacterSize::CHAR_SIZE_DEFAULT,
                                  const FlowControl&   flowControlType = FlowControl::FLOW_CONTROL_DEFAULT,
                                  const Parity&        parityType      = Parity::PARITY_DEFAULT,
-                                 const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT);
+                                 const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT) ;
 
         /**
          * @brief Default Destructor for a SerialStreamBuf object. Closes the
          *        serial port associated with mFileDescriptor if open.
          */
-        virtual ~SerialStreamBuf();
+        virtual ~SerialStreamBuf() ;
+
+        /**
+         * @brief Copy construction is disallowed.
+         */
+        SerialStreamBuf(const SerialStreamBuf& otherSerialStreamBuf) = delete ;
+
+        /**
+         * @brief Move construction is disallowed.
+         */
+        SerialStreamBuf(const SerialStreamBuf&& otherSerialStreamBuf) = delete ;
+
+        /**
+         * @brief Copy assignment is disallowed.
+         */
+        SerialStreamBuf& operator=(const SerialStreamBuf& otherSerialStreamBuf) = delete ;
+
+        /**
+         * @brief Move assignment is disallowed.
+         */
+        SerialStreamBuf& operator=(const SerialStreamBuf&& otherSerialStreamBuf) = delete ;
 
         /**
          * @brief Opens the serial port associated with the specified
@@ -85,117 +117,117 @@ namespace LibSerial
          *        communication port is opened.
          */
         void Open(const std::string& fileName,
-                  const std::ios_base::openmode& openMode = std::ios_base::in | std::ios_base::out);
+                  const std::ios_base::openmode& openMode = std::ios_base::in | std::ios_base::out) ;
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
          *        lost and no more I/O can be performed on the serial port.
          */
-        void Close();
+        void Close() ;
 
         /**
          * @brief Waits until the write buffer is drained and then returns.
          */
-        void DrainWriteBuffer();
+        void DrainWriteBuffer() ;
 
         /**
          * @brief Flushes the serial port input buffer.
          */
-        void FlushInputBuffer();
+        void FlushInputBuffer() ;
 
         /**
          * @brief Flushes the serial port output buffer.
          */
-        void FlushOutputBuffer();
+        void FlushOutputBuffer() ;
 
         /**
          * @brief Flushes the serial port input and output buffers.
          */
-        void FlushIOBuffers();
+        void FlushIOBuffers() ;
 
         /**
          * @brief Checks if data is available at the input of the serial port.
          * @return Returns true iff data is available to read.
          */
-        bool IsDataAvailable();
+        bool IsDataAvailable() ;
 
         /**
          * @brief Determines if the serial port is open for I/O.
          * @return Returns true iff the serial port is open.
          */
-        bool IsOpen();
+        bool IsOpen() const ;
 
         /**
          * @brief Sets all serial port paramters to their default values.
          */
-        void SetDefaultSerialPortParameters();
+        void SetDefaultSerialPortParameters() ;
 
         /**
          * @brief Sets the baud rate for the serial port to the specified value
          * @param baudRate The baud rate to be set for the serial port.
          */
-        void SetBaudRate(const BaudRate& baudRate);
+        void SetBaudRate(const BaudRate& baudRate) ;
 
         /**
          * @brief Gets the current baud rate for the serial port.
          * @return Returns the baud rate.
          */
-        BaudRate GetBaudRate();
+        BaudRate GetBaudRate() const ;
 
         /**
          * @brief Sets the character size for the serial port.
          * @param characterSize The character size to be set.
          */
-        void SetCharacterSize(const CharacterSize& characterSize);
+        void SetCharacterSize(const CharacterSize& characterSize) ;
 
         /**
          * @brief Gets the character size being used for serial communication.
          * @return Returns the current character size. 
          */
-        CharacterSize GetCharacterSize();
+        CharacterSize GetCharacterSize() const ;
 
         /**
          * @brief Sets flow control for the serial port.
          * @param flowControlType The flow control type to be set.
          */
-        void SetFlowControl(const FlowControl& flowControlType);
+        void SetFlowControl(const FlowControl& flowControlType) ;
 
         /**
          * @brief Gets the current flow control setting.
          * @return Returns the flow control type of the serial port.
          */
-        FlowControl GetFlowControl();
+        FlowControl GetFlowControl() const ;
 
         /**
          * @brief Sets the parity type for the serial port.
          * @param parityType The parity type to be set.
          */
-        void SetParity(const Parity& parityType);
+        void SetParity(const Parity& parityType) ;
 
         /**
          * @brief Gets the parity type for the serial port.
          * @return Returns the parity type.
          */
-        Parity GetParity();
+        Parity GetParity() const ;
 
         /**
          * @brief Sets the number of stop bits to be used with the serial port.
          * @param stopBits The number of stop bits to set.
          */
-        void SetStopBits(const StopBits& stopBits);
+        void SetStopBits(const StopBits& stopBits) ;
 
         /**
          * @brief Gets the number of stop bits currently being used by the serial
          * @return Returns the number of stop bits.
          */
-        StopBits GetStopBits();
+        StopBits GetStopBits() const ;
 
         /**
          * @brief Sets the minimum number of characters for non-canonical reads.
          * @note See VMIN in man termios(3).
          * @param vmin the number of minimum characters to be set.
          */
-        void SetVMin(const short vmin);
+        void SetVMin(short vmin) ;
 
         /**
          * @brief Gets the VMIN value for the device, which represents the
@@ -203,78 +235,77 @@ namespace LibSerial
          * @return Returns the minimum number of characters for
          *         non-canonical reads.
          */
-        short GetVMin();
+        short GetVMin() const ;
 
         /** 
          * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
          * @param vtime The timeout value in deciseconds to be set.
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
          */
-        void SetVTime(const short vtime);
+        void SetVTime(short vtime) ;
 
         /** 
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds. 
          */
-        short GetVTime();
+        short GetVTime() const ;
 
         /**
          * @brief Sets the DTR line to the specified value.
          * @param dtrState The line voltage state to be set,
          *        (true = high, false = low).
          */
-        void SetDTR(const bool dtrState = true);
+        void SetDTR(bool dtrState = true) ;
 
         /**
          * @brief Gets the status of the DTR line.
          * @return Returns true iff the status of the DTR line is high.
          */
-        bool GetDTR();
+        bool GetDTR() const ;
 
         /**
          * @brief Set the RTS line to the specified value.
          * @param rtsState The line voltage state to be set,
          *        (true = high, false = low).
          */
-        void SetRTS(const bool rtsState = true);
+        void SetRTS(bool rtsState = true) ;
 
         /**
          * @brief Get the status of the RTS line.
          * @return Returns true iff the status of the RTS line is high.
          */
-        bool GetRTS();
+        bool GetRTS() const ;
 
         /**
          * @brief Get the status of the CTS line.
          * @return Returns true iff the status of the CTS line is high.
          */
-        bool GetCTS();
+        bool GetCTS() ;
 
         /**
          * @brief Get the status of the DSR line.
          * @return Returns true iff the status of the DSR line is high.
          */
-        bool GetDSR();
+        bool GetDSR() ;
 
         /**
          * @brief Gets the serial port file descriptor.
          * @return Returns the serial port file descriptor.
          */
-        int GetFileDescriptor();
+        int GetFileDescriptor() const ;
 
         /**
          * @brief Gets the number of bytes available in the read buffer.
          * @return Returns the number of bytes avilable in the read buffer.
          */
-        int GetNumberOfBytesAvailable();
+        int GetNumberOfBytesAvailable() ;
 
         /**
          * @brief Gets a list of available serial ports.
          * @return Returns a std::vector of std::strings with the name of
          *         each available serial port. 
          */
-        std::vector<std::string> GetAvailableSerialPorts();
-
+        std::vector<std::string> GetAvailableSerialPorts() const ;
 
     protected:
 
@@ -299,7 +330,7 @@ namespace LibSerial
          *
          */
         virtual std::streambuf* setbuf(char_type* character, 
-                                       std::streamsize numberOfBytes) override;
+                                       std::streamsize numberOfBytes) override ;
 
         /**
          * @brief Writes up to n characters from the character sequence at 
@@ -310,7 +341,7 @@ namespace LibSerial
          *         written to the serial port. 
          */
         virtual std::streamsize xsputn(const char_type* character, 
-                                       std::streamsize numberOfBytes) override;
+                                       std::streamsize numberOfBytes) override ;
            
         /**
          * @brief Reads up to n characters from the serial port and returns
@@ -321,14 +352,14 @@ namespace LibSerial
          *         serial port. 
          */
         virtual std::streamsize xsgetn(char_type* character, 
-                                       std::streamsize numberOfBytes) override;
+                                       std::streamsize numberOfBytes) override ;
 
         /**
          * @brief Writes the specified character to the associated serial port.
          * @param character The character to be written to the serial port.
          * @return Returns the character. 
          */
-        virtual int_type overflow(const int_type character) override;
+        virtual int_type overflow(const int_type character) override ;
 
         /**
          * @brief Reads and returns the next character from the associated
@@ -337,7 +368,7 @@ namespace LibSerial
          *        for unbuffered I/O.
          * @return Returns the next character from the serial port.
          */
-        virtual int_type underflow() override;
+        virtual int_type underflow() override ;
 
         /**
          * @brief Reads and returns the next character from the associated
@@ -346,7 +377,7 @@ namespace LibSerial
          *        called for unbuffered I/O.
          * @return Returns the next character from the serial port.  
          */
-        virtual int_type uflow() override;
+        virtual int_type uflow() override ;
 
         /**
          * @brief This function is called when a putback of a character
@@ -356,7 +387,7 @@ namespace LibSerial
          * @param character The character to putback.
          * @return Returns The character iff successful, otherwise eof to signal an error.
          */
-        virtual int_type pbackfail(const int_type character = traits_type::eof()) override;
+        virtual int_type pbackfail(const int_type character) override ;
 
         /**
          * @brief Checks whether input is available on the port.
@@ -365,38 +396,16 @@ namespace LibSerial
          *        \code
          *        while(serial_port.rdbuf()->in_avail() > 0)
          *        {
-         *            serial_port.get(ch);
+         *            serial_port.get(ch) ;
          *            ...
          *        }
          *        \endcode
          * @return Returns 1 if characters are available at the serial port,
          *         0 if no characters are available, and -1 if unsuccessful.
          */
-        virtual std::streamsize showmanyc() override;
+        virtual std::streamsize showmanyc() override ;
 
     private:
- 
-        /**
-         * @brief Prevents copying of objects of this class by declaring the copy
-         *        constructor private. This method is never defined.
-         */
-        SerialStreamBuf(const SerialStreamBuf& otherSerialPort) = delete;
-
-        /**
-         * @brief Move construction is disallowed.
-         */
-        SerialStreamBuf(const SerialStreamBuf&& otherSerialPort) = delete;
-
-        /**
-         * @brief Prevents copying of objects of this class by declaring the
-         *        assignment operator private. This method is never defined.
-         */
-        SerialStreamBuf& operator=(const SerialStreamBuf& otherSerialPort) = delete;
-
-        /**
-         * @brief Move assignment is not allowed.
-         */
-        SerialStreamBuf& operator=(const SerialStreamBuf&& otherSerialPort) = delete;
 
         /**
          * @brief Forward declaration of the Implementation class folowing
@@ -409,8 +418,6 @@ namespace LibSerial
          */
         std::unique_ptr<Implementation> mImpl;
 
-    }; // class SerialStreamBuf
+    } ; // class SerialStreamBuf
 
 } // namespace LibSerial
-
-#endif // #ifndef _SerialStreamBuf_h_

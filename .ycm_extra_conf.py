@@ -5,7 +5,7 @@ def FlagsForFile( filename, **kwargs ):
     flags = [ '-Wall',
               '-Wextra',
               '-Werror',
-              '-std=c++11',
+              '-std=c++14',
               '-x', 'c++',
               '-I',
               '.',

@@ -2,6 +2,8 @@
 mkdir -p build
 cd build
 cmake ..
-cmake -G Sublime\ Text\ 2\ -\ Unix\ Makefiles .. 
+#cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+make
 cd ..
 make -j3 -C build
+sphinx-build -b html docs/user_manual/ docs/html/
