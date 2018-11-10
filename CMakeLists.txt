@@ -8,8 +8,14 @@ SET(LibSerial_VERSION_MINOR 0)
 INCLUDE(ExternalProject)
 
 ENABLE_TESTING()
-
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+#
+# Create compile_commands.json file so that it may be used by various
+# editors/plugins/IDEs that support it.
+#
+SET(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
 #
 # Use GNU standard installation directories. CMake will use /usr/local
 # as the default install directory. Users may override this by setting
@@ -67,11 +73,11 @@ ADD_DEFINITIONS(
   )
 
 #
-# We require support for C++11 features in the compiler. This can be
+# We require support for C++14 features in the compiler. This can be
 # achieved using CMAKE_CXX_STANDARD in CMake version 3.1 or later. For
 # older versions we have to add the compiler flags manually.
 #
-macro(USE_CXX11)
+macro(USE_CXX14)
     IF (CMAKE_VERSION VERSION_LESS "3.1")
         IF (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
             SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -fms-extensions")
@@ -81,8 +87,8 @@ macro(USE_CXX11)
         SET(CMAKE_CXX_STANDARD 14)
         SET(CMAKE_STANDARD_REQUIRES ON)
     ENDIF ()
-endmacro(USE_CXX11)
-USE_CXX11()
+endmacro(USE_CXX14)
+USE_CXX14()
 
 SET(GTEST_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/gtest")
 
