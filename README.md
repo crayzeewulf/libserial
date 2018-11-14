@@ -22,6 +22,7 @@ If you are a developer and would like to make use of the latest code, you will n
 ```sh
 sudo apt update
 sudo apt install autogen autoconf build-essential cmake graphviz libboost-dev libgtest-dev libtool python-sip-dev doxygen
+pip install sphinx
 ```
 ----
 If you get the source code from github and would like to install the library, there are a few steps you will need to accomplish:
