@@ -58,7 +58,9 @@ UnitTests::getTimeInMilliSeconds()
     std::chrono::high_resolution_clock::duration timeNow = 
         std::chrono::high_resolution_clock::now().time_since_epoch() ;
 
-    return std::chrono::duration_cast<std::chrono::milliseconds>(timeNow).count() ;
+    return static_cast<size_t>(
+        std::chrono::duration_cast<std::chrono::milliseconds>(timeNow).count()
+    ) ;
 }
 
 size_t
@@ -67,7 +69,9 @@ UnitTests::getTimeInMicroSeconds()
     std::chrono::high_resolution_clock::duration timeNow = 
         std::chrono::high_resolution_clock::now().time_since_epoch() ;
 
-    return std::chrono::duration_cast<std::chrono::microseconds>(timeNow).count() ;
+    return static_cast<size_t>(
+        std::chrono::duration_cast<std::chrono::microseconds>(timeNow).count()
+    ) ;
 }
 
 void
@@ -83,8 +87,8 @@ UnitTests::testSerialStreamToSerialPortReadWrite()
     serialPort1.SetBaudRate(baud_rate) ;
     serialStream1.SetBaudRate(baud_rate) ;
 
-    BaudRate baudRate1 = serialPort1.GetBaudRate() ;
-    BaudRate baudRate2 = serialStream1.GetBaudRate() ;
+    const auto baudRate1 = serialPort1.GetBaudRate() ;
+    const auto baudRate2 = serialStream1.GetBaudRate() ;
 
     ASSERT_EQ(baudRate1, baud_rate) ;
     ASSERT_EQ(baudRate2, baud_rate) ;
