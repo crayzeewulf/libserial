@@ -1,9 +1,21 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.8)
 
-PROJECT(LibSerial LANGUAGES C CXX)
+#
+# Project version numbering using semantic versioning. See:
+# https://semver.org/
+#
+# These are used to set VERSION and SOVERSION properties of the LibSerial
+# libarary. See:
+# - https://cmake.org/cmake/help/latest/prop_tgt/SOVERSION.html
+# - https://cmake.org/cmake/help/latest/prop_tgt/VERSION.html
+#
+PROJECT(LibSerial LANGUAGES C CXX VERSION 1.0.0)
 
-SET(LibSerial_VERSION_MAJOR 1)
-SET(LibSerial_VERSION_MINOR 0)
+#
+# Project specific options and variables
+#
+OPTION(INSTALL_STATIC "Install static library." ON)
+OPTION(INSTALL_SHARED "Install shared object library." ON)
 
 INCLUDE(ExternalProject)
 
@@ -150,4 +162,3 @@ ADD_CUSTOM_TARGET(docs ALL
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
-

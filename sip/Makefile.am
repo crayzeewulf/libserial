@@ -13,7 +13,7 @@ EXTRA_DIST = \
 	send_test.py \
 	$(SIPFILES)
 
-all: libserial.so
+all: libserialmod.so
 
 libserial.so: Makefile.sip @top_srcdir@/src/libserial.la
 	make -f Makefile.sip

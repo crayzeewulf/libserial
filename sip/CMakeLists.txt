@@ -1,4 +1,4 @@
-ADD_LIBRARY(libserial SHARED
+ADD_LIBRARY(libserialmod SHARED
     SerialPort.sip
 	SerialPortConstants.sip
 	exception.sip
@@ -8,13 +8,13 @@ ADD_LIBRARY(libserial SHARED
 	vector.sip
 )
 
-SET_TARGET_PROPERTIES(libserial PROPERTIES PREFIX "")
+SET_TARGET_PROPERTIES(libserialmod PROPERTIES PREFIX "")
 
-TARGET_LINK_LIBRARIES(libserial
+TARGET_LINK_LIBRARIES(libserialmod
 	libserial_static
 )
 
-INSTALL(TARGETS libserial
+INSTALL(TARGETS libserialmod
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
