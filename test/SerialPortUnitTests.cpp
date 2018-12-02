@@ -791,17 +791,11 @@ SerialPortUnitTests::testSerialPortGetAvailableSerialPorts()
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
 
-    std::vector<std::string> serialPorts1;
-    std::vector<std::string> serialPorts2;
+    const auto serialPorts1 = serialPort1.GetAvailableSerialPorts() ;
+    const auto serialPorts2 = serialPort2.GetAvailableSerialPorts() ;
 
-    serialPorts1.clear() ;
-    serialPorts2.clear() ;
-
-    serialPorts1 = serialPort1.GetAvailableSerialPorts() ;
-    serialPorts2 = serialPort2.GetAvailableSerialPorts() ;
-
-    int portCount1 = (int)serialPorts1.size() ;
-    int portCount2 = (int)serialPorts2.size() ;
+    const auto portCount1 = serialPorts1.size() ;
+    const auto portCount2 = serialPorts2.size() ;
 
     ASSERT_GE(portCount1, 2) ;
     ASSERT_GE(portCount2, 2) ;
@@ -831,8 +825,8 @@ SerialPortUnitTests::testSerialPortReadDataBufferWriteDataBuffer()
     // Test using ASCII characters.
     for (unsigned char i = 0; i < data_count; i++)
     {
-        writeVector1.push_back((char)(48 + i)) ;
-        writeVector2.push_back((char)(122 - i)) ;
+        writeVector1.push_back((48 + i)) ;
+        writeVector2.push_back((122 - i)) ;
     }
 
     serialPort1.Write(writeVector1) ;
