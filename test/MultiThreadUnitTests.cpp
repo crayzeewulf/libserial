@@ -79,12 +79,12 @@ MultiThreadUnitTests::serialStream1ThreadLoop()
             
             if(readString2 != writeString2)
             {
-                std::lock_guard<std::mutex> lock {mutex} ;
+                const std::lock_guard<std::mutex> lock {mutex} ;
                 failureRate++;
             } 
         }
 
-        std::lock_guard<std::mutex> lock {mutex} ;
+        const std::lock_guard<std::mutex> lock {mutex} ;
         loopCount++;
 
         timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
@@ -118,12 +118,12 @@ MultiThreadUnitTests::serialStream2ThreadLoop()
 
             if(readString1 != writeString1)
             {
-                std::lock_guard<std::mutex> lock {mutex} ;
+                const std::lock_guard<std::mutex> lock {mutex} ;
                 failureRate++;
             } 
         } 
 
-        std::lock_guard<std::mutex> lock {mutex} ;
+        const std::lock_guard<std::mutex> lock {mutex} ;
         loopCount++;
 
         timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
@@ -162,12 +162,12 @@ MultiThreadUnitTests::serialPort1ThreadLoop()
 
             if(readString2 != writeString2 + '\n')
             {
-                std::lock_guard<std::mutex> lock {mutex} ;
+                const std::lock_guard<std::mutex> lock {mutex} ;
                 failureRate++;
             }
         } 
 
-        std::lock_guard<std::mutex> lock {mutex} ;
+        const std::lock_guard<std::mutex> lock {mutex} ;
         loopCount++;
 
         timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
@@ -206,12 +206,12 @@ MultiThreadUnitTests::serialPort2ThreadLoop()
 
             if(readString1 != writeString1 + '\n')
             {
-                std::lock_guard<std::mutex> lock {mutex} ;
+                const std::lock_guard<std::mutex> lock {mutex} ;
                 failureRate++;
             }
         }
 
-        std::lock_guard<std::mutex> lock {mutex} ;
+        const std::lock_guard<std::mutex> lock {mutex} ;
         loopCount++;
 
         timeElapsedMilliSeconds = getTimeInMilliSeconds() - threadLoopStartTimeMilliseconds;
@@ -274,15 +274,18 @@ TEST_F(MultiThreadUnitTests, testMultiThreadSerialStreamReadWrite)
 {
     SCOPED_TRACE("Test Multi-Thread Serial Stream Communication.") ;
 
-    failureRate = 0;
-    loopCount = 0;
+    failureRate = 0 ;
+    loopCount = 0 ;
     
     for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testMultiThreadSerialStreamReadWrite() ;
     }
 
-    const double failRate = 100. * (double)failureRate / (double)loopCount;
+    const auto failRate = (
+        100. * static_cast<double>(failureRate) /
+        static_cast<double>(loopCount)
+    ) ;
     
     // If the serial communication fail rate is greater than 0.0001% consider it a failed test.
     if (failRate > 0.0001)
@@ -304,7 +307,10 @@ TEST_F(MultiThreadUnitTests, testMultiThreadSerialPortReadWrite)
         testMultiThreadSerialPortReadWrite() ;
     }
 
-    const double failRate = 100. * (double)failureRate / (double)loopCount;
+    const auto failRate = (
+        100. * static_cast<double>(failureRate) /
+        static_cast<double>(loopCount)
+    ) ;
     
     // If the serial communication fail rate is greater than 0.0001% consider it a failed test.
     if (failRate > 0.0001)
