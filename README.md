@@ -24,7 +24,9 @@ Debian users:
 
 ```sh
 sudo apt update
-sudo apt install autogen autoconf build-essential cmake graphviz libboost-dev libgtest-dev libtool python-sip-dev doxygen python-sphinx
+sudo apt install g++ git autogen autoconf build-essential cmake graphviz \
+                 libboost-dev libboost-test-dev libgtest-dev libtool \
+                 python-sip-dev doxygen python-sphinx
 ```
 ----
 If you get the source code from github and would like to install the library, there are a few steps you will need to accomplish:
@@ -64,7 +66,7 @@ make -f Makefile.dist
 To execute the `configure` script, first create a build directory, then run the script from the build directory as follows:
 
 ```sh
-./configure 
+./configure
 ```
 
 You can specify an installation directory different from the default, (/usr/local/), by adding `--prefix=/installation/directory/path/` to the configure command.  For example, to install into the top level include directory as the package manager would accomplish, you can simply run the following:
@@ -98,7 +100,7 @@ Unit test executables built using make can be run from the `build` directory usi
 ctest -V .
 ```
 
-Alternatively, unit test executables built using CMake can be run from the libserial/build/bin/ directory: 
+Alternatively, unit test executables built using CMake can be run from the libserial/build/bin/ directory:
 ```sh
 ./build/bin/UnitTests
 ./build/bin/unit_tests
