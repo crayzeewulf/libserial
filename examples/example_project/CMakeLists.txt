@@ -1,3 +1,8 @@
+#
+# **NOTE** This example currently requires the LibSerial be built using
+# autotools as the CMake build of LibSerial does not install a pkg-config
+# file yet. Support for pkg-config will be added to CMake build shortly.
+#
 cmake_minimum_required(VERSION 3.8)
 
 project(ExampleProject LANGUAGES C CXX VERSION 1.0.0)
