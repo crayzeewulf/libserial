@@ -791,17 +791,11 @@ SerialPortUnitTests::testSerialPortGetAvailableSerialPorts()
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
 
-    std::vector<std::string> serialPorts1;
-    std::vector<std::string> serialPorts2;
+    const auto serialPorts1 = serialPort1.GetAvailableSerialPorts() ;
+    const auto serialPorts2 = serialPort2.GetAvailableSerialPorts() ;
 
-    serialPorts1.clear() ;
-    serialPorts2.clear() ;
-
-    serialPorts1 = serialPort1.GetAvailableSerialPorts() ;
-    serialPorts2 = serialPort2.GetAvailableSerialPorts() ;
-
-    int portCount1 = (int)serialPorts1.size() ;
-    int portCount2 = (int)serialPorts2.size() ;
+    const auto portCount1 = serialPorts1.size() ;
+    const auto portCount2 = serialPorts2.size() ;
 
     ASSERT_GE(portCount1, 2) ;
     ASSERT_GE(portCount2, 2) ;
@@ -823,21 +817,16 @@ SerialPortUnitTests::testSerialPortReadDataBufferWriteDataBuffer()
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
 
-    const size_t data_count = 75;
-
-    bool timeOutTestPass = false;
+    constexpr size_t data_count = 75;
 
     DataBuffer writeVector1;
     DataBuffer writeVector2;
 
-    DataBuffer readVector1;
-    DataBuffer readVector2;
-
     // Test using ASCII characters.
     for (unsigned char i = 0; i < data_count; i++)
     {
-        writeVector1.push_back((char)(48 + i)) ;
-        writeVector2.push_back((char)(122 - i)) ;
+        writeVector1.push_back((48 + i)) ;
+        writeVector2.push_back((122 - i)) ;
     }
 
     serialPort1.Write(writeVector1) ;
@@ -845,6 +834,9 @@ SerialPortUnitTests::testSerialPortReadDataBufferWriteDataBuffer()
 
     serialPort1.DrainWriteBuffer() ;
     serialPort2.DrainWriteBuffer() ;
+
+    DataBuffer readVector1;
+    DataBuffer readVector2;
 
     serialPort1.Read(readVector2, data_count, timeOutMilliseconds) ;
     serialPort2.Read(readVector1, data_count, timeOutMilliseconds) ;
@@ -855,17 +847,33 @@ SerialPortUnitTests::testSerialPortReadDataBufferWriteDataBuffer()
     readVector1.clear() ;
     readVector2.clear() ;
 
+    //
+    // Read data on serialPort2 for a certain period of time by setting the
+    // second argument of SerialPort::Read() to 0. Make sure that the
+    // time duration is correct.
+    //
+    using namespace std::literals::chrono_literals ;
+    constexpr auto TEST_READ_DURATION = 75ms ;
+    const auto start_time = std::chrono::high_resolution_clock::now() ;
+    bool timeOutTestPass = false;
     try
     {
         serialPort1.Write(writeVector1) ;
-
         serialPort1.DrainWriteBuffer() ;
-
-        serialPort2.Read(readVector1, 0, 75) ;
+        serialPort2.Read(readVector1, 0, TEST_READ_DURATION.count()) ;
     }
-    catch (...)
+    catch(const ReadTimeout&)
     {
-        timeOutTestPass = true;
+        //
+        // Make sure that the timeout period was close to what we specified
+        // within a small margin.
+        //
+        constexpr auto TIMEOUT_DURATION_MARGIN = 30ms ;
+        const auto elapsed_time =(
+            std::chrono::high_resolution_clock::now() - start_time) ;
+        if (elapsed_time - TEST_READ_DURATION < TIMEOUT_DURATION_MARGIN) {
+            timeOutTestPass = true;
+        }
     }
 
     ASSERT_TRUE(timeOutTestPass) ;

@@ -10,7 +10,7 @@ unit_tests_LDADD = \
 	../src/libserial.la \
 	-lboost_unit_test_framework
 
-include_HEADERS = \
+noinst_HEADERS = \
 	SerialPortUnitTests.h \
 	SerialStreamUnitTests.h \
 	MultiThreadUnitTests.h \
@@ -24,6 +24,6 @@ UnitTests_SOURCES = \
 
 UnitTests_LDADD = \
 	../src/libserial.la \
-	/usr/lib/libgtest.a \
-	/usr/lib/libgtest_main.a \
+	-lgtest \
+    -lgtest_main \
 	-lpthread

@@ -16,16 +16,21 @@ An self-contained example project demonstrating the use of CMake and GNU Autotoo
 
 ## Developers
 
-If you are a developer and would like to make use of the latest code, you will need to have a few packages installed to build LibSerial:
-	a recent g++ release, (anything after gcc-3.2 should work), the python sip library, the boost unit test library, and Google Test (gtest).  For Debian users:
+If you are a developer and would like to make use of the latest code, you will
+need to have a few packages installed to build LibSerial: a recent g++ release
+(anything after gcc-3.2 should work), autotools, cmake, doxygen, sphinx, the
+python sip library, the boost unit test library, pkg-config, and Google Test
+(gtest). The following commands should install the required packages for
+Debian/Ubuntu users:
 
 ```sh
 sudo apt update
-sudo apt install autogen autoconf build-essential cmake graphviz libboost-dev libgtest-dev libtool python-sip-dev doxygen
+sudo apt install g++ git autogen autoconf build-essential cmake graphviz \
+                 libboost-dev libboost-test-dev libgtest-dev libtool \
+                 python-sip-dev doxygen python-sphinx pkg-config
 ```
 ----
 If you get the source code from github and would like to install the library, there are a few steps you will need to accomplish:
-
 
 ----
 If you are using CMake, to build the library you can simply run the `compile.sh` script:
@@ -39,7 +44,7 @@ cd build
 sudo make install
 ```
 
-You can specify an installation directory different from the default, (/usr/local/), by replacing the `cmake ..` command in the `compile.sh` script.  For example, to install into the top level `usr/include` instead of the `usr/local/include` directory, use the following:
+You can specify an installation directory different from the default, (/usr/local/), by replacing the `cmake ..` command in the `compile.sh` script.  For example, to install under `/usr` instead of the `/usr/local` directory, use the following:
 ```sh
 cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 ```
@@ -62,7 +67,7 @@ make -f Makefile.dist
 To execute the `configure` script, first create a build directory, then run the script from the build directory as follows:
 
 ```sh
-./configure 
+./configure
 ```
 
 You can specify an installation directory different from the default, (/usr/local/), by adding `--prefix=/installation/directory/path/` to the configure command.  For example, to install into the top level include directory as the package manager would accomplish, you can simply run the following:
@@ -96,7 +101,7 @@ Unit test executables built using make can be run from the `build` directory usi
 ctest -V .
 ```
 
-Alternatively, unit test executables built using CMake can be run from the libserial/build/bin/ directory: 
+Alternatively, unit test executables built using CMake can be run from the libserial/build/bin/ directory:
 ```sh
 ./build/bin/UnitTests
 ./build/bin/unit_tests

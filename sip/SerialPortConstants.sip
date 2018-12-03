@@ -2,7 +2,7 @@ namespace LibSerial
 {
 
 %TypeHeaderCode
-#include <SerialPortConstants.h>
+#include <libserial/SerialPortConstants.h>
 %End
     
     typedef std::vector<unsigned char> DataBuffer;

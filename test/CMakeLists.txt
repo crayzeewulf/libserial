@@ -15,8 +15,12 @@ ADD_EXECUTABLE(unit_tests
   )
 
 TARGET_LINK_LIBRARIES(unit_tests
-  libserial
+  libserial_static
   ${Boost_LIBRARIES}
 )
+
+target_include_directories(UnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_include_directories(unit_tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
+
 
 ADD_TEST(NAME UnitTests COMMAND UnitTests)

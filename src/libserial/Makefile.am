@@ -1,4 +1,4 @@
-include_HEADERS = \
+noinst_HEADERS = \
 	SerialPort.h \
 	SerialPortConstants.h \
 	SerialStream.h \

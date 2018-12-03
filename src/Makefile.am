@@ -10,7 +10,12 @@ libserial_la_SOURCES = \
 	SerialPort.cpp \
 	SerialStream.cpp \
 	SerialStreamBuf.cpp
-	SerialPort.h \
-	SerialPortConstants.h \
-	SerialStream.h \
-	SerialStreamBuf.h
+
+libserialincludedir = @includedir@/libserial
+libserialinclude_HEADERS = \
+	libserial/SerialPort.h \
+	libserial/SerialPortConstants.h \
+	libserial/SerialStream.h \
+	libserial/SerialStreamBuf.h
+
+libserial_la_LDFLAGS = -version-info 1:0:0

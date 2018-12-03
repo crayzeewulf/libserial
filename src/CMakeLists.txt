@@ -10,14 +10,8 @@ add_library(libserial_static STATIC ${LIBSERIAL_SOURCES})
 # another "lib" prefix.
 #
 set_target_properties(libserial_static PROPERTIES PREFIX "")
-
 target_include_directories(libserial_static PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-
-if (CMAKE_VERSION VERSION_LESS "3.1")
-    TARGET_LINK_LIBRARIES(libserial_static ${CMAKE_THREAD_LIBS_INIT})
-else()
-    TARGET_LINK_LIBRARIES(libserial_static Threads::Threads)
-endif()
+target_link_libraries(libserial_static Threads::Threads)
 
 #
 # Install all our headers under the libserial subfolder of the include
@@ -30,9 +24,43 @@ endif()
 install(DIRECTORY libserial
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-install(TARGETS libserial_static
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-
+#
+# The static library is always built as it is needed for unit tests but it is
+# installed only if INSTALL_STATIC is set. 
+#
+if (INSTALL_STATIC)
+    install(TARGETS libserial_static
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
+#
+# Use the same name (libserial) for both the static and shared libraries
+#
 set_target_properties(libserial_static PROPERTIES OUTPUT_NAME libserial)
+
+#
+# Build and install the shared object library only if INSTALL_SHARED is set.
+#
+if (INSTALL_SHARED)
+    add_library(libserial_shared SHARED ${LIBSERIAL_SOURCES})
+    set_target_properties(libserial_shared PROPERTIES PREFIX "")
+    set_target_properties(libserial_shared PROPERTIES OUTPUT_NAME libserial)
+    target_include_directories(libserial_shared PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    target_link_libraries(libserial_shared Threads::Threads)
+    #
+    # Add version numbering to the shared library. Based on the recommendations in
+    # the following book:
+    #
+    # "Professional CMake: A Practical Guide" --Craig Scott 
+    # (https://crascit.com/professional-cmake/)
+    #
+    set_target_properties(libserial_shared PROPERTIES
+        VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}
+        SOVERSION ${PROJECT_VERSION_MAJOR}
+    )
+    install(TARGETS libserial_shared
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()

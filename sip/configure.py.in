@@ -39,7 +39,7 @@ def main():
                               "-c", ".",
                               "-e",
                               "-b", build_file,
-                              "libserial.sip" ] )
+                              "@srcdir@/libserial.sip" ] )
     logging.info( "Running sip command: '" + sip_command + "'" )
     os.system( sip_command )
     #
@@ -60,7 +60,7 @@ def main():
     # ".dll" extension on Windows).
     #
     makefile.extra_include_dirs = [ "@top_srcdir@/src" ]
-    makefile.extra_lib_dirs     = [ "@top_srcdir@/src/.libs" ]
+    makefile.extra_lib_dirs     = [ "@top_builddir@/src/.libs" ]
     makefile.extra_libs         = [ "serial" ]
     #
     # Generate the Makefile itself.

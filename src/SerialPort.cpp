@@ -1108,7 +1108,7 @@ namespace LibSerial
         if (input_baud != output_baud)
         {
             throw std::runtime_error(ERR_MSG_INVALID_BAUD_RATE) ;
-            return BaudRate::BAUD_INVALID ;
+            // return BaudRate::BAUD_INVALID ;
         }
 
         // Obtain the input baud rate from the current settings.
@@ -1377,7 +1377,7 @@ namespace LibSerial
             break ;
         default:
             throw std::invalid_argument(ERR_MSG_INVALID_FLOW_CONTROL) ;
-            break ;
+            // break ; break not needed after a throw
         }
         
         // Apply the modified settings.
@@ -1476,7 +1476,7 @@ namespace LibSerial
             break ;
         default:
             throw std::invalid_argument(ERR_MSG_INVALID_PARITY) ;
-            break ;
+            // break ; break not needed after a throw
         }
 
         // Apply the modified port settings.
@@ -1552,7 +1552,7 @@ namespace LibSerial
             break ;
         default: 
             throw std::invalid_argument(ERR_MSG_INVALID_STOP_BITS) ;
-            break ;
+            // break ; break not needed after a throw
         }
 
         // Apply the modified settings.
