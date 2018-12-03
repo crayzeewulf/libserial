@@ -2,7 +2,7 @@ class SerialPort
 {
 
 %TypeHeaderCode
-#include <SerialPort.h>
+#include <libserial/SerialPort.h>
 using namespace LibSerial;
 %End
 

@@ -1,11 +1,11 @@
 SIPFILES = \
-	SerialPort.sip \
-	SerialPortConstants.sip \
-	exception.sip \
-	libserial.sip \
-	stdexcept.sip \
-	string.sip \
-	vector.sip 
+	@srcdir@/SerialPort.sip \
+	@srcdir@/SerialPortConstants.sip \
+	@srcdir@/exception.sip \
+	@srcdir@/libserial.sip \
+	@srcdir@/stdexcept.sip \
+	@srcdir@/string.sip \
+	@srcdir@/vector.sip 
 
 EXTRA_DIST = \
 	configure.py.in \
@@ -15,7 +15,7 @@ EXTRA_DIST = \
 
 all: libserialmod.so
 
-libserial.so: Makefile.sip @top_srcdir@/src/libserial.la
+libserialmod.so: Makefile.sip @top_builddir@/src/libserial.la
 	make -f Makefile.sip
 
 Makefile.sip: configure.py $(SIPFILES)

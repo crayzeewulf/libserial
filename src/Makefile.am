@@ -14,3 +14,5 @@ libserial_la_SOURCES = \
 	SerialPortConstants.h \
 	SerialStream.h \
 	SerialStreamBuf.h
+
+libserial_la_LDFLAGS = -version-info 1:0:0

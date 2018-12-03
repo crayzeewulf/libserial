@@ -24,6 +24,6 @@ UnitTests_SOURCES = \
 
 UnitTests_LDADD = \
 	../src/libserial.la \
-	/usr/lib/libgtest.a \
-	/usr/lib/libgtest_main.a \
+	-lgtest \
+    -lgtest_main \
 	-lpthread
