@@ -4,14 +4,6 @@ project(ExampleProject LANGUAGES C CXX VERSION 1.0.0)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 #
-# Use GNU standard installation directories. CMake will use /usr/local
-# as the default install directory. Users may override this by setting
-# CMAKE_INSTALL_PREFIX. For example:
-#
-# cd build && cmake -DCMAKE_INSTALL_PREFIX=/usr ..
-#
-
-#
 # Prefer -pthread compiler and linker flag when using libpthread. This must
 # be set before call to find_package(Threads).
 #
