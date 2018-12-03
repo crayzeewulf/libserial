@@ -16,17 +16,18 @@ An self-contained example project demonstrating the use of CMake and GNU Autotoo
 
 ## Developers
 
-If you are a developer and would like to make use of the latest code, you will need to have a few packages installed to build LibSerial:
-	a recent g++ release, (anything after gcc-3.2 should work), the python sip library, the boost unit test library, and Google Test (gtest).  For Debian users:
+If you are a developer and would like to make use of the latest code, you will
+need to have a few packages installed to build LibSerial: a recent g++ release
+(anything after gcc-3.2 should work), autotools, cmake, doxygen, sphinx, the
+python sip library, the boost unit test library, and Google Test (gtest).  For
+Debian users:
 
 ```sh
 sudo apt update
-sudo apt install autogen autoconf build-essential cmake graphviz libboost-dev libgtest-dev libtool python-sip-dev doxygen
-pip install sphinx
+sudo apt install autogen autoconf build-essential cmake graphviz libboost-dev libgtest-dev libtool python-sip-dev doxygen python-sphinx
 ```
 ----
 If you get the source code from github and would like to install the library, there are a few steps you will need to accomplish:
-
 
 ----
 If you are using CMake, to build the library you can simply run the `compile.sh` script:
