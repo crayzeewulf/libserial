@@ -40,7 +40,7 @@ cd build
 sudo make install
 ```
 
-You can specify an installation directory different from the default, (/usr/local/), by replacing the `cmake ..` command in the `compile.sh` script.  For example, to install into the top level `usr/include` instead of the `usr/local/include` directory, use the following:
+You can specify an installation directory different from the default, (/usr/local/), by replacing the `cmake ..` command in the `compile.sh` script.  For example, to install under `/usr` instead of the `/usr/local` directory, use the following:
 ```sh
 cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 ```
