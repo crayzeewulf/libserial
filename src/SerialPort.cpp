@@ -1223,6 +1223,7 @@ namespace LibSerial
             baud_rate_as_int = 1500000 ;
             break ;
 
+#if __MAX_BAUD > B2000000
         case BaudRate::BAUD_2000000:
             baud_rate_as_int = 2000000 ;
             break ;
@@ -1242,6 +1243,7 @@ namespace LibSerial
         case BaudRate::BAUD_4000000:
             baud_rate_as_int = 4000000 ;
             break ;
+#endif /* __MAX_BAUD */
         default:
             // If an incorrect baud rate was specified, throw an exception.
             throw std::runtime_error(ERR_MSG_INVALID_BAUD_RATE) ;
