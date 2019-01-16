@@ -207,7 +207,7 @@ namespace LibSerial
         BAUD_115200  = B115200,
         BAUD_230400  = B230400,
 
-        // @note: >B230400 are defined in Linux but not other POSIX systems, (e.g. Mac OS X).
+// @note: >B230400 are defined in Linux but not other POSIX systems, (e.g. Mac OS X).
 #ifdef __linux__
         BAUD_460800  = B460800,
         BAUD_500000  = B500000,
@@ -222,8 +222,8 @@ namespace LibSerial
         BAUD_3000000 = B3000000,
         BAUD_3500000 = B3500000,
         BAUD_4000000 = B4000000,
-#endif /* __MAX_BAUD */
-#endif /* __linux__ */
+#endif // __MAX_BAUD
+#endif // __linux__
         BAUD_DEFAULT = BAUD_115200,
         BAUD_INVALID = std::numeric_limits<speed_t>::max()
     } ;
