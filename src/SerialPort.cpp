@@ -1195,6 +1195,8 @@ namespace LibSerial
             baud_rate_as_int = 230400 ;
             break ;
 
+// @note: >B230400 are defined in Linux but not other POSIX systems, (e.g. Mac OS X).
+#ifdef __linux__
         case BaudRate::BAUD_460800:
             baud_rate_as_int = 460800 ;
             break ;
@@ -1243,7 +1245,8 @@ namespace LibSerial
         case BaudRate::BAUD_4000000:
             baud_rate_as_int = 4000000 ;
             break ;
-#endif /* __MAX_BAUD */
+#endif // __MAX_BAUD
+#endif // __linux__
         default:
             // If an incorrect baud rate was specified, throw an exception.
             throw std::runtime_error(ERR_MSG_INVALID_BAUD_RATE) ;
