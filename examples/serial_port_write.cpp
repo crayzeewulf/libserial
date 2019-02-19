@@ -8,6 +8,8 @@
 #include <fstream>
 #include <iostream>
 
+#define DEFAULT_SERIAL_PORT_1 "/dev/ttyUSB1"
+
 
 /**
  * @brief This example reads the contents of a file and writes the entire 
@@ -42,8 +44,16 @@ int main(int argc, char** argv)
     // Instantiate a SerialPort object.
     SerialPort serial_port ;
 
-    // Open the Serial Port at the desired hardware port.
-    serial_port.Open("/dev/ttyUSB1") ;
+    try
+    {
+        // Open the Serial Port at the desired hardware port.
+        serial_port.Open(DEFAULT_SERIAL_PORT_1) ;
+    }
+    catch (OpenFailed&)
+    {
+        std::cerr << "The serial port did not open correctly." << std::endl ;
+        return EXIT_FAILURE ;
+    }
 
     // Set the baud rate of the serial port.
     serial_port.SetBaudRate(BaudRate::BAUD_115200) ;

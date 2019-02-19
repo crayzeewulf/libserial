@@ -10,6 +10,9 @@
 #include <iostream>
 #include <unistd.h>
 
+#define DEFAULT_SERIAL_PORT_0 "/dev/ttyUSB0"
+#define DEFAULT_SERIAL_PORT_1 "/dev/ttyUSB1"
+
 /**
  * @brief This example demonstrates multiple methods to read and write
  *        serial stream data utilizing std::iostream functionality.
@@ -17,17 +20,18 @@
 int main()
 {
     using namespace LibSerial ;
+
     // Instantiate two SerialStream objects.
     SerialStream serial_stream_1 ;
     SerialStream serial_stream_2 ;
 
-    // Open the Serial Ports at the desired hardware devices.
-    serial_stream_1.Open("/dev/ttyUSB0") ;
-    serial_stream_2.Open("/dev/ttyUSB1") ;
-
-    // Verify that the serial ports opened.
-    if (!serial_stream_1.IsOpen() ||
-        !serial_stream_2.IsOpen())
+    try
+    {
+        // Open the Serial Ports at the desired hardware devices.
+        serial_stream_1.Open(DEFAULT_SERIAL_PORT_0) ;
+        serial_stream_2.Open(DEFAULT_SERIAL_PORT_1) ;
+    }
+    catch (OpenFailed&)
     {
         std::cerr << "The serial ports did not open correctly." << std::endl ;
         return EXIT_FAILURE ;

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <unistd.h>
 
+#define DEFAULT_SERIAL_PORT_0 "/dev/ttyUSB0"
 
 /**
  * @brief This example demonstrates configuring a serial port and 
@@ -21,8 +22,16 @@ int main()
     // Instantiate a SerialPort object.
     SerialPort serial_port ;
 
-    // Open the Serial Port at the desired hardware port.
-    serial_port.Open("/dev/ttyUSB0") ;
+    try
+    {
+        // Open the Serial Port at the desired hardware port.
+        serial_port.Open(DEFAULT_SERIAL_PORT_0) ;
+    }
+    catch (OpenFailed&)
+    {
+        std::cerr << "The serial port did not open correctly." << std::endl ;
+        return EXIT_FAILURE ;
+    }
 
     // Set the baud rate of the serial port.
     serial_port.SetBaudRate(BaudRate::BAUD_115200) ;
