@@ -158,7 +158,8 @@ int main()
         std::getline(std::cin, user_input) ;
 
         if (user_input == "q" ||
-            user_input == "Q")
+            user_input == "Q" ||
+            user_input == "")
         {
             break ;
         }
