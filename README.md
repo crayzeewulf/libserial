@@ -82,29 +82,43 @@ make
 sudo make install
 ```
 
+### Example Code and Unit Tests
 ----
-If you are interested in running the unit tests, ensure serial port names are appropriate for your hardware configuration in the `test/UnitTests.cpp` file:
+If you are interested in running the unit tests or example code, ensure serial port names are appropriate for your hardware configuration in the `examples/` directory files and in the `test/UnitTests.h` file as such:
 
 ```cpp
-#define TEST_SERIAL_PORT_1 "/dev/ttyUSB0"
-#define TEST_SERIAL_PORT_2 "/dev/ttyUSB1"
+constexpr const char* const SERIAL_PORT_1 = "/dev/ttyUSB0" ;
+constexpr const char* const SERIAL_PORT_2 = "/dev/ttyUSB1" ;
 ```
 
-The unit tests will be built during the make steps above or by running the cmake compile script:
+Example code and Unit test executables are easily built using the cmake compile script and can be run from the `build` directory:
 
 ```sh
-./compile.sh
+./compile
+```
+```sh
+./build/bin/UnitTests
+```
+```sh
+./build/bin/SerialPortReadWriteExample
 ```
 
-Unit test executables built using make can be run from the `build` directory using the command:
+Unit test executables built using make can be run from the `build` directory in the following manner:
 ```sh
 ctest -V .
 ```
 
-Alternatively, unit test executables built using CMake can be run from the libserial/build/bin/ directory:
+#### Hardware and Software Considerations:
+If needed, you can grant user permissions to utilize the hardware ports in the following manner, (afterwards a reboot is required):
 ```sh
-./build/bin/UnitTests
-./build/bin/unit_tests
+sudo usermod -a -G dialout $USER
+sudo usermod -a -G plugdev $USER
+```
+
+##### Socat
+Socat is a useful tool to allow hardware ports to communicate on the same system via a software pipe.  As an example, to allow hardware UART port `/dev/ttyS0` to communicate via software with hardware UART port `/dev/ttyS1`:
+```sh
+socat -d -d pty,raw,echo=0,link=/dev/ttyS0 pty,raw,echo=0,link=/dev/ttyS1
 ```
 
 ----

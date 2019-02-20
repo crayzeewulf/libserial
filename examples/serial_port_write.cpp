@@ -8,8 +8,7 @@
 #include <fstream>
 #include <iostream>
 
-#define DEFAULT_SERIAL_PORT_1 "/dev/ttyUSB1"
-
+constexpr const char* const SERIAL_PORT_2 = "/dev/ttyUSB1" ;
 
 /**
  * @brief This example reads the contents of a file and writes the entire 
@@ -47,7 +46,7 @@ int main(int argc, char** argv)
     try
     {
         // Open the Serial Port at the desired hardware port.
-        serial_port.Open(DEFAULT_SERIAL_PORT_1) ;
+        serial_port.Open(SERIAL_PORT_2) ;
     }
     catch (const OpenFailed&)
     {

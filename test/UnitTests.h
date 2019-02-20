@@ -50,12 +50,12 @@ namespace LibSerial
     /**
      * @var Default Serial Port 1.
      */
-    constexpr const char* const TEST_SERIAL_PORT_1 = "/dev/ttyUSB0" ;
+    constexpr const char* const SERIAL_PORT_1 = "/dev/ttyUSB0" ;
 
     /**
      * @var Default Serial Port 2.
      */
-    constexpr const char* const TEST_SERIAL_PORT_2 = "/dev/ttyUSB1" ;
+    constexpr const char* const SERIAL_PORT_2 = "/dev/ttyUSB1" ;
 
     /**
      * @var The number of iterations to perform on each unit test.

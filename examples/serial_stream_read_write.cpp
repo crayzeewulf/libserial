@@ -10,8 +10,8 @@
 #include <iostream>
 #include <unistd.h>
 
-#define DEFAULT_SERIAL_PORT_0 "/dev/ttyUSB0"
-#define DEFAULT_SERIAL_PORT_1 "/dev/ttyUSB1"
+constexpr const char* const SERIAL_PORT_1 = "/dev/ttyUSB0" ;
+constexpr const char* const SERIAL_PORT_2 = "/dev/ttyUSB1" ;
 
 /**
  * @brief This example demonstrates multiple methods to read and write
@@ -28,8 +28,8 @@ int main()
     try
     {
         // Open the Serial Ports at the desired hardware devices.
-        serial_stream_1.Open(DEFAULT_SERIAL_PORT_0) ;
-        serial_stream_2.Open(DEFAULT_SERIAL_PORT_1) ;
+        serial_stream_1.Open(SERIAL_PORT_1) ;
+        serial_stream_2.Open(SERIAL_PORT_2) ;
     }
     catch (const OpenFailed&)
     {

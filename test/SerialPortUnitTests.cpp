@@ -55,8 +55,8 @@ SerialPortUnitTests::~SerialPortUnitTests()
 void
 SerialPortUnitTests::testSerialPortConstructors()
 {
-    SerialPort serialPort3(TEST_SERIAL_PORT_1) ;
-    SerialPort serialPort4(TEST_SERIAL_PORT_2,
+    SerialPort serialPort3(SERIAL_PORT_1) ;
+    SerialPort serialPort4(SERIAL_PORT_2,
                            BaudRate::BAUD_9600,
                            CharacterSize::CHAR_SIZE_7,
                            FlowControl::FLOW_CONTROL_HARDWARE,
@@ -82,8 +82,8 @@ SerialPortUnitTests::testSerialPortConstructors()
 void
 SerialPortUnitTests::testSerialPortOpenClose()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -98,8 +98,8 @@ SerialPortUnitTests::testSerialPortOpenClose()
 
     try
     {
-        serialPort3.Open(TEST_SERIAL_PORT_1) ;
-        serialPort4.Open(TEST_SERIAL_PORT_2) ;
+        serialPort3.Open(SERIAL_PORT_1) ;
+        serialPort4.Open(SERIAL_PORT_2) ;
     }
     catch (...)
     {
@@ -118,8 +118,8 @@ SerialPortUnitTests::testSerialPortOpenClose()
 void
 SerialPortUnitTests::testSerialPortDrainWriteBuffer()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -155,8 +155,8 @@ SerialPortUnitTests::testSerialPortDrainWriteBuffer()
 void
 SerialPortUnitTests::testSerialPortFlushInputBuffer()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -197,8 +197,8 @@ SerialPortUnitTests::testSerialPortFlushInputBuffer()
 void
 SerialPortUnitTests::testSerialPortFlushOutputBuffer()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -230,8 +230,8 @@ SerialPortUnitTests::testSerialPortFlushOutputBuffer()
 void
 SerialPortUnitTests::testSerialPortFlushIOBuffers()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -276,8 +276,8 @@ SerialPortUnitTests::testSerialPortFlushIOBuffers()
 void
 SerialPortUnitTests::testSerialPortIsDataAvailableTest()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -326,8 +326,8 @@ SerialPortUnitTests::testSerialPortIsOpenTest()
     ASSERT_FALSE(serialPort1.IsOpen()) ;
     ASSERT_FALSE(serialPort2.IsOpen()) ;
 
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -342,8 +342,8 @@ SerialPortUnitTests::testSerialPortIsOpenTest()
 void
 SerialPortUnitTests::testSerialPortSetGetBaudRate()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -370,8 +370,8 @@ SerialPortUnitTests::testSerialPortSetGetBaudRate()
 void
 SerialPortUnitTests::testSerialPortSetGetCharacterSize()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -404,8 +404,8 @@ SerialPortUnitTests::testSerialPortSetGetCharacterSize()
 void
 SerialPortUnitTests::testSerialPortSetGetFlowControl()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -438,8 +438,8 @@ SerialPortUnitTests::testSerialPortSetGetFlowControl()
 void
 SerialPortUnitTests::testSerialPortSetGetParity()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -466,8 +466,8 @@ SerialPortUnitTests::testSerialPortSetGetParity()
 void
 SerialPortUnitTests::testSerialPortSetGetStopBits()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -494,7 +494,7 @@ SerialPortUnitTests::testSerialPortSetGetStopBits()
 void
 SerialPortUnitTests::testSerialPortSetGetVMin()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
     ASSERT_TRUE(serialPort1.IsOpen()) ;
 
     for (short i = 0; i < 5; i++)
@@ -511,7 +511,7 @@ SerialPortUnitTests::testSerialPortSetGetVMin()
 void
 SerialPortUnitTests::testSerialPortSetGetVTime()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
     ASSERT_TRUE(serialPort1.IsOpen()) ;
 
     for (short i = 0; i < 5; i++)
@@ -528,8 +528,8 @@ SerialPortUnitTests::testSerialPortSetGetVTime()
 void
 SerialPortUnitTests::testSerialPortSetGetDTR()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -574,8 +574,8 @@ SerialPortUnitTests::testSerialPortSetGetDTR()
 void
 SerialPortUnitTests::testSerialPortSetGetRTS()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -620,8 +620,8 @@ SerialPortUnitTests::testSerialPortSetGetRTS()
 void
 SerialPortUnitTests::testSerialPortSetRTSGetCTS()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -666,8 +666,8 @@ SerialPortUnitTests::testSerialPortSetRTSGetCTS()
 void
 SerialPortUnitTests::testSerialPortSetDTRGetDSR()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -712,8 +712,8 @@ SerialPortUnitTests::testSerialPortSetDTRGetDSR()
 void
 SerialPortUnitTests::testSerialPortGetFileDescriptor()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -734,8 +734,8 @@ SerialPortUnitTests::testSerialPortGetFileDescriptor()
 void
 SerialPortUnitTests::testSerialPortGetNumberOfBytesAvailable()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -785,8 +785,8 @@ SerialPortUnitTests::testSerialPortGetNumberOfBytesAvailable()
 void
 SerialPortUnitTests::testSerialPortGetAvailableSerialPorts()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -811,8 +811,8 @@ SerialPortUnitTests::testSerialPortGetAvailableSerialPorts()
 void
 SerialPortUnitTests::testSerialPortReadDataBufferWriteDataBuffer()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -889,8 +889,8 @@ SerialPortUnitTests::testSerialPortReadDataBufferWriteDataBuffer()
 void
 SerialPortUnitTests::testSerialPortReadStringWriteString()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -940,8 +940,8 @@ SerialPortUnitTests::testSerialPortReadStringWriteString()
 void
 SerialPortUnitTests::testSerialPortReadByteWriteByte()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
@@ -988,8 +988,8 @@ SerialPortUnitTests::testSerialPortReadByteWriteByte()
 void
 SerialPortUnitTests::testSerialPortReadLineWriteString()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
