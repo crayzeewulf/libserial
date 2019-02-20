@@ -49,7 +49,7 @@ int main(int argc, char** argv)
         // Open the Serial Port at the desired hardware port.
         serial_port.Open(DEFAULT_SERIAL_PORT_1) ;
     }
-    catch (OpenFailed&)
+    catch (const OpenFailed&)
     {
         std::cerr << "The serial port did not open correctly." << std::endl ;
         return EXIT_FAILURE ;

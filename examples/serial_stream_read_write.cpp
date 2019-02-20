@@ -31,7 +31,7 @@ int main()
         serial_stream_1.Open(DEFAULT_SERIAL_PORT_0) ;
         serial_stream_2.Open(DEFAULT_SERIAL_PORT_1) ;
     }
-    catch (OpenFailed&)
+    catch (const OpenFailed&)
     {
         std::cerr << "The serial ports did not open correctly." << std::endl ;
         return EXIT_FAILURE ;
