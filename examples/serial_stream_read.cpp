@@ -8,6 +8,8 @@
 #include <iostream>
 #include <unistd.h>
 
+#define DEFAULT_SERIAL_PORT_0 "/dev/ttyUSB0"
+
 /**
  * @brief This example demonstrates configuring a serial stream and 
  *        reading serial stream data.
@@ -15,11 +17,20 @@
 int main()
 {
     using namespace LibSerial ;
+
     // Instantiate a SerialStream object.
     SerialStream serial_stream ;
 
-    // Open the Serial Port at the desired hardware port.
-    serial_stream.Open("/dev/ttyUSB0") ;
+    try
+    {
+        // Open the Serial Port at the desired hardware port.
+        serial_stream.Open(DEFAULT_SERIAL_PORT_0) ;
+    }
+    catch (OpenFailed&)
+    {
+        std::cerr << "The serial port did not open correctly." << std::endl ;
+        return EXIT_FAILURE ;
+    }
 
     // Set the baud rate of the serial port.
     serial_stream.SetBaudRate(BaudRate::BAUD_115200) ;
