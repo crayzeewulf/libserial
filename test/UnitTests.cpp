@@ -77,10 +77,10 @@ UnitTests::getTimeInMicroSeconds()
 void
 UnitTests::testSerialStreamToSerialPortReadWrite()
 {
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
+    serialPort1.Open(DEFAULT_SERIAL_PORT_0) ;
     ASSERT_TRUE(serialPort1.IsOpen()) ;
 
-    serialStream1.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(DEFAULT_SERIAL_PORT_1) ;
     ASSERT_TRUE(serialStream1.IsOpen()) ;
 
     const auto baud_rate = BaudRate::BAUD_115200 ;

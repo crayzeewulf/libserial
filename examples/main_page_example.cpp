@@ -7,6 +7,9 @@
 
 #include <iostream>
 
+constexpr const char* const DEFAULT_SERIAL_PORT_0 = "/dev/ttyUSB0" ;
+constexpr const char* const DEFAULT_SERIAL_PORT_1 = "/dev/ttyUSB1" ;
+
 int main()
 {
     using LibSerial::SerialPort ;
@@ -17,8 +20,8 @@ int main()
     SerialStream serial_stream ;
 
     // Open the hardware serial ports.
-    serial_port.Open( "/dev/ttyUSB0" ) ;
-    serial_stream.Open( "/dev/ttyUSB1" ) ;
+    serial_port.Open( DEFAULT_SERIAL_PORT_0 ) ;
+    serial_stream.Open( DEFAULT_SERIAL_PORT_1 ) ;
 
     // Set the baud rates.
     using LibSerial::BaudRate ;

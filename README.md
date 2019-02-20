@@ -82,30 +82,40 @@ make
 sudo make install
 ```
 
+### Example Code and Unit Tests
 ----
-If you are interested in running the unit tests, ensure serial port names are appropriate for your hardware configuration in the `test/UnitTests.cpp` file:
+If you are interested in running the unit tests or example code, ensure serial port names are appropriate for your hardware configuration in the `test/UnitTests.h` file and/or in the `examples/` directory files:
 
 ```cpp
-#define TEST_SERIAL_PORT_1 "/dev/ttyUSB0"
-#define TEST_SERIAL_PORT_2 "/dev/ttyUSB1"
+constexpr const char* const DEFAULT_SERIAL_PORT_0 = "/dev/ttyUSB0" ;
+constexpr const char* const DEFAULT_SERIAL_PORT_1 = "/dev/ttyUSB1" ;
 ```
 
-The unit tests will be built during the make steps above or by running the cmake compile script:
+If needed, you can grant user permissions to utilize the hardware ports in the following manner, (afterwards a reboot is required):
+```sh
+sudo usermod -a -G dialout $USER
+sudo usermod -a -G plugdev $USER
+```
+
+Example code and Unit test executables are easily built using the cmake compile script and can be run from the `build` directory:
 
 ```sh
-./compile.sh
+./compile
+./build/bin/UnitTests
+./build/bin/NAME_OF_EXAMPLE_FILE_EXECUTABLE
 ```
 
-Unit test executables built using make can be run from the `build` directory using the command:
+Unit tests can be run in similar manner:
+
+```sh
+```
+
+Unit test executables built using make can be run from the `build` directory in the following manner:
 ```sh
 ctest -V .
 ```
 
-Alternatively, unit test executables built using CMake can be run from the libserial/build/bin/ directory:
-```sh
-./build/bin/UnitTests
-./build/bin/unit_tests
-```
+#### Hardware and Software Considerations:
 
 ----
 Complete documentation is available [here](http://libserial.readthedocs.io/en/latest/index.html).

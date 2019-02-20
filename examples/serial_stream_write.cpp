@@ -8,7 +8,7 @@
 #include <fstream>
 #include <iostream>
 
-#define DEFAULT_SERIAL_PORT_1 "/dev/ttyUSB1"
+constexpr const char* const DEFAULT_SERIAL_PORT_1 = "/dev/ttyUSB1" ;
 
 /**
  * @brief This example reads the contents of a file and writes the entire 

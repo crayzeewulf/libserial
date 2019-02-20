@@ -8,7 +8,7 @@
 #include <iostream>
 #include <unistd.h>
 
-#define DEFAULT_SERIAL_PORT_0 "/dev/ttyUSB0"
+constexpr const char* const DEFAULT_SERIAL_PORT_0 = "/dev/ttyUSB0" ;
 
 /**
  * @brief This example demonstrates configuring a serial stream and 

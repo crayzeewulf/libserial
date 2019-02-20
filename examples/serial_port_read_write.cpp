@@ -9,8 +9,8 @@
 #include <iostream>
 #include <unistd.h>
 
-#define DEFAULT_SERIAL_PORT_0 "/dev/ttyUSB0"
-#define DEFAULT_SERIAL_PORT_1 "/dev/ttyUSB1"
+constexpr const char* const DEFAULT_SERIAL_PORT_0 = "/dev/ttyUSB0" ;
+constexpr const char* const DEFAULT_SERIAL_PORT_1 = "/dev/ttyUSB1" ;
 
 /**
  * @brief This example demonstrates multiple methods to read and write
