@@ -226,11 +226,11 @@ MultiThreadUnitTests::testMultiThreadSerialStreamReadWrite()
     // Otherwise, one thread may flush the serial port I/O buffers *after* the
     // other thread has already sent data. 
     //
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
     serialStream1.SetBaudRate(BaudRate::BAUD_115200) ;
     serialStream1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE) ;
 
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
     serialStream2.SetBaudRate(BaudRate::BAUD_115200) ;
     serialStream2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE) ;
 
@@ -252,11 +252,11 @@ MultiThreadUnitTests::testMultiThreadSerialPortReadWrite()
     // Otherwise, one thread may flush the serial port I/O buffers *after* the
     // other thread has already sent data. 
     //
-    serialPort1.Open(TEST_SERIAL_PORT_1) ;
+    serialPort1.Open(SERIAL_PORT_1) ;
     serialPort1.SetBaudRate(BaudRate::BAUD_115200) ;
     serialPort1.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE) ;
 
-    serialPort2.Open(TEST_SERIAL_PORT_2) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
     serialPort2.SetBaudRate(BaudRate::BAUD_115200) ;
     serialPort2.SetFlowControl(FlowControl::FLOW_CONTROL_HARDWARE) ;
 

@@ -9,7 +9,7 @@
 #include <iostream>
 #include <unistd.h>
 
-#define DEFAULT_SERIAL_PORT_0 "/dev/ttyUSB0"
+constexpr const char* const SERIAL_PORT_1 = "/dev/ttyUSB0" ;
 
 /**
  * @brief This example demonstrates configuring a serial port and 
@@ -25,7 +25,7 @@ int main()
     try
     {
         // Open the Serial Port at the desired hardware port.
-        serial_port.Open(DEFAULT_SERIAL_PORT_0) ;
+        serial_port.Open(SERIAL_PORT_1) ;
     }
     catch (const OpenFailed&)
     {

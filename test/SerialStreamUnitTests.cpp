@@ -55,8 +55,8 @@ SerialStreamUnitTests::~SerialStreamUnitTests()
 void
 SerialStreamUnitTests::testSerialStreamConstructors()
 {
-    SerialStream serialStream3(TEST_SERIAL_PORT_1) ;
-    SerialStream serialStream4(TEST_SERIAL_PORT_2,
+    SerialStream serialStream3(SERIAL_PORT_1) ;
+    SerialStream serialStream4(SERIAL_PORT_2,
                                BaudRate::BAUD_9600,
                                CharacterSize::CHAR_SIZE_7,
                                FlowControl::FLOW_CONTROL_HARDWARE,
@@ -82,8 +82,8 @@ SerialStreamUnitTests::testSerialStreamConstructors()
 void
 SerialStreamUnitTests::testSerialStreamOpenClose()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -104,8 +104,8 @@ SerialStreamUnitTests::testSerialStreamOpenClose()
 
     try
     {
-        serialStream3.Open(TEST_SERIAL_PORT_1) ;
-        serialStream4.Open(TEST_SERIAL_PORT_2) ;
+        serialStream3.Open(SERIAL_PORT_1) ;
+        serialStream4.Open(SERIAL_PORT_2) ;
     }
     catch (...)
     {
@@ -124,8 +124,8 @@ SerialStreamUnitTests::testSerialStreamOpenClose()
 void
 SerialStreamUnitTests::testSerialStreamDrainWriteBuffer()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -158,8 +158,8 @@ SerialStreamUnitTests::testSerialStreamDrainWriteBuffer()
 void
 SerialStreamUnitTests::testSerialStreamFlushInputBuffer()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -200,8 +200,8 @@ SerialStreamUnitTests::testSerialStreamFlushInputBuffer()
 void
 SerialStreamUnitTests::testSerialStreamFlushOutputBuffer()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -233,8 +233,8 @@ SerialStreamUnitTests::testSerialStreamFlushOutputBuffer()
 void
 SerialStreamUnitTests::testSerialStreamFlushIOBuffers()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -279,8 +279,8 @@ SerialStreamUnitTests::testSerialStreamFlushIOBuffers()
 void
 SerialStreamUnitTests::testSerialStreamIsDataAvailableTest()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -329,8 +329,8 @@ SerialStreamUnitTests::testSerialStreamIsOpenTest()
     ASSERT_FALSE(serialStream1.IsOpen()) ;
     ASSERT_FALSE(serialStream2.IsOpen()) ;
 
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -345,8 +345,8 @@ SerialStreamUnitTests::testSerialStreamIsOpenTest()
 void
 SerialStreamUnitTests::testSerialStreamSetGetBaudRate()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -373,8 +373,8 @@ SerialStreamUnitTests::testSerialStreamSetGetBaudRate()
 void
 SerialStreamUnitTests::testSerialStreamSetGetCharacterSize()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -407,8 +407,8 @@ SerialStreamUnitTests::testSerialStreamSetGetCharacterSize()
 void
 SerialStreamUnitTests::testSerialStreamSetGetFlowControl()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -435,8 +435,8 @@ SerialStreamUnitTests::testSerialStreamSetGetFlowControl()
 void
 SerialStreamUnitTests::testSerialStreamSetGetParity()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -463,8 +463,8 @@ SerialStreamUnitTests::testSerialStreamSetGetParity()
 void
 SerialStreamUnitTests::testSerialStreamSetGetStopBits()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -491,8 +491,8 @@ SerialStreamUnitTests::testSerialStreamSetGetStopBits()
 void
 SerialStreamUnitTests::testSerialStreamSetGetVMin()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -522,8 +522,8 @@ SerialStreamUnitTests::testSerialStreamSetGetVMin()
 void
 SerialStreamUnitTests::testSerialStreamSetGetVTime()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -553,8 +553,8 @@ SerialStreamUnitTests::testSerialStreamSetGetVTime()
 void
 SerialStreamUnitTests::testSerialStreamSetGetDTR()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -599,8 +599,8 @@ SerialStreamUnitTests::testSerialStreamSetGetDTR()
 void
 SerialStreamUnitTests::testSerialStreamSetGetRTS()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -645,8 +645,8 @@ SerialStreamUnitTests::testSerialStreamSetGetRTS()
 void
 SerialStreamUnitTests::testSerialStreamSetRTSGetCTS()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -691,8 +691,8 @@ SerialStreamUnitTests::testSerialStreamSetRTSGetCTS()
 void
 SerialStreamUnitTests::testSerialStreamSetDTRGetDSR()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -737,8 +737,8 @@ SerialStreamUnitTests::testSerialStreamSetDTRGetDSR()
 void
 SerialStreamUnitTests::testSerialStreamGetFileDescriptor()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -759,8 +759,8 @@ SerialStreamUnitTests::testSerialStreamGetFileDescriptor()
 void
 SerialStreamUnitTests::testSerialStreamGetNumberOfBytesAvailable()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -807,8 +807,8 @@ SerialStreamUnitTests::testSerialStreamGetNumberOfBytesAvailable()
 void
 SerialStreamUnitTests::testSerialStreamGetAvailableSerialPorts()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -839,8 +839,8 @@ SerialStreamUnitTests::testSerialStreamGetAvailableSerialPorts()
 void
 SerialStreamUnitTests::testSerialStreamReadByteWriteByte()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -879,8 +879,8 @@ SerialStreamUnitTests::testSerialStreamReadByteWriteByte()
 void
 SerialStreamUnitTests::testSerialStreamGetLineWriteString()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
@@ -904,8 +904,8 @@ SerialStreamUnitTests::testSerialStreamGetLineWriteString()
 void
 SerialStreamUnitTests::testSerialStreamGetWriteByte()
 {
-    serialStream1.Open(TEST_SERIAL_PORT_1) ;
-    serialStream2.Open(TEST_SERIAL_PORT_2) ;
+    serialStream1.Open(SERIAL_PORT_1) ;
+    serialStream2.Open(SERIAL_PORT_2) ;
 
     ASSERT_TRUE(serialStream1.IsOpen()) ;
     ASSERT_TRUE(serialStream2.IsOpen()) ;
