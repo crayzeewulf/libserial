@@ -1,6 +1,6 @@
 #
 # Run the following command from top-level folder of libserial source code
-# to build the libserial image for Ubuntu 18.04:
+# to build the libserial image for CentOS-7:
 #
 # docker build -t libserial:centos-7 -f dockerfiles/centos/7/Dockerfile .
 #
