@@ -1,3 +1,8 @@
+![Docker Stars](https://img.shields.io/docker/stars/crayzeewulf/libserial.svg)
+![Docker Pulls](https://img.shields.io/docker/pulls/crayzeewulf/libserial.svg)
+![Docker Automated](https://img.shields.io/docker/automated/crayzeewulf/libserial.svg)
+![Docker Build](https://img.shields.io/docker/build/crayzeewulf/libserial.svg)
+
 # Libserial
 
 ----
