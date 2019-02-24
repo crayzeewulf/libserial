@@ -1,7 +1,7 @@
-![Docker Stars](https://img.shields.io/docker/stars/crayzeewulf/libserial.svg)
-![Docker Pulls](https://img.shields.io/docker/pulls/crayzeewulf/libserial.svg)
-![Docker Automated](https://img.shields.io/docker/automated/crayzeewulf/libserial.svg)
-![Docker Build](https://img.shields.io/docker/build/crayzeewulf/libserial.svg)
+[![Docker Stars](https://img.shields.io/docker/stars/crayzeewulf/libserial.svg)](https://cloud.docker.com/repository/docker/crayzeewulf/libserial/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/crayzeewulf/libserial.svg)](https://cloud.docker.com/repository/docker/crayzeewulf/libserial/)
+[![Docker Automated](https://img.shields.io/docker/automated/crayzeewulf/libserial.svg)](https://cloud.docker.com/repository/docker/crayzeewulf/libserial/)
+[![Docker Build](https://img.shields.io/docker/build/crayzeewulf/libserial.svg)](https://cloud.docker.com/repository/docker/crayzeewulf/libserial/)
 
 # Libserial
 
