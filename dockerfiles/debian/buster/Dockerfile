@@ -1,3 +1,9 @@
+#
+# Run the following command from top-level folder of libserial source code
+# to build the libserial image for Ubuntu 18.04:
+#
+# docker build -t libserial:debian-buster -f dockerfiles/debian/buster/Dockerfile .
+#
 # ------------------------------------------------------------------------------
 # base
 # ------------------------------------------------------------------------------
