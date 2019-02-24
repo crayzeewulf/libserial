@@ -10,7 +10,6 @@ RUN apt-get -yq update && apt-get install -yq --no-install-recommends \
         coreutils \
         doxygen \
         g++ \
-        git \
         graphviz \
         libboost-test-dev \
         libgtest-dev \
