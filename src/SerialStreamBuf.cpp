@@ -57,7 +57,7 @@ namespace LibSerial
         /**
          * @brief Default Destructor.
          */
-        ~Implementation() = default ;
+        ~Implementation() ;
 
         /**
          * @brief Constructor that allows a SerialStreamBuf instance to be
@@ -400,14 +400,7 @@ namespace LibSerial
         setbuf(nullptr, 0) ;
     }
 
-    SerialStreamBuf::~SerialStreamBuf()
-    {
-        // Close the serial port if it is open.
-        if (mImpl->IsOpen())
-        {
-            mImpl->Close() ;
-        }
-    }
+    SerialStreamBuf::~SerialStreamBuf() = default ;
 
     void
     SerialStreamBuf::Open(const std::string& fileName,
@@ -673,6 +666,27 @@ namespace LibSerial
     catch (const std::exception& err)
     {
         throw OpenFailed(err.what()) ;
+    }
+
+    inline
+    SerialStreamBuf::Implementation::~Implementation()
+    try 
+    {
+        // Close the serial port if it is open.
+        if (IsOpen())
+        {
+            Close() ;
+        }
+    } 
+    catch(...) 
+    {
+        //
+        // :IMPORTANT: We do not let any exceptions escape the destructor.
+        // (see https://isocpp.org/wiki/faq/exceptions#dtors-shouldnt-throw)
+        //
+        // :TODO: Once we add logging to LibSerial, we should issue a warning
+        // if we reach here.
+        //
     }
 
     inline
