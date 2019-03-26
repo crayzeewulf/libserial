@@ -898,22 +898,43 @@ namespace LibSerial
         }
 
         // Restore the old settings of the port.
+        //
+        // :IMPORTANT: If there is an error while attempting to restore the old
+        // settings, do not throw an exception here and attempt to close the
+        // serial port anyways. See issue #135 for the reason for this. The
+        // serial port device may have been removed when this method is called.
+        // In such a case we will not be able to restore the old settings. But
+        // we should still close the serial port file descriptor. Otherwise,
+        // the user has no way to cleanly recover from this state.
+        //
+        std::string err_msg {} ;
         if (tcsetattr(this->mFileDescriptor,
                       TCSANOW,
                       &mOldPortSettings) < 0)
         {
-            throw std::runtime_error(std::strerror(errno)) ;
+            err_msg = std::strerror(errno) ;
         }
 
         // Otherwise, close the serial port and set the file descriptor
         // to an invalid value.
-        if (close(this->mFileDescriptor) < 0)
+        bool is_failed = false ;
+        if (call_with_retry(close, this->mFileDescriptor) < 0)
         {
-            throw std::runtime_error(std::strerror(errno)) ;
+            is_failed = true ;
+            err_msg += ", " ;
+            err_msg += std::strerror(errno) ;
         }
 
         // Set the file descriptor to an invalid value, -1.
         mFileDescriptor = -1 ;
+
+        //
+        // Throw an exception if close() failed
+        //
+        if (is_failed)
+        {
+            throw std::runtime_error(err_msg) ;
+        }
     }
 
     inline
