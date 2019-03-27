@@ -59,6 +59,7 @@ namespace LibSerial
     }
 
     SerialStream::~SerialStream() 
+    try 
     {
         // Close the serial stream if it is open.
         if (this->IsOpen())
@@ -66,6 +67,16 @@ namespace LibSerial
             this->FlushIOBuffers() ;
             this->Close() ;
         }
+    } 
+    catch(...) 
+    {
+        //
+        // :IMPORTANT: We do not let any exceptions escape the destructor.
+        // (see https://isocpp.org/wiki/faq/exceptions#dtors-shouldnt-throw)
+        //
+        // :TODO: Once we add logging to LibSerial, we should issue a warning
+        // if we reach here.
+        //
     }
 
     void
