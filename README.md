@@ -1,6 +1,5 @@
 # Libserial
 
-----
 Thanks for checking out LibSerial!  LibSerial provides a convenient, object oriented approach to accessing serial ports on POSIX systems.
 
 After you get to know LibSerial a bit, if you find that you have ideas for improvement, please be sure to let us know!
@@ -30,10 +29,11 @@ sudo apt install g++ git autogen autoconf build-essential cmake graphviz \
                  python-sip-dev doxygen python-sphinx pkg-config
 ```
 
-----
+
 If you get the source code from github and would like to install the library, there are a few steps you will need to accomplish:
 
-----
+### Building Using CMake
+
 If you are using CMake, to build the library you can simply run the `compile.sh` script:
 
 ```sh
@@ -53,8 +53,7 @@ You can specify an installation directory different from the default, (/usr/loca
 cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 ```
 
-----
-If you are using GNU Autotools (make):
+### Building Using GNU Autotools
 
 GNU Autotools is currently configured to built all unit tests, so first you will need to compile the GTest library object files and copy `libgtest.a` and `libgtest_main.a` into your `/usr/lib/` directory which you can accomplish by running the `gtest.sh` convenience script:
 
@@ -68,14 +67,13 @@ To generate the configure script:
 make -f Makefile.dist
 ```
 
-----
 To execute the `configure` script, first create a build directory, then run the script from the build directory as follows:
 
 ```sh
-./configure
+../configure
 ```
 
-You can specify an installation directory different from the default, (/usr/local/), by adding `--prefix=/installation/directory/path/` to the configure command.  For example, to install into the top level include directory as the package manager would accomplish, you can simply run the following:
+You can specify an installation directory different from the default, (`/usr/local/`), by adding `--prefix=/installation/directory/path/` to the configure command.  For example, to install into the top level include directory as the package manager would accomplish, you can simply run the following:
 
 ```sh
 ./configure --prefix=/usr/
@@ -88,9 +86,8 @@ make
 sudo make install
 ```
 
-### Example Code and Unit Tests
+## Example Code and Unit Tests
 
-----
 If you are interested in running the unit tests or example code, ensure serial port names are appropriate for your hardware configuration in the `examples/` directory files and in the `test/UnitTests.h` file as such:
 
 ```cpp
@@ -118,7 +115,7 @@ Unit test executables built using make can be run from the `build` directory in 
 ctest -V .
 ```
 
-#### Hardware and Software Considerations
+## Hardware and Software Considerations
 
 If needed, you can grant user permissions to utilize the hardware ports in the following manner, (afterwards a reboot is required):
 
@@ -127,7 +124,7 @@ sudo usermod -a -G dialout $USER
 sudo usermod -a -G plugdev $USER
 ```
 
-##### Socat
+## Socat
 
 Socat is a useful tool to allow hardware ports to communicate on the same system via a software pipe.  As an example, to allow hardware UART port `/dev/ttyS0` to communicate via software with hardware UART port `/dev/ttyS1`:
 
@@ -135,8 +132,10 @@ Socat is a useful tool to allow hardware ports to communicate on the same system
 socat -d -d pty,raw,echo=0,link=/dev/ttyS0 pty,raw,echo=0,link=/dev/ttyS1
 ```
 
-----
+## Documentation
+
 Complete documentation is available [here](http://libserial.readthedocs.io/en/latest/index.html).
 
-----
-(Let us know that this repository was useful to you by clicking the "star" in the upper right corner of the LibSerial Github home page!)
+
+> Let us know that this repository was useful to you by clicking the "star" in 
+> the upper right corner of the LibSerial Github home page!
