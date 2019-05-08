@@ -29,22 +29,26 @@ sudo apt install g++ git autogen autoconf build-essential cmake graphviz \
                  libboost-dev libboost-test-dev libgtest-dev libtool \
                  python-sip-dev doxygen python-sphinx pkg-config
 ```
+
 ----
 If you get the source code from github and would like to install the library, there are a few steps you will need to accomplish:
 
 ----
 If you are using CMake, to build the library you can simply run the `compile.sh` script:
+
 ```sh
 ./compile.sh
 ```
 
 To install the library:
+
 ```sh
 cd build
 sudo make install
 ```
 
 You can specify an installation directory different from the default, (/usr/local/), by replacing the `cmake ..` command in the `compile.sh` script.  For example, to install under `/usr` instead of the `/usr/local` directory, use the following:
+
 ```sh
 cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 ```
@@ -53,6 +57,7 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 If you are using GNU Autotools (make):
 
 GNU Autotools is currently configured to built all unit tests, so first you will need to compile the GTest library object files and copy `libgtest.a` and `libgtest_main.a` into your `/usr/lib/` directory which you can accomplish by running the `gtest.sh` convenience script:
+
 ```sh
 ./gtest.sh
 ```
@@ -71,6 +76,7 @@ To execute the `configure` script, first create a build directory, then run the 
 ```
 
 You can specify an installation directory different from the default, (/usr/local/), by adding `--prefix=/installation/directory/path/` to the configure command.  For example, to install into the top level include directory as the package manager would accomplish, you can simply run the following:
+
 ```sh
 ./configure --prefix=/usr/
 ```
@@ -83,6 +89,7 @@ sudo make install
 ```
 
 ### Example Code and Unit Tests
+
 ----
 If you are interested in running the unit tests or example code, ensure serial port names are appropriate for your hardware configuration in the `examples/` directory files and in the `test/UnitTests.h` file as such:
 
@@ -96,27 +103,34 @@ Example code and Unit test executables are easily built using the cmake compile 
 ```sh
 ./compile
 ```
+
 ```sh
 ./build/bin/UnitTests
 ```
+
 ```sh
 ./build/bin/SerialPortReadWriteExample
 ```
 
 Unit test executables built using make can be run from the `build` directory in the following manner:
+
 ```sh
 ctest -V .
 ```
 
-#### Hardware and Software Considerations:
+#### Hardware and Software Considerations
+
 If needed, you can grant user permissions to utilize the hardware ports in the following manner, (afterwards a reboot is required):
+
 ```sh
 sudo usermod -a -G dialout $USER
 sudo usermod -a -G plugdev $USER
 ```
 
 ##### Socat
+
 Socat is a useful tool to allow hardware ports to communicate on the same system via a software pipe.  As an example, to allow hardware UART port `/dev/ttyS0` to communicate via software with hardware UART port `/dev/ttyS1`:
+
 ```sh
 socat -d -d pty,raw,echo=0,link=/dev/ttyS0 pty,raw,echo=0,link=/dev/ttyS1
 ```
