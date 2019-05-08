@@ -1,8 +1,3 @@
-[![Docker Stars](https://img.shields.io/docker/stars/crayzeewulf/libserial.svg)](https://hub.docker.com/r/crayzeewulf/libserial)
-[![Docker Pulls](https://img.shields.io/docker/pulls/crayzeewulf/libserial.svg)](https://hub.docker.com/r/crayzeewulf/libserial)
-[![Docker Automated](https://img.shields.io/docker/automated/crayzeewulf/libserial.svg)](https://hub.docker.com/r/crayzeewulf/libserial)
-[![Docker Build](https://img.shields.io/docker/build/crayzeewulf/libserial.svg)](https://hub.docker.com/r/crayzeewulf/libserial)
-
 # Libserial
 
 ----
