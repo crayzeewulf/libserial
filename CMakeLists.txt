@@ -1,4 +1,7 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.8)
+#
+# Minimum version is 3.5 (this supports Ubuntu 16.04 and later, for example)
+#
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 #
 # Project version numbering using semantic versioning. See:
@@ -21,6 +24,12 @@ option(LIBSERIAL_BUILD_DOCS "Build the Doxygen docs" ON)
 #
 OPTION(INSTALL_STATIC "Install static library." ON)
 OPTION(INSTALL_SHARED "Install shared object library." ON)
+
+#
+# LibSerial requies a C++ compiler that supports at least C++14 standard
+#
+SET(CMAKE_CXX_STANDARD 14)
+SET(CMAKE_STANDARD_REQUIRES ON)
 
 INCLUDE(ExternalProject)
 
