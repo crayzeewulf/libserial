@@ -36,7 +36,8 @@ RUN cd /usr/src/libserial \
     && cd build \
     && cmake .. \
     && make -j$(nproc) \
-    && make install
+    && make install \
+    && chown -R root:root /usr/local
 
 # ------------------------------------------------------------------------------
 # release
