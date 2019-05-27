@@ -1,13 +1,13 @@
 #
 # Run the following command from top-level folder of libserial source code
-# to build the libserial image for Debian-buster:
+# to build the libserial image for Ubuntu 16.04:
 #
-# docker build -t libserial:debian-buster -f dockerfiles/debian/buster/Dockerfile .
+# docker build -t libserial:ubuntu-16.04 -f dockerfiles/ubuntu/16.04/Dockerfile .
 #
 # ------------------------------------------------------------------------------
 # base
 # ------------------------------------------------------------------------------
-FROM debian:buster AS base
+FROM ubuntu:16.04 AS base
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get -yq update && apt-get install -yq --no-install-recommends \
@@ -43,5 +43,5 @@ RUN cd /usr/src/libserial \
 # release
 # ------------------------------------------------------------------------------
 
-FROM debian:buster AS release
+FROM ubuntu:16.04 AS release
 COPY --from=build /usr/local /usr/local
