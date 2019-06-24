@@ -1,6 +1,6 @@
 # Libserial
 
-Thanks for checking out LibSerial!  LibSerial provides a convenient, object oriented approach to accessing serial ports on POSIX systems.
+Thanks for checking out LibSerial!  LibSerial provides a convenient, object oriented approach to accessing serial ports on Linux operating system.
 
 After you get to know LibSerial a bit, if you find that you have ideas for improvement, please be sure to let us know!
 
