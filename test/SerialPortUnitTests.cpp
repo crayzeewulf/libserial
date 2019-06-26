@@ -791,14 +791,11 @@ SerialPortUnitTests::testSerialPortGetAvailableSerialPorts()
     ASSERT_TRUE(serialPort1.IsOpen()) ;
     ASSERT_TRUE(serialPort2.IsOpen()) ;
 
-    const auto serialPorts1 = serialPort1.GetAvailableSerialPorts() ;
-    const auto serialPorts2 = serialPort2.GetAvailableSerialPorts() ;
+    const auto portCount1 = serialPort1.GetAvailableSerialPorts() ;
+    const auto portCount2 = serialPort2.GetAvailableSerialPorts() ;
 
-    const auto portCount1 = serialPorts1.size() ;
-    const auto portCount2 = serialPorts2.size() ;
-
-    ASSERT_GE(portCount1, 2) ;
-    ASSERT_GE(portCount2, 2) ;
+    ASSERT_GE(portCount1.size(), 2UL) ;
+    ASSERT_GE(portCount2.size(), 2UL) ;
     ASSERT_EQ(portCount1, portCount2) ;
 
     serialPort1.Close() ;
