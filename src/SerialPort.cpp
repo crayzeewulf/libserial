@@ -1371,7 +1371,7 @@ namespace LibSerial
         if (tcflush(this->mFileDescriptor,
                     TCIOFLUSH) < 0)
         {
-            throw OpenFailed(std::strerror(errno)) ;
+            throw std::runtime_error(std::strerror(errno)) ;
         }
 
         // Get the current serial port settings.
@@ -2088,7 +2088,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw OpenFailed(std::strerror(errno)) ;
+            throw std::runtime_error(std::strerror(errno)) ;
         }
     }
 
@@ -2120,7 +2120,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw OpenFailed(std::strerror(errno)) ;
+            throw std::runtime_error(std::strerror(errno)) ;
         }
     }
 
@@ -2151,7 +2151,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw OpenFailed(std::strerror(errno)) ;
+            throw std::runtime_error(std::strerror(errno)) ;
         }
     }
 
@@ -2183,7 +2183,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw OpenFailed(std::strerror(errno)) ;
+            throw std::runtime_error(std::strerror(errno)) ;
         }
     }
 
@@ -2214,7 +2214,7 @@ namespace LibSerial
                       TCSANOW,
                       &port_settings) < 0)
         {
-            throw OpenFailed(std::strerror(errno)) ;
+            throw std::runtime_error(std::strerror(errno)) ;
         }
     }
 
