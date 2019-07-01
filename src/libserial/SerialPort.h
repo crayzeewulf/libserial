@@ -297,12 +297,14 @@ namespace LibSerial
          */
         int GetNumberOfBytesAvailable() ;
 
+#ifdef __linux__
         /**
          * @brief Gets a list of available serial ports.
          * @return Returns a std::vector of std::strings with the name of
          *         each available serial port.
          */
         std::vector<std::string> GetAvailableSerialPorts() const ;
+#endif
 
         /**
          * @brief Reads the specified number of bytes from the serial port.
