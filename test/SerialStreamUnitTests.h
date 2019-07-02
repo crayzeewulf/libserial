@@ -167,10 +167,12 @@ namespace LibSerial
          */
         void testSerialStreamGetNumberOfBytesAvailable() ;
 
+#ifdef __linux__
         /**
          * @brief Tests for correct functionality of the GetAvailableSerialPorts() method.
          */
         void testSerialStreamGetAvailableSerialPorts() ;
+#endif
 
         /**
          * @brief Tests for correct functionality of the ReadByte() and WriteByte() methods.

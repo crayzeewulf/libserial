@@ -782,6 +782,7 @@ SerialPortUnitTests::testSerialPortGetNumberOfBytesAvailable()
     ASSERT_FALSE(serialPort2.IsOpen()) ;
 }
 
+#ifdef __linux__
 void
 SerialPortUnitTests::testSerialPortGetAvailableSerialPorts()
 {
@@ -804,6 +805,7 @@ SerialPortUnitTests::testSerialPortGetAvailableSerialPorts()
     ASSERT_FALSE(serialPort1.IsOpen()) ;
     ASSERT_FALSE(serialPort2.IsOpen()) ;
 }
+#endif
 
 void
 SerialPortUnitTests::testSerialPortReadDataBufferWriteDataBuffer()
@@ -1234,6 +1236,7 @@ TEST_F(SerialPortUnitTests, testSerialPortGetNumberOfBytesAvailable)
     }
 }
 
+#ifdef __linux__
 TEST_F(SerialPortUnitTests, testSerialPortGetAvailableSerialPorts)
 {
     SCOPED_TRACE("Serial Port GetAvailableSerialPorts() Test") ;
@@ -1243,6 +1246,7 @@ TEST_F(SerialPortUnitTests, testSerialPortGetAvailableSerialPorts)
         testSerialPortGetAvailableSerialPorts() ;
     }
 }
+#endif
 
 TEST_F(SerialPortUnitTests, testSerialPortReadDataBufferWriteDataBuffer)
 {

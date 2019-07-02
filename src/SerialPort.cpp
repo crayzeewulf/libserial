@@ -285,12 +285,15 @@ namespace LibSerial
          */
         int GetNumberOfBytesAvailable() ;
 
+#ifdef __linux__
         /**
          * @brief Gets a list of available serial ports.
          * @return Returns a std::vector of std::strings with the name of
          *         each available serial port.
          */
         std::vector<std::string> GetAvailableSerialPorts() const ;
+#endif
+
         /**
          * @brief Reads the specified number of bytes from the serial port.
          *        The method will timeout if no data is received in the
@@ -679,11 +682,13 @@ namespace LibSerial
         return mImpl->GetNumberOfBytesAvailable() ;
     }
 
+#ifdef __linux__
     std::vector<std::string>
     SerialPort::GetAvailableSerialPorts() const
     {
         return mImpl->GetAvailableSerialPorts() ;
     }
+#endif
 
     void
     SerialPort::Read(DataBuffer& dataBuffer,
@@ -1858,6 +1863,7 @@ namespace LibSerial
         return number_of_bytes_available ;
     }
 
+#ifdef __linux__
     inline
     std::vector<std::string>
     SerialPort::Implementation::GetAvailableSerialPorts() const
@@ -1902,6 +1908,7 @@ namespace LibSerial
 
         return serial_port_names ;
     }
+#endif
 
     inline
     void
