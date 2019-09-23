@@ -26,7 +26,8 @@ Debian/Ubuntu users:
 sudo apt update
 sudo apt install g++ git autogen autoconf build-essential cmake graphviz \
                  libboost-dev libboost-test-dev libgtest-dev libtool \
-                 python-sip-dev doxygen python-sphinx pkg-config
+                 python-sip-dev doxygen python-sphinx pkg-config \
+                 python3-sphinx-rtd-theme
 ```
 
 
