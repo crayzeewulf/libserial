@@ -247,7 +247,7 @@ namespace LibSerial
          * @note See VMIN in man termios(3).
          * @param vmin the number of minimum characters to be set.
          */
-        void SetVMin(short vmin) ;
+        void SetVMin(const short vmin) ;
 
         /**
          * @brief Gets the VMIN value for the device, which represents the
@@ -262,7 +262,7 @@ namespace LibSerial
          * @param vtime The timeout value in deciseconds to be set.
          * @return Returns the character buffer timeout for non-canonical reads in deciseconds.
          */
-        void SetVTime(short vtime) ;
+        void SetVTime(const short vtime) ;
 
         /**
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
@@ -275,7 +275,7 @@ namespace LibSerial
          * @param dtrState The line voltage state to be set,
          *        (true = high, false = low).
          */
-        void SetDTR(bool dtrState = true) ;
+        void SetDTR(const bool dtrState = true) ;
 
         /**
          * @brief Gets the status of the DTR line.
@@ -288,7 +288,7 @@ namespace LibSerial
          * @param rtsState The line voltage state to be set,
          *        (true = high, false = low).
          */
-        void SetRTS(bool rtsState = true) ;
+        void SetRTS(const bool rtsState = true) ;
 
         /**
          * @brief Get the status of the RTS line.

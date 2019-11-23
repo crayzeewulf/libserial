@@ -216,7 +216,7 @@ namespace LibSerial
          * @brief Sets the minimum number of characters for non-canonical reads.
          * @param vmin the number of minimum characters to be set.
          */
-        void SetVMin(short vmin) ;
+        void SetVMin(const short vmin) ;
 
         /**
          * @brief Gets the VMIN value for the device, which represents the
@@ -229,7 +229,7 @@ namespace LibSerial
          * @brief Sets character buffer timeout for non-canonical reads in deciseconds.
          * @param vtime The timeout value in deciseconds to be set.
          */
-        void SetVTime(short vtime) ;
+        void SetVTime(const short vtime) ;
 
         /**
          * @brief Gets the current timeout value for non-canonical reads in deciseconds.
@@ -241,7 +241,7 @@ namespace LibSerial
          * @brief Sets the serial port DTR line status.
          * @param dtrState The state to set the DTR line
          */
-        void SetDTR(bool dtrState) ;
+        void SetDTR(const bool dtrState) ;
 
         /**
          * @brief Gets the serial port DTR line status.
@@ -253,7 +253,7 @@ namespace LibSerial
          * @brief Sets the serial port RTS line status.
          * @param rtsState The state to set the RTS line
          */
-        void SetRTS(bool rtsState) ;
+        void SetRTS(const bool rtsState) ;
 
         /**
          * @brief Gets the serial port RTS line status.
