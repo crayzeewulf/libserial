@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 import os
 import sys
 import logging
@@ -7,7 +7,7 @@ import sipconfig
 
 def create_options_parser():
     """Create a parser to extract value from command line options."""
-    parser = optparse.OptionParser( usage = "python %prog [opts]" )
+    parser = optparse.OptionParser( usage = "python3 %prog [opts]" )
     parser.add_option( "-t", "--otdir",
                        action = "store",
                        type   = "string",

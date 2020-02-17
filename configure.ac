@@ -43,10 +43,10 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_INLINE
 
-AC_ARG_WITH([python],
-	AS_HELP_STRING([--without-python], [Disable Python bindings]),
-	[], [with_python=yes])
-AM_CONDITIONAL([PYTHON], [test "${with_python}" != "no"])
+AC_ARG_WITH([python3],
+	AS_HELP_STRING([--without-python3], [Disable Python bindings]),
+	[], [with_python3=yes])
+AM_CONDITIONAL([PYTHON], [test "${with_python3}" != "no"])
 
 AC_ARG_ENABLE([tests],
 	AS_HELP_STRING([--disable-tests], [Disable tests]),

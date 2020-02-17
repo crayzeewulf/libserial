@@ -11,7 +11,7 @@
     // Python object and return the result.
     if ( ! sipIsErr )
     {
-        return PyString_Check( sipPy );
+        return PyUnicode_Check(PyObject_Str( sipPy ));
     }
 
     char *str_val = 0 ;
