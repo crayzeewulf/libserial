@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 from libserial import SerialPort
 from time      import sleep
 import optparse

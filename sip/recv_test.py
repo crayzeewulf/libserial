@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 from libserial import SerialPort
 import errno
 import sys
@@ -15,8 +15,8 @@ def main():
             sys.stdout.write( serial_port.ReadByte() )
     except IOError, (errorNumber, errorMessage):
         if ( errno.EINTR == errorNumber ):
-            print
-            print "Ignoring EINTR."
+            print()
+            print("Ignoring EINTR.")
             pass
         else:
             raise

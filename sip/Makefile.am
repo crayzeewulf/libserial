@@ -19,7 +19,7 @@ libserialmod.so: Makefile.sip @top_builddir@/src/libserial.la
 	make -f Makefile.sip
 
 Makefile.sip: configure.py $(SIPFILES)
-	python ./configure.py
+	python3 ./configure.py
 
 clean-local: Makefile.sip
 	make -f Makefile.sip clean

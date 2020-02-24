@@ -205,7 +205,7 @@ template<TYPE>
     for (int i = 0; i < (int)sipCpp -> size(); ++i)
     {
         // Add the wrapper to the list.
-        PyList_SET_ITEM(l, i, PyInt_FromLong(sipCpp -> at(i)));
+        PyList_SET_ITEM(l, i, PyLong_FromLong(sipCpp -> at(i)));
     }
 
     // Return the Python list.
@@ -236,14 +236,14 @@ template<TYPE>
     {
         while ((item = PyIter_Next(iterator)))
         {
-            if (!PyInt_Check(item))
+            if (!PyLong_Check(item))
             {
                 PyErr_Format(PyExc_TypeError, "object in iterable cannot be converted to float");
                 *sipIsErr = 1;
                 break;
             }
 
-            int val = PyInt_AsLong(item);
+            int val = PyLong_AsLong(item);
             V->push_back(val);
 
             Py_DECREF(item);
@@ -286,7 +286,7 @@ template<TYPE>
     for (int i = 0; i < (int)sipCpp -> size(); ++i)
     {
         // Add the wrapper to the list.
-        PyList_SET_ITEM(l, i, PyInt_FromLong(sipCpp -> at(i)));
+        PyList_SET_ITEM(l, i, PyLong_FromLong(sipCpp -> at(i)));
     }
 
     // Return the Python list.
@@ -317,14 +317,14 @@ template<TYPE>
     {
         while ((item = PyIter_Next(iterator)))
         {
-            if (!PyInt_Check(item))
+            if (!PyLong_Check(item))
             {
                 PyErr_Format(PyExc_TypeError, "object in iterable cannot be converted to float");
                 *sipIsErr = 1;
                 break;
             }
 
-            unsigned int val = PyInt_AsLong(item);
+            unsigned int val = PyLong_AsLong(item);
             V->push_back(val);
 
             Py_DECREF(item);
@@ -366,7 +366,7 @@ template<TYPE>
     for (int i = 0; i < (int)sipCpp -> size(); ++i)
     {
         // Add the wrapper to the list.
-        PyList_SET_ITEM(l, i, PyInt_FromLong(sipCpp -> at(i)));
+        PyList_SET_ITEM(l, i, PyLong_FromLong(sipCpp -> at(i)));
     }
 
     // Return the Python list.
@@ -397,14 +397,14 @@ template<TYPE>
     {
         while ((item = PyIter_Next(iterator)))
         {
-            if (!PyInt_Check(item))
+            if (!PyLong_Check(item))
             {
                 PyErr_Format(PyExc_TypeError, "object in iterable cannot be converted to float");
                 *sipIsErr = 1;
                 break;
             }
 
-            unsigned int val = PyInt_AsLong(item);
+            unsigned int val = PyLong_AsLong(item);
             V->push_back(val);
 
             Py_DECREF(item);
