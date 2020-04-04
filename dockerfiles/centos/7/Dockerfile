@@ -18,6 +18,7 @@ RUN yum install -y centos-release-scl \
        doxygen \
        graphviz \
        make \
+       rpm-build \
        python-devel 
 
 # ------------------------------------------------------------------------------
@@ -32,12 +33,14 @@ RUN cd /usr/src/libserial \
     && rm -rf build \
     && mkdir -p build \
     && cd build \
-    && cmake3 .. \
+    && cmake3 -DCMAKE_INSTALL_PREFIX=/usr .. \
     && make -j$(nproc) \
-    && make install
+    && make install \
+    && cpack3 -G RPM 
 
 # ------------------------------------------------------------------------------
 # release
 # ------------------------------------------------------------------------------
 FROM centos:7 AS release
-COPY --from=build /usr/local /usr/local
+COPY --from=build /usr/src/libserial/build/libserial*.rpm /usr/src/
+RUN rpm -ivh /usr/src/libserial*.rpm
