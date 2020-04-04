@@ -176,3 +176,10 @@ if (LIBSERIAL_BUILD_DOCS)
     COMMENT "Generating API documentation with Doxygen" VERBATIM
     )
 endif()
+
+#
+# Packaging support
+#
+if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    add_subdirectory(packaging)
+endif()
