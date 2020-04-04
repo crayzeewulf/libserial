@@ -34,17 +34,15 @@ RUN cd /usr/src/libserial \
     && rm -rf build \
     && mkdir -p build \
     && cd build \
-    && cmake .. \
+    && cmake -DCMAKE_INSTALL_PREFIX=/usr .. \
     && make -j$(nproc) \
     && make install \
-    && chown -R root:root /usr/local \
-    && cpack -G DEB --config CPackSourceConfig.cmake \
-    && cpack -G DEB -D CPACK_SYSTEM_NAME=bionic_amd64
+    && cpack -G DEB 
 
 # ------------------------------------------------------------------------------
 # release
 # ------------------------------------------------------------------------------
 
 FROM ubuntu:18.04 AS release
-COPY --from=build /usr/local /usr/local
-COPY --from=build /usr/src/libserial/build/*.deb /usr/src/
+COPY --from=build /usr/src/libserial/build/libserial*.deb /usr/src/
+RUN dpkg -i /usr/src/libserial*.deb
