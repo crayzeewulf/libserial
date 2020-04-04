@@ -14,7 +14,7 @@ sudo apt install libserial-dev
    > Note that the above command may install an older version of LibSerial (e.g. 0.6.0 on Ubuntu 18.04). 
    > In order to use the latest features and the example project mentioned below, please build the 
    > library from source code as described in 
-   > [this](https://github.com/crayzeewulf/libserial#developers) section below. We are working to 
+   > [here](https://github.com/crayzeewulf/libserial#developers). We are working to 
    > release updated versions of the library from package repositories of major Linux distribution
    > in the mean time and apologize for the inconvenience.
    > 
