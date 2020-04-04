@@ -10,8 +10,17 @@ If you simply want to use LibSerial and you already utilize a Debian Linux distr
 sudo apt install libserial-dev
 ```
 
+   > 
+   > Note that the above command may install an older version of LibSerial (e.g. 0.6.0 on Ubuntu 18.04). 
+   > In order to use the latest features and the example project mentioned below, please build the 
+   > library from source code as described in 
+   > [this](https://github.com/crayzeewulf/libserial#developers) section below. We are working to 
+   > release updated versions of the library from package repositories of major Linux distribution
+   > in the mean time and apologize for the inconvenience.
+   > 
+
 Example code to demonstrate how to use the library can be found in the [`examples`](https://github.com/crayzeewulf/libserial/tree/master/examples) directory.
-An self-contained example project demonstrating the use of CMake and GNU Autotools (make) can be found in [`examples/example_project`](https://github.com/crayzeewulf/libserial/tree/master/examples/example_project) directory.
+A self-contained example project demonstrating the use of CMake and GNU Autotools (make) can be found in [`examples/example_project`](https://github.com/crayzeewulf/libserial/tree/master/examples/example_project) directory.
 
 ## Developers
 
