@@ -164,6 +164,17 @@ if (LIBSERIAL_ENABLE_TESTING)
   ADD_SUBDIRECTORY(test)
 endif()
 
+#
+# Create pkg-config file for cmake builds as well as autotool builds
+#
+set(prefix ${CMAKE_INSTALL_PREFIX})
+set(exec_prefix ${CMAKE_INSTALL_PREFIX})
+set(libdir ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
+set(includedir ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR})
+set(VERSION ${PROJECT_VERSION})
+configure_file(libserial.pc.in libserial.pc @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/libserial.pc DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
+
 if (LIBSERIAL_BUILD_DOCS)
   CONFIGURE_FILE(
     ${CMAKE_CURRENT_SOURCE_DIR}/doxygen.conf.in
