@@ -491,6 +491,15 @@ namespace LibSerial
     {
         /* Empty */
     }
+    SerialPort::SerialPort(SerialPort&& otherSerialPort)
+    {
+        mImpl = std::move(otherSerialPort.mImpl);
+    }
+    SerialPort& SerialPort::operator=(SerialPort&& otherSerialPort)
+    {
+        mImpl = std::move(otherSerialPort.mImpl);
+        return *this;
+    }
 
     SerialPort::~SerialPort() noexcept = default ;
 
