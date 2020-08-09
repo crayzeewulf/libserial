@@ -52,6 +52,7 @@ namespace LibSerial
     const std::string ERR_MSG_READ_TIMEOUT           = "Read timeout";
     const std::string ERR_MSG_PORT_ALREADY_OPEN      = "Serial port already open.";
     const std::string ERR_MSG_PORT_NOT_OPEN          = "Serial port not open.";
+    const std::string ERR_MSG_INVALID_MODEM_LINE     = "Invalid modem line." ;
 
     /**
      * @brief Time conversion constants.
