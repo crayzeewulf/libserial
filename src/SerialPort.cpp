@@ -1642,7 +1642,7 @@ namespace LibSerial
         if (vmin < 0 || vmin > 255)
         {
             std::stringstream error_message ;
-            error_message << "invalid vmin value: " << vmin << ". " ;
+            error_message << "Invalid vmin value: " << vmin << ". " ;
             error_message << "Vmin must be in the range [0, 255]." ;
             throw std::invalid_argument {error_message.str()} ;
         }
@@ -1704,7 +1704,7 @@ namespace LibSerial
         if (vtime < 0 || vtime > 255)
         {
             std::stringstream error_message ;
-            error_message << "invalid vtime value: " << vtime << ". " ;
+            error_message << "Invalid vtime value: " << vtime << ". " ;
             error_message << "Vtime must be in the range [0, 255]." ;
             throw std::invalid_argument {error_message.str()} ;
         }
