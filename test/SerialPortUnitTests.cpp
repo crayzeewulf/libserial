@@ -80,6 +80,83 @@ SerialPortUnitTests::testSerialPortConstructors()
 }
 
 void
+SerialPortUnitTests::testSerialPortMoveConstruction()
+{
+    // Create an instance of SerialPort
+    SerialPort origSerialPort {SERIAL_PORT_1} ;
+    ASSERT_TRUE(origSerialPort.IsOpen()) ;
+
+    // Cache settings of origSerialPort before we move it
+    const auto origBaudRate    = origSerialPort.GetBaudRate() ;
+    const auto origCharSize    = origSerialPort.GetCharacterSize() ;
+    const auto origFlowControl = origSerialPort.GetFlowControl() ;
+    const auto origParity      = origSerialPort.GetParity() ;
+    const auto origStopBits    = origSerialPort.GetStopBits() ;
+
+    // Create another instance by move construction.
+    auto movedSerialPort {std::move(origSerialPort)} ; 
+    //
+    // :IMPORTANT: origSerialPort is no longer valid at this point.  Using
+    // origSerialPort after this will cause segmentation fault.
+    //
+    ASSERT_TRUE(movedSerialPort.IsOpen()) ;
+
+    ASSERT_EQ(movedSerialPort.GetBaudRate(),      origBaudRate) ;
+    ASSERT_EQ(movedSerialPort.GetCharacterSize(), origCharSize) ;
+    ASSERT_EQ(movedSerialPort.GetFlowControl(),   origFlowControl) ;
+    ASSERT_EQ(movedSerialPort.GetParity(),        origParity) ;
+    ASSERT_EQ(movedSerialPort.GetStopBits(),      origStopBits) ;
+
+    //
+    // :TODO: Add a method to retrieve the serial port device name of a
+    // SerialPort intance. Then we can use the following test:
+    //
+    // ASSERT_EQ(movedSerialPort.GetDeviceFileName(), SERIAL_PORT_1) ;
+    // ASSERT_EQ(origSerialPort.GetDeviceFileName(), "") ;
+    //
+}
+
+void
+SerialPortUnitTests::testSerialPortMoveAssignment()
+{
+    // Create an instance of SerialPort.
+    SerialPort origSerialPort {SERIAL_PORT_1} ;
+    ASSERT_TRUE(origSerialPort.IsOpen()) ;
+
+    // Cache settings of origSerialPort before we move it
+    const auto origBaudRate    = origSerialPort.GetBaudRate() ;
+    const auto origCharSize    = origSerialPort.GetCharacterSize() ;
+    const auto origFlowControl = origSerialPort.GetFlowControl() ;
+    const auto origParity      = origSerialPort.GetParity() ;
+    const auto origStopBits    = origSerialPort.GetStopBits() ;
+
+    // Create another instance using default constructor.
+    SerialPort movedSerialPort ;
+
+    // Move assign origSerialPort to movedSerialPort
+    movedSerialPort = std::move(origSerialPort) ;
+    //
+    // :IMPORTANT: origSerialPort is no longer valid at this point.  Using
+    // origSerialPort after this will cause segmentation fault.
+    //
+    ASSERT_TRUE(movedSerialPort.IsOpen()) ;
+
+    ASSERT_EQ(movedSerialPort.GetBaudRate(),      origBaudRate) ;
+    ASSERT_EQ(movedSerialPort.GetCharacterSize(), origCharSize) ;
+    ASSERT_EQ(movedSerialPort.GetFlowControl(),   origFlowControl) ;
+    ASSERT_EQ(movedSerialPort.GetParity(),        origParity) ;
+    ASSERT_EQ(movedSerialPort.GetStopBits(),      origStopBits) ;
+
+    //
+    // :TODO: Add a method to retrieve the serial port device name of a
+    // SerialPort intance. Then we can use the following test:
+    //
+    // ASSERT_EQ(movedSerialPort.GetDeviceFileName(), SERIAL_PORT_1) ;
+    // ASSERT_EQ(origSerialPort.GetDeviceFileName(), "") ;
+    //
+}
+
+void
 SerialPortUnitTests::testSerialPortOpenClose()
 {
     serialPort1.Open(SERIAL_PORT_1) ;
@@ -1033,6 +1110,26 @@ TEST_F(SerialPortUnitTests, testSerialPortConstructors)
     for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortConstructors() ;
+    }  
+}
+
+TEST_F(SerialPortUnitTests, testSerialPortMoveConstruction)
+{
+    SCOPED_TRACE("Serial Port Move Constructor Tests") ;
+    
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
+    {
+        testSerialPortMoveConstruction() ;
+    }  
+}
+
+TEST_F(SerialPortUnitTests, testSerialPortMoveAssignment)
+{
+    SCOPED_TRACE("Serial Port Move Assignment Tests") ;
+    
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
+    {
+        testSerialPortMoveAssignment() ;
     }  
 }
 
