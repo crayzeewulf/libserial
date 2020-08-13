@@ -38,6 +38,7 @@
 #include <cstring>
 #include <fcntl.h>
 #include <linux/serial.h>
+#include <sstream>
 #include <sys/ioctl.h>
 #include <type_traits>
 #include <unistd.h>
@@ -1640,7 +1641,10 @@ namespace LibSerial
 
         if (vmin < 0 || vmin > 255)
         {
-            throw std::invalid_argument(std::strerror(errno)) ;
+            std::stringstream error_message ;
+            error_message << "Invalid vmin value: " << vmin << ". " ;
+            error_message << "Vmin must be in the range [0, 255]." ;
+            throw std::invalid_argument {error_message.str()} ;
         }
 
         // Get the current serial port settings.
@@ -1699,7 +1703,10 @@ namespace LibSerial
 
         if (vtime < 0 || vtime > 255)
         {
-            throw std::invalid_argument(std::strerror(errno)) ;
+            std::stringstream error_message ;
+            error_message << "Invalid vtime value: " << vtime << ". " ;
+            error_message << "Vtime must be in the range [0, 255]." ;
+            throw std::invalid_argument {error_message.str()} ;
         }
 
         // Get the current serial port settings.
@@ -1933,7 +1940,7 @@ namespace LibSerial
             modemLine != TIOCM_RI  &&
             modemLine != TIOCM_DSR)
         {
-            throw std::invalid_argument(std::strerror(errno)) ;
+            throw std::invalid_argument {ERR_MSG_INVALID_MODEM_LINE} ;
         }
 
         // Set or unset the specified bit according to the value of lineState.
@@ -1987,7 +1994,7 @@ namespace LibSerial
             modemLine != TIOCM_RI  &&
             modemLine != TIOCM_DSR)
         {
-            throw std::invalid_argument(std::strerror(errno)) ;
+            throw std::invalid_argument {ERR_MSG_INVALID_MODEM_LINE} ;
         }
 
         // Use an ioctl() call to get the state of the line.
@@ -2051,7 +2058,7 @@ namespace LibSerial
 
         bool blocking_status = false ;
 
-        int flags = fcntl(this->mFileDescriptor, F_GETFL, 0) ;
+        const int flags = fcntl(this->mFileDescriptor, F_GETFL, 0) ;
 
         if (flags == -1)
         {
