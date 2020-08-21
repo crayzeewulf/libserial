@@ -493,6 +493,18 @@ namespace LibSerial
         /* Empty */
     }
 
+    SerialPort::SerialPort(SerialPort&& otherSerialPort) : 
+        mImpl(std::move(otherSerialPort.mImpl))
+    {
+        // empty
+    }
+
+    SerialPort& SerialPort::operator=(SerialPort&& otherSerialPort)
+    {
+        mImpl = std::move(otherSerialPort.mImpl);
+        return *this;
+    }
+
     SerialPort::~SerialPort() noexcept = default ;
 
     void
@@ -865,7 +877,6 @@ namespace LibSerial
 
         if (this->mFileDescriptor < 0)
         {
-            close(this->mFileDescriptor) ;
             throw OpenFailed(std::strerror(errno)) ;
         }
 

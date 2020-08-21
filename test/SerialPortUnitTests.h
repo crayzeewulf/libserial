@@ -67,6 +67,16 @@ namespace LibSerial
         void testSerialPortConstructors() ;
 
         /**
+         * @brief Test move construction of SerialPort instances.
+         */
+        void testSerialPortMoveConstruction() ;
+
+        /**
+         * @brief Test move assignment of SerialPort instances.
+         */
+        void testSerialPortMoveAssignment() ;
+
+        /**
          * @brief Tests correct functionality for opening and closing serial ports.
          */
         void testSerialPortOpenClose() ;

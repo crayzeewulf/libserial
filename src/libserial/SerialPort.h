@@ -92,9 +92,9 @@ namespace LibSerial
         SerialPort(const SerialPort& otherSerialPort) = delete ;
 
         /**
-         * @brief Move construction is disallowed.
+         * @brief Move construction is allowed.
          */
-        SerialPort(const SerialPort&& otherSerialPort) = delete ;
+        SerialPort(SerialPort&& otherSerialPort) ;
 
         /**
          * @brief Copy assignment is disallowed.
@@ -102,9 +102,9 @@ namespace LibSerial
         SerialPort& operator=(const SerialPort& otherSerialPort) = delete ;
 
         /**
-         * @brief Move assignment is disallowed.
+         * @brief Move assignment is allowed.
          */
-        SerialPort& operator=(const SerialPort&& otherSerialPort) = delete ;
+        SerialPort& operator=(SerialPort&& otherSerialPort) ;
 
         /**
          * @brief Opens the serial port associated with the specified
