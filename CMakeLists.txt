@@ -81,7 +81,6 @@ ADD_DEFINITIONS(
   -Wall
   -Wcast-align
   -Wchar-subscripts
-  -Wchkp
   -Wdouble-promotion
   -Wextra
   -Wfatal-errors
