@@ -2263,7 +2263,7 @@ namespace LibSerial
 
         // Local variables.
         size_t number_of_bytes_read = 0 ;
-        size_t number_of_bytes_remaining = std::max(numberOfBytes, size_t {1}) ;
+        size_t number_of_bytes_remaining = std::max(numberOfBytes, static_cast<size_t>(1)) ;
         size_t maximum_number_of_bytes = dataBuffer.max_size() ;
 
         // Clear the data buffer and reserve enough space in the buffer to store the incoming data.
@@ -2357,7 +2357,7 @@ namespace LibSerial
 
         // Local variables.
         size_t number_of_bytes_read = 0 ;
-        size_t number_of_bytes_remaining = std::max(numberOfBytes, size_t {1}) ;
+        size_t number_of_bytes_remaining = std::max(numberOfBytes, static_cast<size_t>(1)) ;
         size_t maximum_number_of_bytes = dataString.max_size() ;
 
         // Clear the data buffer and reserve enough space in the buffer to store the incoming data.
