@@ -91,8 +91,8 @@ Setting the Number of Stop Bits
 
    // Set the number of stop bits using a SetNumOfStopBits() method call.
    // Available stop bit values are defined in SerialStreamConstants.h.
-   my_serial_port.SetNumOfStopBits( STOP_BITS_1 ) ;
-   my_serial_stream.SetNumOfStopBits( STOP_BITS_1 ) ;
+   my_serial_port.SetStopBits( STOP_BITS_1 ) ;
+   my_serial_stream.SetStopBits( STOP_BITS_1 ) ;
 
 
 Reading Characters
