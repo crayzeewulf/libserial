@@ -109,16 +109,16 @@ if (LIBSERIAL_ENABLE_TESTING)
   SET(GTEST_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/gtest")
 
   EXTERNALPROJECT_ADD(GTestExternal
-    PREFIX             "${GTEST_PREFIX}"
-    URL https://github.com/google/googletest/archive/release-1.8.1.tar.gz
-    URL_HASH SHA1=152b849610d91a9dfa1401293f43230c2e0c33f8
-    INSTALL_COMMAND ""
-    )
+     PREFIX             "${GTEST_PREFIX}"
+     URL https://github.com/google/googletest/archive/refs/tags/v1.13.0.tar.gz
+     URL_HASH SHA1=bfa4b5131b6eaac06962c251742c96aab3f7aa78
+     INSTALL_COMMAND ""
+     )
 
   SET(LIBPREFIX "${CMAKE_STATIC_LIBRARY_PREFIX}")
   SET(LIBSUFFIX "${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
-  SET(GTEST_LOCATION "${GTEST_PREFIX}/src/GTestExternal-build/googlemock/gtest/")
+  SET(GTEST_LOCATION "${GTEST_PREFIX}/src/GTestExternal-build/lib")
   SET(GTEST_LIBRARY  "${GTEST_LOCATION}/${LIBPREFIX}gtest${LIBSUFFIX}")
   SET(GTEST_MAINLIB  "${GTEST_LOCATION}/${LIBPREFIX}gtest_main${LIBSUFFIX}")
 
