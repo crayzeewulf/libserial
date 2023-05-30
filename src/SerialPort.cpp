@@ -37,11 +37,14 @@
 #include <cstdlib>
 #include <cstring>
 #include <fcntl.h>
-#include <linux/serial.h>
 #include <sstream>
 #include <sys/ioctl.h>
 #include <type_traits>
 #include <unistd.h>
+
+#ifdef __linux__
+#include <linux/serial.h>
+#endif
 
 namespace LibSerial
 {
@@ -2106,7 +2109,9 @@ namespace LibSerial
 
         // @NOTE - termios.c_line is not a standard element of the termios
         // structure, (as per the Single Unix Specification 3).
-        port_settings.c_line = '\0' ;
+        #ifdef __linux__
+          port_settings.c_line = '\0' ;
+        #endif
 
         // Apply the modified settings.
         if (tcsetattr(this->mFileDescriptor,

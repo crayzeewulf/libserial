@@ -906,6 +906,7 @@ namespace LibSerial
         throw ;
     }
 
+#ifdef __linux__
     std::vector<std::string>
     SerialStream::GetAvailableSerialPorts()
     try
@@ -932,4 +933,5 @@ namespace LibSerial
         setstate(std::ios_base::failbit) ;
         throw ;
     }
+#endif
 } // namespace LibSerial

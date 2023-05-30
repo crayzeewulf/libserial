@@ -37,7 +37,6 @@
 #include <cassert>
 #include <cstring>
 #include <fcntl.h>
-#include <linux/serial.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
