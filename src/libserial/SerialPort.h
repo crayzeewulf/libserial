@@ -398,6 +398,14 @@ namespace LibSerial
         void Write(const std::string& dataString) ;
 
         /**
+         * @brief Writes a char* to the serial port.
+         * 
+         * @param dataCharArray The char type array to write to the serial port.
+         * @param size The size of dataCharArray.
+         */
+        void Write(const char* const dataCharArray, size_t size) ;
+
+        /**
          * @brief Writes a single byte to the serial port.
          * @param charbuffer The byte to write to the serial port.
          */
