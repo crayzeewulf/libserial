@@ -46,10 +46,11 @@ namespace LibSerial
                                const CharacterSize& characterSize,
                                const FlowControl&   flowControlType,
                                const Parity&        parityType,
-                               const StopBits&      stopBits) : 
+                               const StopBits&      stopBits,
+                               bool                 exclusive) :
         std::iostream(nullptr)
     {
-        this->Open(fileName) ;  // NOLINT (fuchsia-default-arguments)
+        this->Open(fileName, std::ios_base::in | std::ios_base::out, exclusive) ;  // NOLINT (fuchsia-default-arguments)
         this->SetBaudRate(baudRate) ;
         this->SetCharacterSize(characterSize) ;
         this->SetFlowControl(flowControlType) ;
@@ -81,7 +82,8 @@ namespace LibSerial
 
     void
     SerialStream::Open(const std::string& fileName,
-                       const std::ios_base::openmode& openMode)
+                       const std::ios_base::openmode& openMode,
+                       bool exclusive)
     try
     {
         // Create a new SerialStreamBuf if one does not exist. 
@@ -93,7 +95,7 @@ namespace LibSerial
         }
 
         // Open the serial port. 
-        mIOBuffer->Open(fileName, openMode) ;
+        mIOBuffer->Open(fileName, openMode, exclusive) ;
     }
     catch (const std::exception&)
     {

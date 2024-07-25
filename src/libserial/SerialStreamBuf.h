@@ -75,13 +75,15 @@ namespace LibSerial
          * @param parityType The parity type for the serial stream.
          * @param stopBits The number of stop bits for the serial stream.
          * @param flowControlType The flow control type for the serial stream.
+         * @param exclusive Set exclusive access for the serial stream
          */
         explicit SerialStreamBuf(const std::string&   fileName,
                                  const BaudRate&      baudRate        = BaudRate::BAUD_DEFAULT,
                                  const CharacterSize& characterSize   = CharacterSize::CHAR_SIZE_DEFAULT,
                                  const FlowControl&   flowControlType = FlowControl::FLOW_CONTROL_DEFAULT,
                                  const Parity&        parityType      = Parity::PARITY_DEFAULT,
-                                 const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT) ;
+                                 const StopBits&      stopBits        = StopBits::STOP_BITS_DEFAULT,
+                                 bool                 exclusive       = true) ;
 
         /**
          * @brief Default Destructor for a SerialStreamBuf object. Closes the
@@ -115,9 +117,12 @@ namespace LibSerial
          * @param fileName The file name of the serial port.
          * @param openMode The communication mode status when the serial
          *        communication port is opened.
+         * @param exclusive Set exclusive access for this process to the
+         *        serial port.
          */
         void Open(const std::string& fileName,
-                  const std::ios_base::openmode& openMode = std::ios_base::in | std::ios_base::out) ;
+                  const std::ios_base::openmode& openMode = std::ios_base::in | std::ios_base::out,
+                  bool exclusive = true) ;
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
