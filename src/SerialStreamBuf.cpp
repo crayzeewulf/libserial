@@ -69,13 +69,15 @@ namespace LibSerial
          * @param parityType The parity type for the serial stream.
          * @param stopBits The number of stop bits for the serial stream.
          * @param flowControlType The flow control type for the serial stream.
+         * @param exclusive Set exclusive access for the serial stream.
          */
         Implementation(const std::string&   fileName,
                        const BaudRate&      baudRate,
                        const CharacterSize& characterSize,
                        const FlowControl&   flowControlType,
                        const Parity&        parityType,
-                       const StopBits&      stopBits) ;
+                       const StopBits&      stopBits,
+                       bool                 exclusive) ;
 
         /**
          * @brief Copy construction is disallowed.
@@ -103,9 +105,11 @@ namespace LibSerial
          * @param fileName The file name of the serial port.
          * @param openMode The communication mode status when the serial
          *        communication port is opened.
+         * @param exclusive Set exclusive access for this serial port.
          */
         void Open(const std::string& fileName,
-                  const std::ios_base::openmode& openMode) ;
+                  const std::ios_base::openmode& openMode,
+                  bool exclusive) ;
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
@@ -390,13 +394,15 @@ namespace LibSerial
                                      const CharacterSize& characterSize,
                                      const FlowControl&   flowControlType,
                                      const Parity&        parityType,
-                                     const StopBits&      stopBits)
+                                     const StopBits&      stopBits,
+                                     bool                 exclusive)
         : mImpl(new Implementation(fileName,
                                    baudRate,
                                    characterSize,
                                    flowControlType,
                                    parityType,
-                                   stopBits))
+                                   stopBits,
+                                   exclusive))
     {
         setbuf(nullptr, 0) ;
     }
@@ -405,10 +411,12 @@ namespace LibSerial
 
     void
     SerialStreamBuf::Open(const std::string& fileName,
-                          const std::ios_base::openmode& openMode)
+                          const std::ios_base::openmode& openMode,
+                          bool exclusive)
     {
         mImpl->Open(fileName,
-                    openMode) ;
+                    openMode,
+                    exclusive) ;
     }
 
     void
@@ -656,13 +664,15 @@ namespace LibSerial
                                                     const CharacterSize& characterSize,
                                                     const FlowControl&   flowControlType,
                                                     const Parity&        parityType,
-                                                    const StopBits&      stopBits)
+                                                    const StopBits&      stopBits,
+                                                    bool                 exclusive)
     try : mSerialPort(fileName,
                       baudRate, 
                       characterSize,
                       flowControlType,
                       parityType,
-                      stopBits)
+                      stopBits,
+                      exclusive)
     {
         //  empty
     }
@@ -695,11 +705,13 @@ namespace LibSerial
     inline
     void
     SerialStreamBuf::Implementation::Open(const std::string& fileName,
-                                          const std::ios_base::openmode& openMode)
+                                          const std::ios_base::openmode& openMode,
+                                          bool exclusive)
     try
     {
         mSerialPort.Open(fileName, 
-                         openMode) ;
+                         openMode,
+                         exclusive) ;
 
         // @note - Stream communications need to happen in blocking mode.
         mSerialPort.SetSerialPortBlockingStatus(true) ;

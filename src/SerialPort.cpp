@@ -70,13 +70,15 @@ namespace LibSerial
          * @param parityType The parity type for the serial port.
          * @param stopBits The number of stop bits for the serial port.
          * @param flowControlType The flow control type for the serial port.
+         * @param exclusive Set exclusive access for the serial port.
          */
         Implementation(const std::string&   fileName,
                        const BaudRate&      baudRate,
                        const CharacterSize& characterSize,
                        const FlowControl&   flowControlType,
                        const Parity&        parityType,
-                       const StopBits&      stopBits) ;
+                       const StopBits&      stopBits,
+                       bool                 exclusive) ;
 
         /**
          * @brief Default Destructor for a SerialPort object. Closes the
@@ -110,9 +112,11 @@ namespace LibSerial
          * @param fileName The file name of the serial port.
          * @param openMode The communication mode status when the serial
          *        communication port is opened.
+         * @param exclusive Set exclusive access for this serial port.
          */
         void Open(const std::string& fileName,
-                  const std::ios_base::openmode& openMode) ;
+                  const std::ios_base::openmode& openMode,
+                  bool exclusive) ;
 
         /**
          * @brief Closes the serial port. All settings of the serial port will be
@@ -467,6 +471,12 @@ namespace LibSerial
         int mByteArrivalTimeDelta = 1 ;
 
         /**
+         * Whether the process that opened the serial port has exclusive
+         * access to it.
+         */
+        bool mExclusiveAccess = true;
+
+        /**
          * Serial port settings are saved into this struct immediately after
          * the port is opened. These settings are restored when the serial port
          * is closed.
@@ -485,13 +495,15 @@ namespace LibSerial
                            const CharacterSize& characterSize,
                            const FlowControl&   flowControlType,
                            const Parity&        parityType,
-                           const StopBits&      stopBits)
+                           const StopBits&      stopBits,
+                           bool                 exclusive)
         : mImpl(new Implementation(fileName,
                                    baudRate,
                                    characterSize,
                                    flowControlType,
                                    parityType,
-                                   stopBits))
+                                   stopBits,
+                                   exclusive))
     {
         /* Empty */
     }
@@ -512,10 +524,12 @@ namespace LibSerial
 
     void
     SerialPort::Open(const std::string& fileName,
-                     const std::ios_base::openmode& openMode)
+                     const std::ios_base::openmode& openMode,
+                     bool exclusive)
     {
         mImpl->Open(fileName,
-                    openMode) ;
+                    openMode,
+                    exclusive) ;
     }
 
     void
@@ -809,9 +823,10 @@ namespace LibSerial
                                                const CharacterSize& characterSize,
                                                const FlowControl&   flowControlType,
                                                const Parity&        parityType,
-                                               const StopBits&      stopBits)
+                                               const StopBits&      stopBits,
+                                               bool                 exclusive)
     {
-        this->Open(fileName, std::ios_base::in | std::ios_base::out) ;
+        this->Open(fileName, std::ios_base::in | std::ios_base::out, exclusive) ;
         this->SetBaudRate(baudRate) ;
         this->SetCharacterSize(characterSize) ;
         this->SetFlowControl(flowControlType) ;
@@ -843,7 +858,8 @@ namespace LibSerial
     inline
     void
     SerialPort::Implementation::Open(const std::string& fileName,
-                                     const std::ios_base::openmode& openMode)
+                                     const std::ios_base::openmode& openMode,
+                                     bool exclusive)
     {
         // Throw an exception if the port is already open.
         if (this->IsOpen())
@@ -885,9 +901,10 @@ namespace LibSerial
 
         // Set the serial port to exclusive access to this process.
         // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
-        if (call_with_retry(ioctl,
-                            this->mFileDescriptor,
-                            TIOCEXCL) == -1)
+        mExclusiveAccess = exclusive;
+        if (mExclusiveAccess && call_with_retry(ioctl,
+                                         this->mFileDescriptor,
+                                         TIOCEXCL) == -1)
         {
             throw std::runtime_error(std::strerror(errno)) ;
         }
@@ -933,6 +950,17 @@ namespace LibSerial
                       &mOldPortSettings) < 0)
         {
             err_msg = std::strerror(errno) ;
+        }
+
+        // Release the serial port from exclusive access.
+        if (mExclusiveAccess)
+        {
+            // NOLINTNEXTLINE (cppcoreguidelines-pro-type-vararg)
+            if(call_with_retry(ioctl, this->mFileDescriptor, TIOCNXCL) == -1)
+            {
+                err_msg += ", ";
+                err_msg += std::strerror(errno);
+            }
         }
 
         // Otherwise, close the serial port and set the file descriptor
