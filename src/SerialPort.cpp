@@ -967,7 +967,7 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN) ;
         }
 
-        if (tcdrain(this->mFileDescriptor) < 0)
+        if (call_with_retry(tcdrain, this->mFileDescriptor) < 0)
         {
             throw std::runtime_error(std::strerror(errno)) ;
         }
