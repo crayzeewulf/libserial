@@ -110,8 +110,8 @@ if (LIBSERIAL_ENABLE_TESTING)
 
   EXTERNALPROJECT_ADD(GTestExternal
      PREFIX             "${GTEST_PREFIX}"
-     URL https://github.com/google/googletest/archive/refs/tags/v1.13.0.tar.gz
-     URL_HASH SHA1=bfa4b5131b6eaac06962c251742c96aab3f7aa78
+     URL https://github.com/google/googletest/archive/refs/tags/v1.16.0.tar.gz
+     URL_HASH SHA1=517f27ed21b40f9927ab91f2abc147519cedb5a5
      INSTALL_COMMAND ""
      )
 
