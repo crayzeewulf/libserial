@@ -26,9 +26,9 @@ OPTION(INSTALL_STATIC "Install static library." ON)
 OPTION(INSTALL_SHARED "Install shared object library." ON)
 
 #
-# LibSerial requies a C++ compiler that supports at least C++14 standard
+# LibSerial requies a C++ compiler that supports at least C++17 standard
 #
-SET(CMAKE_CXX_STANDARD 14)
+SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_STANDARD_REQUIRES ON)
 
 INCLUDE(ExternalProject)
