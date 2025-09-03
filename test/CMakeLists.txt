@@ -7,7 +7,7 @@ ADD_EXECUTABLE(UnitTests
 
 TARGET_LINK_LIBRARIES(UnitTests
   libserial_static
-  GTestMain
+  ${GTestMain}
 )
 
 ADD_EXECUTABLE(unit_tests
