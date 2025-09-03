@@ -111,17 +111,18 @@ if (LIBSERIAL_ENABLE_TESTING)
     /usr/src/googletest
     /usr/src/gtest
   )
+
   FIND_PACKAGE(GTest)
   SET(GTEST_DEPENDENCIES)
   SET(GTestMain gtest gtest_main)
   SET(GTEST_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/gtest")
   if(NOT GTEST_FOUND)
     EXTERNALPROJECT_ADD(GTestExternal
-       PREFIX             "${GTEST_PREFIX}"
-       URL https://github.com/google/googletest/archive/refs/tags/v1.13.0.tar.gz
-       URL_HASH SHA1=517f27ed21b40f9927ab91f2abc147519cedb5a5
-       INSTALL_COMMAND ""
-       )
+      PREFIX             "${GTEST_PREFIX}"
+      URL https://github.com/google/googletest/archive/refs/tags/v1.17.0.tar.gz
+      URL_HASH SHA1=8a8ee424e8275ec4b480ba4a0d1ba94b5dee3ee4
+      INSTALL_COMMAND ""
+      )
 
     SET(LIBPREFIX "${CMAKE_STATIC_LIBRARY_PREFIX}")
     SET(LIBSUFFIX "${CMAKE_STATIC_LIBRARY_SUFFIX}")
