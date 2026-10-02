@@ -35,6 +35,8 @@
 #include "UnitTests.h"
 
 #include <chrono>
+#include <cstdlib>
+#include <fcntl.h>
 #include <iostream>
 #include <thread>
 #include <unistd.h>
@@ -1383,4 +1385,130 @@ TEST_F(SerialPortUnitTests, testSerialPortReadLineWriteString)
     {
         testSerialPortReadLineWriteString() ;
     }
+}
+
+/**
+ * @brief Hardware-independent ReadLine tests using a pseudoterminal.
+ */
+class SerialPortReadLineTests : public ::testing::Test
+{
+protected:
+    /**
+     * @brief Opens the serial port on a pseudoterminal slave.
+     */
+    void SetUp() override
+    {
+        mMaster = posix_openpt(O_RDWR | O_NOCTTY) ;
+        ASSERT_GE(mMaster, 0) ;
+        ASSERT_EQ(grantpt(mMaster), 0) ;
+        ASSERT_EQ(unlockpt(mMaster), 0) ;
+
+        const auto slave_name = ptsname(mMaster) ;
+        ASSERT_NE(slave_name, nullptr) ;
+        ASSERT_NO_THROW(mPort.Open(slave_name)) ;
+    }
+
+    /**
+     * @brief Closes both ends of the pseudoterminal.
+     */
+    void TearDown() override
+    {
+        if (mPort.IsOpen())
+        {
+            EXPECT_NO_THROW(mPort.Close()) ;
+        }
+        if (mMaster >= 0)
+        {
+            EXPECT_EQ(close(mMaster), 0) ;
+        }
+    }
+
+    /** @brief Pseudoterminal master used to supply input. */
+    int mMaster = -1 ;
+
+    /** @brief Serial port under test. */
+    SerialPort mPort {} ;
+} ;
+
+TEST_F(SerialPortReadLineTests, testAllByteTerminators)
+{
+    for (unsigned int value = 0; value <= 255; ++value)
+    {
+        SCOPED_TRACE(value) ;
+        const auto terminator = static_cast<char>(value) ;
+        const std::string expected = std::string(3, static_cast<char>(value + 1)) + terminator ;
+        const std::string input = expected + "next\n" ;
+        ASSERT_EQ(write(mMaster, input.data(), input.size()), static_cast<ssize_t>(input.size())) ;
+
+        std::string actual = "old contents" ;
+        ASSERT_NO_THROW(mPort.ReadLine(actual, terminator, 100)) ;
+        ASSERT_EQ(actual, expected) ;
+
+        // The following record must remain available, including its terminator.
+        ASSERT_NO_THROW(mPort.ReadLine(actual, '\n', 100)) ;
+        ASSERT_EQ(actual, "next\n") ;
+    }
+}
+
+TEST_F(SerialPortReadLineTests, testEmptyRecords)
+{
+    for (const auto terminator : {'\0', '\n', static_cast<char>(0xff)})
+    {
+        ASSERT_EQ(write(mMaster, &terminator, 1), 1) ;
+        std::string actual = "old contents" ;
+        ASSERT_NO_THROW(mPort.ReadLine(actual, terminator, 100)) ;
+        ASSERT_EQ(actual, std::string(1, terminator)) ;
+    }
+}
+
+TEST_F(SerialPortReadLineTests, testNullTerminatorWithoutTimeout)
+{
+    const std::string expected("abc\0", 4) ;
+    ASSERT_EQ(write(mMaster, expected.data(), expected.size()), static_cast<ssize_t>(expected.size())) ;
+    std::string actual ;
+    ASSERT_NO_THROW(mPort.ReadLine(actual, '\0')) ;
+    EXPECT_EQ(actual, expected) ;
+}
+
+TEST_F(SerialPortReadLineTests, testMissingTerminatorTimesOut)
+{
+    for (const auto terminator : {'\0', '\n'})
+    {
+        std::string actual = "old contents" ;
+        ASSERT_THROW(mPort.ReadLine(actual, terminator, 20), ReadTimeout) ;
+        EXPECT_TRUE(actual.empty()) ;
+
+        const std::string input = "partial" ;
+        ASSERT_EQ(write(mMaster, input.data(), input.size()), static_cast<ssize_t>(input.size())) ;
+        ASSERT_THROW(mPort.ReadLine(actual, terminator, 20), ReadTimeout) ;
+        EXPECT_EQ(actual, input) ;
+    }
+}
+
+TEST_F(SerialPortReadLineTests, testReadErrorIsNotReportedAsTimeout)
+{
+    mPort.Close() ;
+    mPort.Open(ptsname(mMaster), std::ios_base::out) ;
+    std::string actual = "old contents" ;
+    try
+    {
+        mPort.ReadLine(actual, '\0', 100) ;
+        FAIL() << "Expected a read error on a write-only port" ;
+    }
+    catch (const ReadTimeout&)
+    {
+        FAIL() << "A read error must not be reported as a timeout" ;
+    }
+    catch (const std::runtime_error&)
+    {
+        EXPECT_TRUE(actual.empty()) ;
+    }
+}
+
+TEST_F(SerialPortReadLineTests, testClosedPortPreservesOutput)
+{
+    mPort.Close() ;
+    std::string actual = "old contents" ;
+    EXPECT_THROW(mPort.ReadLine(actual, '\0', 100), NotOpen) ;
+    EXPECT_EQ(actual, "old contents") ;
 }

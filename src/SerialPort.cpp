@@ -2542,7 +2542,7 @@ namespace LibSerial
         // Clear the data string.
         dataString.clear() ;
 
-        unsigned char next_char = 0 ;
+        char next_char = 0 ;
 
         size_t elapsed_ms = 0 ;
 
@@ -2555,7 +2555,7 @@ namespace LibSerial
         // Obtain the entry time.
         entry_time = std::chrono::high_resolution_clock::now().time_since_epoch() ;
 
-        while (next_char != lineTerminator)
+        do
         {
             // Obtain the current time.
             current_time = std::chrono::high_resolution_clock::now().time_since_epoch() ;
@@ -2580,7 +2580,7 @@ namespace LibSerial
                            remaining_ms) ;
 
             dataString += next_char ;
-        }
+        } while (next_char != lineTerminator) ;
     }
 
     inline
