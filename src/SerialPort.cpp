@@ -2689,6 +2689,11 @@ namespace LibSerial
             return ;
         }
 
+        if (dataCharArray == nullptr)
+        {
+            throw std::invalid_argument("Data buffer must not be null.") ;
+        }
+
         // Local variables.
         size_t number_of_bytes_written = 0 ;
         size_t number_of_bytes_remaining = number_of_bytes ;
