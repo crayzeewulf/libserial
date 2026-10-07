@@ -36,6 +36,8 @@
 
 #include <chrono>
 #include <iostream>
+#include <stdexcept>
+#include <string>
 #include <thread>
 #include <unistd.h>
 #include <vector>
@@ -1014,6 +1016,86 @@ SerialPortUnitTests::testSerialPortReadStringWriteString()
 }
 
 void
+SerialPortUnitTests::testSerialPortReadStringWriteCharArray()
+{
+    serialPort1.Open(SERIAL_PORT_1) ;
+    serialPort2.Open(SERIAL_PORT_2) ;
+
+    ASSERT_TRUE(serialPort1.IsOpen()) ;
+    ASSERT_TRUE(serialPort2.IsOpen()) ;
+
+    // A buffer with an embedded NUL byte, which cannot be written intact
+    // through a null-terminated C string interface (see issue #177).
+    const char embeddedNulCharArray[] = {'A', '\0', 'B'} ;
+    const size_t embeddedNulCharArraySize = sizeof(embeddedNulCharArray) ;
+
+    std::string readEmbeddedNulString ;
+
+    serialPort1.Write(embeddedNulCharArray, embeddedNulCharArraySize) ;
+    serialPort1.DrainWriteBuffer() ;
+
+    serialPort2.Read(readEmbeddedNulString,
+                     embeddedNulCharArraySize,
+                     timeOutMilliseconds) ;
+
+    const std::string expectedEmbeddedNulString(embeddedNulCharArray,
+                                                embeddedNulCharArraySize) ;
+
+    ASSERT_EQ(readEmbeddedNulString.size(), embeddedNulCharArraySize) ;
+    ASSERT_EQ(readEmbeddedNulString, expectedEmbeddedNulString) ;
+
+    // Writing in the other direction with a longer buffer, using only
+    // part of it, verifies the explicit size is honored.
+    const char partialCharArray[] = {'x', 'y', '\0', 'z', 'w', 'v'} ;
+    const size_t partialCharArrayWriteSize = 4 ;
+
+    std::string readPartialString ;
+
+    serialPort2.Write(partialCharArray, partialCharArrayWriteSize) ;
+    serialPort2.DrainWriteBuffer() ;
+
+    serialPort1.Read(readPartialString,
+                     partialCharArrayWriteSize,
+                     timeOutMilliseconds) ;
+
+    const std::string expectedPartialString(partialCharArray,
+                                            partialCharArrayWriteSize) ;
+
+    ASSERT_EQ(readPartialString, expectedPartialString) ;
+
+    // No bytes beyond the requested size should have been sent.
+    bool timeOutTestPass = false ;
+    unsigned char unexpectedByte = 0 ;
+
+    try
+    {
+        serialPort1.ReadByte(unexpectedByte, 1) ;
+    }
+    catch (const ReadTimeout&)
+    {
+        timeOutTestPass = true ;
+    }
+
+    ASSERT_TRUE(timeOutTestPass) ;
+
+    // A zero-length write is a no-op, even with a null pointer.
+    ASSERT_NO_THROW(serialPort1.Write(nullptr, 0)) ;
+
+    // A null pointer with a nonzero size is rejected.
+    ASSERT_THROW(serialPort1.Write(nullptr, 1), std::invalid_argument) ;
+
+    serialPort1.Close() ;
+    serialPort2.Close() ;
+
+    ASSERT_FALSE(serialPort1.IsOpen()) ;
+    ASSERT_FALSE(serialPort2.IsOpen()) ;
+
+    // Writing to a closed port throws.
+    ASSERT_THROW(serialPort1.Write(embeddedNulCharArray, embeddedNulCharArraySize),
+                 NotOpen) ;
+}
+
+void
 SerialPortUnitTests::testSerialPortReadByteWriteByte()
 {
     serialPort1.Open(SERIAL_PORT_1) ;
@@ -1362,6 +1444,16 @@ TEST_F(SerialPortUnitTests, testSerialPortReadStringWriteString)
     for (size_t i = 0; i < TEST_ITERATIONS; i++)
     {
         testSerialPortReadStringWriteString() ;
+    }
+}
+
+TEST_F(SerialPortUnitTests, testSerialPortReadStringWriteCharArray)
+{
+    SCOPED_TRACE("Serial Port Read(string) and Write(const char*, size_t) Test") ;
+
+    for (size_t i = 0; i < TEST_ITERATIONS; i++)
+    {
+        testSerialPortReadStringWriteCharArray() ;
     }
 }
 

@@ -402,6 +402,21 @@ namespace LibSerial
         void Write(const std::string& dataString) ;
 
         /**
+         * @brief Writes a block of bytes of the specified size to the serial
+         *        port. Unlike a null-terminated C string, the data may contain
+         *        any byte values, including embedded NUL (0x00) bytes.
+         * @param dataCharArray Pointer to the bytes to write. May be nullptr
+         *        only when size is zero.
+         * @param size The number of bytes to write. If zero, nothing is
+         *        written.
+         * @throw NotOpen if the serial port is not open.
+         * @throw std::invalid_argument if dataCharArray is nullptr and size
+         *        is nonzero.
+         * @throw std::runtime_error if the underlying write fails.
+         */
+        void Write(const char* const dataCharArray, size_t size) ;
+
+        /**
          * @brief Writes a single byte to the serial port.
          * @param charbuffer The byte to write to the serial port.
          */

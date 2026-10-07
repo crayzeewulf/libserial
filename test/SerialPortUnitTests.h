@@ -194,6 +194,12 @@ namespace LibSerial
         void testSerialPortReadStringWriteString() ;
 
         /**
+         * @brief Tests for correct functionality of the Write(const char* const, size_t) method,
+         *        including buffers containing embedded NUL bytes.
+         */
+        void testSerialPortReadStringWriteCharArray() ;
+
+        /**
          * @brief Tests for correct functionality of the ReadByte() and WriteByte() methods.
          */
         void testSerialPortReadByteWriteByte() ;
