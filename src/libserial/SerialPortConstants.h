@@ -54,6 +54,7 @@ namespace LibSerial
     const std::string ERR_MSG_PORT_ALREADY_OPEN      = "Serial port already open.";
     const std::string ERR_MSG_PORT_NOT_OPEN          = "Serial port not open.";
     const std::string ERR_MSG_INVALID_MODEM_LINE     = "Invalid modem line." ;
+    const std::string ERR_MSG_NULL_DATA_BUFFER       = "Data buffer must not be null." ;
 
     /**
      * @brief Time conversion constants.

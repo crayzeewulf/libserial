@@ -38,6 +38,7 @@
 #include <cstring>
 #include <fcntl.h>
 #include <sstream>
+#include <stdexcept>
 #include <sys/ioctl.h>
 #include <type_traits>
 #include <unistd.h>
@@ -383,10 +384,9 @@ namespace LibSerial
         void Write(const std::string& dataString) ;
 
         /**
-         * @brief Writes a char* to the serial port.
-         * 
-         * @param dataCharArray The char type array to write to the serial port.
-         * @param size The size of dataCharArray.
+         * @brief Writes a block of bytes of the specified size to the serial port.
+         * @param dataCharArray Pointer to the bytes to write.
+         * @param size The number of bytes to write.
          */
         void Write(const char* const dataCharArray, size_t size) ;
 
@@ -2601,107 +2601,20 @@ namespace LibSerial
     void
     SerialPort::Implementation::Write(const DataBuffer& dataBuffer)
     {
-        // Throw an exception if the serial port is not open.
-        if (not this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN) ;
-        }
-
-        size_t number_of_bytes = dataBuffer.size() ;
-
-        // Nothing needs to be done if there is no data in the string.
-        if (number_of_bytes <= 0)
-        {
-            return ;
-        }
-
-        // Local variables.
-        size_t number_of_bytes_written = 0 ;
-        size_t number_of_bytes_remaining = number_of_bytes ;
-
-        // Write the data to the serial port. Keep retrying if EAGAIN
-        // error is received and EWOULDBLOCK is not received.
-        ssize_t write_result = 0 ;
-
-        while (number_of_bytes_remaining > 0)
-        {
-            write_result = call_with_retry(write,
-                                           this->mFileDescriptor,
-                                           &dataBuffer[number_of_bytes_written],
-                                           number_of_bytes_remaining) ;
-
-            if (write_result >= 0)
-            {
-                number_of_bytes_written += write_result ;
-                number_of_bytes_remaining = number_of_bytes - number_of_bytes_written ;
-
-                if (number_of_bytes_remaining == 0)
-                {
-                    break ;
-                }
-            }
-            else if (write_result <= 0 &&
-                     errno != EWOULDBLOCK)
-            {
-                throw std::runtime_error(std::strerror(errno)) ;
-            }
-        }
+        const char* const data_char_array = reinterpret_cast<const char*>(dataBuffer.data()) ; // NOLINT (cppcoreguidelines-pro-type-reinterpret-cast)
+        this->Write(data_char_array, dataBuffer.size()) ;
     }
 
     inline
     void
     SerialPort::Implementation::Write(const std::string& dataString)
     {
-        // Throw an exception if the serial port is not open.
-        if (not this->IsOpen())
-        {
-            throw NotOpen(ERR_MSG_PORT_NOT_OPEN) ;
-        }
-
-        size_t number_of_bytes = dataString.size() ;
-
-        // Nothing needs to be done if there is no data in the string.
-        if (number_of_bytes <= 0)
-        {
-            return ;
-        }
-
-        // Local variables.
-        size_t number_of_bytes_written = 0 ;
-        size_t number_of_bytes_remaining = number_of_bytes ;
-
-        // Write the data to the serial port. Keep retrying if EAGAIN
-        // error is received and EWOULDBLOCK is not received.
-        ssize_t write_result = 0 ;
-
-        while (number_of_bytes_remaining > 0)
-        {
-            write_result = call_with_retry(write,
-                                           this->mFileDescriptor,
-                                           &dataString[number_of_bytes_written],
-                                           number_of_bytes_remaining) ;
-
-            if (write_result >= 0)
-            {
-                number_of_bytes_written += write_result ;
-                number_of_bytes_remaining = number_of_bytes - number_of_bytes_written ;
-
-                if (number_of_bytes_remaining == 0)
-                {
-                    break ;
-                }
-            }
-            else if (write_result <= 0 &&
-                     errno != EWOULDBLOCK)
-            {
-                throw std::runtime_error(std::strerror(errno)) ;
-            }
-        }
+        this->Write(dataString.data(), dataString.size()) ;
     }
 
-    inline 
-    void 
-    SerialPort::Implementation::Write(const char* const dataCharArray, size_t size)
+    inline
+    void
+    SerialPort::Implementation::Write(const char* const dataCharArray, const size_t size)
     {
         // Throw an exception if the serial port is not open.
         if (not this->IsOpen())
@@ -2709,46 +2622,38 @@ namespace LibSerial
             throw NotOpen(ERR_MSG_PORT_NOT_OPEN) ;
         }
 
-        size_t number_of_bytes = size ;
-
-        // Nothing needs to be done if there is no data in the string.
-        if (number_of_bytes <= 0)
+        // Nothing needs to be done if there is no data to write.
+        if (size == 0)
         {
             return ;
         }
 
         if (dataCharArray == nullptr)
         {
-            throw std::invalid_argument("Data buffer must not be null.") ;
+            throw std::invalid_argument(ERR_MSG_NULL_DATA_BUFFER) ;
         }
 
-        // Local variables.
         size_t number_of_bytes_written = 0 ;
-        size_t number_of_bytes_remaining = number_of_bytes ;
 
-        // Write the data to the serial port. Keep retrying if EAGAIN
-        // error is received and EWOULDBLOCK is not received.
-        ssize_t write_result = 0 ;
-
-        while (number_of_bytes_remaining > 0)
+        // Write the data to the serial port. write() may accept fewer bytes
+        // than requested, so loop until all bytes are written. EINTR is
+        // retried by call_with_retry(), and EAGAIN (the port is opened
+        // non-blocking; equal to EWOULDBLOCK on Linux) means the output
+        // buffer is full, so retry.
+        while (number_of_bytes_written < size)
         {
-            write_result = call_with_retry(write,
-                                           this->mFileDescriptor,
-                                           &dataCharArray[number_of_bytes_written],
-                                           number_of_bytes_remaining) ;
+            const size_t number_of_bytes_remaining = size - number_of_bytes_written ;
+
+            const ssize_t write_result = call_with_retry(write,
+                                                         this->mFileDescriptor,
+                                                         dataCharArray + number_of_bytes_written,
+                                                         number_of_bytes_remaining) ;
 
             if (write_result >= 0)
             {
-                number_of_bytes_written += write_result ;
-                number_of_bytes_remaining = number_of_bytes - number_of_bytes_written ;
-
-                if (number_of_bytes_remaining == 0)
-                {
-                    break ;
-                }
+                number_of_bytes_written += static_cast<size_t>(write_result) ;
             }
-            else if (write_result <= 0 &&
-                     errno != EWOULDBLOCK)
+            else if (errno != EAGAIN)
             {
                 throw std::runtime_error(std::strerror(errno)) ;
             }
