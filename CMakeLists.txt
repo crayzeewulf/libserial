@@ -177,24 +177,31 @@ endif()
 # Create pkg-config file for cmake builds as well as autotool builds
 #
 set(prefix ${CMAKE_INSTALL_PREFIX})
-set(exec_prefix ${CMAKE_INSTALL_PREFIX})
-set(libdir ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
-set(includedir ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR})
+set(exec_prefix ${prefix})
+set(libdir ${CMAKE_INSTALL_FULL_LIBDIR})
+set(includedir ${CMAKE_INSTALL_FULL_INCLUDEDIR})
 set(VERSION ${PROJECT_VERSION})
 configure_file(libserial.pc.in libserial.pc @ONLY)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libserial.pc DESTINATION ${libdir}/pkgconfig)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libserial.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 if (LIBSERIAL_BUILD_DOCS)
+  # Generate the Doxygen HTML into the build tree instead of the source
+  # tree, and install it to CMAKE_INSTALL_DOCDIR.
+  set(LIBSERIAL_DOXYGEN_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs/doxygen)
+  file(MAKE_DIRECTORY "${LIBSERIAL_DOXYGEN_OUTPUT_DIRECTORY}")
   CONFIGURE_FILE(
     ${CMAKE_CURRENT_SOURCE_DIR}/doxygen.conf.in
-    ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf.in @ONLY
+    ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf @ONLY
     )
 
   ADD_CUSTOM_TARGET(docs ALL
-    ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxygen.conf.in
+    ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Generating API documentation with Doxygen" VERBATIM
     )
+
+  install(DIRECTORY ${LIBSERIAL_DOXYGEN_OUTPUT_DIRECTORY}/html/
+    DESTINATION ${CMAKE_INSTALL_DOCDIR})
 endif()
 
 #
